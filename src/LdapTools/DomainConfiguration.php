@@ -301,7 +301,7 @@ class DomainConfiguration
     /**
      * Get the LDAP type set for this domain (ie. Active Directory, OpenLDAP, etc).
      *
-     * @return array
+     * @return string
      */
     public function getLdapType()
     {
@@ -350,7 +350,7 @@ class DomainConfiguration
     /**
      * Set the schema name to use for this domain.
      *
-     * @param $schemaName
+     * @param string $schemaName
      * @return $this
      */
     public function setSchemaName($schemaName)
