@@ -30,14 +30,6 @@ class EncodeWindowsPasswordSpec extends ObjectBehavior
         $this->fromLdap('foo')->shouldBeNull();
     }
 
-    /**
-     *  Possible phpspec issue? This seems to always convert
-     */
-    function it_should_encode_a_password_with_double_quotes_and_utf16le_encoding()
-    {
-        //$this->toLdap('test')->shouldHaveEncoding('UTF-16LE');
-    }
-
     public function getMatchers()
     {
         return [
