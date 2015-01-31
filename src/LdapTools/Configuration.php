@@ -13,8 +13,8 @@ namespace LdapTools;
 use LdapTools\Exception\ConfigurationException;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Factory\CacheFactory;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser;
 
 /**
  * Represents the configuration for LdapTools.
@@ -276,10 +276,9 @@ class Configuration
         if (!is_readable($file)) {
             throw new ConfigurationException(sprintf("Cannot read configuration file: %s", $file));
         }
-        $parser = new Parser();
 
         try {
-            $config = $parser->parse(file_get_contents($file));
+            $config = Yaml::parse(file_get_contents($file));
         } catch (ParseException $e) {
             throw new ConfigurationException('Error in configuration file: %s', $e->getMessage());
         }

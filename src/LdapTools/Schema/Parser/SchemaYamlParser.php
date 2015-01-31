@@ -13,7 +13,7 @@ namespace LdapTools\Schema\Parser;
 use LdapTools\Exception\SchemaParserException;
 use LdapTools\Schema\LdapObjectSchema;
 use Symfony\Component\Yaml\Exception\ParseException;
-use Symfony\Component\Yaml\Parser;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Parses a schema definition from a YAML file.
@@ -51,12 +51,10 @@ class SchemaYamlParser implements SchemaParserInterface
     public function parse($schemaName, $objectType)
     {
         $file = $this->schemaFolder.'/'.$schemaName.'.yml';
-
         $this->validateFileCanBeRead($file);
-        $parser = new Parser();
 
         try {
-            $schema = $parser->parse(file_get_contents($file));
+            $schema = Yaml::parse(file_get_contents($file));
         } catch (ParseException $e) {
             throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
         }
