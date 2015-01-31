@@ -70,7 +70,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $isBound = false;
 
     /**
-     * @var \Resource
+     * @var resource
      */
     protected $connection;
 
