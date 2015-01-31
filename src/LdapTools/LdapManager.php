@@ -15,7 +15,6 @@ use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Query\LdapQueryBuilder;
-use LdapTools\Query\LdapQuerySelector;
 
 /**
  * The LDAP Manager provides each access to the various tools in the library.
