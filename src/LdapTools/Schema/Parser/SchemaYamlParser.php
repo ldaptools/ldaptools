@@ -23,6 +23,11 @@ use Symfony\Component\Yaml\Yaml;
 class SchemaYamlParser implements SchemaParserInterface
 {
     /**
+     * @var string The folder where the schema files are located.
+     */
+    protected $schemaFolder = '';
+
+    /**
      * @param string $schemaFolder
      */
     public function __construct($schemaFolder)
