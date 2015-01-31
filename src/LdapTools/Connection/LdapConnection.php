@@ -119,6 +119,7 @@ class LdapConnection implements LdapConnectionInterface
         if (!$username || !$password) {
             throw new \InvalidArgumentException("You must specify a username and password.");
         }
+        $wasBound = $this->isBound;
 
         // Only catch a bind failure. Let the others through, as it's probably a sign of other issues.
         try {
@@ -127,8 +128,10 @@ class LdapConnection implements LdapConnectionInterface
         } catch (LdapBindException $e) {
             $authenticated = false;
         }
-        // Need to reconnect afterwards to rebind as the user from the configuration values.
-        $this->close()->connect();
+        $this->close();
+
+        // Only reconnect afterwards if the connection was bound to begin with.
+        !$wasBound ?: $this->connect();
 
         return $authenticated;
     }
