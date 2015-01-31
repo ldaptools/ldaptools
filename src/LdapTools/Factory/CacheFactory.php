@@ -40,8 +40,6 @@ class CacheFactory
      */
     public static function get($type, array $options)
     {
-        $cache = null;
-
         if (self::TYPE_STASH == $type) {
             $cache = new StashCache();
         } elseif (self::TYPE_NONE == $type) {
