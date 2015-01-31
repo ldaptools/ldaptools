@@ -1,7 +1,7 @@
 {
   "name": "ldaptools/ldaptools",
   "type": "library",
-  "description": "LdapTools is a feature-rich LDAP library PHP 5.6+.",
+  "description": "LdapTools is a feature-rich LDAP library for PHP 5.6+.",
   "keywords": ["ldap", "Active Directory", "OpenLDAP"],
   "homepage": "https://github.com/ChadSikorra/LdapTools",
   "license": "MIT",
