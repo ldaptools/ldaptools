@@ -5,12 +5,10 @@ php:
 
 before_install:
   - echo "extension=ldap.so" >> `php --ini | grep "Loaded Configuration" | sed -e "s|.*:\s*||"`
+  - composer self-update
 
 install:
   - composer install --prefer-source --no-interaction --dev
-
-before_script:
-  - composer self-update
   
 script:
-  - bin/phpspec run --format=pretty
+  - bin/phpspec run --format=pretty --no-interaction
