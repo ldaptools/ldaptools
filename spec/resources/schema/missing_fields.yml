@@ -1,0 +1,19 @@
+objects:
+    user_object:
+        type: user
+        class: user
+        attributes:
+            firstName:
+                names: bleh
+    group_object:
+        type: group
+        attributes:
+            foo: bar
+    distribution_list_object:
+        type: distributionlist
+        class: group
+    superuser_object:
+        type: superuser
+        class: superuser
+        attributes:
+            firstName:

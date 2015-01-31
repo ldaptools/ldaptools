@@ -1,0 +1,197 @@
+<?php
+/**
+ * This file is part of the LdapTools package.
+ *
+ * (c) Chad Sikorra <Chad.Sikorra@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace LdapTools;
+
+use LdapTools\Connection\LdapConnection;
+use LdapTools\Factory\CacheFactory;
+use LdapTools\Factory\LdapObjectSchemaFactory;
+use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Query\LdapQuerySelector;
+
+/**
+ * The LDAP Manager provides each access to the various tools in the library.
+ *
+ * @author Chad Sikorra <Chad.Sikorra@gmail.com>
+ */
+class LdapManager
+{
+    /**
+     * @var Configuration The main configuration for the library.
+     */
+    protected $config;
+
+    /**
+     * @var array An array of "domain name" => "LdapConnection" pairs.
+     */
+    protected $connections;
+
+    /**
+     * @var string The current domain in focus for calls to this class.
+     */
+    protected $context;
+
+    /**
+     * @var array An array of "domain name" => "DomainConfiguration" pairs.
+     */
+    protected $domains;
+
+    /**
+     * @var Schema\Parser\SchemaParserInterface
+     */
+    protected $schemaParser;
+
+    /**
+     * @var Cache\CacheInterface
+     */
+    protected $cache;
+
+    /**
+     * @var Factory\LdapObjectSchemaFactory
+     */
+    protected $schemaFactory;
+
+    /**
+     * @param Configuration $config
+     */
+    public function __construct(Configuration $config)
+    {
+        $this->config = $config;
+        $this->domains = $config->getDomainConfiguration();
+
+        if ($this->config->getDefaultDomain()) {
+            $this->context = $this->config->getDefaultDomain();
+        } elseif (!empty($this->domains)) {
+            $this->context = array_keys($this->domains)[0];
+        } else {
+            throw new \RuntimeException("Your configuration must have at least one domain.");
+        }
+
+        // Pre-populate the connections array. They will be instantiated as needed.
+        foreach (array_keys($this->domains) as $domain) {
+            $this->connections[$domain] = null;
+        }
+    }
+
+    /**
+     * Get the domain name currently being used.
+     *
+     * @return string
+     */
+    public function getDomainContext()
+    {
+        return $this->context;
+    }
+
+    /**
+     * Get all of the domain names that are loaded.
+     *
+     * @return array
+     */
+    public function getDomains()
+    {
+        return array_keys($this->domains);
+    }
+
+    /**
+     * Switch the context of the LdapManager by passing a domain name (ie. 'example.local').
+     *
+     * @param string $domain
+     * @return $this
+     * @throws \InvalidArgumentException If the domain name is not recognized.
+     */
+    public function switchDomain($domain)
+    {
+        if (!array_key_exists($domain, $this->domains)) {
+            throw new \InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
+        }
+        $this->context = $domain;
+
+        return $this;
+    }
+
+    /**
+     * Get the Ldap Connection object.
+     *
+     * @return \LdapTools\Connection\LdapConnectionInterface
+     */
+    public function getConnection()
+    {
+        if (!$this->connections[$this->context]) {
+            $this->connections[$this->context] = new LdapConnection($this->domains[$this->context]);
+        }
+
+        return $this->connections[$this->context];
+    }
+
+    /**
+     * Get a LdapQueryBuilder object.
+     *
+     * @return \LdapTools\Query\LdapQueryBuilder
+     * @throws \InvalidArgumentException When the query type is not recognized.
+     */
+    public function buildLdapQuery()
+    {
+        return new LdapQueryBuilder($this->getConnection(), $this->getSchemaFactory());
+    }
+
+    public function getRepository($type)
+    {
+        try {
+            $ldapObjectSchema = $this->getLdapObjectSchema($type);
+            $repositoryClass = $ldapObjectSchema->getRepository();
+
+            $repository = new $repositoryClass($ldapObjectSchema, $this->getConnection());
+        } catch (\ErrorException $e) {
+            throw new \RuntimeException(sprintf('Unable to load Repository for type "%s": %s', $type, $e->getMessage()));
+        }
+        if (!($repository instanceof LdapObjectRepository)) {
+            throw new \RuntimeException('Your repository class must extend \LdapTools\LdapObjectRepository.');
+        }
+
+        return $repository;
+    }
+
+    protected function getLdapObjectSchema($type)
+    {
+        return $this->getSchemaFactory()->get($this->getConnection()->getSchemaName(), $type);
+    }
+
+    protected function getSchemaFactory()
+    {
+        if (!$this->schemaFactory) {
+            $this->schemaFactory = new LdapObjectSchemaFactory($this->getCache(), $this->getSchemaParser());
+        }
+
+        return $this->schemaFactory;
+    }
+
+    protected function getCache()
+    {
+        if (!$this->cache) {
+            $this->cache = CacheFactory::get($this->config->getCacheType(), $this->config->getCacheOptions());
+        }
+
+        return $this->cache;
+    }
+
+    protected function getSchemaParser()
+    {
+        if (!$this->schemaParser) {
+            $this->schemaParser = SchemaParserFactory::get(
+                $this->config->getSchemaFormat(),
+                $this->config->getSchemaFolder()
+            );
+        }
+
+        return $this->schemaParser;
+    }
+}

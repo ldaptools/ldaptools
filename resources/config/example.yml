@@ -1,0 +1,61 @@
+general:
+    # Optional: When using the LdapManager and there are multiple domains configured, the following domain
+    #   will be selected first by default for any operations.
+    default_domain: "example.com"
+    # Optional: When more than one server is listed for a domain, choose which one is selected for the
+    #   connection. The possible choices are: order (tried in the order they appear), random. Default: order
+    server_selection: order
+    # Optional: The format that the schema is in. Default: yml
+    schema_format: yml
+    # Optional: The location to use when loading schema files. Default: "resources/schema" in the library
+    #   root.
+    schema_folder: "/var/www/project/resources/schema"
+    # The cache type to use. Either 'stash' or 'none'. Default: none
+    cache_type: none
+    # Optional: These are variable settings for the cache type in use.
+    cache_options:
+        # Type: stash
+        # Optional: The location to cache generated schema data. Default: The systems temporary directory.
+        cache_folder: "/tmp/projectCache"
+
+domains:
+    # At least one domain is required.
+    example:
+        # Required: The full domain name.
+        domain_name: "example.com"
+        # Optional: If not specified, it will be looked-up in the RootDSE.
+        base_dn: "dc=example,dc=com"
+        # Required: One or more LDAP servers to connect to.
+        servers: [ 'example1','example2' ]
+        # Optional: The page size to use for paging operations, such as searches. Default: 1000
+        page_size: 1000
+        # Optional: The port to communicate to the LDAP servers on. If this is not set, the default is 389.
+        #   If this is not set and 'use_ssl' is specified, the the port will be set to 636.
+        port: 389
+        # Optional: Whether or not to talk to LDAP over SSL. Default: false
+        use_ssl: false
+        # Optional: Whether or not to talk to LDAP over TLS. Default: false
+        # If this is set to false, certain operations will not work. Such as password changes.
+        use_tls: false
+        # Required: The user to use for binding to LDAP and subsequent operations for the connection.
+        username: user
+        # Required: The password for the user binding to LDAP.
+        password: 12345
+        # Optional: The LDAP type for this domain: ad, openldap. Default: ad
+        ldap_type: openldap
+        # Optional: Whether the connection should wait to bind until necessary (true) or bind immediately
+        #   on construction (false). Default: false
+        lazy_bind: false
+    # Any number of additional domains can be added.
+    test:
+        domain_name: "test.local"
+        base_dn: "dc=test,dc=local"
+        servers: [ 'test1' ]
+        page_size: 1000
+        port: 389
+        use_ssl: false
+        use_tls: true
+        username: admin
+        password: 12345
+        ldap_type: ad
+        lazy_bind: false

@@ -1,0 +1,32 @@
+{
+  "name": "ldaptools/ldaptools",
+  "type": "library",
+  "description": "LdapTools is a feature-rich LDAP library PHP 5.6+.",
+  "keywords": ["ldap", "Active Directory", "OpenLDAP"],
+  "homepage": "https://github.com/ChadSikorra/LdapTools",
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Chad Sikorra"
+    }
+  ],
+  "require": {
+    "php": ">=5.6",
+    "ext-ldap": "*",
+    "symfony/yaml": ">=2.0"
+  },
+  "suggest": {
+    "tedivm/stash": "Provides the cache_type 'stash' to help increase performance."
+  },
+  "require-dev": {
+    "phpspec/phpspec": "~2.0",
+    "fabpot/php-cs-fixer": "~1.0",
+    "tedivm/stash": "*"
+  },
+  "config": {
+    "bin-dir": "bin"
+  },
+  "autoload": {
+    "psr-4": {"LdapTools\\": "src/LdapTools"}
+  }
+}

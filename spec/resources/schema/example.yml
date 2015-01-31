@@ -1,0 +1,102 @@
+objects:
+    user_object:
+        type: user
+        class: user
+        category: person
+        repository: '\Foo\Bar'
+        converters:
+            convert_string_to_utf8:
+                - 'firstName'
+                - 'lastName'
+                - 'initials'
+                - 'displayName'
+                - 'description'
+                - 'emailAddress'
+                - 'streetAddress'
+                - 'city'
+                - 'state'
+                - 'zipCode'
+                - 'poBox'
+                - 'country'
+                - 'office'
+                - 'company'
+                - 'department'
+                - 'homeDirectory'
+                - 'homeDrive'
+                - 'profilePath'
+                - 'scriptPath'
+            convert_windows_time:
+                - 'created'
+                - 'modified'
+            encode_windows_password:
+                - 'password'
+            convert_windows_sid:
+                - 'sid'
+                - 'guid'
+            convert_windows_guid:
+                - 'guid'
+        attributes:
+            firstName: givenName
+            lastName: sn
+            initials: initials
+            displayName: displayname
+            description: description
+            emailAddress: mail
+            streetAddress: streetAddress
+            city: l
+            state: st
+            zipCode: postalCode
+            poBox: postOfficeBox
+            country: c
+            office: physicalDeliveryOfficeName
+            company: company
+            department: department
+            homeDirectory: homeDirectory
+            homeDrive: homeDrive
+            profilePath: profilePath
+            scriptPath: scriptPath
+            userPrincipalName: userPrincipalName
+            title: title
+            phoneNumber: telephoneNumber
+            cellPhone: mobile
+            ipPhone: ipPhone
+            pager: pager
+            fax: facsimileTelephoneNumber
+            homePhone: homePhone
+            webPage: wWWHomePage
+            enabled: userAccountControl
+            changePassword: pwdLastSet
+            password: unicodePwd
+            modified: whenChanged
+            created: whenCreated
+            sid: objectSid
+            guid: objectGuid
+    group_object:
+        type: group
+        class: group
+        repository: '\LdapTools\Configuration'
+        converters:
+             convert_string_to_utf8:
+                 - 'description'
+                 - 'displayName'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            description: description
+            displayName: displayname
+            dn: distinguishedName
+            emailAddress: mail
+            guid: objectGuid
+            modified: whenChanged
+            name: cn
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'

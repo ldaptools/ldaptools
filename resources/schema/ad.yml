@@ -1,0 +1,216 @@
+objects:
+    user_object:
+        # This is a LdapTools specific to refer to this object type overall.
+        type: user
+        # The LDAP objectCategory
+        category: person
+        # The LDAP objectClass
+        class: user
+        # These are converters to be applied for going both to and from LDAP.
+        converters:
+             convert_string_to_utf8:
+                 - 'city'
+                 - 'company'
+                 - 'country'
+                 - 'department'
+                 - 'description'
+                 - 'displayName'
+                 - 'division'
+                 - 'dn'
+                 - 'emailAddress'
+                 - 'employeeId'
+                 - 'firstName'
+                 - 'homeDirectory'
+                 - 'homeDrive'
+                 - 'homePage'
+                 - 'initials'
+                 - 'lastName'
+                 - 'office'
+                 - 'organization'
+                 - 'otherName'
+                 - 'poBox'
+                 - 'profilePath'
+                 - 'state'
+                 - 'streetAddress'
+                 - 'scriptPath'
+                 - 'title'
+                 - 'username'
+                 - 'upn'
+                 - 'zipCode'
+             convert_int:
+                 - 'badPasswordCount'
+                 - 'employeeNumber'
+             convert_windows_guid:
+                 - 'guid'
+             encode_windows_password:
+                 - 'password'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+             convert_windows_time:
+                 - 'passwordLastSet'
+        # This is the actual mapping of attribute names to what they really are in LDAP.
+        attributes:
+            badPasswordCount: badPwdCount
+            city: l
+            company: company
+            country: c
+            created: whenCreated
+            department: department
+            description: description
+            division: division
+            displayName: displayname
+            dn: dn
+            emailAddress: mail
+            employeeId: employeeId
+            employeeNumber: employeeNumber
+            fax: facsimileTelephoneNumber
+            firstName: givenName
+            guid: objectGuid
+            homeDirectory: homeDirectory
+            homeDrive: homeDrive
+            homePage: wWWHomePage
+            homePhone: homePhone
+            initials: initials
+            ipPhone: ipPhone
+            lastName: sn
+            middleName: middleName
+            mobilePhone: mobile
+            modified: whenChanged
+            office: physicalDeliveryOfficeName
+            organization: o
+            pager: pager
+            password: unicodePwd
+            passwordLastSet: pwdLastSet
+            phoneNumber: telephoneNumber
+            poBox: postOfficeBox
+            profilePath: profilePath
+            scriptPath: scriptPath
+            sid: objectSid
+            state: st
+            streetAddress: streetAddress
+            title: title
+            username: sAMAccountName
+            upn: userPrincipalName
+            zipCode: postalCode
+        # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
+        attributes_to_select:
+            - 'firstName'
+            - 'lastName'
+            - 'username'
+            - 'emailAddress'
+            - 'dn'
+            - 'guid'
+    group_object:
+        type: group
+        class: group
+        converters:
+             convert_string_to_utf8:
+                 - 'accountName'
+                 - 'description'
+                 - 'displayName'
+                 - 'dn'
+                 - 'name'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            accountName: sAMAccountName
+            created: whenCreated
+            description: description
+            displayName: displayname
+            dn: dn
+            guid: objectGuid
+            members: member
+            modified: whenChanged
+            name: cn
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+    computer_object:
+        type: computer
+        category: computer
+        converters:
+             convert_string_to_utf8:
+                 - 'accountName'
+                 - 'description'
+                 - 'displayName'
+                 - 'dnsHostName'
+                 - 'location'
+                 - 'os'
+                 - 'osServicePack'
+                 - 'osVersion'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            accountName: sAMAccountName
+            created: whenCreated
+            description: description
+            dnsHostName: dNSHostName
+            dn: distinguishedName
+            guid: objectGuid
+            location: location
+            modified: whenChanged
+            name: cn
+            os: operatingSystem
+            osServicePack: operatingSystemServicePack
+            osVersion: operatingSystemVersion
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'os'
+            - 'dn'
+            - 'guid'
+    contact_object:
+        type: contact
+        category: contact
+        converters:
+             convert_string_to_utf8:
+                 - 'name'
+                 - 'description'
+                 - 'displayName'
+                 - 'dn'
+                 - 'emailAddress'
+                 - 'firstName'
+                 - 'lastName'
+                 - 'name'
+                 - 'phoneNumber'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            description: description
+            dn: dn
+            displayName: displayName
+            emailAddress: mail
+            firstName: givenName
+            guid: objectGuid
+            lastName: sn
+            modified: whenChanged
+            name: cn
+            phoneNumber: telephoneNumber
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'emailAddress'
+            - 'phoneNumber'
+            - 'dn'
+            - 'guid'

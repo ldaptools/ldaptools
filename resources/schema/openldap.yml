@@ -1,0 +1,89 @@
+objects:
+    user_object:
+        # This is a LdapTools specific to refer to this object type overall.
+        type: user
+        # The LDAP objectClass
+        class: inetOrgPerson
+        # These are converters to be applied for going both to and from LDAP.
+        converters:
+             convert_string_to_utf8:
+                 - 'city'
+                 - 'company'
+                 - 'country'
+                 - 'department'
+                 - 'departmentNumber'
+                 - 'description'
+                 - 'displayName'
+                 - 'dn'
+                 - 'emailAddress'
+                 - 'employeeNumber'
+                 - 'firstName'
+                 - 'homeDirectory'
+                 - 'homeDrive'
+                 - 'initials'
+                 - 'lastName'
+                 - 'name'
+                 - 'office'
+                 - 'poBox'
+                 - 'state'
+                 - 'streetAddress'
+                 - 'zipCode'
+             convert_generalized_time:
+                 - 'created'
+                 - 'modified'
+        # This is the actual mapping of attribute names to what they really are in LDAP.
+        attributes:
+            cellPhone: mobile
+            city: l
+            company: company
+            country: c
+            created: createTimestamp
+            department: department
+            departmentNumber: departmentNumber
+            description: description
+            displayName: displayName
+            dn: dn
+            emailAddress: email
+            employeeNumber: employeeNumber
+            fax: fax
+            firstName: givenName
+            homeDirectory: homeDirectory
+            homePhone: homePhone
+            initials: initials
+            ipPhone: ipPhone
+            lastName: sn
+            modified: modifyTimestamp
+            name: cn
+            pager: pager
+            password: password
+            phoneNumber: telephoneNumber
+            poBox: postOfficeBox
+            state: st
+            streetAddress: streetAddress
+            title: title
+            zipCode: postalCode
+        attributes_to_select:
+            - 'firstName'
+            - 'lastName'
+            - 'emailAddress'
+            - 'dn'
+    group_object:
+        type: group
+        class: groupOfUniqueNames
+        converters:
+             convert_string_to_utf8:
+                 - 'description'
+                 - 'name'
+             convert_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: createTimestamp
+            description: description
+            name: cn
+            modified: modifyTimestamp
+            members: uniqueMember
+        attributes_to_select:
+            - 'name'
+            - 'description'
+            - 'created'
