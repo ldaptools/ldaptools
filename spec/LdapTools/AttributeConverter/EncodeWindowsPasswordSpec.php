@@ -29,13 +29,4 @@ class EncodeWindowsPasswordSpec extends ObjectBehavior
     {
         $this->fromLdap('foo')->shouldBeNull();
     }
-
-    public function getMatchers()
-    {
-        return [
-            'haveEncoding' => function($subject, $encoding) {
-                return (bool) mb_detect_encoding($subject, $encoding);
-            }
-        ];
-    }
 }
