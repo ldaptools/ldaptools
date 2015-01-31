@@ -162,15 +162,21 @@ class LdapConnection implements LdapConnectionInterface
     {
         $username = $username ?: $this->config->getUsername();
         $password = $password ?: $this->config->getPassword();
-        $this->connection = ldap_connect($this->uri, $this->config->getPort());
 
         // If this is AD and the username is not in UPN form, then assume the default domain context.
         if ($this->config->getLdapType() == self::TYPE_AD && !strpos($username, '@')) {
             $username .= '@'.$this->config->getDomainName();
         }
 
+        $this->connection = ldap_connect($this->uri, $this->config->getPort());
+        if (!$this->connection) {
+            throw new LdapConnectionException(sprintf("Failed to initiate LDAP connection with URI: %s", $this->uri));
+        }
+
         foreach ($this->optionsOnConnect as $option => $value) {
-            ldap_set_option($this->connection, $option, $value);
+            if (!ldap_set_option($this->connection, $option, $value)) {
+                throw new LdapConnectionException("Failed to set LDAP connection option.");
+            }
         }
 
         if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
