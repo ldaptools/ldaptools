@@ -160,27 +160,14 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function connect($username = null, $password = null)
     {
+        $this->initiateLdapConnection();
+
         $username = $username ?: $this->config->getUsername();
         $password = $password ?: $this->config->getPassword();
 
         // If this is AD and the username is not in UPN form, then assume the default domain context.
         if ($this->config->getLdapType() == self::TYPE_AD && !strpos($username, '@')) {
             $username .= '@'.$this->config->getDomainName();
-        }
-
-        $this->connection = ldap_connect($this->uri, $this->config->getPort());
-        if (!$this->connection) {
-            throw new LdapConnectionException(sprintf("Failed to initiate LDAP connection with URI: %s", $this->uri));
-        }
-
-        foreach ($this->optionsOnConnect as $option => $value) {
-            if (!ldap_set_option($this->connection, $option, $value)) {
-                throw new LdapConnectionException("Failed to set LDAP connection option.");
-            }
-        }
-
-        if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
-            throw new LdapConnectionException(sprintf("Failed to start TLS: %s", $this->getLastError()));
         }
 
         $this->isBound = @ldap_bind($this->connection, $this->encodeString($username), $this->encodeString($password));
@@ -379,5 +366,28 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         return $this->scopeMap[$scope];
+    }
+
+    /**
+     * Makes the initial connection to LDAP, sets connection options, and starts TLS if specified.
+     *
+     * @throws LdapConnectionException
+     */
+    protected function initiateLdapConnection()
+    {
+        $this->connection = ldap_connect($this->uri, $this->config->getPort());
+        if (!$this->connection) {
+            throw new LdapConnectionException(sprintf("Failed to initiate LDAP connection with URI: %s", $this->uri));
+        }
+
+        foreach ($this->optionsOnConnect as $option => $value) {
+            if (!ldap_set_option($this->connection, $option, $value)) {
+                throw new LdapConnectionException("Failed to set LDAP connection option.");
+            }
+        }
+
+        if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
+            throw new LdapConnectionException(sprintf("Failed to start TLS: %s", $this->getLastError()));
+        }
     }
 }
