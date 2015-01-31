@@ -20,7 +20,6 @@ use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\Wildcard;
-use LdapTools\Query\Operator\MemberOf;
 
 /**
  * Used to store and iterate on the operators used to build a LDAP query.
