@@ -1,4 +1,4 @@
-# LdapTools
+# LdapTools [![Build Status](https://travis-ci.org/ldaptools/ldaptools.svg)](https://travis-ci.org/ldaptools/ldaptools)
 -----------
 
 LdapTools is a feature-rich LDAP library for PHP 5.6+. It was designed to be customizable for use with pretty much any 
