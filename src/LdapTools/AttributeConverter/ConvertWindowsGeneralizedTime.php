@@ -16,37 +16,13 @@ namespace LdapTools\AttributeConverter;
  * @see https://msdn.microsoft.com/en-us/library/aa772189%28v=vs.85%29.aspx
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class ConvertWindowsGeneralizedTime implements AttributeConverterInterface
+class ConvertWindowsGeneralizedTime extends ConvertGeneralizedTime
 {
     /**
      * {@inheritdoc}
      */
-    public function toLdap($date)
+    protected function getTzOffsetForTimestamp($tzOffset)
     {
-        if (!$date instanceof \DateTime) {
-            throw new \InvalidArgumentException('The datetime going to LDAP should be a DateTime object.');
-        }
-
-        $tzOffset = str_replace(':', '', $date->format('P'));
-        $tzOffset = ($tzOffset == '+0000') ? 'Z' : $tzOffset;
-        $tzOffset = '.0'.$tzOffset;
-
-        return $date->format('YmdHis').$tzOffset;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fromLdap($timestamp)
-    {
-        preg_match("/^(\d+).0(([+-]\d\d)(\d\d)|Z)$/i", $timestamp, $matches);
-
-        if (!isset($matches[1]) || !isset($matches[2])) {
-            throw new \RuntimeException(sprintf('Invalid timestamp encountered: %s', $timestamp));
-        }
-
-        $tz = (strtoupper($matches[2]) == 'Z') ? 'UTC' : $matches[3].':'.$matches[4];
-
-        return new \DateTime($matches[1], new \DateTimeZone($tz));
+        return '.0'.parent::getTzOffsetForTimestamp($tzOffset);
     }
 }

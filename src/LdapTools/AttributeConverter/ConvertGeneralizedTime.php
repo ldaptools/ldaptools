@@ -27,10 +27,7 @@ class ConvertGeneralizedTime implements AttributeConverterInterface
             throw new \InvalidArgumentException('The datetime going to LDAP should be a DateTime object.');
         }
 
-        $tzOffset = str_replace(':', '', $date->format('P'));
-        $tzOffset = ($tzOffset == '+0000') ? 'Z' : $tzOffset;
-
-        return $date->format('YmdHis').$tzOffset;
+        return $date->format('YmdHis').$this->getTzOffsetForTimestamp($date->format('P'));
     }
 
     /**
@@ -38,7 +35,7 @@ class ConvertGeneralizedTime implements AttributeConverterInterface
      */
     public function fromLdap($timestamp)
     {
-        preg_match("/^(\d+)(([+-]\d\d)(\d\d)|Z)$/i", $timestamp, $matches);
+        preg_match("/^(\d+).?0?(([+-]\d\d)(\d\d)|Z)$/i", $timestamp, $matches);
 
         if (!isset($matches[1]) || !isset($matches[2])) {
             throw new \RuntimeException(sprintf('Invalid timestamp encountered: %s', $timestamp));
@@ -47,5 +44,18 @@ class ConvertGeneralizedTime implements AttributeConverterInterface
         $tz = (strtoupper($matches[2]) == 'Z') ? 'UTC' : $matches[3].':'.$matches[4];
 
         return new \DateTime($matches[1], new \DateTimeZone($tz));
+    }
+
+    /**
+     * Get the timezone offset that will be appended to the timestamp.
+     *
+     * @param string $tzOffset As given from the \DateTime object.
+     * @return string
+     */
+    protected function getTzOffsetForTimestamp($tzOffset)
+    {
+        $tzOffset = str_replace(':', '', $tzOffset);
+
+        return ($tzOffset == '+0000') ? 'Z' : $tzOffset;
     }
 }
