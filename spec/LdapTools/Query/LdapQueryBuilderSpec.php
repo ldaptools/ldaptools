@@ -208,4 +208,11 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->from($schema);
         $this->getAttributes()->shouldBeEqualTo(['bar']);
     }
+
+    function it_should_add_additional_statements_to_the_AND_section_of_the_filter_when_calling_andWhere()
+    {
+        $this->where(['foo' => 'bar']);
+        $this->andWhere(['bar' => 'foo']);
+        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
+    }
 }

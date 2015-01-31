@@ -255,17 +255,7 @@ class LdapQueryBuilder
      */
     public function andWhere(...$whereStatements)
     {
-        $this->addBaseAndIfNotExists();
-
-        if (1 == count($whereStatements) && is_array($whereStatements[0])) {
-            foreach ($whereStatements[0] as $attribute => $value) {
-                $this->baseAnd->add(new Comparison($attribute, Comparison::EQ, $value));
-            }
-        } else {
-            $this->baseAnd->add(...$whereStatements);
-        }
-
-        return $this;
+        return $this->where(...$whereStatements);
     }
 
     /**
