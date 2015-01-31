@@ -105,10 +105,11 @@ class Configuration
     }
 
     /**
-     * Get domain configurations.
+     * Get the DomainConfiguration for a specific domain, or an array of all DomainConfiguration objects if none is
+     * specified.
      *
      * @param null|string $domain
-     * @return mixed A DomainConfiguration when a domain name is specified. Otherwise an array of configs.
+     * @return array|DomainConfiguration
      */
     public function getDomainConfiguration($domain = null)
     {
