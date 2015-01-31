@@ -86,19 +86,6 @@ class SchemaYamlParser implements SchemaParserInterface
         $objectSchema = $this->getObjectFromSchema($schema, $objectType);
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectType);
 
-        $converterMap = [];
-        if (array_key_exists('converters', $objectSchema)) {
-            foreach ($objectSchema['converters'] as $converter => $attributes) {
-                if (is_array($attributes)) {
-                    foreach ($attributes as $attribute) {
-                        $converterMap[$attribute] = $converter;
-                    }
-                } elseif (is_string($attributes)) {
-                    $converterMap[$attributes] = $converter;
-                }
-            }
-        }
-
         if (array_key_exists('category', $objectSchema)) {
             $ldapObjectSchema->setObjectCategory($objectSchema['category']);
         }
@@ -115,9 +102,8 @@ class SchemaYamlParser implements SchemaParserInterface
         if (!((bool)count(array_filter(array_keys($objectSchema['attributes']), 'is_string')))) {
             throw new SchemaParserException('The attributes for a schema should be an associative array.');
         }
-
         $ldapObjectSchema->setAttributeMap($objectSchema['attributes']);
-        $ldapObjectSchema->setConverterMap($converterMap);
+        $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
 
         return $ldapObjectSchema;
     }
@@ -150,5 +136,30 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         return $objectSchema;
+    }
+
+    /**
+     * Parse the converters section of an object schema definition to generate the attribute converter map.
+     *
+     * @param array $objectSchema
+     * @return array
+     */
+    protected function parseConverterMap(array $objectSchema)
+    {
+        $converterMap = [];
+
+        if (array_key_exists('converters', $objectSchema)) {
+            foreach ($objectSchema['converters'] as $converter => $attributes) {
+                if (is_array($attributes)) {
+                    foreach ($attributes as $attribute) {
+                        $converterMap[$attribute] = $converter;
+                    }
+                } elseif (is_string($attributes)) {
+                    $converterMap[$attributes] = $converter;
+                }
+            }
+        }
+
+        return $converterMap;
     }
 }
