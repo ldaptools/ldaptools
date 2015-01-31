@@ -10,10 +10,8 @@
 
 namespace LdapTools\Connection;
 
-use LdapTools\Exception\Exception;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
-use LdapTools\Exception\LdapReconnectException;
 use LdapTools\DomainConfiguration;
 use LdapTools\AttributeConverter\ConvertStringToUtf8;
 use LdapTools\Query\LdapQuery;
@@ -129,15 +127,8 @@ class LdapConnection implements LdapConnectionInterface
         } catch (LdapBindException $e) {
             $authenticated = false;
         }
-
         // Need to reconnect afterwards to rebind as the user from the configuration values.
-        try {
-            $this->close()->connect();
-        } catch (Exception $e) {
-            throw new LdapReconnectException(
-                sprintf('Failed to reconnect LDAP connection: %s', $this->getLastError())
-            );
-        }
+        $this->close()->connect();
 
         return $authenticated;
     }

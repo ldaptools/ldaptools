@@ -50,9 +50,8 @@ interface LdapConnectionInterface
      * @param $username
      * @param $password
      * @return bool
-     * @throws \LdapTools\Exception\LdapBindException
-     * @throws \LdapTools\Exception\LdapConnectionException
-     * @throws \LdapTools\Exception\LdapReconnectException
+     * @throws \LdapTools\Exception\LdapBindException If re-binding fails after authentication.
+     * @throws \LdapTools\Exception\LdapConnectionException If re-connecting fails after authentication.
      */
     public function authenticate($username, $password);
 
