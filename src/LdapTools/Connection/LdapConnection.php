@@ -160,8 +160,8 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function connect($username = null, $password = null)
     {
-        $username = $username ? $username : $this->config->getUsername();
-        $password = $password ? $password : $this->config->getPassword();
+        $username = $username ?: $this->config->getUsername();
+        $password = $password ?: $this->config->getPassword();
         $this->connection = ldap_connect($this->uri, $this->config->getPort());
 
         // If this is AD and the username is not in UPN form, then assume the default domain context.
