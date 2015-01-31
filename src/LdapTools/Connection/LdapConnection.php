@@ -97,7 +97,7 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * @var ConvertStringToUtf8
      */
-    protected $uft8;
+    protected $utf8;
 
     /**
      * @param DomainConfiguration $config
