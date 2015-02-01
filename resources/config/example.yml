@@ -2,9 +2,6 @@ general:
     # Optional: When using the LdapManager and there are multiple domains configured, the following domain
     #   will be selected first by default for any operations.
     default_domain: "example.com"
-    # Optional: When more than one server is listed for a domain, choose which one is selected for the
-    #   connection. The possible choices are: order (tried in the order they appear), random. Default: order
-    server_selection: order
     # Optional: The format that the schema is in. Default: yml
     schema_format: yml
     # Optional: The location to use when loading schema files. Default: "resources/schema" in the library
@@ -46,6 +43,9 @@ domains:
         # Optional: Whether the connection should wait to bind until necessary (true) or bind immediately
         #   on construction (false). Default: false
         lazy_bind: false
+        # Optional: When more than one server is listed for a domain, choose which one is selected for the
+        #   connection. The possible choices are: order (tried in the order they appear), random. Default: order
+        server_selection: order
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

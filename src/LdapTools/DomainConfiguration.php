@@ -11,6 +11,7 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Connection\LdapServerPool;
 use LdapTools\Exception\ConfigurationException;
 
 /**
@@ -48,6 +49,7 @@ class DomainConfiguration
         'ldap_type' => 'ldapType',
         'lazy_bind' => 'lazyBind',
         'schema_name' => 'schemaName',
+        'server_selection' => 'serverSelection',
     ];
 
     /**
@@ -76,6 +78,7 @@ class DomainConfiguration
         'ldapType' => LdapConnection::TYPE_AD,
         'lazyBind' => false,
         'schemaName' => '',
+        'serverSelection' => LdapServerPool::SELECT_ORDER,
     ];
 
     /**
@@ -294,6 +297,30 @@ class DomainConfiguration
     public function setServers(array $servers)
     {
         $this->config['servers'] = $servers;
+
+        return $this;
+    }
+
+    /**
+     * Get the server selection method to be used.
+     *
+     * @return mixed
+     */
+    public function getServerSelection()
+    {
+        return $this->config['serverSelection'];
+    }
+
+    /**
+     * Set the server selection method that should be used. Let the LdapServerPool take care of validation.
+     *
+     * @param $type
+     * @return $this
+     * @throws ConfigurationException
+     */
+    public function setServerSelection($type)
+    {
+        $this->config['serverSelection'] = $type;
 
         return $this;
     }

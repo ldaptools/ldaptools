@@ -26,16 +26,6 @@ class Configuration
     use ConfigurationParseTrait;
 
     /**
-     * When multiple servers are entered for a domain, select the server at random.
-     */
-    const SERVER_SELECTION_RANDOM = 'random';
-
-    /**
-     * When multiple servers are entered for a domain, select the server in the order they appear.
-     */
-    const SERVER_SELECTION_ORDER = 'order';
-
-    /**
      * @var array Maps the config values to their array key values in this class.
      */
     protected $yamlConfigMap = [
@@ -44,14 +34,12 @@ class Configuration
         'cache_options' => 'cacheOptions',
         'cache_type' => 'cacheType',
         'default_domain' => 'defaultDomain',
-        'server_selection' => 'serverSelection',
     ];
 
     /**
      * @var array
      */
     protected $config = [
-        'serverSelection' => self::SERVER_SELECTION_ORDER,
         'defaultDomain' => '',
         'schemaFolder' => '/../../resources/schema',
         'schemaFormat' => SchemaParserFactory::TYPE_YML,
@@ -75,33 +63,6 @@ class Configuration
 
         $this->config['cacheOptions']['cache_folder'] = sys_get_temp_dir();
         $this->config['schemaFolder'] = __DIR__ . $this->config['schemaFolder'];
-    }
-
-    /**
-     * Get the server selection method to be used.
-     *
-     * @return mixed
-     */
-    public function getServerSelection()
-    {
-        return $this->config['serverSelection'];
-    }
-
-    /**
-     * Set the server selection method that should be used.
-     *
-     * @param $type
-     * @return $this
-     * @throws ConfigurationException
-     */
-    public function setServerSelection($type)
-    {
-        if (!defined('self::SERVER_SELECTION_'.strtoupper($type))) {
-            throw new ConfigurationException(sprintf('Unknown server selection type "%s".', $type));
-        }
-        $this->config['serverSelection'] = $type;
-
-        return $this;
     }
 
     /**

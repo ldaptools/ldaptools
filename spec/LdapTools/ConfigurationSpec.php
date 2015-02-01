@@ -81,22 +81,6 @@ class ConfigurationSpec extends ObjectBehavior
         $this->getDomainConfiguration()->shouldHaveCount(2);
     }
 
-    function it_should_return_self_when_calling_setServerSelection()
-    {
-        $this->setServerSelection(Configuration::SERVER_SELECTION_ORDER)->shouldReturnAnInstanceOf('\LdapTools\Configuration');
-    }
-
-    function it_should_return_the_correct_server_selection_type_after_calling_setServerSelection()
-    {
-        $this->setServerSelection(Configuration::SERVER_SELECTION_RANDOM);
-        $this->getServerSelection()->shouldBeEqualTo(Configuration::SERVER_SELECTION_RANDOM);
-    }
-
-    function it_should_throw_ConfigurationException_when_setting_invalid_server_selection_types()
-    {
-        $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringSetServerSelection('turtles');
-    }
-
     function it_should_return_a_string_when_calling_getSchemaFolder()
     {
         $this->getSchemaFolder()->shouldBeString();

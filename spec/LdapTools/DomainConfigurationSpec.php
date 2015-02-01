@@ -11,6 +11,7 @@
 namespace spec\LdapTools;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Connection\LdapServerPool;
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -201,6 +202,22 @@ class DomainConfigurationSpec extends ObjectBehavior
     function it_should_error_when_setting_an_unknown_ldap_type()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringSetLdapType('SuperHappyFunTime');
+    }
+
+    function it_should_return_self_when_calling_setServerSelection()
+    {
+        $this->setServerSelection(LdapServerPool::SELECT_RANDOM)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
+    }
+
+    function it_should_return_the_correct_server_selection_type_after_calling_setServerSelection()
+    {
+        $this->setServerSelection(LdapServerPool::SELECT_RANDOM);
+        $this->getServerSelection()->shouldBeEqualTo(LdapServerPool::SELECT_RANDOM);
+    }
+
+    function it_should_have_the_server_selection_type_as_order_by_default()
+    {
+        $this->getServerSelection()->shouldBeEqualTo(LdapServerPool::SELECT_ORDER);
     }
 
     function it_should_load_an_array_for_the_configuration()

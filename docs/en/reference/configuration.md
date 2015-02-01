@@ -68,9 +68,6 @@ The below reference describes each possible configuration directive.
 * **default_domain**: If you have added more than one domain configuration, set this to the domain name you would like to be
  the default context when using the `LdapManager` class.
  
-* **server_selection**: When more than one server is listed for a domain, choose which one is selected for the 
- connection. The possible choices are `order` (tried in the order they appear), `random`. Default is `order`
- 
 * **schema_format**: The format that the schema file is in. Default (and only current option) is `yml`
 
 * **schema_folder**: This is where the LDAP object schema definition files are stored. It defaults to the 
@@ -88,6 +85,9 @@ default is `none`.
 * **base_dn**: The base DN for searches (ie. `dc=example,dc=com`).
 
 * **servers**: An array of LDAP servers (ie. `[ 'dc01' ]`).
+
+* **server_selection**: When more than one server is listed for a domain, choose which one is selected for the 
+ connection. The possible choices are `order` (tried in the order they appear), `random`. Default is `order`
 
 * **page_size**: The default page size to use for paging operations. The default is `1000`.
 
