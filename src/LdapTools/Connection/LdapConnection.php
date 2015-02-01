@@ -78,9 +78,9 @@ class LdapConnection implements LdapConnectionInterface
     protected $config;
 
     /**
-     * @var string The full LDAP URI to connect to.
+     * @var string The full LDAP URL to connect to.
      */
-    protected $uri;
+    protected $ldapUrl;
 
     /**
      * @var string The LDAP type in use (ie. AD, OpenLDAP, etc).
@@ -98,13 +98,18 @@ class LdapConnection implements LdapConnectionInterface
     protected $utf8;
 
     /**
+     * @var LdapServerPool
+     */
+    protected $serverPool;
+
+    /**
      * @param DomainConfiguration $config
      */
     public function __construct(DomainConfiguration $config)
     {
+        $this->serverPool = new LdapServerPool($config->getServers(), $config->getPort());
         $this->utf8 = new ConvertStringToUtf8();
         $this->config = $config;
-        $this->uri = ($this->config->getUseSsl() ? 'ldaps' : 'ldap').'://'.$this->config->getServers()[0];
 
         if (!$config->getLazyBind()) {
             $this->connect();
@@ -182,7 +187,7 @@ class LdapConnection implements LdapConnectionInterface
          * when installed on some distributions.
          */
         if (!$this->isBound) {
-            $this->connection = ldap_connect($this->uri, $this->config->getPort());
+            $this->connection = @ldap_connect($this->getLdapUrl(), $this->config->getPort());
             if (!@ldap_bind($this->connection)) {
                 throw new LdapBindException(sprintf("Unable to bind anonymously: %s", $this->getLastError()));
             }
@@ -368,9 +373,11 @@ class LdapConnection implements LdapConnectionInterface
      */
     protected function initiateLdapConnection()
     {
-        $this->connection = ldap_connect($this->uri, $this->config->getPort());
+        $this->connection = @ldap_connect($this->getLdapUrl(), $this->config->getPort());
         if (!$this->connection) {
-            throw new LdapConnectionException(sprintf("Failed to initiate LDAP connection with URI: %s", $this->uri));
+            throw new LdapConnectionException(
+                sprintf("Failed to initiate LDAP connection with URI: %s", $this->getLdapUrl())
+            );
         }
 
         foreach ($this->optionsOnConnect as $option => $value) {
@@ -382,5 +389,20 @@ class LdapConnection implements LdapConnectionInterface
         if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
             throw new LdapConnectionException(sprintf("Failed to start TLS: %s", $this->getLastError()));
         }
+    }
+
+    /**
+     * Get the LDAP URL to connect to.
+     *
+     * @return string
+     * @throws LdapConnectionException
+     */
+    protected function getLdapUrl()
+    {
+        if (!$this->ldapUrl) {
+            $this->ldapUrl = ($this->config->getUseSsl() ? 'ldaps' : 'ldap').'://'.$this->serverPool->getServer();
+        }
+
+        return $this->ldapUrl;
     }
 }
