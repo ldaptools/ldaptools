@@ -14,9 +14,7 @@ use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
 use LdapTools\AttributeConverter\ConvertStringToUtf8;
-use LdapTools\Query\LdapQuery;
 use LdapTools\Query\LdapQueryBuilder;
-use LdapTools\Query\Operator\Wildcard;
 
 /**
  * A LDAP connection class that provides an OOP style wrapper around the ldap_* functions.
@@ -49,9 +47,9 @@ class LdapConnection implements LdapConnectionInterface
      * @var array Maps the scope type to the corresponding function of the LdapConnection
      */
     protected $scopeMap = [
-        LdapQuery::SCOPE_BASE => 'ldap_read',
-        LdapQuery::SCOPE_ONELEVEL => 'ldap_list',
-        LdapQuery::SCOPE_SUBTREE => 'ldap_search',
+        'subtree' => 'ldap_read',
+        'onelevel' => 'ldap_list',
+        'base' => 'ldap_search',
     ];
 
     /**
@@ -195,7 +193,8 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         if (empty($this->rootDse)) {
-            $rootDse = (new LdapQueryBuilder($this))->add(new Wildcard('objectClass', Wildcard::PRESENT))
+            $query = new LdapQueryBuilder($this);
+            $rootDse = $query->add($query->filter()->present('objectClass'))
                 ->setBaseDn('')
                 ->setScopeBase()
                 ->getLdapQuery()
@@ -291,7 +290,7 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function search($ldapFilter, array $attributes = [], $baseDn = null, $scope = LdapQuery::SCOPE_SUBTREE, $pageSize = null)
+    public function search($ldapFilter, array $attributes = [], $baseDn = null, $scope = 'subtree', $pageSize = null)
     {
         $searchMethod = $this->getLdapFunctionForScope($scope);
         $baseDn = !is_null($baseDn) ? $baseDn : $this->getBaseDn();
