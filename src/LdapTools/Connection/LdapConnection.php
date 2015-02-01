@@ -123,8 +123,7 @@ class LdapConnection implements LdapConnectionInterface
 
         // Only catch a bind failure. Let the others through, as it's probably a sign of other issues.
         try {
-            $this->close();
-            $authenticated = (bool) $this->connect($username, $password);
+            $authenticated = (bool) $this->close()->connect($username, $password);
         } catch (LdapBindException $e) {
             $authenticated = false;
         }
