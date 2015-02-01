@@ -47,9 +47,9 @@ class LdapConnection implements LdapConnectionInterface
      * @var array Maps the scope type to the corresponding function of the LdapConnection
      */
     protected $scopeMap = [
-        'subtree' => 'ldap_read',
+        'subtree' => 'ldap_search',
         'onelevel' => 'ldap_list',
-        'base' => 'ldap_search',
+        'base' => 'ldap_read',
     ];
 
     /**
