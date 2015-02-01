@@ -44,6 +44,10 @@ class LdapServerPool
      */
     protected $port = 389;
 
+    /**
+     * @param array $servers
+     * @param int $port
+     */
     public function __construct(array $servers, $port)
     {
         $this->servers = $servers;
