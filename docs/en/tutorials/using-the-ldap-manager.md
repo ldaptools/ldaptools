@@ -68,6 +68,9 @@ if ($connection->authenticate('username','password')) {
     echo "Successfully authenticated $username!".PHP_EOL;
 }
 
-// $retrieve an array containing the RootDSE for the domain
+// Retrieve an object containing the RootDSE for the domain
 $rootDse = $connection->getRootDse();
+
+var_dump($rootDse->toArray());
+var_dump($rootDse->getDefaultNamingContext());
 ```
