@@ -101,6 +101,17 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->getBaseDn()->shouldBeEqualTo('dc=example,dc=local');
     }
 
+    function it_should_have_the_paged_results_control_st_to_true_by_default()
+    {
+        $this->getPagedResults()->shouldBeEqualTo(true);
+    }
+
+    function it_should_properly_set_the_paged_results_control()
+    {
+        $this->setPagedResults(false);
+        $this->getPagedResults()->shouldBeEqualTo(false);
+    }
+
     public function getMatchers()
     {
         return [

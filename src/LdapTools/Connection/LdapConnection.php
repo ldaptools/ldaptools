@@ -14,7 +14,6 @@ use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
 use LdapTools\AttributeConverter\ConvertStringToUtf8;
-use LdapTools\Query\LdapQueryBuilder;
 
 /**
  * A LDAP connection class that provides an OOP style wrapper around the ldap_* functions.
@@ -23,16 +22,6 @@ use LdapTools\Query\LdapQueryBuilder;
  */
 class LdapConnection implements LdapConnectionInterface
 {
-    /**
-     * This RootDSE attribute contains the BaseDN information.
-     */
-    const ROOTDSE_BASE_DN = 'defaultnamingcontext';
-
-    /**
-     * This RootDSE attribute contains OIDs for supported controls.
-     */
-    const ROOTDSE_SUPPORTED_CONTROL = 'supportedcontrol';
-
     /**
      * Active Directory connection.
      */
@@ -86,11 +75,6 @@ class LdapConnection implements LdapConnectionInterface
     protected $type;
 
     /**
-     * @var array The RootDSE info for the LDAP connection.
-     */
-    protected $rootDse = [];
-
-    /**
      * @var ConvertStringToUtf8
      */
     protected $utf8;
@@ -99,6 +83,11 @@ class LdapConnection implements LdapConnectionInterface
      * @var LdapServerPool
      */
     protected $serverPool;
+
+    /**
+     * @var bool Whether or not to used paged results control when searching.
+     */
+    protected $pagedResults = true;
 
     /**
      * @param DomainConfiguration $config
@@ -113,6 +102,16 @@ class LdapConnection implements LdapConnectionInterface
         if (!$config->getLazyBind()) {
             $this->connect();
         }
+    }
+
+    /**
+     * Get an object that represents the RootDSE information for the domain.
+     *
+     * @return RootDse
+     */
+    public function getRootDse()
+    {
+        return new RootDse($this);
     }
 
     /**
@@ -155,7 +154,7 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function connect($username = null, $password = null)
+    public function connect($username = null, $password = null, $anonymous = false)
     {
         $this->initiateLdapConnection();
 
@@ -167,44 +166,9 @@ class LdapConnection implements LdapConnectionInterface
             $username .= '@'.$this->config->getDomainName();
         }
 
-        $this->isBound = @ldap_bind($this->connection, $this->encodeString($username), $this->encodeString($password));
-        if (!$this->isBound) {
-            throw new LdapBindException(sprintf('Unable to bind to LDAP: %s', $this->getLastError()));
-        }
+        $this->bind($username, $password, $anonymous);
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getRootDse()
-    {
-        /**
-         * An anonymous bind should be sufficient to query the RootDSE. This is true in Active Directory
-         * by default, but not OpenLDAP in all cases. OpenLDAP requires slight modification to bind anonymously
-         * when installed on some distributions.
-         */
-        if (!$this->isBound) {
-            $this->connection = @ldap_connect($this->getLdapUrl(), $this->config->getPort());
-            if (!@ldap_bind($this->connection)) {
-                throw new LdapBindException(sprintf("Unable to bind anonymously: %s", $this->getLastError()));
-            }
-        }
-
-        if (empty($this->rootDse)) {
-            $query = new LdapQueryBuilder($this);
-            $rootDse = $query->add($query->filter()->present('objectClass'))
-                ->setBaseDn('')
-                ->setScopeBase()
-                ->getLdapQuery()
-                ->execute();
-            if (!empty($rootDse)) {
-                $this->rootDse = array_shift($rootDse);
-            }
-        }
-
-        return $this->rootDse;
     }
 
     /**
@@ -241,16 +205,6 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isControlSupported($oid)
-    {
-        return (!empty($this->getRootDse()) && isset($this->rootDse[self::ROOTDSE_SUPPORTED_CONTROL])
-            && in_array($oid, $this->rootDse[self::ROOTDSE_SUPPORTED_CONTROL])
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getSchemaName()
     {
         return $this->config->getSchemaName() ?: $this->config->getLdapType();
@@ -279,12 +233,23 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getBaseDn()
     {
-        // If not in the config, check the RootDSE.
-        if (empty($this->config->getBaseDn())) {
-            return $this->getRootDse()[self::ROOTDSE_BASE_DN];
-        }
-
         return $this->config->getBaseDn();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setPagedResults($pagedResults)
+    {
+        $this->pagedResults = (bool) $pagedResults;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPagedResults()
+    {
+        return $this->pagedResults;
     }
 
     /**
@@ -294,15 +259,20 @@ class LdapConnection implements LdapConnectionInterface
     {
         $searchMethod = $this->getLdapFunctionForScope($scope);
         $baseDn = !is_null($baseDn) ? $baseDn : $this->getBaseDn();
-        $pageSize = $pageSize ? $pageSize : $this->getPageSize();
+        $pageSize = !is_null($pageSize) ? $pageSize : $this->getPageSize();
 
         $allEntries = [];
         $cookie = '';
         do {
-            @ldap_control_paged_result($this->connection, $pageSize, false, $cookie);
+            if ($this->pagedResults) {
+                @ldap_control_paged_result($this->connection, $pageSize, false, $cookie);
+            }
 
-            $result  = @$searchMethod($this->connection, $baseDn, $ldapFilter, $attributes);
-            $entries = $result ? @ldap_get_entries($this->connection, $result) : false;
+            $result = @$searchMethod($this->connection, $baseDn, $ldapFilter, $attributes);
+            if (!$result) {
+                throw new LdapConnectionException(sprintf('LDAP search failed: %s', $this->getLastError()));
+            }
+            $entries = @ldap_get_entries($this->connection, $result);
 
             if ($entries) {
                 $allEntries = array_merge($allEntries, $entries);
@@ -388,6 +358,27 @@ class LdapConnection implements LdapConnectionInterface
 
         if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
             throw new LdapConnectionException(sprintf("Failed to start TLS: %s", $this->getLastError()));
+        }
+    }
+
+    /**
+     * Binds to LDAP with the supplied credentials or anonymously if specified.
+     *
+     * @param string $username The username to bind with.
+     * @param string $password The password to bind with.
+     * @param bool $anonymous Whether this is an anonymous bind attempt.
+     * @throws LdapBindException
+     */
+    protected function bind($username, $password, $anonymous)
+    {
+        if ($anonymous) {
+            $this->isBound = @ldap_bind($this->connection);
+        } else {
+            $this->isBound = @ldap_bind($this->connection, $this->encodeString($username), $this->encodeString($password));
+        }
+
+        if (!$this->isBound) {
+            throw new LdapBindException(sprintf('Unable to bind to LDAP: %s', $this->getLastError()));
         }
     }
 

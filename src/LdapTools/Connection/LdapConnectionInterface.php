@@ -38,11 +38,12 @@ interface LdapConnectionInterface
     /**
      * Connect and bind to LDAP.
      *
-     * @param null $username
-     * @param null $password
+     * @param null $username The username to connect with. If not specified, the one in the config is used.
+     * @param null $password The password for the username.
+     * @param bool $anonymous Whether this is an attempt to bind anonymously, ignoring the username and password.
      * @return $this
      */
-    public function connect($username = null, $password = null);
+    public function connect($username = null, $password = null, $anonymous = false);
 
     /**
      * Try to connect and bind to LDAP as a user account.
@@ -106,10 +107,10 @@ interface LdapConnectionInterface
     public function getPageSize();
 
     /**
-     * Retrieve the RootDSE entries for the connection. Some directories may require a bind for this to work correctly.
+     * Return a RootDse object for this connection.
      *
-     * @return array
-     * @throws \LdapTools\Exception\LdapBindException When an anonymous bind fails.
+     * @return RootDse
+     * @throws \LdapTools\Exception\LdapBindException When not bound yet and an anonymous bind fails.
      */
     public function getRootDse();
 
@@ -128,16 +129,6 @@ interface LdapConnectionInterface
     public function getLastError();
 
     /**
-     * Check if a LDAP Control is supported by its OID. This will query the RootDSE "supportedcontrol" attribute.
-     * Use the constants supplied in LdapControls for convenience.
-     *
-     * @param $oid
-     * @return bool
-     * @throws \LdapTools\Exception\LdapBindException
-     */
-    public function isControlSupported($oid);
-
-    /**
      * Get the schema name used by this connection.
      *
      * @return string
@@ -150,4 +141,18 @@ interface LdapConnectionInterface
      * @return string
      */
     public function getLdapType();
+
+    /**
+     * Get whether or not the search is set to use the paging control.
+     *
+     * @return bool
+     */
+    public function getPagedResults();
+
+    /**
+     * Set whether or not the search should use paging control.
+     *
+     * @param bool $pagedResults
+     */
+    public function setPagedResults($pagedResults);
 }
