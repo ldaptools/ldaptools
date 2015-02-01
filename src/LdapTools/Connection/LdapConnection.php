@@ -111,6 +111,7 @@ class LdapConnection implements LdapConnectionInterface
         $this->utf8 = new ConvertStringToUtf8();
         $this->config = $config;
 
+        $this->serverPool->setSelectionMethod($config->getServerSelection());
         if (!$config->getLazyBind()) {
             $this->connect();
         }
