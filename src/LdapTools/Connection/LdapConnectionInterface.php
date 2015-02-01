@@ -38,8 +38,8 @@ interface LdapConnectionInterface
     /**
      * Connect and bind to LDAP.
      *
-     * @param null $username The username to connect with. If not specified, the one in the config is used.
-     * @param null $password The password for the username.
+     * @param string|null $username The username to connect with. If not specified, the one in the config is used.
+     * @param string|null $password The password for the username.
      * @param bool $anonymous Whether this is an attempt to bind anonymously, ignoring the username and password.
      * @return $this
      */
@@ -48,8 +48,8 @@ interface LdapConnectionInterface
     /**
      * Try to connect and bind to LDAP as a user account.
      *
-     * @param $username
-     * @param $password
+     * @param string $username
+     * @param string $password
      * @return bool
      * @throws \LdapTools\Exception\LdapBindException If re-binding fails after authentication.
      * @throws \LdapTools\Exception\LdapConnectionException If re-connecting fails after authentication.
