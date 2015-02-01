@@ -224,6 +224,7 @@ class DomainConfigurationSpec extends ObjectBehavior
     {
         $config = [
             'domain_name' => 'example.local',
+            'base_dn' => 'dc=example,dc=local',
             'username' => 'admin',
             'password' => '12345',
             'servers' => ['test'],
