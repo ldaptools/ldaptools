@@ -55,8 +55,8 @@ The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.o
 
 Browse [the docs folder](/docs/en) for more information about LdapTools.
 
-* [Configuration Reference](/docs/en/reference/configuration.md)
-* [Schema Configuration](/docs/en/reference/schema.md)
+* [Main Configuration Reference](/docs/en/reference/main-configuration.md)
+* [Schema Configuration](/docs/en/reference/schema-configuration.md)
 * [Using the LdapManager](/docs/en/tutorials/using-the-ldap-manager.md)
 * [Building LDAP Queries](/docs/en/tutorials/building-ldap-queries.md)
 * [Default Schema Attributes](/docs/en/reference/default-schema-attributes.md)

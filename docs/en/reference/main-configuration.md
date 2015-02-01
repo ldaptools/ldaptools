@@ -1,5 +1,5 @@
-# Configuration
----------------
+# Main Configuration
+--------------------
 
 You can either choose to configure your settings via a file (YAML) or directly using the methods on the `Configuration` 
 and `DomainConfiguration` classes. Once you have an instance of the configuration, you can pass it to the `LdapManager`

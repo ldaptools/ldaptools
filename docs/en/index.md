@@ -54,4 +54,13 @@ $user = $userRepository->findOneByUsername('jsmith');
 
 The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
 
+## TODO
 
+There are still several features that need to be implemented:
+
+* Creating and modifying LDAP entries.
+* An object hydration process in addition to the array hydrator.
+* Automatic generation of the schema based off of information in LDAP.
+* A logging mechanism.
+* An event system.
+* More work needed on the OpenLDAP schema.

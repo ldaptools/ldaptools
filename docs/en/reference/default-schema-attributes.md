@@ -2,7 +2,7 @@
 
 Default schemas are provided for both Active Directory and OpenLDAP that contain attribute name mappings and converters
 against commonly used attributes and object types. Below is a reference for the mappings and their converters that can be
-used when generating queries and returining data from LDAP.
+used when generating queries and returning data from LDAP.
 
 * Active Directory Schema
   * [Users](#ad-user-types)

@@ -50,7 +50,8 @@ attribute by within the class, and the `value` is the name of the attribute in L
             - 'modified'
     ```
     
-    The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a          complete listing of possible built-in attribute converters, see this [reference doc](/docs/en/reference/attribute-converters.md).
+    The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a 
+    complete listing of possible built-in attribute converters, see this [reference doc](attribute-converters.md).
     
 * **attributes_to_select**: An array of attributes that will be selected by default on LDAP queries when using this type.
 
