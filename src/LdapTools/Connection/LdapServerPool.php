@@ -62,7 +62,7 @@ class LdapServerPool
      */
     public function getServer()
     {
-        $servers = $this->getSortedServersArray($this->selectionMethod);
+        $servers = $this->getSortedServersArray();
 
         foreach ($servers as $server) {
             if ($this->isServerAvailable($server)) {
