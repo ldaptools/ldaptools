@@ -4,13 +4,13 @@ Default schemas are provided for both Active Directory and OpenLDAP that contain
 against commonly used attributes and object types. Below is a reference for the mappings and their converters that can be
 used when generating queries and returning data from LDAP.
 
-* Active Directory Schema
+#### Active Directory Schema
   * [Users](#ad-user-types)
   * [Groups](#ad-group-types)
   * [Computers](#ad-computer-types)
   * [Contacts](#ad-contact-types)
 
-* OpenLDAP Schema
+#### OpenLDAP Schema
   * [Users](#openldap-user-types)
   * [Groups](#openldap-group-types)
 

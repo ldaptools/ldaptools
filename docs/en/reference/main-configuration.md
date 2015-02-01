@@ -5,7 +5,8 @@ You can either choose to configure your settings via a file (YAML) or directly u
 and `DomainConfiguration` classes. Once you have an instance of the configuration, you can pass it to the `LdapManager`
 class.
  
-### Manual Configuration
+## Manual Configuration
+------------------------
  
 ```php
 use LdapTools\Configuration;
@@ -36,9 +37,10 @@ $config->setDefaultDomain('foo.bar');
 $ldap = new LdapManager($config);
 ```
 
-### YAML Configuration
+## YAML Configuration
+----------------------
 
-The easy way to configure everything is by using a single YAML configuration file. See the [example configuration](/resources/config/example.yml)
+The easy way to configure everything is by using a single YAML configuration file. See the [example configuration](https://github.com/ldaptools/ldaptools/blob/master/resources/config/example.yml)
 for a detailed overview. The YAML file is split into a `general` section and a `domains` section. 
 
 ```yaml
@@ -63,51 +65,114 @@ $ldap = new LdapManager($config);
 
 The below reference describes each possible configuration directive.
 
-##### General Section
+#### **General Section**
 
-* **default_domain**: If you have added more than one domain configuration, set this to the domain name you would like to be
- the default context when using the `LdapManager` class.
+##### default_domain
+
+If you have added more than one domain configuration, set this to the domain name (ie. `example.com`) you would like to 
+be the default context when using the `LdapManager` class.
+
+ **Default**: If more than one domain is present, the first domain added is the default domain.
  
-* **schema_format**: The format that the schema file is in. Default (and only current option) is `yml`
+##### schema_format
 
-* **schema_folder**: This is where the LDAP object schema definition files are stored. It defaults to the 
-`resources/schema` folder in the libraries root directory.
+The format that the schema file is in. Only `yml` is available at present.
 
-* **cache_type**: The default caching mechanism to use when parsing schema files. Options are `stash` or `none`. The
-default is `none`.
+**Default**: `yml`
 
-* **cache_options**: An array of options that will be passed to the cache type when it is instantiated.
+##### schema_folder
 
-##### Domain Section
+This is where the LDAP object schema definition files are stored.
 
-* **domain_name**: The FQDN of the domain (ie. `example.com`).
+**Default**: The `resources/schema` folder in the libraries root directory.
 
-* **base_dn**: The base DN for searches (ie. `dc=example,dc=com`).
+##### cache_type
 
-* **servers**: An array of LDAP servers (ie. `[ 'dc01' ]`).
+The default caching mechanism to use when parsing schema files. Options are `stash` or `none`. When `stash` is used it
+will take the parsed LDAP schema objects and cache them to disk. It will then use the cache instead of re-parsing the
+schema each time. If it detects that the schema file has been modified, it will re-parse it and cache it again.
 
-* **server_selection**: When more than one server is listed for a domain, choose which one is selected for the 
- connection. The possible choices are `order` (tried in the order they appear), `random`. Default is `order`
+To use the `stash` type you must install [Stash](https://github.com/tedious/Stash).
 
-* **page_size**: The default page size to use for paging operations. The default is `1000`.
+**Default:** `none`
 
-* **port**: The default port number to connect to LDAP on. The default is `389`.
+##### cache_options
 
-* **use_ssl**: Whether or not to talk to LDAP over SSL. The default is `false`. Typically you want to use the `use_tls`
-directive (in the case of Active Directory). Setting this to `true` also changes the port to `636`.
+An array of options that will be passed to the cache type when it is instantiated.
 
-* **use_tls**: Whether or not to initiate TLS when connecting to LDAP. This is required for certain LDAP operations
-(such as password changes in Active Directory). The default is `false`.
+**Defaults**: No options are passed by default.
 
-* **username**: The username to use when binding to LDAP.
+#### **Domain Section**
 
-* **password**: The password to use when binding to LDAP.
+##### domain_name ***(REQUIRED)***
 
-* **ldap_type**: The LDAP type for this domain. Choices are `ad` or `openldap`. Defaults to `ad`.
+The FQDN of the domain (ie. `example.com`).
 
-* **lazy_bind**: If set to `true`, then the connection will not automatically connect and bind when first created. The
-default is `false`.
+##### base_dn ***(REQUIRED)***
 
-* **schema_name**: The schema name to use for this domain. This typically refers to the name of the schema file to use
-within the path defined by the `schema_folder` directive in the general section. The default is to be the same name as
-the `ldap_type`.
+The base DN for searches (ie. `dc=example,dc=com`).
+
+##### username ***(REQUIRED)***
+
+The username to use when binding to LDAP.
+
+##### password ***(REQUIRED)***
+
+The password to use when binding to LDAP.
+
+##### servers ***(REQUIRED)***
+
+An array of LDAP servers (ie. `[ 'dc01' ]`). When more than one is used it will attempt it each server until it finds
+one it can connect to.
+
+##### server_selection
+
+When more than one server is listed for a domain, choose which one is selected for the connection. The possible choices 
+are `order` (tried in the order they appear) or `random`. 
+
+**Default**: `order`
+
+##### page_size
+
+The default page size to use for paging operations.
+
+**Default**: `1000`
+
+##### port
+
+The default port number to connect to LDAP on.
+
+**Default**: `389`
+
+##### use_ssl
+
+Whether or not to talk to LDAP over SSL. The default is `false`. Typically you want to use the `use_tls` directive (in
+the case of Active Directory). Setting this to `true` also changes the port to `636`.
+
+**Default**: `false`
+
+##### use_tls
+
+Whether or not to initiate TLS when connecting to LDAP. This is required for certain LDAP operations (such as password 
+changes in Active Directory).
+
+**Default**: `false`
+
+##### ldap_type
+
+The LDAP type for this domain. Choices are `ad` or `openldap`.
+
+**Default**: `ad`
+
+##### lazy_bind
+
+If set to `true`, then the connection will not automatically connect and bind when first created.
+
+**Default**: `false`
+
+##### schema_name
+
+The schema name to use for this domain. This typically refers to the name of the schema file to use within the path 
+defined by the `schema_folder` directive in the general section. 
+
+**Default**: The same value set for `ldap_type`.

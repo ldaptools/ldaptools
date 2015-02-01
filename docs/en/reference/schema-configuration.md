@@ -28,40 +28,52 @@ objects:
 
 ### Schema Object Configuration Options
 
-* **type**: The name for the type is how you will refer to this LDAP schema object within the class. This is a required
- field. Default LDAP object types that the class has defined are: `user`, `group`, `computer`, `contact`.
- 
-* **class**: This is the `objectClass` value for the LDAP object you're defining. It can be any valid LDAP objectClass
-value (`user`, `inetOrgPerson`, `group`, etc) and will be used in the creation of LDAP query filters when using this
-type.
+##### type ***(Required)***
 
-* **category**: This is the `objectCategory` value for the LDAP object you're defining. It can be any valid LDAP
+The name for the type is how you will refer to this LDAP schema object within the class. This is a required field. 
+Default LDAP object types that the class has defined are: `user`, `group`, `computer`, `contact`.
+ 
+##### class
+ 
+This is the `objectClass` value for the LDAP object you're defining. It can be any valid LDAP objectClass value (`user`,
+`inetOrgPerson`, `group`, etc) and will be used in the creation of LDAP query filters when using this type.
+
+##### category
+
+This is the `objectCategory` value for the LDAP object you're defining. It can be any valid LDAP
 objectCategory value (`person`, `computer`, `contact`, etc) and will be used in the creation of LDAP query filters 
 (along with the `class` definition above) when using this type.
 
-* **attributes**: These should be `key: value` pairs. Where they `key` is the name you would like the refer to the LDAP 
-attribute by within the class, and the `value` is the name of the attribute in LDAP (ie. `firstName: givenName`).
+##### attributes 
 
-* **converters**: These should defined as keys with the convery name with an array of attribute name values:
+These should be `key: value` pairs. Where the `key` is the name you would like the refer to the LDAP attribute by 
+within the class, and the `value` is the name of the attribute in LDAP (ie. `firstName: givenName`).
 
-    ```yaml
-        convert_windows_generalized_time:
-            - 'created'
-            - 'modified'
-    ```
+##### converters
+
+These should defined as keys with the converters name with an array of attribute name values:
+
+```yaml
+    convert_windows_generalized_time:
+        - 'created'
+        - 'modified'
+```
     
-    The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a 
-    complete listing of possible built-in attribute converters, see this [reference doc](attribute-converters.md).
+The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a 
+complete listing of possible built-in attribute converters, see this [reference doc](attribute-converters.md).
     
-* **attributes_to_select**: An array of attributes that will be selected by default on LDAP queries when using this type.
+##### attributes_to_select
 
-    ```yaml
-        attributes_to_select:
-            - 'firstName'
-            - 'lastName'
-            - 'guid'
-    ```
+An array of attributes that will be selected by default on LDAP queries when using this type.
 
-* **repository**: The full name class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default
-repository when calling `getRepository('object_type')` on the `LdapManager` class. The class must extend 
-`\LdapTools\LdapObjectRepository`
+```yaml
+    attributes_to_select:
+        - 'firstName'
+        - 'lastName'
+        - 'guid'
+```
+
+##### repository
+
+The full name class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default repository when calling
+ `getRepository('object_type')` on the `LdapManager` class. The class must extend `\LdapTools\LdapObjectRepository`.

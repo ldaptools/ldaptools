@@ -1,4 +1,4 @@
-docs_dir: docs/en
+docs_dir: en
 site_name: LdapTools
 site_url: http://www.phpldaptools.com
 site_description: A feature-rich LDAP library for PHP 5.6+.
