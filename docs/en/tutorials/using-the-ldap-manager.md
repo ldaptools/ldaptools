@@ -1,4 +1,5 @@
 # Using the LdapManager Class
+-----------------------------
 
 The `LdapManager` provides an easy point of access into the different parts of this library after you have setup the
 [configuration](../reference/main-configuration.md). You can use the `LdapManager` to generate LDAP queries for a
@@ -6,6 +7,7 @@ certain domain, get a "Repository" for a specific LDAP type in your schema, swit
 multiple defined in your configuration, and retrieve a `LdapConnection` object for the domain.
 
 ### Getting a LdapQueryBuilder Instance
+---------------------------------------
 
 You can retrieve a `LdapQueryBuilder` for a specific domain. For example, the below query will select all users with 
 the first name 'John', last name starts with a 'S', and whose accounts are not disabled.
@@ -26,6 +28,7 @@ $users = $query->select(['username', 'city', 'state', 'guid'])
 ```
 
 ### Getting a Repository Object for a LDAP Type
+-----------------------------------------------
 
 A repository object lets you easily query specific attributes for a LDAP object type to retrieve either a single result
 or many results. You can also define your own custom repository for a LDAP type to encapsulate an reuse your queries.
@@ -46,6 +49,7 @@ $users = $repository->findByCity('Seattle');
 ```
 
 ### Switching Domains
+---------------------
 
 If you have multiple domains defined in your configuration, you can easily switch the contexts of your calls in the
 `LdapManager` by using `switchDomain`:
@@ -56,6 +60,7 @@ $ldapManager->switchDomain('example.local');
 ```
 
 ### Getting The LdapConnection
+------------------------------
 
 The `LdapConnection` is what ultimately executes queries against LDAP. It encapsulates the PHP `ldap_*` functions into
 an object oriented form. It has several functions that also may be useful on their own.
