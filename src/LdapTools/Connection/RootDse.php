@@ -44,7 +44,7 @@ class RootDse
      */
     protected $rootDse = [];
 
-    function __construct(LdapConnectionInterface $connection)
+    public function __construct(LdapConnectionInterface $connection)
     {
         $this->connection = $connection;
         $this->hydrator = new ArrayHydrator();
@@ -97,7 +97,7 @@ class RootDse
 
         // If the connection is not bound, then we need to bind anonymously and turn of paging.
         if (!$this->connection->isBound()) {
-            $this->connection->connect('','', true);
+            $this->connection->connect('', '', true);
             $this->connection->setPagedResults(false);
             $wasAnonymousBind = true;
         }
