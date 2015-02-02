@@ -119,7 +119,7 @@ $lqb->fromGroups();
 ```
 
 ------------------------
-###### `where(...$statements)`
+###### where(...$statements)
 
 This method encapsulates its arguments into a logical 'AND' statement. You can either pass a simple array of attributes
 and values that must be met, or any number of filter operator statements.
