@@ -301,6 +301,14 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        return $this->config->getDomainName();
+    }
+
+    /**
      * Encodes a string before sending it to LDAP. The encoding type should probably just be a config directive with a
      * default of UTF-8.
      *

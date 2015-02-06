@@ -112,6 +112,11 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->getPagedResults()->shouldBeEqualTo(false);
     }
 
+    function it_should_output_the_domain_name_when_cast_as_a_string()
+    {
+        $this->__toString()->shouldBeEqualTo('example.com');
+    }
+
     public function getMatchers()
     {
         return [
