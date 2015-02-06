@@ -71,6 +71,16 @@ objects:
             created: whenCreated
             sid: objectSid
             guid: objectGuid
+        default_values:
+            name: %username%
+            displayName: "%username%"
+            firstName: "%username%"
+            upn: "%username%@%_domainname_%"
+            userAccountControl: "512"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'user' ]
+        required_attributes:
+            - 'username'
+            - 'password'
     group_object:
         type: group
         class: group
