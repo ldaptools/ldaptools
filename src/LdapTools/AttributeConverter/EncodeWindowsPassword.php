@@ -24,20 +24,7 @@ class EncodeWindowsPassword implements AttributeConverterInterface
      */
     public function toLdap($password)
     {
-        $password = '"'.$password.'"';
-
-        $encodedPassword = '';
-        // This is probably the better way to do it, but the extension is not a default...
-        if (function_exists('mb_convert_encoding')) {
-            $encodedPassword = mb_convert_encoding($password, 'UTF-16LE', mb_detect_encoding($password));
-        } else {
-            for ($i = 0; $i < strlen($password); $i++) {
-                $encodedPassword .= "{$password{$i}
-                }\000";
-            }
-        }
-
-        return $encodedPassword;
+        return iconv("UTF-8", "UTF-16LE", '"'.(new ConvertStringToUtf8())->toLdap($password).'"');
     }
 
     /**
