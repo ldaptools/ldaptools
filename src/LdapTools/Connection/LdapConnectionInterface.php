@@ -155,4 +155,11 @@ interface LdapConnectionInterface
      * @param bool $pagedResults
      */
     public function setPagedResults($pagedResults);
+
+    /**
+     * Outputs the domain name for the connection.
+     *
+     * @return string
+     */
+    public function __toString();
 }
