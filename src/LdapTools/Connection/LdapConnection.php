@@ -289,7 +289,9 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function add($dn, array $entry)
     {
-        return ldap_add($this->connection, $dn, $entry);
+        if (!@ldap_add($this->connection, $dn, $entry)) {
+            throw new LdapConnectionException(sprintf('Unable to add LDAP object: %s', $this->getLastError()));
+        }
     }
 
     /**
@@ -297,7 +299,9 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function delete($dn)
     {
-        return ldap_delete($this->connection, $dn);
+        if (!@ldap_delete($this->connection, $dn)) {
+            throw new LdapConnectionException(sprintf('Unable to delete LDAP object: %s', $this->getLastError()));
+        }
     }
 
     /**
