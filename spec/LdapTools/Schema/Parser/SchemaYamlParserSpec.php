@@ -122,4 +122,22 @@ class SchemaYamlParserSpec extends ObjectBehavior
 
         $this->shouldThrow('\Exception')->duringGetSchemaModificationTime('foo');
     }
+
+    function it_should_parse_default_attributes_for_an_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'user')
+            ->getDefaultValues()
+            ->shouldHaveKey('displayName');
+    }
+
+    function it_should_parse_required_attributes_for_an_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'user')
+            ->getRequiredAttributes()
+            ->shouldBeEqualTo(['username', 'password']);
+    }
 }

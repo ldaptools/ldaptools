@@ -55,6 +55,16 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $attributesToSelect = [];
 
     /**
+     * @var array These attributes are required when creating this object.
+     */
+    protected $requiredAttributes = [];
+
+    /**
+     * @var array Default values for attributes upon creation.
+     */
+    protected $defaultValues = [];
+
+    /**
      * @var string The repository to use for this object.
      */
     protected $repository = '\LdapTools\LdapObjectRepository';
@@ -303,5 +313,45 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getRepository()
     {
         return $this->repository;
+    }
+
+    /**
+     * Set the required attributes when creating this object.
+     *
+     * @param array $attributes
+     */
+    public function setRequiredAttributes(array $attributes)
+    {
+        $this->requiredAttributes = $attributes;
+    }
+
+    /**
+     * Get the required attributes when creating this object.
+     *
+     * @return array
+     */
+    public function getRequiredAttributes()
+    {
+        return $this->requiredAttributes;
+    }
+
+    /**
+     * Set the default values when creating this object.
+     *
+     * @param array $defaultValues
+     */
+    public function setDefaultValues(array $defaultValues)
+    {
+        $this->defaultValues = $defaultValues;
+    }
+
+    /**
+     * Get the default values when creating this object.
+     *
+     * @return array
+     */
+    public function getDefaultValues()
+    {
+        return $this->defaultValues;
     }
 }

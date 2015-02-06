@@ -167,4 +167,17 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->setRepository('\Foo\Bar');
         $this->getRepository()->shouldBeEqualTo('\Foo\Bar');
     }
+
+    function it_should_set_the_required_attributes_when_calling_setRequiredAttributes()
+    {
+        $this->setRequiredAttributes(['foo', 'bar']);
+        $this->getRequiredAttributes()->shouldBeEqualTo(['foo','bar']);
+    }
+
+    function it_should_set_the_default_values_when_calling_setDefaultValues()
+    {
+        $values = ['foo' => 'bar', 'bar' => 'foo'];
+        $this->setDefaultValues($values);
+        $this->getDefaultValues()->shouldBeEqualTo($values);
+    }
 }

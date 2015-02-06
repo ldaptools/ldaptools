@@ -32,6 +32,8 @@ class SchemaYamlParser implements SchemaParserInterface
         'category' => 'setObjectCategory',
         'attributes_to_select' => 'setAttributesToSelect',
         'repository' => 'setRepository',
+        'default_values' => 'setDefaultValues',
+        'required_attributes' => 'setRequiredAttributes',
     ];
 
     /**
