@@ -27,6 +27,13 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     protected $schemaFolder = '';
 
+    protected $optionMap = [
+        'class' => 'setObjectClass',
+        'category' => 'setObjectCategory',
+        'attributes_to_select' => 'setAttributesToSelect',
+        'repository' => 'setRepository',
+    ];
+
     /**
      * @param string $schemaFolder
      */
@@ -91,17 +98,10 @@ class SchemaYamlParser implements SchemaParserInterface
         $objectSchema = $this->getObjectFromSchema($schema, $objectType);
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectType);
 
-        if (array_key_exists('category', $objectSchema)) {
-            $ldapObjectSchema->setObjectCategory($objectSchema['category']);
-        }
-        if (array_key_exists('class', $objectSchema)) {
-            $ldapObjectSchema->setObjectClass($objectSchema['class']);
-        }
-        if (array_key_exists('attributes_to_select', $objectSchema)) {
-            $ldapObjectSchema->setAttributesToSelect($objectSchema['attributes_to_select']);
-        }
-        if (array_key_exists('repository', $objectSchema)) {
-            $ldapObjectSchema->setRepository($objectSchema['repository']);
+        foreach ($this->optionMap as $option => $setter) {
+            if (array_key_exists($option, $objectSchema)) {
+                $ldapObjectSchema->$setter($objectSchema[$option]);
+            }
         }
 
         if (!((bool)count(array_filter(array_keys($objectSchema['attributes']), 'is_string')))) {
