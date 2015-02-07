@@ -126,7 +126,7 @@ and values that must be met, or any number of filter operator statements.
 
 ```php
 // Pass a simple array of attributes => values. These attributes must be equal to these values.
-$lqb->where(['firstName' => 'Timmy', 'state' => 'Wyoming]);
+$lqb->where(['firstName' => 'Timmy', 'state' => 'Wyoming']);
 
 // Pass filter operator statements instead. It will take care of attribute value conversions as well.
 $lqb->where($lqb->filter->gte('created', new \DateTime('5-4-2000'));
