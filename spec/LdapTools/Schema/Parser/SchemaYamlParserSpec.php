@@ -74,10 +74,10 @@ class SchemaYamlParserSpec extends ObjectBehavior
         );
     }
 
-    function it_should_throw_a_SchemaParserException_when_the_schema_object_type_has_no_class(){
+    function it_should_throw_a_SchemaParserException_when_the_schema_object_type_has_no_class_or_category(){
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->shouldThrow(new SchemaParserException('Object type "group" has no class defined.'))->duringParse(
+        $this->shouldThrow(new SchemaParserException('Object type "group" has no class or category defined.'))->duringParse(
             'missing_fields',
             'group'
         );

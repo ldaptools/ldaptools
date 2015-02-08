@@ -135,8 +135,8 @@ class SchemaYamlParser implements SchemaParserInterface
             throw new SchemaParserException(sprintf('Cannot find object type "%s" in schema.', $objectType));
         }
 
-        if (!array_key_exists('class', $objectSchema)) {
-            throw new SchemaParserException(sprintf('Object type "%s" has no class defined.', $objectType));
+        if (!array_key_exists('class', $objectSchema) && !array_key_exists('category', $objectSchema)) {
+            throw new SchemaParserException(sprintf('Object type "%s" has no class or category defined.', $objectType));
         }
         if (!array_key_exists('attributes', $objectSchema) || empty($objectSchema['attributes'])) {
             throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $objectType));
