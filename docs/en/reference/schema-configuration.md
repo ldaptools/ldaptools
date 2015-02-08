@@ -84,3 +84,30 @@ An array of attributes that will be selected by default on LDAP queries when usi
 
 The full name class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default repository when calling
  `getRepository('object_type')` on the `LdapManager` class. The class must extend `\LdapTools\LdapObjectRepository`.
+
+--------------------
+#### default_values
+
+An array of attributes with what their default value should be set to whe creating this object using the 
+`LdapObjectCreator`. These values also accept parameter values encased within % symbols that can resolve to other 
+attribute values.
+
+```yaml
+    attributes_to_select:
+        firstName: "%username%"
+        displayName: "%lastName%, %firstName%"
+        description: "%displayName%: Located in %city%"
+        city: "Utah"
+        
+--------------------
+#### attributes_required
+
+An array of attributes that are required when creating this object type. If these are not present, an exception will be
+thrown. This will only happen if they are not specified on creation and not contained within the `default_values` list.
+
+```yaml
+    required_attributes:
+        - 'username'
+        - 'password'
+        - 'firstName'
+        - 'lastName'
