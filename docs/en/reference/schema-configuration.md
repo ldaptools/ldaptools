@@ -98,6 +98,7 @@ attribute values.
         displayName: "%lastName%, %firstName%"
         description: "%displayName%: Located in %city%"
         city: "Utah"
+```
         
 --------------------
 #### attributes_required
@@ -111,3 +112,4 @@ thrown. This will only happen if they are not specified on creation and not cont
         - 'password'
         - 'firstName'
         - 'lastName'
+```
