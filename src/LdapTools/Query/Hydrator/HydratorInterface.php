@@ -20,12 +20,20 @@ use LdapTools\Schema\LdapObjectSchema;
 interface HydratorInterface
 {
     /**
+     * Hydrates an array representing a LDAP object so it can be sent back to LDAP.
+     *
+     * @param mixed $object
+     * @return array
+     */
+    public function hydrateToLdap($object);
+
+    /**
      * Hydrates a single LDAP entry.
      *
      * @param array $entry
      * @return mixed
      */
-    public function hydrateEntry(array $entry);
+    public function hydrateFromLdap(array $entry);
 
     /**
      * Hydrates an array of LDAP entries.
@@ -33,7 +41,7 @@ interface HydratorInterface
      * @param array $entries
      * @return mixed
      */
-    public function hydrateAll(array $entries);
+    public function hydrateAllFromLdap(array $entries);
 
     /**
      * Set the LdapObjectSchema objects needed to attribute/value conversion.

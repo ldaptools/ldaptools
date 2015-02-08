@@ -65,7 +65,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 
 Things that still need to be implemented:
 
-* Creating and modifying LDAP entries.
+* Modifying LDAP entries.
 * An object hydration process in addition to the array hydrator.
 * Automatic generation of the schema based off of information in LDAP.
 * A logging mechanism.

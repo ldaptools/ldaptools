@@ -108,6 +108,6 @@ class RootDse
             $this->connection->setPagedResults($pagedResults);
             $this->connection->close();
         }
-        $this->rootDse = $this->hydrator->hydrateEntry($entry[0]);
+        $this->rootDse = $this->hydrator->hydrateFromLdap($entry[0]);
     }
 }

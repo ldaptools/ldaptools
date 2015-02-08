@@ -142,6 +142,21 @@ class LdapManager
         return new LdapQueryBuilder($this->getConnection(), $this->getSchemaFactory());
     }
 
+    /**
+     * Get a LdapObjectCreator object.
+     *
+     * @return LdapObjectCreator
+     */
+    public function createLdapObject()
+    {
+        return new LdapObjectCreator($this->getConnection(), $this->getSchemaFactory());
+    }
+
+    /**
+     * Get a repository for a specific LDAP object type.
+     * @param string $type
+     * @return LdapObjectRepository
+     */
     public function getRepository($type)
     {
         try {
@@ -159,11 +174,22 @@ class LdapManager
         return $repository;
     }
 
+    /**
+     * Get the LDAP object schema from the factory by its type.
+     *
+     * @param string $type
+     * @return Schema\LdapObjectSchema
+     */
     protected function getLdapObjectSchema($type)
     {
         return $this->getSchemaFactory()->get($this->getConnection()->getSchemaName(), $type);
     }
 
+    /**
+     * Retrieve the schema factory instance.
+     *
+     * @return LdapObjectSchemaFactory
+     */
     protected function getSchemaFactory()
     {
         if (!$this->schemaFactory) {
@@ -173,6 +199,11 @@ class LdapManager
         return $this->schemaFactory;
     }
 
+    /**
+     * Retrieve the cache instance.
+     *
+     * @return Cache\CacheInterface
+     */
     protected function getCache()
     {
         if (!$this->cache) {
@@ -182,6 +213,11 @@ class LdapManager
         return $this->cache;
     }
 
+    /**
+     * Retrieve the schema parser instance.
+     *
+     * @return Schema\Parser\SchemaParserInterface
+     */
     protected function getSchemaParser()
     {
         if (!$this->schemaParser) {

@@ -135,7 +135,7 @@ class ParameterResolver
     {
         $dependencies = [];
 
-        foreach ($parameters as $parameter){
+        foreach ($parameters as $parameter) {
             if (isset($this->requirements[$parameter]) && !in_array($parameter, $this->resolvedParameters)) {
                 $dependencies[] = $parameter;
             }

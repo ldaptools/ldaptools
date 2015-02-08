@@ -79,6 +79,7 @@ objects:
             middleName: middleName
             mobilePhone: mobile
             modified: whenChanged
+            name: cn
             office: physicalDeliveryOfficeName
             organization: o
             pager: pager
@@ -103,6 +104,16 @@ objects:
             - 'emailAddress'
             - 'dn'
             - 'guid'
+        default_values:
+            name: %username%
+            displayName: "%username%"
+            firstName: "%username%"
+            upn: "%username%@%_domainname_%"
+            userAccountControl: "512"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'user' ]
+        required_attributes:
+            - 'username'
+            - 'password'
     group_object:
         type: group
         class: group
@@ -135,6 +146,11 @@ objects:
             - 'name'
             - 'dn'
             - 'guid'
+        default_values:
+            accountName: "%name%"
+            objectclass: "group"
+        required_attributes:
+            - 'name'
     computer_object:
         type: computer
         category: computer
@@ -174,6 +190,13 @@ objects:
             - 'os'
             - 'dn'
             - 'guid'
+        default_values:
+            accountName: "%name%"
+            # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
+            userAccountControl: "4096"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
+        required_attributes:
+            - 'name'
     contact_object:
         type: contact
         category: contact
@@ -214,3 +237,9 @@ objects:
             - 'phoneNumber'
             - 'dn'
             - 'guid'
+        default_values:
+            displayName: "%name%"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'contact' ]
+        required_attributes:
+            - 'name'
+            - 'emailAddress'

@@ -22,7 +22,7 @@ class ArrayHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrateEntry(array $entry)
+    public function hydrateFromLdap(array $entry)
     {
         $attributes = [];
 
@@ -39,7 +39,7 @@ class ArrayHydrator implements HydratorInterface
                 }
             }
         }
-        $attributes = $this->setAttributesFromSchema($attributes);
+        $attributes = $this->convertNamesFromLdap($attributes);
         $attributes = $this->convertValuesFromLdap($attributes);
 
         return $attributes;
@@ -48,14 +48,28 @@ class ArrayHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrateAll(array $entries)
+    public function hydrateAllFromLdap(array $entries)
     {
         $results = [];
 
         for ($i = 0; $i < $entries['count']; $i++) {
-            $results[] = $this->hydrateEntry($entries[$i]);
+            $results[] = $this->hydrateFromLdap($entries[$i]);
         }
 
         return $results;
+    }
+
+    public function hydrateToLdap($attributes)
+    {
+        if (!is_array($attributes)) {
+            throw new \InvalidArgumentException('Expects an array to convert data to LDAP.');
+        }
+        $attributes = $this->mergeDefaultAttributes($attributes);
+        $this->validateAttributesToLdap($attributes);
+        $attributes = $this->resolveParameters($attributes);
+        $attributes = $this->convertValuesToLdap($attributes);
+        $attributes = $this->convertNamesToLdap($attributes);
+
+        return $attributes;
     }
 }

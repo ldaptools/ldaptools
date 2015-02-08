@@ -11,6 +11,7 @@
 namespace LdapTools\Query\Hydrator;
 
 use LdapTools\Factory\AttributeConverterFactory;
+use LdapTools\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -21,7 +22,7 @@ use LdapTools\Schema\LdapObjectSchema;
 trait HydratorTrait
 {
     /**
-     * @var array An array of LdapObjectSchemas
+     * @var LdapObjectSchema[]
      */
     protected $schemas = [];
 
@@ -29,6 +30,32 @@ trait HydratorTrait
      * @var array The attributes selected for in the query.
      */
     protected $selectedAttributes = [];
+
+    /**
+     * @var array Default parameter values that have been set.
+     */
+    protected $parameters = [];
+
+    /**
+     * Sets a parameter that can be used within an attribute value.
+     *
+     * @param $name
+     * @param $value
+     */
+    public function setParameter($name, $value)
+    {
+        $this->parameters[$name] = $value;
+    }
+
+    /**
+     * Get the array of additional possible parameters that have been set for the hydrator.
+     *
+     * @return array
+     */
+    public function getParameters()
+    {
+        return $this->parameters;
+    }
 
     /**
      * @see HydratorInterface::setLdapObjectSchema()
@@ -68,17 +95,18 @@ trait HydratorTrait
      * @param array $entry
      * @return array
      */
-    protected function setAttributesFromSchema(array $entry)
+    protected function convertNamesFromLdap(array $entry)
     {
         if (empty($this->schemas)) {
             return $entry;
         }
 
         $newEntry = [];
+        $schema = $this->getSchema();
         foreach ($entry as $attribute => $value) {
-            $mappedNames = $this->schemas[0]->getNamesMappedToAttribute($attribute);
+            $mappedNames = $schema->getNamesMappedToAttribute($attribute);
             // Get all names mapped to this LDAP attribute name...
-            if ($this->schemas[0]->hasNamesMappedToAttribute($attribute)) {
+            if ($schema->hasNamesMappedToAttribute($attribute)) {
                 foreach ($mappedNames as $mappedName) {
                     // Any names specifically selected for should be in the result array...
                     if ($this->selectedButNotPartOfEntry($mappedName, $newEntry)) {
@@ -107,7 +135,7 @@ trait HydratorTrait
             return $entry;
         }
 
-        $schema = $this->schemas[0];
+        $schema= $this->getSchema();
         foreach ($entry as $attribute => $value) {
             if ($schema->hasConverter($attribute)) {
                 $converter = $schema->getConverter($attribute);
@@ -126,13 +154,9 @@ trait HydratorTrait
      */
     protected function getAttributeNameAsRequested($attribute)
     {
-        // Is there a more efficient way of doing this?
         $lcAttribute = strtolower($attribute);
-        foreach ($this->selectedAttributes as $selectedAttribute) {
-            if ($lcAttribute == strtolower($selectedAttribute)) {
-                return $selectedAttribute;
-            }
-        }
+
+        return $this->selectedAttributes[array_change_key_case(array_flip($this->selectedAttributes))[$lcAttribute]];
     }
 
     /**
@@ -151,5 +175,109 @@ trait HydratorTrait
         $existsInEntry = array_key_exists($lcAttribute, array_change_key_case($entry));
 
         return ($inSelectedAttributes && !$existsInEntry);
+    }
+
+    /**
+     * Returns all of the attributes to be sent to LDAP after factoring in possible default schema values.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function mergeDefaultAttributes(array $attributes)
+    {
+        $defaults = empty($this->schemas) ? [] : $this->getSchema()->getDefaultValues();
+
+        return array_filter(array_merge($defaults, $attributes));
+    }
+
+    /**
+     * Checks to make sure all required attributes are present.
+     *
+     * @param array $attributes
+     */
+    protected function validateAttributesToLdap(array $attributes)
+    {
+        if (empty($this->schemas)) {
+            return;
+        }
+        $missing = [];
+
+        foreach ($this->getSchema()->getRequiredAttributes() as $attribute) {
+            if (!array_key_exists(strtolower($attribute), array_change_key_case($attributes))) {
+                $missing[] = $attribute;
+            }
+        }
+
+        if (!empty($missing)) {
+            throw new \LogicException(
+                sprintf('The following required attributes are missing: %s', implode(', ', $missing))
+            );
+        }
+    }
+
+    /**
+     * Checks for attributes assigned an attribute converter. It will replace the value with the converted value then
+     * send back all the attributes.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function convertValuesToLdap(array $attributes)
+    {
+        if (empty($this->schemas)) {
+            return $attributes;
+        }
+
+        foreach ($attributes as $attribute => $value) {
+            if ($this->getSchema()->hasConverter($attribute)) {
+                $converter = $this->getSchema()->getConverter($attribute);
+                $attributes[$attribute] = AttributeConverterFactory::get($converter)->toLdap($value);
+            }
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * Converts attribute names from their schema defined value to the value LDAP needs them in.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function convertNamesToLdap(array $attributes)
+    {
+        if (empty($this->schemas)) {
+            return $attributes;
+        }
+        $toLdap = [];
+
+        foreach ($attributes as $attribute => $value) {
+            $toLdap[$this->getSchema()->getAttributeToLdap($attribute)] = $value;
+        }
+
+        return $toLdap;
+    }
+
+    /**
+     * @return LdapObjectSchema
+     */
+    protected function getSchema()
+    {
+        if (1 == count($this->schemas)) {
+            return $this->schemas[0];
+        } else {
+            throw new \RuntimeException('Using only one LDAP object type is currently supported.');
+        }
+    }
+
+    /**
+     * Resolves all parameters within an array of attributes.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function resolveParameters(array $attributes)
+    {
+        return (new ParameterResolver($attributes, $this->parameters))->resolve();
     }
 }

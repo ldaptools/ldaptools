@@ -52,7 +52,7 @@ class LdapQuery
     protected $hydratorFactory;
 
     /**
-     * @var array LdapObjectSchema objects.
+     * @var LdapObjectSchema[]
      */
     protected $schemas = [];
 
@@ -101,7 +101,7 @@ class LdapQuery
             $hydrator->setLdapObjectSchemas(...$this->schemas);
         }
 
-        return $hydrator->hydrateAll($this->ldap->search(
+        return $hydrator->hydrateAllFromLdap($this->ldap->search(
             $this->ldapFilter,
             $attributes,
             $this->baseDn,

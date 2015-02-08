@@ -115,4 +115,9 @@ class LdapManagerSpec extends ObjectBehavior
     {
         $this->shouldThrow('\Exception')->duringGetRepository('foo');
     }
+
+    function it_should_return_a_ldap_object_creator_when_calling_createLdapObject()
+    {
+        $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+    }
 }
