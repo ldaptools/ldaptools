@@ -55,24 +55,25 @@ $user = $userRepository->findOneByUsername('jsmith');
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
-$object->createUser()
+$ldapObject->createUser()
     ->in('ou=Users,dc=example,dc=local')
     ->with(['username' => 'jsmith', 'password' => '12345'])
     ->execute();
 
 // Create a typical AD global security group...
-$object->createGroup()
+$ldapObject->createGroup()
     ->in('dc=example,dc=local')
     ->with(['name' => 'Generic Security Group'])
     ->execute();
 
 // Creates a contact user...
-$object->createContact()
+$ldapObject->createContact()
     ->in('dc=awesome,dc=local')
     ->with(['name' => 'Some Guy', 'emailAddress' => 'SomeGuy@SomeDomain.com'])
     ->execute();
 
-$object->createComputer()
+// Creates a computer object...
+$ldapObject->createComputer()
     ->in('dc=awesome,dc=local')
     ->with(['name' => 'MYWOKRSTATION'])
     ->execute();
