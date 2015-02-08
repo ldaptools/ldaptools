@@ -16,11 +16,11 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 {
     public function let(LdapConnectionInterface $connection)
     {
-        $connection->getSchemaName()->willReturn('ad');
+        $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
         $cache = CacheFactory::get('none', []);
         $factory = new LdapObjectSchemaFactory($cache, $parser);
 
@@ -144,6 +144,50 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->createUser()
             ->with(['name' => 'foo=,bar', 'username' => 'foobar', 'password' => '12345'])
             ->in('dc=foo,dc=bar')
+            ->execute();
+    }
+
+    function it_should_thrown_an_exception_when_no_container_is_specified()
+    {
+        $this->createGroup()
+            ->with(['name' => 'foo']);
+        $this->shouldThrow(new \LogicException('You must specify a container or OU to place this LDAP object in.'))->duringExecute();
+    }
+
+    function it_should_use_a_default_container_defined_in_the_schema(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->add('cn=foobar,ou=foo,ou=bar,dc=example,dc=local', Argument::any())->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $this->createUser()
+            ->with(['username' => 'foobar', 'password' => '12345'])
+            ->execute();
+    }
+
+    function it_should_allow_a_default_container_to_be_overwritten(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->add('cn=foobar,ou=employees,dc=example,dc=local', Argument::any())->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $this->createUser()
+            ->with(['username' => 'foobar', 'password' => '12345'])
+            ->in('ou=employees,dc=example,dc=local')
             ->execute();
     }
 }

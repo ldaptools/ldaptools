@@ -34,6 +34,7 @@ class SchemaYamlParser implements SchemaParserInterface
         'repository' => 'setRepository',
         'default_values' => 'setDefaultValues',
         'required_attributes' => 'setRequiredAttributes',
+        'default_container' => 'setDefaultContainer',
     ];
 
     /**

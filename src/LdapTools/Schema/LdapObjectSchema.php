@@ -70,6 +70,11 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $repository = '\LdapTools\LdapObjectRepository';
 
     /**
+     * @var string The default ou/container where the object should reside in LDAP when created.
+     */
+    protected $defaultContainer = '';
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -353,5 +358,25 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getDefaultValues()
     {
         return $this->defaultValues;
+    }
+
+    /**
+     * Set the default ou/container when creating this object.
+     *
+     * @param string $container
+     */
+    public function setDefaultContainer($container)
+    {
+        $this->defaultContainer = $container;
+    }
+
+    /**
+     * Get the default ou/container used when creating this object.
+     *
+     * @return string
+     */
+    public function getDefaultContainer()
+    {
+        return $this->defaultContainer;
     }
 }

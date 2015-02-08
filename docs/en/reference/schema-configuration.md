@@ -113,3 +113,13 @@ thrown. This will only happen if they are not specified on creation and not cont
         - 'firstName'
         - 'lastName'
 ```
+
+--------------------
+#### default_container
+
+This should be a string in DN format that represents the OU/container where new objects for this LDAP type should be
+placed by default when created.
+
+```yaml
+    default_container: 'OU=Accounting,OU=Employees,DC=example,DC=local'
+```

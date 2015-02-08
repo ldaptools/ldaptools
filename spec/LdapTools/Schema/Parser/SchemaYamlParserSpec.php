@@ -140,4 +140,13 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->getRequiredAttributes()
             ->shouldBeEqualTo(['username', 'password']);
     }
+
+    function it_should_parse_the_default_container_for_an_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'user')
+            ->getDefaultContainer()
+            ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
+    }
 }

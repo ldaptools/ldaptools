@@ -25,6 +25,7 @@ objects:
                 - 'homeDrive'
                 - 'profilePath'
                 - 'scriptPath'
+                - 'name'
             convert_windows_time:
                 - 'created'
                 - 'modified'
@@ -71,6 +72,7 @@ objects:
             created: whenCreated
             sid: objectSid
             guid: objectGuid
+            name: cn
         default_values:
             name: %username%
             displayName: "%username%"
@@ -81,6 +83,7 @@ objects:
         required_attributes:
             - 'username'
             - 'password'
+        default_container: 'ou=foo,ou=bar,dc=example,dc=local'
     group_object:
         type: group
         class: group
@@ -110,3 +113,95 @@ objects:
             - 'name'
             - 'dn'
             - 'guid'
+    computer_object:
+        type: computer
+        category: computer
+        converters:
+             convert_string_to_utf8:
+                 - 'accountName'
+                 - 'description'
+                 - 'displayName'
+                 - 'dnsHostName'
+                 - 'location'
+                 - 'os'
+                 - 'osServicePack'
+                 - 'osVersion'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            accountName: sAMAccountName
+            created: whenCreated
+            description: description
+            dnsHostName: dNSHostName
+            dn: distinguishedName
+            guid: objectGuid
+            location: location
+            modified: whenChanged
+            name: cn
+            os: operatingSystem
+            osServicePack: operatingSystemServicePack
+            osVersion: operatingSystemVersion
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'os'
+            - 'dn'
+            - 'guid'
+        default_values:
+            accountName: "%name%"
+            # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
+            userAccountControl: "4096"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
+        required_attributes:
+            - 'name'
+    contact_object:
+        type: contact
+        category: contact
+        converters:
+             convert_string_to_utf8:
+                 - 'name'
+                 - 'description'
+                 - 'displayName'
+                 - 'dn'
+                 - 'emailAddress'
+                 - 'firstName'
+                 - 'lastName'
+                 - 'name'
+                 - 'phoneNumber'
+             convert_windows_guid:
+                 - 'guid'
+             convert_windows_sid:
+                 - 'sid'
+             convert_windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            description: description
+            dn: dn
+            displayName: displayName
+            emailAddress: mail
+            firstName: givenName
+            guid: objectGuid
+            lastName: sn
+            modified: whenChanged
+            name: cn
+            phoneNumber: telephoneNumber
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'emailAddress'
+            - 'phoneNumber'
+            - 'dn'
+            - 'guid'
+        default_values:
+            displayName: "%name%"
+            objectclass: [ 'top', 'person', 'organizationalPerson', 'contact' ]
+        required_attributes:
+            - 'name'
+            - 'emailAddress'

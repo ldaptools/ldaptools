@@ -180,4 +180,16 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->setDefaultValues($values);
         $this->getDefaultValues()->shouldBeEqualTo($values);
     }
+
+    function it_should_have_an_empty_default_container_when_instantiated()
+    {
+        $this->getDefaultContainer()->shouldBeEqualTo('');
+    }
+
+    function it_should_properly_set_the_default_container()
+    {
+        $ou = 'ou=foo,ou=bar,dc=example,dc=local';
+        $this->setDefaultContainer($ou);
+        $this->getDefaultContainer()->shouldBeEqualTo($ou);
+    }
 }

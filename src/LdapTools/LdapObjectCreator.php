@@ -92,6 +92,7 @@ class LdapObjectCreator
             $type = $this->schemaFactory->get($this->connection->getSchemaName(), $type);
         }
         $this->schema = $type;
+        $this->container = $type->getDefaultContainer();
 
         return $this;
     }
@@ -219,6 +220,7 @@ class LdapObjectCreator
      */
     protected function getDnToUse(array $attributes)
     {
+        // If the DN was explicitly set, just return it.
         if ($this->dn) {
             return $this->dn;
         } elseif (!$this->schema) {
@@ -228,6 +230,8 @@ class LdapObjectCreator
                 'To create an object you must specify the name attribute in the schema. That attribute should typically'
                 .' map to the "cn" attribute, as it will use that as the base of the distinguished name.'
             );
+        } elseif (empty($this->container)) {
+            throw new \LogicException('You must specify a container or OU to place this LDAP object in.');
         }
         $attribute = $this->schema->getAttributeToLdap('name');
 
