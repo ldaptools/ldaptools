@@ -97,7 +97,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the LdapObjectSchemas loaded into the collection by 'type' => object.
      *
-     * @return array
+     * @return LdapObjectSchema[]
      */
     public function getLdapObjectSchemas()
     {
@@ -117,7 +117,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'From' Operators.
      *
-     * @return array
+     * @return From[]
      */
     public function getFromOperators()
     {
@@ -127,7 +127,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'bAnd' Operators.
      *
-     * @return array
+     * @return bAnd[]
      */
     public function getAndOperators()
     {
@@ -137,7 +137,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'bOr' Operators.
      *
-     * @return array
+     * @return bOr[]
      */
     public function getOrOperators()
     {
@@ -147,7 +147,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'bNot' Operators.
      *
-     * @return array
+     * @return bNot[]
      */
     public function getNotOperators()
     {
@@ -157,7 +157,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'Comparison' Operators.
      *
-     * @return array
+     * @return Comparison[]
      */
     public function getComparisonOperators()
     {
@@ -167,7 +167,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the 'Wildcard' Operators.
      *
-     * @return array
+     * @return Wildcard[]
      */
     public function getWildcardOperators()
     {
@@ -175,9 +175,9 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
-     * Get all the 'MemberOf' Operators.
+     * Get all the 'MatchingRule' Operators.
      *
-     * @return array
+     * @return MatchingRule[]
      */
     public function getMatchingRuleOperators()
     {
@@ -187,7 +187,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get all the Operators sorted into a single array.
      *
-     * @return array
+     * @return BaseOperator[]
      */
     public function toArray()
     {
@@ -233,7 +233,7 @@ class OperatorCollection implements \IteratorAggregate
      * Merges all the Operators into one large array in a specific order. Before doing so, it will apply any schemas
      * that exist.
      *
-     * @return array
+     * @return BaseOperator[]
      * @throws LdapQueryException
      */
     protected function sortOperatorsToArray()
