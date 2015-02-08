@@ -32,6 +32,7 @@ $object->createComputer()
     ->in('dc=awesome,dc=local')
     ->with(['name' => 'MYWOKRSTATION'])
     ->execute();
+```
 
 ## Using Parameters in Attribute Values
 ---------------------------------------
