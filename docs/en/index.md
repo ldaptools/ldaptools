@@ -10,6 +10,7 @@ LdapTools is designed to be customizable for use with pretty much any directory 
 for Active Directory and OpenLDAP. 
  
  * A fluent and easy to understand syntax for generating LDAP queries.
+ * Easily create common LDAP objects (Users, Groups, Contacts, Computers).
  * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
  * Active Directory specific features to help ease development of applications.
  * Includes a comprehensive set of specs for the code.
