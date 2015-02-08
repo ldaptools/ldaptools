@@ -68,13 +68,13 @@ $ldapObject->createGroup()
 
 // Creates a contact user...
 $ldapObject->createContact()
-    ->in('dc=awesome,dc=local')
+    ->in('dc=example,dc=local')
     ->with(['name' => 'Some Guy', 'emailAddress' => 'SomeGuy@SomeDomain.com'])
     ->execute();
 
 // Creates a computer object...
 $ldapObject->createComputer()
-    ->in('dc=awesome,dc=local')
+    ->in('dc=example,dc=local')
     ->with(['name' => 'MYWOKRSTATION'])
     ->execute();
 ```
