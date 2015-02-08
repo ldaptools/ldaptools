@@ -17,7 +17,7 @@ use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
- * The LDAP Manager provides each access to the various tools in the library.
+ * The LDAP Manager provides easy access to the various tools in the library.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
