@@ -241,7 +241,7 @@ class ParameterResolver
             } elseif (array_key_exists(strtolower($parameter), array_change_key_case($attributes))) {
                 $value = array_change_key_case($attributes)[strtolower($parameter)];
             }
-            $original = preg_replace("/%$parameter%/", $value, $original);
+            $original = preg_replace("/".self::PARAM_MARKER.$parameter.self::PARAM_MARKER."/", $value, $original);
         }
 
         return $original;
