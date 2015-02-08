@@ -55,9 +55,9 @@ $object->createContact()
     ->execute();
 ```
 
-The contains 3 parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
- parameters will populate their value with their corresponding attribute. However, the `%somedomain%` does not 
-correspond to a known attribute, so the parameter must be defined. It will be filled in with 'foo.bar' as defined.
+This contains 3 parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
+ parameters will populate their value with their corresponding attribute name. However, `%somedomain%` does not 
+correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` as defined.
 
 There is also a special parameter called `%_domainname_%` when creating LDAP objects that will resolve to the fully
 qualified domain name of the connection in the current context (ie. `example.com`).
