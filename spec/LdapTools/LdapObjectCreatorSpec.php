@@ -127,4 +127,23 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->setDn('cn=chad,ou=users,dc=foo,dc=bar')
             ->execute();
     }
+
+    function it_should_escape_the_base_dn_name_properly_when_using_a_schema(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('ad');
+        $connection->__toString()->willReturn('example.com');
+        $connection->add('cn=foo\\3d\\2cbar,dc=foo,dc=bar', Argument::withEntry('sAMAccountName', 'foobar'))->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $this->createUser()
+            ->with(['name' => 'foo=,bar', 'username' => 'foobar', 'password' => '12345'])
+            ->in('dc=foo,dc=bar')
+            ->execute();
+    }
 }

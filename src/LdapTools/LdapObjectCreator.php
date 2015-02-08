@@ -231,6 +231,6 @@ class LdapObjectCreator
         }
         $attribute = $this->schema->getAttributeToLdap('name');
 
-        return $attribute.'='.$attributes[$attribute].','.$this->container;
+        return $attribute.'='.ldap_escape($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->container;
     }
 }
