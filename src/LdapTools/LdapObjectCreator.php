@@ -34,6 +34,11 @@ class LdapObjectCreator
     protected $connection;
 
     /**
+     * @var HydratorFactory
+     */
+    protected $hydratorFactory;
+
+    /**
      * @var LdapObjectSchema
      */
     protected $schema;
