@@ -10,7 +10,7 @@
 
 namespace LdapTools\Connection;
 
-use LdapTools\Query\Hydrator\ArrayHydrator;
+use LdapTools\Hydrator\ArrayHydrator;
 
 class RootDse
 {

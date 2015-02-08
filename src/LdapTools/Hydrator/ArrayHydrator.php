@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Query\Hydrator;
+namespace LdapTools\Hydrator;
 
 /**
  * Hydrates a LDAP entry in an easier to use array form.

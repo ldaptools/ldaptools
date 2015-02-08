@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools\Query\Hydrator;
+namespace spec\LdapTools\Hydrator;
 
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -78,12 +78,12 @@ class ArrayHydratorSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\Query\Hydrator\ArrayHydrator');
+        $this->shouldHaveType('LdapTools\Hydrator\ArrayHydrator');
     }
 
     function it_should_implement_the_HydratorInterface()
     {
-        $this->shouldImplement('\LdapTools\Query\Hydrator\HydratorInterface');
+        $this->shouldImplement('\LdapTools\Hydrator\HydratorInterface');
     }
 
     function it_should_set_selected_attributes_when_calling_setSelectedAttributes()

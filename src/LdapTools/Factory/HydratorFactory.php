@@ -10,8 +10,7 @@
 
 namespace LdapTools\Factory;
 
-use LdapTools\Query\Hydrator\ArrayHydrator;
-use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Hydrator\ArrayHydrator;
 
 /**
  * Gets the appropriate LDAP hydrator type.

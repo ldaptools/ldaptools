@@ -13,7 +13,7 @@ namespace LdapTools;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Object\LdapObjectType;
-use LdapTools\Query\Hydrator\ArrayHydrator;
+use LdapTools\Factory\HydratorFactory;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -66,6 +66,7 @@ class LdapObjectCreator
     {
         $this->connection = $connection;
         $this->schemaFactory = $schemaFactory;
+        $this->hydratorFactory = new HydratorFactory();
     }
 
     /**
@@ -189,7 +190,7 @@ class LdapObjectCreator
      */
     public function execute()
     {
-        $hydrator = new ArrayHydrator();
+        $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_ARRAY);
 
         $hydrator->setParameter('_domainname_', (string) $this->connection);
         foreach ($this->parameters as $parameter => $value) {
