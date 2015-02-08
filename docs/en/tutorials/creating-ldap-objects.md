@@ -12,7 +12,7 @@ $ldapObject = $ldapManager->createLdapObject();
 
 // Creating a user account (enabled by default)
 $ldapObject->createUser()
-    ->in('ou=Users,dc=example,dc=local')
+    ->in('cn=Users,dc=example,dc=local')
     ->with(['username' => 'jsmith', 'password' => '12345'])
     ->execute();
 
@@ -108,7 +108,7 @@ $ldapObject = $ldapManager->createLdapObject();
 // Creating a user account (enabled by default)
 try {
     $object->createUser()
-        ->in('ou=Users,dc=example,dc=local')
+        ->in('cn=Users,dc=example,dc=local')
         ->with(['username' => 'jsmith', 'password' => '12345'])
         ->execute();
 } catch (LdapConnectionException $e) {
