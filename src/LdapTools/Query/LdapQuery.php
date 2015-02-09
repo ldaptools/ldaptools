@@ -245,7 +245,7 @@ class LdapQuery
     /**
      * Get the LdapObjectSchemas added to this query.
      *
-     * @return array LdapObjectSchemas
+     * @return LdapObjectSchema[] LdapObjectSchemas
      */
     public function getLdapObjectSchemas()
     {

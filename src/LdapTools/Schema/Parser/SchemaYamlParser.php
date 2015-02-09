@@ -27,6 +27,9 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     protected $schemaFolder = '';
 
+    /**
+     * @var array
+     */
     protected $optionMap = [
         'class' => 'setObjectClass',
         'category' => 'setObjectCategory',
@@ -77,6 +80,12 @@ class SchemaYamlParser implements SchemaParserInterface
         return $this->parseYamlForObject($schema, $schemaName, $objectType);
     }
 
+    /**
+     * Make sure a file is readable.
+     *
+     * @param string $file
+     * @throws SchemaParserException
+     */
     protected function validateFileCanBeRead($file)
     {
         if (!is_readable($file)) {

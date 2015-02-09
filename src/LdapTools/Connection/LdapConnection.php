@@ -316,7 +316,7 @@ class LdapConnection implements LdapConnectionInterface
      * Encodes a string before sending it to LDAP. The encoding type should probably just be a config directive with a
      * default of UTF-8.
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     protected function encodeString($string)
