@@ -48,7 +48,7 @@ class Configuration
     ];
 
     /**
-     * @var array An array of DomainConfiguration objects in the form of 'domainName' => object.
+     * @var DomainConfiguration[] DomainConfiguration objects in the form of 'domainName' => object.
      */
     protected $domains = [];
 
@@ -86,7 +86,7 @@ class Configuration
     /**
      * Add domain configurations. Accepts an arbitrary amount of domain configurations.
      *
-     * @param DomainConfiguration ...$domains
+     * @param DomainConfiguration|DomainConfiguration[] $domains
      * @return $this
      */
     public function addDomain(DomainConfiguration ...$domains)

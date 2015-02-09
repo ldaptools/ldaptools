@@ -39,8 +39,8 @@ trait HydratorTrait
     /**
      * Sets a parameter that can be used within an attribute value.
      *
-     * @param $name
-     * @param $value
+     * @param string $name
+     * @param string $value
      */
     public function setParameter($name, $value)
     {
