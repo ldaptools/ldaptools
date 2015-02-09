@@ -86,7 +86,7 @@ class Configuration
     /**
      * Add domain configurations. Accepts an arbitrary amount of domain configurations.
      *
-     * @param DomainConfiguration|DomainConfiguration[] $domains
+     * @param DomainConfiguration $domains,...
      * @return $this
      */
     public function addDomain(DomainConfiguration ...$domains)
