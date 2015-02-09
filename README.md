@@ -86,6 +86,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Schema Configuration](/docs/en/reference/schema-configuration.md)
 * [Using the LdapManager](/docs/en/tutorials/using-the-ldap-manager.md)
 * [Building LDAP Queries](/docs/en/tutorials/building-ldap-queries.md)
+* [Creating LDAP Objects](/docs/en/tutorials/creating-ldap-objects.md)
 * [Default Schema Attributes](/docs/en/reference/default-schema-attributes.md)
 
 ### TODO
