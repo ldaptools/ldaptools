@@ -62,7 +62,7 @@ objects:
             description: description
             division: division
             displayName: displayname
-            dn: dn
+            dn: distinguishedName
             emailAddress: mail
             employeeId: employeeId
             employeeNumber: employeeNumber
@@ -136,7 +136,7 @@ objects:
             created: whenCreated
             description: description
             displayName: displayname
-            dn: dn
+            dn: distinguishedName
             guid: objectGuid
             members: member
             modified: whenChanged
@@ -159,6 +159,7 @@ objects:
                  - 'accountName'
                  - 'description'
                  - 'displayName'
+                 - 'dn'
                  - 'dnsHostName'
                  - 'location'
                  - 'os'
@@ -175,8 +176,8 @@ objects:
             accountName: sAMAccountName
             created: whenCreated
             description: description
-            dnsHostName: dNSHostName
             dn: distinguishedName
+            dnsHostName: dNSHostName
             guid: objectGuid
             location: location
             modified: whenChanged
@@ -221,8 +222,8 @@ objects:
         attributes:
             created: whenCreated
             description: description
-            dn: dn
             displayName: displayName
+            dn: distinguishedName
             emailAddress: mail
             firstName: givenName
             guid: objectGuid
