@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.7.0 (2015-02-09)
+------------------
+
+  * Add the ability to easily create common LDAP objects (User, Group, Contact, Computer).
+  * Implement a parameter resolver for LDAP object creation.
+  * Add several new schema directives: default_values, attributes_required, default_container
+  * Throw exceptions on LDAP add/delete operations for better error handling in try/catch blocks.
+  * Fixed the DN mapping for the AD schema.
+  * Fix AD password encoding.
+  
 0.6.0 (2015-02-01)
 ------------------
 
