@@ -89,7 +89,7 @@ The full class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the
 #### default_values
 
 An array of attributes with what their default value should be set to whe creating this object using the 
-`LdapObjectCreator`. These values also accept parameter values encased within % symbols that can resolve to other 
+`LdapObjectCreator`. These values also accept parameter values encased within `%` symbols that can resolve to other 
 attribute values.
 
 ```yaml
