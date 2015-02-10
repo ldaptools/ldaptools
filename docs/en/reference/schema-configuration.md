@@ -82,7 +82,7 @@ An array of attributes that will be selected by default on LDAP queries when usi
 --------------------
 #### repository
 
-The full name class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default repository when calling
+The full class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default repository when calling
  `getRepository('object_type')` on the `LdapManager` class. The class must extend `\LdapTools\LdapObjectRepository`.
 
 --------------------
