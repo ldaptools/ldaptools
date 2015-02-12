@@ -30,8 +30,6 @@ abstract class BaseOperator
      */
     const SEPARATOR_END = ')';
 
-    protected $alias;
-
     /**
      * @var string The attribute name.
      */
@@ -68,11 +66,6 @@ abstract class BaseOperator
     protected $operatorSymbol = '';
 
     protected $unescapedValues = null;
-
-    public function getAlias()
-    {
-        return $this->alias;
-    }
 
     /**
      * Get the attribute value.

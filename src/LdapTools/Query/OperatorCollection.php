@@ -47,11 +47,6 @@ class OperatorCollection implements \IteratorAggregate
     ];
 
     /**
-     * @var array Any aliases detected in a 'From' Operator will be stored here.
-     */
-    protected $aliases = [];
-
-    /**
      * Add an Operator to the collection.
      *
      * @param BaseOperator ...$operators
@@ -77,7 +72,6 @@ class OperatorCollection implements \IteratorAggregate
                     throw new LdapQueryException('You cannot add more than one "From" operator to a query');
                 }
                 $this->operators['from'][] = $operator;
-                $this->addPossibleAliases($operator);
             } else {
                 throw new \InvalidArgumentException('Unknown operator type.');
             }
@@ -195,37 +189,14 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
-     * Iterate through a 'From' Operator to see if any aliases should be set.
-     *
-     * @param From $from
-     * @throws LdapQueryException
-     */
-    protected function addPossibleAliases(From $from)
-    {
-        if ($from->getAlias() && isset($this->aliases[$from->getAlias()])) {
-            throw new LdapQueryException(sprintf(
-                'Alias "%s" is already in use. Occurred on type "%s".', $from->getAlias(), $from->getObjectType())
-            );
-        } elseif ($from->getAlias()) {
-            $this->aliases[$from->getAlias()] = $from->getObjectType();
-        }
-    }
-
-    /**
      * Iterate through a set of Operators and apply the schema to convert attribute names.
      *
-     * @param BaseOperator ...$operators
-     * @throws LdapQueryException
+     * @param BaseOperator[] $operators
      */
     protected function applySchema(BaseOperator ...$operators)
     {
         foreach ($operators as $operator) {
-            if ($operator->getAlias() && !isset($this['aliases'][$operator->getAlias()])) {
-                throw new LdapQueryException(sprintf('Undefined alias "%s" used.', $operator->getAlias()));
-            }
-
-            $schema = $operator->getAlias() ? $this->schema[$this->aliases[$operator->getAlias()]] : reset($this->schema);
-            $operator->applySchema($schema);
+            $operator->applySchema(reset($this->schema));
         }
     }
 
