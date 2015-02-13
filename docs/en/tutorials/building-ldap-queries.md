@@ -30,7 +30,7 @@ echo "LDAP Filter: ".$filter.PHP_EOL;
 ## Generating Queries When Using the LdapManager
 -----------------------
 
-When you call `createLdapQuery` in the `LdapManager` you will get an instance of the `LdapQueryBuilder` class that knows
+When you call `buildLdapQuery` in the `LdapManager` you will get an instance of the `LdapQueryBuilder` class that knows
 all the information about the schema of your domain, and a `LdapConnection` capable of executing the query. With this
 information it can do a lot of the heavy lifting to allow it to easily generate any LDAP filter.
 
@@ -377,7 +377,7 @@ Checks for accounts that have passwords that are set to never expire. Creates a 
 #### hasMemberRecursively($userDn)
 ---
 
-Recursively checks a groups for a member specified by their full distinguished name. Creates a matching rule comparison 
+Recursively checks groups for a member specified by their full distinguished name. Creates a matching rule comparison 
 using the OID `IN_CHAIN` against the groups `member` attribute.
 
 ------------------------
