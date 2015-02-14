@@ -23,6 +23,11 @@ use Symfony\Component\Yaml\Yaml;
 class SchemaYamlParser implements SchemaParserInterface
 {
     /**
+     * @var array Schema names to their YAML mappings (ie. ['ad' => [ <yaml array> ]])
+     */
+    protected $schemas = [];
+
+    /**
      * @var string The folder where the schema files are located.
      */
     protected $schemaFolder = '';
@@ -68,16 +73,18 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     public function parse($schemaName, $objectType)
     {
-        $file = $this->schemaFolder.'/'.$schemaName.'.yml';
-        $this->validateFileCanBeRead($file);
+        if (!isset($this->schemas[$schemaName])) {
+            $file = $this->schemaFolder . '/' . $schemaName . '.yml';
+            $this->validateFileCanBeRead($file);
 
-        try {
-            $schema = Yaml::parse(file_get_contents($file));
-        } catch (ParseException $e) {
-            throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
+            try {
+                $this->schemas[$schemaName] = Yaml::parse(file_get_contents($file));
+            } catch (ParseException $e) {
+                throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
+            }
         }
 
-        return $this->parseYamlForObject($schema, $schemaName, $objectType);
+        return $this->parseYamlForObject($this->schemas[$schemaName], $schemaName, $objectType);
     }
 
     /**
