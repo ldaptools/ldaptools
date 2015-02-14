@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Factory;
 
 use LdapTools\AttributeConverter\ConvertBoolean;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -80,5 +81,15 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     function it_should_error_when_registering_a_converter_that_does_not_implement_AttributeConverterInterface()
     {
         $this->shouldThrow('\Exception')->duringRegister('foo_bar', new LdapObjectSchema('foo', 'bar'));
+    }
+
+    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
+    {
+        $this->get('windows_guid')->setLdapConnection($ldap)->shouldBeNull();
+    }
+
+    function it_should_let_me_set_the_converter_options_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->setOptions(['foo' => 'bar'])->shouldBeNull();
     }
 }

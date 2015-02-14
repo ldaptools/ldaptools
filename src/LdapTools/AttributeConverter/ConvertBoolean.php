@@ -18,6 +18,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertBoolean implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */

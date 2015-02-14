@@ -18,6 +18,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertWindowsSid implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */

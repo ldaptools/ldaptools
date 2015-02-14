@@ -18,6 +18,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertGeneralizedTime implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */

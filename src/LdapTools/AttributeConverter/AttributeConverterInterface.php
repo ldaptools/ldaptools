@@ -10,6 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Connection\LdapConnectionInterface;
+
 /**
  * Any attribute conversion to/from LDAP should implement this interface.
  *
@@ -32,4 +34,18 @@ interface AttributeConverterInterface
      * @return mixed
      */
     public function fromLdap($value);
+
+    /**
+     * Sets the current LDAP Connection for use by the converter.
+     *
+     * @param LdapConnectionInterface $connection
+     */
+    public function setLdapConnection(LdapConnectionInterface $connection);
+
+    /**
+     * Sets options that may be recognized by the converter.
+     *
+     * @param array $options
+     */
+    public function setOptions(array $options);
 }

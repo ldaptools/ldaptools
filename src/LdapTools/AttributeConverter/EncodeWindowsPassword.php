@@ -19,6 +19,8 @@ namespace LdapTools\AttributeConverter;
  */
 class EncodeWindowsPassword implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */

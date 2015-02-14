@@ -18,6 +18,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertStringToUtf8 implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */

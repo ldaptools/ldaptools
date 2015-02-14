@@ -19,6 +19,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertWindowsGuid implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * @var array The guid structure in order by section to parse using substr().
      */

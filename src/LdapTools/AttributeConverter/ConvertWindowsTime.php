@@ -17,6 +17,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertWindowsTime implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * The seconds between 1/1/1601 and 1/1/1970.
      */

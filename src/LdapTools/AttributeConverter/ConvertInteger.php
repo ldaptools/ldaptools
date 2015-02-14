@@ -18,6 +18,8 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertInteger implements AttributeConverterInterface
 {
+    use AttributeConverterTrait;
+
     /**
      * {@inheritdoc}
      */
