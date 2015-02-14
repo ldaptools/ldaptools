@@ -262,23 +262,15 @@ class LdapConnection implements LdapConnectionInterface
         $pageSize = !is_null($pageSize) ? $pageSize : $this->getPageSize();
 
         $allEntries = [];
-        $cookie = '';
+        // If this is not a paged search then set this to null so it ends the loop on the first pass.
+        $cookie = $this->pagedResults ? '' : null;
         do {
-            if ($this->pagedResults) {
-                @ldap_control_paged_result($this->connection, $pageSize, false, $cookie);
-            }
+            $this->setPagedResultsControl($pageSize, $cookie);
 
             $result = @$searchMethod($this->connection, $baseDn, $ldapFilter, $attributes);
-            if (!$result) {
-                throw new LdapConnectionException(sprintf('LDAP search failed: %s', $this->getLastError()));
-            }
-            $entries = @ldap_get_entries($this->connection, $result);
+            $allEntries = $this->processSearchResult($result, $allEntries);
 
-            if ($entries) {
-                $allEntries = array_merge($allEntries, $entries);
-            }
-
-            @ldap_control_paged_result_response($this->connection, $result, $cookie);
+            $this->setPagedResultsResponse($result, $cookie);
         } while ($cookie !== null && $cookie != '');
 
         return $allEntries;
@@ -407,5 +399,56 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         return $this->ldapUrl;
+    }
+
+    /**
+     * Send the LDAP pagination control if specified and check for errors.
+     *
+     * @param int $pageSize
+     * @param string $cookie
+     * @throws LdapConnectionException
+     */
+    protected function setPagedResultsControl($pageSize, &$cookie) {
+        if ($this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
+            throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
+        }
+    }
+
+    /**
+     * Retrieves the LDAP pagination cookie based on the result if specified and check for errors.
+     *
+     * @param resource $result
+     * @param string $cookie
+     * @throws LdapConnectionException
+     */
+    protected function setPagedResultsResponse($result, &$cookie)
+    {
+        if ($this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
+            throw new LdapConnectionException(
+                sprintf('Unable to set paged results response: %s', $this->getLastError())
+            );
+        }
+    }
+
+    /**
+     * Process a LDAP search result and merge it with the existing entries if possible.
+     *
+     * @param resource $result
+     * @param array $allEntries
+     * @return array
+     * @throws LdapConnectionException
+     */
+    protected function processSearchResult($result, array $allEntries)
+    {
+        if (!$result) {
+            throw new LdapConnectionException(sprintf('LDAP search failed: %s', $this->getLastError()));
+        }
+        $entries = @ldap_get_entries($this->connection, $result);
+
+        if ($entries) {
+            $allEntries = array_merge($allEntries, $entries);
+        }
+
+        return $allEntries;
     }
 }
