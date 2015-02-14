@@ -6,7 +6,7 @@ objects:
         class: inetOrgPerson
         # These are converters to be applied for going both to and from LDAP.
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'city'
                  - 'company'
                  - 'country'
@@ -28,7 +28,7 @@ objects:
                  - 'state'
                  - 'streetAddress'
                  - 'zipCode'
-             convert_generalized_time:
+             generalized_time:
                  - 'created'
                  - 'modified'
         # This is the actual mapping of attribute names to what they really are in LDAP.
@@ -71,10 +71,10 @@ objects:
         type: group
         class: groupOfUniqueNames
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'description'
                  - 'name'
-             convert_generalized_time:
+             generalized_time:
                  - 'created'
                  - 'modified'
         attributes:

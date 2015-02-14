@@ -23,14 +23,14 @@ class AttributeConverterFactory
      * @var array The default converter name to class mapping.
      */
     protected static $converterMap = [
-        'convert_bool' => '\LdapTools\AttributeConverter\ConvertBoolean',
-        'convert_generalized_time' => '\LdapTools\AttributeConverter\ConvertGeneralizedTime',
-        'convert_int' => '\LdapTools\AttributeConverter\ConvertInteger',
-        'convert_string_to_utf8' => '\LdapTools\AttributeConverter\ConvertStringToUtf8',
-        'convert_windows_guid' => '\LdapTools\AttributeConverter\ConvertWindowsGuid',
-        'convert_windows_sid' => '\LdapTools\AttributeConverter\ConvertWindowsSid',
-        'convert_windows_time' => '\LdapTools\AttributeConverter\ConvertWindowsTime',
-        'convert_windows_generalized_time' => '\LdapTools\AttributeConverter\ConvertWindowsGeneralizedTime',
+        'bool' => '\LdapTools\AttributeConverter\ConvertBoolean',
+        'generalized_time' => '\LdapTools\AttributeConverter\ConvertGeneralizedTime',
+        'int' => '\LdapTools\AttributeConverter\ConvertInteger',
+        'string_to_utf8' => '\LdapTools\AttributeConverter\ConvertStringToUtf8',
+        'windows_guid' => '\LdapTools\AttributeConverter\ConvertWindowsGuid',
+        'windows_sid' => '\LdapTools\AttributeConverter\ConvertWindowsSid',
+        'windows_time' => '\LdapTools\AttributeConverter\ConvertWindowsTime',
+        'windows_generalized_time' => '\LdapTools\AttributeConverter\ConvertWindowsGeneralizedTime',
         'encode_windows_password' => '\LdapTools\AttributeConverter\EncodeWindowsPassword',
     ];
 

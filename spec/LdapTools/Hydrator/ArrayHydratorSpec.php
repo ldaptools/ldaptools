@@ -150,7 +150,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn', 'created' => 'whenCreated']);
-        $schema->setConverterMap(['created' => 'convert_generalized_time']);
+        $schema->setConverterMap(['created' => 'generalized_time']);
         $this->setLdapObjectSchemas($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName', 'created']);
@@ -161,7 +161,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn', 'created' => 'whenCreated', 'createdInt' => 'whenCreated']);
-        $schema->setConverterMap(['created' => 'convert_generalized_time', 'createdInt' => 'convert_int']);
+        $schema->setConverterMap(['created' => 'generalized_time', 'createdInt' => 'int']);
         $this->setLdapObjectSchemas($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName', 'created', 'createdInt']);
@@ -244,7 +244,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([ 'foo' => 'bar' ]);
-        $schema->setConverterMap(['foo' => 'convert_bool']);
+        $schema->setConverterMap(['foo' => 'bool']);
         $this->setLdapObjectSchemas($schema);
         $attributes = $this->objectToLdap;
         $attributes['foo'] = true;

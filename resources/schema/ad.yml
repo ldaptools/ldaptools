@@ -8,7 +8,7 @@ objects:
         class: user
         # These are converters to be applied for going both to and from LDAP.
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'city'
                  - 'company'
                  - 'country'
@@ -37,19 +37,19 @@ objects:
                  - 'username'
                  - 'upn'
                  - 'zipCode'
-             convert_int:
+             int:
                  - 'badPasswordCount'
                  - 'employeeNumber'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
              encode_windows_password:
                  - 'password'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
-             convert_windows_time:
+             windows_time:
                  - 'passwordLastSet'
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
@@ -118,17 +118,17 @@ objects:
         type: group
         class: group
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'accountName'
                  - 'description'
                  - 'displayName'
                  - 'dn'
                  - 'name'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:
@@ -155,7 +155,7 @@ objects:
         type: computer
         category: computer
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'accountName'
                  - 'description'
                  - 'displayName'
@@ -165,11 +165,11 @@ objects:
                  - 'os'
                  - 'osServicePack'
                  - 'osVersion'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:
@@ -202,7 +202,7 @@ objects:
         type: contact
         category: contact
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'name'
                  - 'description'
                  - 'displayName'
@@ -212,11 +212,11 @@ objects:
                  - 'lastName'
                  - 'name'
                  - 'phoneNumber'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:

@@ -5,7 +5,7 @@ objects:
         category: person
         repository: '\Foo\Bar'
         converters:
-            convert_string_to_utf8:
+            string_to_utf8:
                 - 'firstName'
                 - 'lastName'
                 - 'initials'
@@ -26,15 +26,15 @@ objects:
                 - 'profilePath'
                 - 'scriptPath'
                 - 'name'
-            convert_windows_time:
+            windows_time:
                 - 'created'
                 - 'modified'
             encode_windows_password:
                 - 'password'
-            convert_windows_sid:
+            windows_sid:
                 - 'sid'
                 - 'guid'
-            convert_windows_guid:
+            windows_guid:
                 - 'guid'
         attributes:
             firstName: givenName
@@ -89,14 +89,14 @@ objects:
         class: group
         repository: '\LdapTools\Configuration'
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'description'
                  - 'displayName'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:
@@ -117,7 +117,7 @@ objects:
         type: computer
         category: computer
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'accountName'
                  - 'description'
                  - 'displayName'
@@ -126,11 +126,11 @@ objects:
                  - 'os'
                  - 'osServicePack'
                  - 'osVersion'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:
@@ -163,7 +163,7 @@ objects:
         type: contact
         category: contact
         converters:
-             convert_string_to_utf8:
+             string_to_utf8:
                  - 'name'
                  - 'description'
                  - 'displayName'
@@ -173,11 +173,11 @@ objects:
                  - 'lastName'
                  - 'name'
                  - 'phoneNumber'
-             convert_windows_guid:
+             windows_guid:
                  - 'guid'
-             convert_windows_sid:
+             windows_sid:
                  - 'sid'
-             convert_windows_generalized_time:
+             windows_generalized_time:
                  - 'created'
                  - 'modified'
         attributes:
