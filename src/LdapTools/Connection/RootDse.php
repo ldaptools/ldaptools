@@ -15,9 +15,14 @@ use LdapTools\Hydrator\ArrayHydrator;
 class RootDse
 {
     /**
-     * This RootDSE attribute contains the BaseDN information.
+     * This RootDSE attribute contains the configuration naming context information.
      */
-    const BASE_DN = 'defaultnamingcontext';
+    const CONFIG_NC = 'configurationnamingcontext';
+
+    /**
+     * This RootDSE attribute contains the default naming context information.
+     */
+    const DEFAULT_NC = 'defaultnamingcontext';
 
     /**
      * This RootDSE attribute contains OIDs for supported controls.
@@ -64,13 +69,23 @@ class RootDse
     }
 
     /**
-     * Get the default naming context (ie. base DN) for the domain.
+     * Get the default naming context for the domain.
      *
      * @return string
      */
     public function getDefaultNamingContext()
     {
-        return isset($this->rootDse[self::BASE_DN]) ? $this->rootDse[self::BASE_DN] : '';
+        return $this->getAttributeIfExists(self::DEFAULT_NC);
+    }
+
+    /**
+     * Get the configuration naming context for the domain.
+     *
+     * @return string
+     */
+    public function getConfigurationNamingContext()
+    {
+        return $this->getAttributeIfExists(self::CONFIG_NC);
     }
 
     /**
@@ -81,6 +96,16 @@ class RootDse
     public function toArray()
     {
         return $this->rootDse;
+    }
+
+    /**
+     * Retrieve the value for the attribute if it exists.
+     * @param string $attribute
+     * @return mixed
+     */
+    protected function getAttributeIfExists($attribute)
+    {
+        return isset($this->rootDse[$attribute]) ? $this->rootDse[$attribute] : null;
     }
 
     /**

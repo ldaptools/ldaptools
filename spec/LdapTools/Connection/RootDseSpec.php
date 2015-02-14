@@ -30,9 +30,14 @@ class RootDseSpec extends ObjectBehavior
         $this->toArray()->shouldBeEqualTo([]);
     }
 
-    function it_should_return_an_empty_string_if_the_root_dse_doesnt_have_the_dn_value()
+    function it_should_return_null_if_the_root_dse_doesnt_have_the_default_nc_value()
     {
-        $this->getDefaultNamingContext()->shouldBeEqualTo('');
+        $this->getDefaultNamingContext()->shouldBeNull();
+    }
+
+    function it_should_return_null_if_the_root_dse_doesnt_have_the_config_nc_value()
+    {
+        $this->getConfigurationNamingContext()->shouldBeNull();
     }
 
     function it_should_return_false_if_the_root_dse_doesnt_have_the_oid_control()
