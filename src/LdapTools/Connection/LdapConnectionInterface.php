@@ -86,6 +86,15 @@ interface LdapConnectionInterface
     public function delete($dn);
 
     /**
+     * Modify a LDAP entry from the directory using the ldap_modify_batch specification.
+     *
+     * @param string $dn The full distinguished name of the entry.
+     * @param array $entries The ldap_modify_batch array specification of changes to perform.
+     * @return bool
+     */
+    public function modifyBatch($dn, array $entries);
+
+    /**
      * If the connection is bound, this closes the LDAP connection.
      *
      * @return $this

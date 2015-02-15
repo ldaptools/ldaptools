@@ -299,6 +299,16 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function modifyBatch($dn, array $entries)
+    {
+        if (!@ldap_modify_batch($this->connection, $dn, $entries)) {
+            throw new LdapConnectionException(sprintf('Unable to batch modify LDAP object: %s', $this->getLastError()));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function __toString()
     {
         return $this->config->getDomainName();
