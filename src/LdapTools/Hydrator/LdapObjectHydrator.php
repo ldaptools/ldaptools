@@ -41,7 +41,10 @@ class LdapObjectHydrator extends ArrayHydrator
     }
 
     /**
-     * {@inheritdoc}
+     * Hydrates an array of LDAP entries in a LdapObjectCollection.
+     *
+     * @param array $entries
+     * @return LdapObjectCollection
      */
     public function hydrateAllFromLdap(array $entries)
     {

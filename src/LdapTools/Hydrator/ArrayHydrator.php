@@ -59,6 +59,9 @@ class ArrayHydrator implements HydratorInterface
         return $results;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function hydrateToLdap($attributes)
     {
         if (!is_array($attributes)) {
