@@ -237,4 +237,9 @@ class LdapObjectSpec extends ObjectBehavior
         $this->set('phoneNumber', '555-5555');
         $this->getBatchModifications()->shouldHaveCount(4);
     }
+
+    function it_should_return_the_ldap_type_when_calling_get_type()
+    {
+        $this->getType()->shouldBeEqualTo('user');
+    }
 }

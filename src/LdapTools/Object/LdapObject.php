@@ -68,6 +68,16 @@ class LdapObject
     }
 
     /**
+     * Get the LDAP type for this object.
+     *
+     * @return string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Check if this LDAP Object is a specific type (Schema type).
      *
      * @param string $type
