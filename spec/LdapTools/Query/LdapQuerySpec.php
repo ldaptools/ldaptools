@@ -72,9 +72,9 @@ class LdapQuerySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Query\LdapQuery');
     }
 
-    function it_should_return_an_Array_by_default()
+    function it_should_return_a_LdapObjectCollection_by_default()
     {
-        $this->execute()->shouldBeArray();
+        $this->execute()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
     function it_should_set_the_filter_when_calling_setLdapFilter()

@@ -11,6 +11,7 @@
 namespace LdapTools\Factory;
 
 use LdapTools\Hydrator\ArrayHydrator;
+use LdapTools\Hydrator\LdapObjectHydrator;
 
 /**
  * Gets the appropriate LDAP hydrator type.
@@ -19,12 +20,28 @@ use LdapTools\Hydrator\ArrayHydrator;
  */
 class HydratorFactory
 {
+    /**
+     * Hydrates to a simple array.
+     */
     const TO_ARRAY = 'array';
 
+    /**
+     * Hydrates to a LdapObject (single result) or LdapObjectCollection (all results).
+     */
+    const TO_OBJECT = 'object';
+
+    /**
+     * Get the hydrator by its type.
+     *
+     * @param string $hydratorType
+     * @return \LdapTools\Hydrator\HydratorInterface
+     */
     public function get($hydratorType)
     {
         if (self::TO_ARRAY == $hydratorType) {
             return new ArrayHydrator();
+        } elseif (self::TO_OBJECT == $hydratorType) {
+            return new LdapObjectHydrator();
         } else {
             throw new \InvalidArgumentException(sprintf('Unknown hydrator type "%s".', $hydratorType));
         }

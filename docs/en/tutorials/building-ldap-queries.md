@@ -45,7 +45,7 @@ $users = $lqb->select()
     ->execute();
     
 foreach ($users as $user) {
-    foreach ($user as $attribute => $value) {
+    foreach ($user->toArray() as $attribute => $value) {
         echo $attribute.' => '.$value.PHP_EOL;
     }
 }
@@ -398,7 +398,7 @@ $group = $groupRepo->findOneByName('Domain Administrators');
 $query = $ldapManager->buildLdapQuery();
 $users = $query->select()
     ->fromUsers()
-    ->where($query->filter()->isRecursivelyMemberOf($group['dn']))
+    ->where($query->filter()->isRecursivelyMemberOf($group->getDn()))
     ->getLdapQuery()
     ->execute();
 ```

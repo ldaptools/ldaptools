@@ -91,7 +91,7 @@ class LdapQuery
      * @param string $hydratorType A hyrdrator type constant from the factory.
      * @return mixed
      */
-    public function execute($hydratorType = HydratorFactory::TO_ARRAY)
+    public function execute($hydratorType = HydratorFactory::TO_OBJECT)
     {
         $hydrator = $this->hydratorFactory->get($hydratorType);
         $attributes = empty($this->schemas) ? $this->attributes : $this->getAttributesToLdap($this->attributes);

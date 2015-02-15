@@ -11,6 +11,7 @@ for Active Directory and OpenLDAP.
  
  * A fluent and easy to understand syntax for generating LDAP queries.
  * Easily create common LDAP objects (Users, Groups, Contacts, Computers).
+ * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
  * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
  * Active Directory specific features to help ease development of applications.
  * Includes a comprehensive set of specs for the code.
@@ -40,8 +41,13 @@ $query = $ldap->buildLdapQuery()
     ->where(['firstName' => 'Foo'])
     ->orWhere(['firstName' => 'Bar']);
     
-// Returns an array of all users whose first name is 'Foo' or 'Bar'
+// Returns a `LdapObjectCollection` of all users whose first name is 'Foo' or 'Bar'
 $users = $query->getLdapQuery()->execute();
+
+echo "Found ".$users->count()." user(s).".PHP_EOL;
+foreach ($users as $user) {
+    echo "User: ".$user->getUsername().PHP_EOL;
+}
 
 // It also supports the concepts of repositories...
 $userRepository = $ldap->getRepository('user');
@@ -49,8 +55,9 @@ $userRepository = $ldap->getRepository('user');
 // Find all users whose last name equals Smith.
 $users = $userRepository->findByLastName('Smith');
 
-// Get the first user whose username equals 'jsmith'
+// Get the first user whose username equals 'jsmith'. Returns a `LdapObject`.
 $user = $userRepository->findOneByUsername('jsmith');
+echo "First name ".$user->getFirstName()." and last name ".$user->getLastName().PHP_EOL;
 
 $ldapObject = $ldap->createLdapObject();
 

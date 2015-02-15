@@ -47,7 +47,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
     function it_should_call_findByFirstName()
     {
-        $this->findByFirstName('foo')->shouldBeArray();
+        $this->findByFirstName('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
     function it_should_error_when_calling_findOneByFooBar()
