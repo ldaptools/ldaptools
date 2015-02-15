@@ -21,11 +21,64 @@ use Prophecy\Argument;
 
 class LdapObjectRepositorySpec extends ObjectBehavior
 {
+    protected $ldapEntries = [
+        'count' => 2,
+        0 => [
+            'cn' => [
+                'count' => 1,
+                0 => "Smith, Archie",
+            ],
+            0 => "cn",
+            'sn' => [
+                'count' => 1,
+                0 => "Smith",
+            ],
+            1 => "sn",
+            'givenname' => [
+                'count' => 1,
+                0 => "Archie",
+            ],
+            2 => "givenname",
+            'whencreated' => [
+                'count' => 1,
+                0 => "19960622123421Z",
+            ],
+            3 => "whencreated",
+            'count' => 3,
+            'dn' => "CN=Smith\, Archie,OU=DE,OU=Employees,DC=example,DC=local",
+        ],
+        1 => [
+            'cn' => [
+                'count' => 1,
+                0 => "Smith, John",
+            ],
+            0 => "cn",
+            'sn' => [
+                'count' => 1,
+                0 => "Smith",
+            ],
+            1 => "sn",
+            'givenname' => [
+                'count' => 1,
+                0 => "John",
+            ],
+            2 => "givenname",
+            'whenCreated' => [
+                'count' => 1,
+                0 => "19920622123421Z",
+            ],
+            3 => "whenCreated",
+            'count' => 3,
+            'dn' => "CN=Smith\, John,OU=DE,OU=Employees,DC=example,DC=local",
+
+        ]
+    ];
+
     public function let(LdapConnectionInterface $ldap)
     {
         $config = new Configuration();
         $config->setCacheType('none');
-        $ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->willReturn(['count' => 0]);
+        $ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->willReturn($this->ldapEntries);
         $ldap->getLdapType()->willReturn(LdapConnection::TYPE_AD);
 
         $cache = CacheFactory::get($config->getCacheType(), $config->getCacheOptions());
@@ -40,9 +93,9 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\LdapObjectRepository');
     }
 
-    function it_should_call_findOneByGuid()
+    function it_should_call_findOneByGuid_and_return_a_LdapObject()
     {
-        $this->findOneByGuid('foo')->shouldBeArray();
+        $this->findOneByGuid('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 
     function it_should_call_findByFirstName()
@@ -64,5 +117,17 @@ class LdapObjectRepositorySpec extends ObjectBehavior
     {
         $this->setAttributes(['foo']);
         $this->getAttributes()->shouldBeEqualTo(['foo']);
+    }
+
+    function it_should_get_set_the_hydration_mode_if_calling_set_hydration_mode()
+    {
+        $this->setHydrationMode('array');
+        $this->getHydrationMode()->shouldBeEqualTo('array');
+    }
+
+    function it_should_respect_the_explicitly_set_hydration_mode()
+    {
+        $this->setHydrationMode('array');
+        $this->findByFirstName('foo')->shouldBeArray();
     }
 }

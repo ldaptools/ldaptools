@@ -11,6 +11,7 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Schema\LdapObjectSchema;
 
@@ -21,6 +22,11 @@ use LdapTools\Schema\LdapObjectSchema;
  */
 class LdapObjectRepository
 {
+    /**
+     * @var string An explicitly set hydration mode.
+     */
+    protected $hydrationMode;
+
     /**
      * @var array The default attributes to return
      */
@@ -52,7 +58,9 @@ class LdapObjectRepository
      */
     public function findBy(array $attributes)
     {
-        return $this->buildQuery()->where($attributes)->getLdapQuery()->execute();
+        $query = $this->buildQuery()->where($attributes)->getLdapQuery();
+
+        return  $this->hydrationMode ? $query->execute($this->hydrationMode) : $query->execute();
     }
 
     /**
@@ -61,11 +69,22 @@ class LdapObjectRepository
      */
     public function findOneBy(array $attributes)
     {
-        $results = $this->buildQuery()->where($attributes)->getLdapQuery()->execute();
+        $results = $this->findBy($attributes);
+
+        if ($results instanceof LdapObjectCollection) {
+            $results = $results->toArray();
+        }
 
         return reset($results) ?: [];
     }
 
+    /**
+     * Determines which method to actually call.
+     *
+     * @param string $method
+     * @param mixed $arguments
+     * @return mixed
+     */
     public function __call($method, $arguments)
     {
         if (!preg_match('/^(findOneBy|findBy)(.*)$/', $method, $matches)) {
@@ -94,6 +113,11 @@ class LdapObjectRepository
         }
     }
 
+    /**
+     * Get the LdapQueryBuilder with the defaults for this repository type.
+     *
+     * @return LdapQueryBuilder
+     */
     public function buildQuery()
     {
         $lqb = new LdapQueryBuilder($this->ldap);
@@ -105,13 +129,49 @@ class LdapObjectRepository
         return $lqb->from($this->schema);
     }
 
+    /**
+     * Set the default attributes to select.
+     *
+     * @param array $attributes
+     * @return $this
+     */
     public function setAttributes(array $attributes)
     {
         $this->attributes = $attributes;
+
+        return $this;
     }
 
+    /**
+     * Get the default attributes that will be selected.
+     *
+     * @return array
+     */
     public function getAttributes()
     {
         return $this->attributes;
+    }
+
+    /**
+     * Set the hydration mode to use for the results.
+     *
+     * @param string $hydrationMode
+     * @return $this
+     */
+    public function setHydrationMode($hydrationMode)
+    {
+        $this->hydrationMode = $hydrationMode;
+
+        return $this;
+    }
+
+    /**
+     * Get the hydration mode used for the results.
+     *
+     * @return string
+     */
+    public function getHydrationMode()
+    {
+        return $this->hydrationMode;
     }
 }

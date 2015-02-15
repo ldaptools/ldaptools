@@ -37,4 +37,11 @@ class LdapObjectCollectionSpec extends ObjectBehavior
         $this->add(new LdapObject(['foo' => 'bar']));
         $this->count()->shouldBeEqualTo(1);
     }
+
+    function it_should_return_an_array_of_objects_when_calling_to_array()
+    {
+        $this->add(new LdapObject(['foo' => 'bar']));
+        $this->toArray()->shouldBeArray();
+        $this->toArray()->shouldHaveCount(1);
+    }
 }

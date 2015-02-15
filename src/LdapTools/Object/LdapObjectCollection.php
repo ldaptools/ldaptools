@@ -35,6 +35,17 @@ class LdapObjectCollection implements \IteratorAggregate
     }
 
     /**
+     * Returns an array of LdapObjects. To get the results in a simple array for you should change the hydration when
+     * executing the query.
+     *
+     * @return LdapObject[]
+     */
+    public function toArray()
+    {
+        return $this->objects;
+    }
+
+    /**
      * Allows this object to be iterated over.
      *
      * @return \ArrayIterator
