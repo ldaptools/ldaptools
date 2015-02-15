@@ -15,7 +15,7 @@ use LdapTools\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
- * Common Hydrator functions.
+ * Common Hydrator functions. The default functionality is to hydrate to/from arrays.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
@@ -87,6 +87,64 @@ trait HydratorTrait
     public function getSelectedAttributes()
     {
         return $this->selectedAttributes;
+    }
+
+    /**
+     * @see HydratorInterface::hydrateFromLdap()
+     */
+    public function hydrateFromLdap(array $entry)
+    {
+        $attributes = [];
+
+        foreach ($entry as $key => $value) {
+            if (!is_string($key)) {
+                continue;
+            }
+            if (isset($value['count']) && $value['count'] == 1) {
+                $attributes[$key] = $value[0];
+            } elseif (isset($value['count']) && $value['count'] > 0) {
+                $attributes[$key] = [];
+                for ($i = 0; $i < $value['count']; $i++) {
+                    $attributes[$key][] = $value[$i];
+                }
+            }
+        }
+        $attributes = $this->convertNamesFromLdap($attributes);
+        $attributes = $this->convertValuesFromLdap($attributes);
+
+        return $attributes;
+    }
+
+    /**
+     * @see HydratorInterface::hydrateAllFromLdap()
+     */
+    public function hydrateAllFromLdap(array $entries)
+    {
+        $results = [];
+        $entryCount = isset($entries['count']) ? $entries['count'] : 0;
+
+        for ($i = 0; $i < $entryCount; $i++) {
+            $results[] = $this->hydrateFromLdap($entries[$i]);
+        }
+
+        return $results;
+    }
+
+    /**
+     * @see HydratorInterface::hydrateToLdap()
+     */
+    public function hydrateToLdap($attributes)
+    {
+        if (!is_array($attributes)) {
+            throw new \InvalidArgumentException('Expects an array to convert data to LDAP.');
+        }
+        $attributes = $this->mergeDefaultAttributes($attributes);
+        $this->validateAttributesToLdap($attributes);
+        $attributes = $this->resolveParameters($attributes);
+        $attributes = $this->convertValuesToLdap($attributes);
+        $attributes = $this->convertNamesToLdap($attributes);
+
+        return $attributes;
     }
 
     /**

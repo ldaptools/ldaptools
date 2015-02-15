@@ -119,6 +119,7 @@ class LdapObjectHydratorSpec extends ObjectBehavior
     function it_should_hydrate_all_entries_from_ldap_to_a_ldap_object_collection()
     {
         $this->hydrateAllFromLdap($this->ldapEntries)->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
+        $this->hydrateAllFromLdap($this->ldapEntries)->count()->shouldBeEqualTo(2);
     }
 
     public function getMatchers()

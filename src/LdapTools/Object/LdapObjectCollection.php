@@ -23,13 +23,15 @@ class LdapObjectCollection implements \IteratorAggregate
     protected $objects = [];
 
     /**
-     * Add a LdapObject to the collection.
+     * Add LdapObjects to the collection.
      *
-     * @param LdapObject $ldapObject
+     * @param LdapObject[] $ldapObjects
      */
-    public function add(LdapObject $ldapObject)
+    public function add(LdapObject ...$ldapObjects)
     {
-        $this->objects[] = $ldapObject;
+        foreach ($ldapObjects as $ldapObject) {
+            $this->objects[] = $ldapObject;
+        }
     }
 
     /**
