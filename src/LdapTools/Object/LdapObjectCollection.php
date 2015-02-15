@@ -25,7 +25,7 @@ class LdapObjectCollection implements \IteratorAggregate
     /**
      * Add LdapObjects to the collection.
      *
-     * @param LdapObject[] $ldapObjects
+     * @param LdapObject[] ...$ldapObjects
      */
     public function add(LdapObject ...$ldapObjects)
     {
