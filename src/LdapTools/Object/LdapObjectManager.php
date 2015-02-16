@@ -67,6 +67,7 @@ class LdapObjectManager
         }
 
         $this->connection->modifyBatch($ldapObject->get('dn'), $batch);
+        $ldapObject->clearBatchModifications();
     }
 
     /**

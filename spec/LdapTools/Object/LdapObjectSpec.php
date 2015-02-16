@@ -242,4 +242,14 @@ class LdapObjectSpec extends ObjectBehavior
     {
         $this->getType()->shouldBeEqualTo('user');
     }
+
+    function it_should_be_able_to_clear_the_batch_modifcations_array()
+    {
+        $this->addFirstName('Foo');
+        $this->removeLastName('Sikorra');
+        $this->reset('emailAddress');
+        $this->set('phoneNumber', '555-5555');
+        $this->getBatchModifications()->shouldHaveCount(4);
+        $this->clearBatchModifications()->getBatchModifications()->shouldHaveCount(0);
+    }
 }

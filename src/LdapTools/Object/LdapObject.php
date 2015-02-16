@@ -234,6 +234,18 @@ class LdapObject
     }
 
     /**
+     * Clears the batch modifications array.
+     *
+     * @return $this
+     */
+    public function clearBatchModifications()
+    {
+        $this->modifications = [];
+
+        return $this;
+    }
+
+    /**
      * Determines which function, if any, should be called.
      *
      * @param string $method
