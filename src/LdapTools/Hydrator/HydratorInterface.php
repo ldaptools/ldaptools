@@ -28,6 +28,14 @@ interface HydratorInterface
     public function hydrateToLdap($object);
 
     /**
+     * Converts a ldap_modify_batch array specification so any schema names and value conversions are accounted for.
+     *
+     * @param mixed $batch
+     * @return array
+     */
+    public function hydrateBatchToLdap($batch);
+
+    /**
      * Hydrates a single LDAP entry.
      *
      * @param array $entry

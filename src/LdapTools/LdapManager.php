@@ -14,6 +14,8 @@ use LdapTools\Connection\LdapConnection;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Object\LdapObject;
+use LdapTools\Object\LdapObjectManager;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -57,6 +59,11 @@ class LdapManager
      * @var Factory\LdapObjectSchemaFactory
      */
     protected $schemaFactory;
+
+    /**
+     * @var array
+     */
+    protected $ldapObjectManager = [];
 
     /**
      * @param Configuration $config
@@ -154,6 +161,7 @@ class LdapManager
 
     /**
      * Get a repository for a specific LDAP object type.
+     *
      * @param string $type
      * @return LdapObjectRepository
      */
@@ -172,6 +180,49 @@ class LdapManager
         }
 
         return $repository;
+    }
+
+    /**
+     * Sends a LdapObject back to LDAP so the changes can be written to the directory.
+     *
+     * @param LdapObject $ldapObject
+     * @return $this
+     */
+    public function persist(LdapObject $ldapObject)
+    {
+        $this->getObjectManager()->persist($ldapObject);
+
+        return $this;
+    }
+
+    /**
+     * Delete an object from LDAP.
+     *
+     * @param LdapObject $ldapObject
+     * @return $this
+     */
+    public function delete(LdapObject $ldapObject)
+    {
+        $this->getObjectManager()->delete($ldapObject);
+
+        return $this;
+    }
+
+    /**
+     * Retrieve the LdapObjectManager for the current domain context.
+     *
+     * @return LdapObjectManager
+     */
+    protected function getObjectManager()
+    {
+        if (!isset($this->ldapObjectManager[$this->context])) {
+            $this->ldapObjectManager[$this->context] = new LdapObjectManager(
+                $this->getConnection(),
+                $this->getSchemaFactory()
+            );
+        }
+
+        return $this->ldapObjectManager[$this->context];
     }
 
     /**

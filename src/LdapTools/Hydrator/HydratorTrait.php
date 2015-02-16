@@ -141,6 +141,33 @@ trait HydratorTrait
     }
 
     /**
+     * @see HydratorInterface::hydrateBatchToLdap()
+     */
+    public function hydrateBatchToLdap($batch)
+    {
+        if (!is_array($batch)) {
+            throw new \InvalidArgumentException('Expects an array to convert batch modifications to LDAP.');
+        }
+
+        foreach ($batch as &$item) {
+            if (!(LDAP_MODIFY_BATCH_REMOVE_ALL === $item['modtype'])) {
+                $entry = $this->convertValuesToLdap([$item['attrib'] => $item['values']]);
+                $entry = $this->convertNamesToLdap($entry);
+                $item['values'] = reset($entry);
+                $item['attrib'] = key($entry);
+
+            } else {
+                if (!empty($this->schemas)) {
+                    $item['attrib'] = $this->getSchema()->getAttributeToLdap($item['attrib']);
+                }
+            }
+        }
+        var_dump($batch);
+
+        return $batch;
+    }
+
+    /**
      * Given a specific attribute and value add it to the newly formed LDAP entry array.
      *
      * @param array $entry
@@ -322,10 +349,14 @@ trait HydratorTrait
             return $attributes;
         }
 
-        foreach ($attributes as $attribute => $value) {
+        foreach ($attributes as $attribute => $values) {
             if ($this->getSchema()->hasConverter($attribute)) {
                 $converter = $this->getSchema()->getConverter($attribute);
-                $attributes[$attribute] = AttributeConverterFactory::get($converter)->toLdap($value);
+                $values = is_array($values) ? $values : [ $values ];
+                foreach ($values as $index => $value) {
+                    $values[$index] = AttributeConverterFactory::get($converter)->toLdap($value);
+                }
+                $attributes[$attribute] = (count($values) == 1) ? reset($values) : $values;
             }
         }
 

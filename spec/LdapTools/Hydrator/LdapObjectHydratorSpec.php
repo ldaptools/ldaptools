@@ -122,6 +122,44 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $this->hydrateAllFromLdap($this->ldapEntries)->count()->shouldBeEqualTo(2);
     }
 
+    function it_should_hydrate_a_ldap_batch_modify_spec_()
+    {
+        $batch = [
+            [
+                'attrib' => 'givenName',
+                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+                'values' => ['Chad'],
+            ],
+            [
+                'attrib' => 'sn',
+                'modtype' => LDAP_MODIFY_BATCH_ADD,
+                'values' => ['Sikorra'],
+            ],
+            [
+                'attrib' => 'sAMAccountName',
+                'modtype' => LDAP_MODIFY_BATCH_REMOVE,
+                'values' => ['csikorra'],
+            ],
+            [
+                'attrib' => 'mail',
+                'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
+            ],
+        ];
+
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap([ 'firstName' => 'givenName','lastName' => 'sn', 'emailAddress' => 'mail', 'username' => 'sAMAccountName' ]);
+        $this->setLdapObjectSchemas($schema);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject->set('firstName', 'Chad');
+        $ldapObject->add('lastName', 'Sikorra');
+        $ldapObject->remove('username', 'csikorra');
+        $ldapObject->reset('emailAddress');
+
+        $this->hydrateBatchToLdap($ldapObject)->shouldBeEqualTo($batch);
+        $this->hydrateBatchToLdap($ldapObject)->shouldHaveCount(4);
+    }
+
     public function getMatchers()
     {
         return [
