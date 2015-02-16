@@ -6,6 +6,7 @@ directory service, but contains default attribute converters and schemas for Act
  
  * A fluent and easy to understand syntax for generating LDAP queries.
  * Easily create common LDAP objects (Users, Groups, Contacts, Computers).
+ * Easily modify LDAP objects with automatic setters/getters/properties/etc.
  * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
  * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
  * Active Directory specific features to help ease development of applications.
@@ -56,6 +57,17 @@ $users = $userRepository->findByLastName('Smith');
 $user = $userRepository->findOneByUsername('jsmith');
 echo "First name ".$user->getFirstName()." and last name ".$user->getLastName().PHP_EOL;
 
+// Make some modifications to the user account...
+$user->setTitle('CEO');
+$user->resetMobilePhone();
+
+// Now actually save the changes back to LDAP...
+try {
+    $ldap->persist($user);
+} catch (\Exception $e) {
+    echo "Error updating user! ".$e->getMessage();
+}
+
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
@@ -94,13 +106,13 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Using the LdapManager](/docs/en/tutorials/using-the-ldap-manager.md)
 * [Building LDAP Queries](/docs/en/tutorials/building-ldap-queries.md)
 * [Creating LDAP Objects](/docs/en/tutorials/creating-ldap-objects.md)
+* [Modifying LDAP Objects](/docs/en/tutorials/modifying-ldap-objects.md)
 * [Default Schema Attributes](/docs/en/reference/default-schema-attributes.md)
 
 ### TODO
 
 Things that still need to be implemented:
 
-* Modifying LDAP entries.
 * Automatic generation of the schema based off of information in LDAP.
 * A logging mechanism.
 * An event system.

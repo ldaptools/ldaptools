@@ -11,6 +11,7 @@ for Active Directory and OpenLDAP.
  
  * A fluent and easy to understand syntax for generating LDAP queries.
  * Easily create common LDAP objects (Users, Groups, Contacts, Computers).
+ * Easily modify LDAP objects with automatic setters/getters/properties/etc.
  * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
  * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
  * Active Directory specific features to help ease development of applications.
@@ -59,6 +60,17 @@ $users = $userRepository->findByLastName('Smith');
 $user = $userRepository->findOneByUsername('jsmith');
 echo "First name ".$user->getFirstName()." and last name ".$user->getLastName().PHP_EOL;
 
+// Make some modifications to the user account...
+$user->setTitle('CEO');
+$user->resetMobilePhone();
+
+// Now actually save the changes back to LDAP...
+try {
+    $ldap->persist($user);
+} catch (\Exception $e) {
+    echo "Error updating user! ".$e->getMessage();
+}
+
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
@@ -92,8 +104,6 @@ The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.o
 
 There are still several features that need to be implemented:
 
-* Modifying LDAP entries.
-* An object hydration process in addition to the array hydrator.
 * Automatic generation of the schema based off of information in LDAP.
 * A logging mechanism.
 * An event system.
