@@ -71,6 +71,13 @@ try {
     echo "Error updating user! ".$e->getMessage();
 }
 
+// Decide they no longer work here and should be deleted?
+try {
+    $ldap->delete($user);
+} catch (\Exception $e) {
+    echo "Error deleting user! ".$e->getMessage();
+}
+
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)

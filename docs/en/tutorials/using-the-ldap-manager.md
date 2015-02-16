@@ -79,3 +79,51 @@ $rootDse = $connection->getRootDse();
 var_dump($rootDse->toArray());
 var_dump($rootDse->getDefaultNamingContext());
 ```
+
+### Modifying LDAP Objects
+--------------------------
+
+Using the `LdapManager` class you can save changes to LDAP users you have searched for back to LDAP using the
+`persist($ldapObject)` method.
+
+```php
+use LdapTools\Object\LdapObjectTypes;
+
+$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+
+// Retrieve the user that has a specific GUID.
+$user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
+
+// Change some attribute value
+$user->setCity('Milwaukee');
+
+// Save the changes back to LDAP using the persist method...
+try {
+    $ldapManager->persist($user);
+} catch (\Exception $e) {
+    echo "Error saving object to LDAP: ".$e->getMessage();
+}
+```
+
+### Deleting LDAP Objects
+--------------------------
+
+Using the `LdapManager` class you can also remove an object from LDAP using the `delete($ldapObject)` method.
+
+`persist($ldapObject)` method.
+
+```php
+use LdapTools\Object\LdapObjectTypes;
+
+$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+
+// Retrieve the user that has a specific GUID.
+$user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
+
+// Delete the object from LDAP...
+try {
+    $ldapManager->delete($user);
+} catch (\Exception $e) {
+    echo "Error deleting object from LDAP: ".$e->getMessage();
+}
+```
