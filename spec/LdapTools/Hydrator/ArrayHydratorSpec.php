@@ -169,6 +169,16 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKeyWithInt('createdInt');
     }
 
+    function it_should_return_the_dn_attribute_even_if_it_wasnt_selected()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn']);
+        $this->setLdapObjectSchemas($schema);
+
+        $this->setSelectedAttributes(['givenName', 'lastName']);
+        $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKey('dn');
+    }
+
     function it_should_return_an_array_when_hydrating_to_ldap()
     {
         $schema = new LdapObjectSchema('ad', 'user');

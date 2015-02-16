@@ -97,17 +97,10 @@ trait HydratorTrait
         $attributes = [];
 
         foreach ($entry as $key => $value) {
-            if (!is_string($key)) {
+            if (!is_string($key) ) {
                 continue;
             }
-            if (isset($value['count']) && $value['count'] == 1) {
-                $attributes[$key] = $value[0];
-            } elseif (isset($value['count']) && $value['count'] > 0) {
-                $attributes[$key] = [];
-                for ($i = 0; $i < $value['count']; $i++) {
-                    $attributes[$key][] = $value[$i];
-                }
-            }
+            $attributes = $this->setAttributeFromLdap($attributes, $key, $value);
         }
         $attributes = $this->convertNamesFromLdap($attributes);
         $attributes = $this->convertValuesFromLdap($attributes);
@@ -148,6 +141,30 @@ trait HydratorTrait
     }
 
     /**
+     * Given a specific attribute and value add it to the newly formed LDAP entry array.
+     *
+     * @param array $entry
+     * @param string $attribute
+     * @param string|array $value
+     * @return array
+     */
+    protected function setAttributeFromLdap(array $entry, $attribute, $value)
+    {
+        if (isset($value['count']) && $value['count'] == 1) {
+            $entry[$attribute] = $value[0];
+        } elseif (isset($value['count']) && $value['count'] > 0) {
+            $entry[$attribute] = [];
+            for ($i = 0; $i < $value['count']; $i++) {
+                $entry[$attribute][] = $value[$i];
+            }
+        } elseif ($attribute === 'dn') {
+            $entry[$attribute] = $value;
+        }
+
+        return $entry;
+    }
+
+    /**
      * Replace the LDAP attribute names with the schema names if there is a schema present.
      *
      * @param array $entry
@@ -176,6 +193,25 @@ trait HydratorTrait
             if ($this->selectedButNotPartOfEntry($attribute, $newEntry)) {
                 $newEntry[$this->getAttributeNameAsRequested($attribute)] = $value;
             }
+        }
+        // The DN attribute must be present as it is used in many critical functions.
+        $newEntry = $this->addDnFromLdapIfNotPresent($newEntry, $entry);
+
+        return $newEntry;
+    }
+
+    /**
+     * The DN attribute is returned by PHP on all LDAP search operations, regardless of selected attributes, and is used
+     * in many functions. So add it to the results even if it wasn't selected for.
+     *
+     * @param array $newEntry
+     * @param array $entry
+     * @return array
+     */
+    protected function addDnFromLdapIfNotPresent(array $newEntry, array $entry)
+    {
+        if (!isset($newEntry['dn']) && isset($entry['dn'])) {
+            $newEntry['dn'] = $entry['dn'];
         }
 
         return $newEntry;
