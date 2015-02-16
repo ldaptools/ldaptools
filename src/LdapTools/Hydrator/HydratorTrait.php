@@ -162,7 +162,6 @@ trait HydratorTrait
                 }
             }
         }
-        var_dump($batch);
 
         return $batch;
     }
