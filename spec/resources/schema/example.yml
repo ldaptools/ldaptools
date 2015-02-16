@@ -73,6 +73,7 @@ objects:
             sid: objectSid
             guid: objectGuid
             name: cn
+            username: sAMAccountName
         default_values:
             name: %username%
             displayName: "%username%"
