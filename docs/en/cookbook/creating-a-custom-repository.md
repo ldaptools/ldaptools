@@ -37,7 +37,7 @@ objects:
 
 Then once you have your `LdapManager` class instantiated you can get your custom repository and use it:
  
- ```php
+```php
  // Assuming you defined the custom repository under the 'user' object type.
  $repository = $ldapManager->getRepository('user');
  
