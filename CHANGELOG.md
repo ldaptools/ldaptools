@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.8.0 (2015-02-16)
+------------------
+
+  * Implement an object hydrator and make it the default.
+  * Implement automatic setters/getters/property access on searched objects.
+  * Implement modifying LDAP objects by persisting a hydrated LDAP object using the LdapManager.
+  * Implement a method to easily delete LDAP objects using the LdapManager.
+  * Better error detection in the LdapConnection.
+  * Improved YAML schema parsing performance.
+  
 0.7.0 (2015-02-09)
 ------------------
 
