@@ -120,4 +120,12 @@ class LdapManagerSpec extends ObjectBehavior
     {
         $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
     }
+
+    /**
+     * Unsure of how to really mock this behavior since the connection is instantiated from the config.
+     */
+    function it_should_attempt_to_authenticate_a_username_and_password()
+    {
+        $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringAuthenticate('foo','bar');
+    }
 }

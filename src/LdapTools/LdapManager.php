@@ -209,6 +209,18 @@ class LdapManager
     }
 
     /**
+     * A shorthand method for verifying a username/password combination against LDAP.
+     *
+     * @param string $user
+     * @param string $password
+     * @return bool
+     */
+    public function authenticate($user, $password)
+    {
+        return $this->getConnection()->authenticate($user, $password);
+    }
+
+    /**
      * Retrieve the LdapObjectManager for the current domain context.
      *
      * @return LdapObjectManager
