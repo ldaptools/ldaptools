@@ -2,7 +2,7 @@
 -----------------------------
 
 The `LdapManager` provides an easy point of access into the different parts of this library after you have setup the
-[configuration](../reference/main-configuration.md). You can use the `LdapManager` to generate LDAP queries for a
+[configuration](../reference/Main-Configuration.md). You can use the `LdapManager` to generate LDAP queries for a
 certain domain, get a "Repository" for a specific LDAP type in your schema, switch between domains when you have 
 multiple defined in your configuration, and retrieve a `LdapConnection` object for the domain.
 

@@ -108,13 +108,13 @@ The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.o
 
 Browse [the docs folder](/docs/en) for more information about LdapTools.
 
-* [Main Configuration Reference](/docs/en/reference/main-configuration.md)
-* [Schema Configuration](/docs/en/reference/schema-configuration.md)
-* [Using the LdapManager](/docs/en/tutorials/using-the-ldap-manager.md)
-* [Building LDAP Queries](/docs/en/tutorials/building-ldap-queries.md)
-* [Creating LDAP Objects](/docs/en/tutorials/creating-ldap-objects.md)
-* [Modifying LDAP Objects](/docs/en/tutorials/modifying-ldap-objects.md)
-* [Default Schema Attributes](/docs/en/reference/default-schema-attributes.md)
+* [Main Configuration Reference](/docs/en/reference/Main-Configuration.md)
+* [Schema Configuration](/docs/en/reference/Schema-Configuration.md)
+* [Using the LdapManager](/docs/en/tutorials/Using-the-LDAP-Manager.md)
+* [Building LDAP Queries](/docs/en/tutorials/Building-LDAP-Queries.md)
+* [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
+* [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-objects.md)
+* [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
 
 ### TODO
 

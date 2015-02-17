@@ -65,7 +65,7 @@ These should defined as keys with the converters name with an array of attribute
 ```
     
 The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a 
-complete listing of possible built-in attribute converters, see this [reference doc](attribute-converters.md).
+complete listing of possible built-in attribute converters, see this [reference doc](Attribute-Converters.md).
     
 --------------------
 #### attributes_to_select
