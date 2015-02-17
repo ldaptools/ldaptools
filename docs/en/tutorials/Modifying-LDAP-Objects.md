@@ -59,7 +59,6 @@ $user->firstName = 'Fred';
 $user->lastName = 'Fuchs';
 
 // You can also call isset on a property to determine if it exists on the object...
-
 if (isset($user.phoneNumber)) {
     echo "Phone: ".$user.phoneNumber.PHP_EOL; 
 }
