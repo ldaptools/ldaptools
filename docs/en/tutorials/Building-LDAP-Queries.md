@@ -186,12 +186,13 @@ This method sets the LDAP search scope to one level at the point of the base DN.
 ------------------------ 
 #### setScopeBase()
 
-This method sets the LDAP search scope to the base level. This is used to retrieve the contents of a single entry, is
-likely most commonly used to retrieve  the RootDSE of a domain.
+This method sets the LDAP search scope to the base level. This is used to retrieve the contents of a single entry, and 
+is most commonly used to retrieve the RootDSE of a domain.
 
 Example usage to return the RootDSE for a domain:
 
 ```php
+// NOTE: You can also call the getRootDse() method on the connection object to get the RootDSE...
 $rootDse = $lqb->where($lqb->filter->present('objectClass'))
                 ->setBaseDn('')
                 ->setScopeBase()
@@ -223,11 +224,28 @@ $filter = $lqb->getLdapFilter();
 
 Retrieves an instance of the `LdapQuery` object that you can then call the `execute` method on to get your results. The
 `LdapQuery` object has the filter, page size, base DN, scope, etc that you set in the builder and takes care of
-converting the LDAP results array using a hydration process. It returns an easier to use associative array of the
- LDAP entries.
+converting the LDAP results array using a hydration process. It returns an easier to use set of objects. Or you can
+have it return a simple set of arrays with the attributes and values.
  
 ```php
+use LdapTools\Factory\HydratorFactory;
+
+// By default the results will be a collection of LdapUser objects you can iterate over...
 $results = $lqb->getLdapQuery()->execute();
+
+foreach ($results as $result) {
+    echo $result->getEmailAddress();
+}
+
+// If you just want simple arrays returned you can specify that
+$results = $lqb->getLdapQuery()->execute(HydratorFactory::TO_ARRAY);
+
+foreach ($results as $result) {
+    foreach ($result as $attribute => $value) {
+        echo "$attribute => $value";
+    }
+}
+
 ```
 
 ------------------------
