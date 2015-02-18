@@ -260,16 +260,10 @@ class LdapObject
         $method = $matches[1];
         $attribute = lcfirst($matches[2]);
 
-        if ('get' == $method) {
-            return $this->get($attribute);
-        } elseif ('set' == $method) {
-            return $this->set($attribute, ...$arguments);
-        } elseif ('remove' == $method) {
-            return $this->remove($attribute, ...$arguments);
-        } elseif ('reset' == $method) {
-            return $this->reset($attribute);
+        if ('get' == $method || 'reset' == $method) {
+            return $this->$method($attribute);
         } else {
-            return $this->add($attribute, ...$arguments);
+            return $this->$method($attribute, ...$arguments);
         }
     }
 
