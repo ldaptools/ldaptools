@@ -25,6 +25,16 @@ $user->removePhoneNumber('555-5555');
 // Adds a value to an attribute in addition to what it might already have
 $user->addIpPhone('#001-1000');
 
+// Check if a specific attribute exists
+if ($user->hasEmailAddress()) {
+    // do something....
+}
+
+// Check if an attribute with a specific value exists
+if ($user->hasState('WI')) {
+    // do something else....
+}
+
 // Now actually save the changes back to LDAP
 try {
     $ldapManager->persist($user);
@@ -40,7 +50,7 @@ several "magic" PHP methods defined to make your life easier. You can get/set an
 just as if it had an actual setter defined. So to get the `firstName` attribute you can call `getFirstName()`. And
 to change it you simply call `setFirstName($firstName)`.
 
-However, be sure to check if the attribute exists in the returned object first by calling `hasAttribute($attributeName)`
+However, be sure to check if the attribute exists in the returned object first by calling `has($attributeName)`
 before trying to actually get its value.
 
 ## Automatic Property Access
@@ -93,7 +103,8 @@ attribute then an exception will be thrown during persist. It's best to wrap per
 Resets an attribute by removing any values it may contain.
 
 ------------------------
-#### hasAttribute($attribute)
+#### has($attribute, $value = null)
 
 Check for the existence of an attribute before you attempt to retrieve its value. If you attempt to get the value of a
-non-existent attribute then it will throw an exception.
+non-existent attribute then it will throw an exception. You can optionally specify a value check as well. In that case 
+the attribute must exist and it must have the specified value for it to return `true`.

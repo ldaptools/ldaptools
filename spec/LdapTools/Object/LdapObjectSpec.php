@@ -63,13 +63,19 @@ class LdapObjectSpec extends ObjectBehavior
 
     function it_should_properly_check_whether_an_attribute_exists()
     {
-        $this->hasAttribute('foo')->shouldBeEqualTo(false);
-        $this->hasAttribute('lastName')->shouldBeEqualTo(true);
+        $this->has('foo')->shouldBeEqualTo(false);
+        $this->has('lastName')->shouldBeEqualTo(true);
+    }
+
+    function it_should_properly_check_whether_an_attribute_with_a_specific_value_exists()
+    {
+        $this->has('firstName', 'Foo')->shouldBeEqualTo(false);
+        $this->has('lastName', 'Sikorra')->shouldBeEqualTo(true);
     }
 
     function it_should_be_case_insensitive_when_checking_whether_an_attribute_exists()
     {
-        $this->hasAttribute('LaStNaMe')->shouldBeEqualTo(true);
+        $this->has('LaStNaMe')->shouldBeEqualTo(true);
     }
 
     function it_should_get_an_attribute_using_the_magic_property_getter()
@@ -116,7 +122,7 @@ class LdapObjectSpec extends ObjectBehavior
     function it_should_remove_an_attribute_when_calling_the_magical_reset()
     {
         $this->resetFirstName();
-        $this->hasAttribute('firstName')->shouldBeEqualTo(false);
+        $this->has('firstName')->shouldBeEqualTo(false);
     }
 
     function it_should_return_self_when_calling_the_magical_reset()
@@ -160,13 +166,13 @@ class LdapObjectSpec extends ObjectBehavior
     function it_should_remove_an_attribute_completely_when_calling_reset()
     {
         $this->reset('firstName');
-        $this->hasAttribute('firstName')->shouldBeEqualTo(false);
+        $this->has('firstName')->shouldBeEqualTo(false);
     }
 
     function it_should_be_case_insensitive_when_calling_reset()
     {
         $this->reset('FirsTName');
-        $this->hasAttribute('firstName')->shouldBeEqualTo(false);
+        $this->has('firstName')->shouldBeEqualTo(false);
     }
 
     function it_should_return_self_when_calling_reset()
@@ -251,5 +257,16 @@ class LdapObjectSpec extends ObjectBehavior
         $this->set('phoneNumber', '555-5555');
         $this->getBatchModifications()->shouldHaveCount(4);
         $this->clearBatchModifications()->getBatchModifications()->shouldHaveCount(0);
+    }
+
+    function it_should_check_for_an_attribute_when_calling_the_magical_has()
+    {
+        $this->hasFirstName()->shouldBeEqualTo(true);
+    }
+
+    function it_should_check_for_an_attribute_with_a_value_if_specified_in_the_magical_has()
+    {
+        $this->hasFirstName('Chad')->shouldBeEqualTo(true);
+        $this->hasFirstName('foo')->shouldBeEqualTo(false);
     }
 }

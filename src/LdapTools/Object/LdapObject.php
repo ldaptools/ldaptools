@@ -21,6 +21,7 @@ class LdapObject
      * @var array These are the expected "magic" function calls for the attributes.
      */
     protected $functions = [
+        'has',
         'get',
         'set',
         'remove',
@@ -111,14 +112,19 @@ class LdapObject
     }
 
     /**
-     * Check to see if a specific attribute exists.
+     * Check to see if a specific attribute exists. Optionally check if it exists with a specific value.
      *
      * @param string $attribute
+     * @param mixed $value
      * @return bool
      */
-    public function hasAttribute($attribute)
+    public function has($attribute, $value = null)
     {
-        return array_key_exists(strtolower($attribute), array_change_key_case($this->attributes));
+        if (!array_key_exists(strtolower($attribute), array_change_key_case($this->attributes))) {
+            return false;
+        }
+
+        return is_null($value) ?: $this->attributeHasValue($attribute, $value);
     }
 
     /**
@@ -129,7 +135,7 @@ class LdapObject
      */
     public function get($attribute)
     {
-        if ($this->hasAttribute($attribute)) {
+        if ($this->has($attribute)) {
             return array_change_key_case($this->attributes)[strtolower($attribute)];
         } else {
             throw new \InvalidArgumentException(
@@ -147,7 +153,7 @@ class LdapObject
      */
     public function set($attribute, $value)
     {
-        if ($this->hasAttribute($attribute)) {
+        if ($this->has($attribute)) {
             $attribute = $this->resolveAttributeName($attribute);
             $this->attributes[$attribute] = $value;
         } else {
@@ -167,7 +173,7 @@ class LdapObject
      */
     public function remove($attribute, $value)
     {
-        if ($this->hasAttribute($attribute)) {
+        if ($this->has($attribute)) {
             $attribute = $this->resolveAttributeName($attribute);
             $this->attributes[$attribute] = $this->removeAttributeValue($this->attributes[$attribute], $value);
         }
@@ -184,7 +190,7 @@ class LdapObject
      */
     public function reset($attribute)
     {
-        if ($this->hasAttribute($attribute)) {
+        if ($this->has($attribute)) {
             $attribute = $this->resolveAttributeName($attribute);
             unset($this->attributes[$attribute]);
         }
@@ -202,7 +208,7 @@ class LdapObject
      */
     public function add($attribute, $value)
     {
-        if ($this->hasAttribute($attribute)) {
+        if ($this->has($attribute)) {
             $attribute = $this->resolveAttributeName($attribute);
             $this->attributes[$attribute] = $this->addAttributeValue($this->attributes[$attribute], $value);
         } else {
@@ -298,7 +304,25 @@ class LdapObject
      */
     public function __isset($attribute)
     {
-        return $this->hasAttribute($attribute);
+        return $this->has($attribute);
+    }
+
+    /**
+     * Check if an attribute has a specific value. Called only when the attribute is known to exist already.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return bool
+     */
+    protected function attributeHasValue($attribute, $value)
+    {
+        $attribute = $this->resolveAttributeName($attribute);
+
+        if (is_array($this->attributes[$attribute])) {
+            return in_array($value, $this->attributes[$attribute]);
+        } else {
+            return ($this->attributes[$attribute] == $value);
+        }
     }
 
     /**

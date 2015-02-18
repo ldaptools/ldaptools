@@ -88,7 +88,7 @@ class LdapObjectManager
      */
     protected function validateObject(LdapObject $ldapObject)
     {
-        if (!$ldapObject->hasAttribute('dn')) {
+        if (!$ldapObject->has('dn')) {
             throw new \InvalidArgumentException('To persist/delete a LDAP object it must have the DN attribute.');
         }
     }
