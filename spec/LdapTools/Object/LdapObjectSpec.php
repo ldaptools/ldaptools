@@ -269,4 +269,10 @@ class LdapObjectSpec extends ObjectBehavior
         $this->hasFirstName('Chad')->shouldBeEqualTo(true);
         $this->hasFirstName('foo')->shouldBeEqualTo(false);
     }
+
+    function it_should_properly_check_for_an_attribute_with_a_value_even_when_the_attribute_doesnt_exist()
+    {
+        $this->hasFoo()->shouldBeEqualTo(false);
+        $this->hasFoo('bar')->shouldBeEqualTo(false);
+    }
 }
