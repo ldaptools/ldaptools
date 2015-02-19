@@ -206,3 +206,40 @@ objects:
         required_attributes:
             - 'name'
             - 'emailAddress'
+    without_name_object:
+        type: noname
+        category: user
+        converters:
+             string_to_utf8:
+                 - 'description'
+                 - 'displayName'
+                 - 'dn'
+                 - 'emailAddress'
+                 - 'firstName'
+                 - 'lastName'
+                 - 'name'
+                 - 'phoneNumber'
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            description: description
+            dn: dn
+            displayName: displayName
+            emailAddress: mail
+            firstName: givenName
+            guid: objectGuid
+            lastName: sn
+            modified: whenChanged
+            phoneNumber: telephoneNumber
+            sid: objectSid
+        attributes_to_select:
+            - 'emailAddress'
+            - 'phoneNumber'
+            - 'dn'
+            - 'guid'
