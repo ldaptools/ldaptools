@@ -13,6 +13,19 @@ use Prophecy\Argument;
 
 class LdapObjectManagerSpec extends ObjectBehavior
 {
+    protected $ldapEntries = [
+        'count' => 1,
+        0 => [
+            'cn' => [
+                'count' => 1,
+                0 => "foo",
+            ],
+            0 => "cn",
+            'count' => 1,
+            'dn' => "CN=foo,DC=foo,DC=bar",
+        ]
+    ];
+
     function let(LdapConnectionInterface $connection)
     {
         $connection->getSchemaName()->willReturn('example');
@@ -96,5 +109,111 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $ldapObject->remove('username', 'csikorra');
         $ldapObject->reset('emailAddress');
         $this->persist($ldapObject);
+    }
+
+    function it_should_move_a_ldap_object_using_move(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
+        $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
+    }
+
+    function it_should_escape_the_RDN_when_moving_a_ldap_object(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo\2c bar', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
+        $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
+    }
+
+    function it_should_error_moving_if_a_schema_type_is_not_defined(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
+        $this->shouldThrow(new \InvalidArgumentException("The LDAP object must have a schema type defined to perform this action."))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
+    }
+
+    function it_should_error_moving_if_a_schema_does_not_have_a_name_attribute(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'noname');
+        $this->shouldThrow(new \InvalidArgumentException('The LdapObject type "noname" needs a "name" attribute defined that references the RDN.'))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
+    }
+
+    function it_should_error_moving_if_the_ldap_object_name_field_cannot_be_queried_when_not_selected(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->getLdapType()->willReturn('ad');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn([]);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $this->shouldThrow(new \RuntimeException("Unable to retrieve the RDN value for the LdapObject"))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
+    }
+
+    function it_should_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected(LdapConnectionInterface $connection)
+    {
+        $connection->getSchemaName()->willReturn('example');
+        $connection->getLdapType()->willReturn('ad');
+        $connection->__toString()->willReturn('example.com');
+        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn($this->ldapEntries);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 }

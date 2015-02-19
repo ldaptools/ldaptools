@@ -209,6 +209,19 @@ class LdapManager
     }
 
     /**
+     * Move an object in LDAP from one container/OU to another.
+     *
+     * @param LdapObject $ldapObject
+     * @return $this
+     */
+    public function move(LdapObject $ldapObject, $container)
+    {
+        $this->getObjectManager()->move($ldapObject, $container);
+
+        return $this;
+    }
+
+    /**
      * A shorthand method for verifying a username/password combination against LDAP.
      *
      * @param string $user

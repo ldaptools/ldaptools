@@ -127,3 +127,27 @@ try {
     echo "Error deleting object from LDAP: ".$e->getMessage();
 }
 ```
+
+
+### Moving LDAP Objects
+-----------------------
+
+Using the `LdapManager` class you can move an object from one location to another in LDAP. The method for doing this is 
+to call `move($ldapObject, $container)`. All this requires is you pass the existing LdapObject and then the new location
+of the OU/container in standard DN form:
+
+```php
+use LdapTools\Object\LdapObjectTypes;
+
+$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+
+// Retrieve the user that has a specific GUID.
+$user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
+
+// Move the object to a new OU...
+try {
+    $ldapManager->move($user, 'ou=Employees,dc=example,dc=local');
+} catch (\Exception $e) {
+    echo "Error moving object: ".$e->getMessage();
+}
+```
