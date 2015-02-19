@@ -95,6 +95,16 @@ interface LdapConnectionInterface
     public function modifyBatch($dn, array $entries);
 
     /**
+     * Moves a LDAP object to a new location in the directory.
+     *
+     * @param string $dn The full distinguished name of the entry.
+     * @param string $newRdn The RDN of the entry (ie. 'cn=user').
+     * @param string $container The path for the OU/container (ie. 'ou=Employees,dc=example,dc=local').
+     * @param bool $deleteOldRdn
+     */
+    public function move($dn, $newRdn, $container, $deleteOldRdn = true);
+
+    /**
      * If the connection is bound, this closes the LDAP connection.
      *
      * @return $this

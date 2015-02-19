@@ -299,6 +299,16 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function move($dn, $newRdn, $container, $deleteOldRdn = true)
+    {
+        if (!@ldap_rename($this->connection, $dn, $newRdn, $container, $deleteOldRdn)) {
+            throw new LdapConnectionException(sprintf('Unable to move LDAP object: %s', $this->getLastError()));
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function modifyBatch($dn, array $entries)
     {
         if (!@ldap_modify_batch($this->connection, $dn, $entries)) {
