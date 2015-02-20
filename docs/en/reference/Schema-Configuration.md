@@ -26,8 +26,8 @@ objects:
         # ... More object directives are defined here
 ```
 
-### Schema Object Configuration Options
----------------------------------------
+### Schema Configuration Options
+--------------------------------
 
 #### objects ***(Required)***
 
