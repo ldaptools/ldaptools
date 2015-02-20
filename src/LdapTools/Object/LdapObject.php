@@ -333,7 +333,12 @@ class LdapObject
      */
     protected function resolveAttributeName($attribute)
     {
-        return reset(preg_grep("/^$attribute$/i", array_keys($this->attributes)));
+        $result = preg_grep("/^$attribute$/i", array_keys($this->attributes));
+        if (empty($result)) {
+            throw new \InvalidArgumentException(sprintf('Unable to resolve attriute "%s".', $attribute));
+        }
+
+        return reset($result);
     }
 
     /**
