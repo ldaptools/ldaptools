@@ -335,7 +335,7 @@ class LdapObject
     {
         $result = preg_grep("/^$attribute$/i", array_keys($this->attributes));
         if (empty($result)) {
-            throw new \InvalidArgumentException(sprintf('Unable to resolve attriute "%s".', $attribute));
+            throw new \InvalidArgumentException(sprintf('Unable to resolve attribute "%s".', $attribute));
         }
 
         return reset($result);
