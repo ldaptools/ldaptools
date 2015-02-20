@@ -174,8 +174,8 @@ objects:
 --------------------
 #### extends_default
 
-By using this option you can tell the schema to extend a specific object type for a default schema, either `ad` or 
-`openldap`. This helps you to avoid repetition when configuring a custom schema yet still customize it to your needs.
+By using this option you can tell the schema to extend a specific object type from a default schema, either `ad` or 
+`openldap`. This helps you to avoid repetition when configuring your own schema yet still customize it to your needs.
 This value must be an array that contains the default schema name and object type to extend.
 
 ```yaml
