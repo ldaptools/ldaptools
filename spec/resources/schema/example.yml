@@ -1,5 +1,5 @@
 objects:
-    user_object:
+    user:
         type: user
         class: user
         category: person
@@ -85,7 +85,7 @@ objects:
             - 'username'
             - 'password'
         default_container: 'ou=foo,ou=bar,dc=example,dc=local'
-    group_object:
+    group:
         type: group
         class: group
         repository: '\LdapTools\Configuration'
@@ -114,7 +114,7 @@ objects:
             - 'name'
             - 'dn'
             - 'guid'
-    computer_object:
+    computer:
         type: computer
         category: computer
         converters:
@@ -160,7 +160,7 @@ objects:
             objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
         required_attributes:
             - 'name'
-    contact_object:
+    contact:
         type: contact
         category: contact
         converters:
@@ -206,7 +206,7 @@ objects:
         required_attributes:
             - 'name'
             - 'emailAddress'
-    without_name_object:
+    without_name:
         type: noname
         category: user
         converters:

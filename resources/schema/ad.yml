@@ -1,5 +1,5 @@
 objects:
-    user_object:
+    user:
         # This is a LdapTools specific to refer to this object type overall.
         type: user
         # The LDAP objectCategory
@@ -114,7 +114,7 @@ objects:
         required_attributes:
             - 'username'
             - 'password'
-    group_object:
+    group:
         type: group
         class: group
         converters:
@@ -151,7 +151,7 @@ objects:
             objectclass: "group"
         required_attributes:
             - 'name'
-    computer_object:
+    computer:
         type: computer
         category: computer
         converters:
@@ -198,7 +198,7 @@ objects:
             objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
         required_attributes:
             - 'name'
-    contact_object:
+    contact:
         type: contact
         category: contact
         converters:

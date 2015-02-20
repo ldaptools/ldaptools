@@ -1,5 +1,5 @@
 objects:
-    user_object:
+    user:
         # This is a LdapTools specific to refer to this object type overall.
         type: user
         # The LDAP objectClass
@@ -67,7 +67,7 @@ objects:
             - 'lastName'
             - 'emailAddress'
             - 'dn'
-    group_object:
+    group:
         type: group
         class: groupOfUniqueNames
         converters:
