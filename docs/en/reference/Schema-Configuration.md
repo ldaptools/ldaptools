@@ -31,7 +31,7 @@ objects:
 
 #### objects ***(Required)***
 
-Underneath the `objects` is where you defined all your schema object definitions. This option must be defined.
+Underneath the `objects` is where you define all your schema object definitions. This option must be defined.
 
 #### extends_default
 --------------------
