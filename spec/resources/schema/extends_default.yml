@@ -1,0 +1,10 @@
+extends_default: ad
+objects:
+    user:
+        default_container: 'ou=foo,ou=bar,dc=example,dc=local'
+        attributes:
+            foo: bar
+        category:
+        repository: '\Foo\Bar\Repo'
+        required_attributes:
+            - 'foo'

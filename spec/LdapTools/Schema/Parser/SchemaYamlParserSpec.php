@@ -149,4 +149,55 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->getDefaultContainer()
             ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
     }
+
+    function it_should_parse_a_schema_that_extends_a_default_schema()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('extends_default', 'user')
+            ->getDefaultContainer()
+            ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
+        $this->parse('extends_default', 'user')
+            ->hasAttribute('username')
+            ->shouldBeEqualTo(true);
+        $this->parse('extends_default', 'user')
+            ->hasAttribute('foo')
+            ->shouldBeEqualTo(true);
+        $this->parse('extends_default', 'user')
+            ->hasAttribute('username')
+            ->shouldBeEqualTo(true);
+        $this->parse('extends_default', 'user')
+            ->getRepository()
+            ->shouldBeEqualTo('\Foo\Bar\Repo');
+        $this->parse('extends_default', 'user')
+            ->getRequiredAttributes()
+            ->shouldContain('foo');
+        $this->parse('extends_default', 'user')
+            ->getRequiredAttributes()
+            ->shouldContain('username');
+    }
+
+    function it_should_parse_a_schema_with_an_object_that_extends_a_default_schema_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'extend_default')
+            ->getRepository()
+            ->shouldBeEqualTo('\Foo\Bar');
+        $this->parse('example', 'extend_default')
+            ->getRequiredAttributes()
+            ->shouldContain('username');
+    }
+
+    function it_should_parse_a_schema_with_an_object_that_extends_another_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'custom_contact')
+            ->getAttributesToSelect()
+            ->shouldContain('fax');
+        $this->parse('example', 'custom_contact')
+            ->getRequiredAttributes()
+            ->shouldContain('name');
+    }
 }

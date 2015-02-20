@@ -243,3 +243,12 @@ objects:
             - 'phoneNumber'
             - 'dn'
             - 'guid'
+    extend_default:
+        type: extend_default
+        extends_default: [ ad, user ]
+        repository: '\Foo\Bar'
+    extends_contact:
+        extends: contact
+        type: custom_contact
+        attributes_to_select:
+            - 'fax'

@@ -51,6 +51,7 @@ class SchemaYamlParser implements SchemaParserInterface
     public function __construct($schemaFolder)
     {
         $this->schemaFolder = $schemaFolder;
+        $this->defaultSchemaFolder = __DIR__.'/../../../../resources/schema';
     }
 
     /**
@@ -73,18 +74,9 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     public function parse($schemaName, $objectType)
     {
-        if (!isset($this->schemas[$schemaName])) {
-            $file = $this->schemaFolder . '/' . $schemaName . '.yml';
-            $this->validateFileCanBeRead($file);
+        $this->parseSchemaNameToArray($schemaName);
 
-            try {
-                $this->schemas[$schemaName] = Yaml::parse(file_get_contents($file));
-            } catch (ParseException $e) {
-                throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
-            }
-        }
-
-        return $this->parseYamlForObject($this->schemas[$schemaName], $schemaName, $objectType);
+        return $this->parseYamlForObject($this->schemas[$this->schemaFolder][$schemaName], $schemaName, $objectType);
     }
 
     /**
@@ -115,6 +107,8 @@ class SchemaYamlParser implements SchemaParserInterface
             throw new SchemaParserException('Cannot find the "objects" section in the schema file.');
         }
         $objectSchema = $this->getObjectFromSchema($schema, $objectType);
+        $objectSchema = $this->mergeAnyExtendedSchemas($objectSchema, $schemaName);
+        $this->validateObjectSchema($objectSchema, $objectType);
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectType);
 
         foreach ($this->optionMap as $option => $setter) {
@@ -148,15 +142,8 @@ class SchemaYamlParser implements SchemaParserInterface
                 $objectSchema = $ldapObject;
             }
         }
-        if (!$objectSchema) {
+        if (is_null($objectSchema)) {
             throw new SchemaParserException(sprintf('Cannot find object type "%s" in schema.', $objectType));
-        }
-
-        if (!array_key_exists('class', $objectSchema) && !array_key_exists('category', $objectSchema)) {
-            throw new SchemaParserException(sprintf('Object type "%s" has no class or category defined.', $objectType));
-        }
-        if (!array_key_exists('attributes', $objectSchema) || empty($objectSchema['attributes'])) {
-            throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $objectType));
         }
 
         return $objectSchema;
@@ -185,5 +172,139 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         return $converterMap;
+    }
+
+    /**
+     * Validate that an object schema meets the minimum requirements.
+     *
+     * @param array $objectSchema
+     * @param string $objectType
+     * @throws SchemaParserException
+     */
+    protected function validateObjectSchema($objectSchema, $objectType)
+    {
+        if (!array_key_exists('class', $objectSchema) && !array_key_exists('category', $objectSchema)) {
+            throw new SchemaParserException(sprintf('Object type "%s" has no class or category defined.', $objectType));
+        }
+        if (!array_key_exists('attributes', $objectSchema) || empty($objectSchema['attributes'])) {
+            throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $objectType));
+        }
+    }
+
+    /**
+     * Given a schema name, parse it into the array.
+     *
+     * @param string $schemaName
+     * @throws SchemaParserException
+     */
+    protected function parseSchemaNameToArray($schemaName)
+    {
+        if (!isset($this->schemas[$this->schemaFolder][$schemaName])) {
+            $file = $this->schemaFolder . '/' . $schemaName . '.yml';
+            $this->validateFileCanBeRead($file);
+
+            try {
+                $this->schemas[$this->schemaFolder][$schemaName] = Yaml::parse(file_get_contents($file));
+            } catch (ParseException $e) {
+                throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
+            }
+            $this->mergeDefaultSchemaFile($schemaName);
+        }
+    }
+
+    /**
+     * If the 'extends_default' directive is used, then merge the specified default schema.
+     *
+     * @param string $schemaName
+     * @throws SchemaParserException
+     */
+    protected function mergeDefaultSchemaFile($schemaName)
+    {
+        if (!isset($this->schemas[$this->schemaFolder][$schemaName]['extends_default'])) {
+            return;
+        }
+        $defaultSchemaName = $this->schemas[$this->schemaFolder][$schemaName]['extends_default'];
+        $folder = $this->schemaFolder;
+
+        $this->schemaFolder = $this->defaultSchemaFolder;
+        $this->parseSchemaNameToArray($defaultSchemaName);
+        // Perhaps an option at some point to specify the merge action/type? ie. replace vs merge.
+        $this->schemas[$folder][$schemaName] = array_merge_recursive(
+            $this->schemas[$this->schemaFolder][$defaultSchemaName],
+            $this->schemas[$folder][$schemaName]
+        );
+
+        $this->schemaFolder = $folder;
+    }
+
+    /**
+     * If the 'extends' option is given, then merge this schema object with the requested schema object.
+     *
+     * @param array $objectSchema
+     * @param string $schemaName
+     * @return array
+     * @throws SchemaParserException
+     */
+    protected function mergeAnyExtendedSchemas(array $objectSchema, $schemaName)
+    {
+        if (!(isset($objectSchema['extends']) || isset($objectSchema['extends_default']))) {
+            return $objectSchema;
+        }
+
+        return array_merge_recursive($this->getParentSchemaObject($objectSchema, $schemaName), $objectSchema);
+    }
+
+    /**
+     * If we need to retrieve one of the default schemas, then it's probably the case that the schema folder path was
+     * manually defined. So retrieve the default schema object by parsing the name from the default folder path and then
+     * reset the schema folder back to what it originally was.
+     *
+     * @param array $objectSchema
+     * @return array
+     * @throws SchemaParserException
+     */
+    protected function getExtendedDefaultSchemaObject(array $objectSchema)
+    {
+        if (!(is_array($objectSchema['extends_default']) && 2 == count($objectSchema['extends_default']))) {
+            throw new SchemaParserException('The "extends_default" directive should be an array with exactly 2 values.');
+        }
+        $folder = $this->schemaFolder;
+        $this->schemaFolder = $this->defaultSchemaFolder;
+
+        $this->parseSchemaNameToArray(reset($objectSchema['extends_default']));
+        $parent = $this->getObjectFromSchema(
+            $this->schemas[$this->defaultSchemaFolder][reset($objectSchema['extends_default'])],
+            $objectSchema['extends_default'][1]
+        );
+
+        $this->schemaFolder = $folder;
+
+        return $parent;
+    }
+
+    /**
+     * Determines what parent array object to get based on the directive used.
+     *
+     * @param array $objectSchema
+     * @param string $schemaName
+     * @return array
+     * @throws SchemaParserException
+     */
+    protected function getParentSchemaObject(array $objectSchema, $schemaName)
+    {
+        if (isset($objectSchema['extends_default'])) {
+            $parent = $this->getExtendedDefaultSchemaObject($objectSchema);
+        } elseif (isset($objectSchema['extends']) && is_string($objectSchema['extends'])) {
+            $parent = $this->getObjectFromSchema($this->schemas[$this->schemaFolder][$schemaName], $objectSchema['extends']);
+        } elseif (isset($objectSchema['extends']) && is_array($objectSchema['extends']) && 2 == count($objectSchema['extends']) ) {
+            $name = reset($objectSchema['extends']);
+            $type = $objectSchema[1];
+            $this->parseSchemaNameToArray($name);
+            $parent = $this->getObjectFromSchema($this->schemas[$this->schemaFolder][$name], $type);
+        } else {
+            throw new SchemaParserException('The directive "extends" must be a string or array with exactly 2 values.');
+        }
+
+        return $parent;
     }
 }

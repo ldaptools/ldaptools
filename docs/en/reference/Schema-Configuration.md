@@ -29,6 +29,30 @@ objects:
 ### Schema Object Configuration Options
 ---------------------------------------
 
+#### objects ***(Required)***
+
+Underneath the `objects` is where you defined all your schema object definitions. This option must be defined.
+
+#### extends_default
+--------------------
+
+By using this option you can specify the name of one of the default schemas to extend. Any options contained within that
+schema will be merged into your schema. To add additional options to existing schema types the keys underneath "objects"
+must match between the default schema and your own!
+
+```yaml
+# Extends the default 'ad' schema included within the 'resources/schema' directory.
+extends_default: ad
+objects:
+    # This 'user' key must exist in the default schema for it to merge, otherwise it will be considered a new object type.
+    user:
+        # Sets a custom repository definition for the user object, in addition to everything else in the default schema.
+        repository: '\My\Custom\Repository'
+```
+
+### Schema Object Configuration Options
+---------------------------------------
+
 #### type ***(Required)***
 
 The name for the type is how you will refer to this LDAP schema object within the class. This is a required field. 
@@ -122,4 +146,47 @@ placed by default when created.
 
 ```yaml
     default_container: 'OU=Accounting,OU=Employees,DC=example,DC=local'
+```
+
+--------------------
+#### extends
+
+By using this option you can explicitly state to make a object type extend another object and inherit everything it
+already has defined. This value can either be a string, meaning that the object to extend already exists within the
+current schema, or it can be an array. The array must be like `[ schema, object ]`, where `schema` is the name of a 
+separate schema file within the same schema folder and `object` is the name of a defined object type within that schema. 
+
+```yaml
+objects:
+    user:
+        # A bunch of stuff defined...
+    custom_user:
+        # Tells it to 'extend' the user type defined above and inherit its properties.
+        extends: user
+        # Make sure the define a different type!
+        type: custom_user
+    another_user:
+        # Tells it to look in the schema file called 'custom' for the object type 'user' and extend that.
+        extends: [ custom, user ]
+        type: another_user
+```
+
+--------------------
+#### extends_default
+
+By using this option you can tell the schema to extend a specific object type for a default schema, either `ad` or 
+`openldap`. This helps you to avoid repetition when configuring a custom schema yet still customize it to your needs.
+This value must be an array that contains the default schema name and object type to extend.
+
+```yaml
+objects:
+    special_user:
+        # Extends the default AD user type.
+        extends_default: [ ad, user ]
+        type: special_user
+        # Put these accounts in a specific OU
+        default_container: 'ou=special accounts,dc=example,dc=local'
+        # Add an additional attribute to select.
+        attributes_to_select:
+            - 'title'
 ```
