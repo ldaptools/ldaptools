@@ -136,7 +136,7 @@ class SchemaYamlParser implements SchemaParserInterface
      *
      * @param array $schema
      * @param string $objectType
-     * @return null|array
+     * @return array
      * @throws SchemaParserException
      */
     protected function getObjectFromSchema(array $schema, $objectType)
