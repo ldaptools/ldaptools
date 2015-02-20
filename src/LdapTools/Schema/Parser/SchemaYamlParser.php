@@ -33,6 +33,11 @@ class SchemaYamlParser implements SchemaParserInterface
     protected $schemaFolder = '';
 
     /**
+     * @var string The folder where the default schema files reside.
+     */
+    protected $defaultSchemaFolder = '';
+
+    /**
      * @var array
      */
     protected $optionMap = [
