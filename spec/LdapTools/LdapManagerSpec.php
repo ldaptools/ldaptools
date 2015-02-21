@@ -128,4 +128,24 @@ class LdapManagerSpec extends ObjectBehavior
     {
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringAuthenticate('foo','bar');
     }
+
+    function it_should_register_converters_listed_in_the_config()
+    {
+        $config = new Configuration();
+        $config->setSchemaFolder(__DIR__.'/../resources/schema');
+        $config->setAttributeConverters(['my_bool' => '\LdapTools\AttributeConverter\ConvertBoolean']);
+        $domain = new DomainConfiguration('example.com');
+        $domain->setServers(['example'])
+            ->setLazyBind(true)
+            ->setBaseDn('dc=example,dc=com')
+            ->setSchemaName('example');
+        $config->addDomain($domain);
+
+        $this->beConstructedWith($config);
+        $this->buildLdapQuery()
+            ->select()
+            ->from('custom_converter')
+            ->where(['foo' => true])
+            ->getLdapFilter()->shouldBeEqualTo('(&(objectClass=\66\6f\6f)(&(bar=\54\52\55\45)))');
+    }
 }

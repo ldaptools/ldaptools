@@ -11,6 +11,7 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
@@ -73,13 +74,11 @@ class LdapManager
         $this->config = $config;
         $this->domains = $config->getDomainConfiguration();
 
-        if ($this->config->getDefaultDomain()) {
-            $this->context = $this->config->getDefaultDomain();
-        } elseif (!empty($this->domains)) {
-            $this->context = array_keys($this->domains)[0];
-        } else {
+        if (empty($this->domains)) {
             throw new \RuntimeException("Your configuration must have at least one domain.");
         }
+        $this->context = $this->config->getDefaultDomain() ?: array_keys($this->domains)[0];
+        $this->registerAttributeConverters($config->getAttributeConverters());
 
         // Pre-populate the connections array. They will be instantiated as needed.
         foreach (array_keys($this->domains) as $domain) {
@@ -304,5 +303,17 @@ class LdapManager
         }
 
         return $this->schemaParser;
+    }
+
+    /**
+     * Register any explicitly defined converters.
+     *
+     * @param array $attributeConverters
+     */
+    protected function registerAttributeConverters(array $attributeConverters)
+    {
+        foreach ($attributeConverters as $name => $class) {
+            AttributeConverterFactory::register($name, $class);
+        }
     }
 }

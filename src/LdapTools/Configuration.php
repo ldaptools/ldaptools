@@ -34,6 +34,7 @@ class Configuration
         'cache_options' => 'cacheOptions',
         'cache_type' => 'cacheType',
         'default_domain' => 'defaultDomain',
+        'attribute_converters' => 'attributeConverters',
     ];
 
     /**
@@ -45,6 +46,7 @@ class Configuration
         'schemaFormat' => SchemaParserFactory::TYPE_YML,
         'cacheOptions' => [],
         'cacheType' => CacheFactory::TYPE_NONE,
+        'attributeConverters' => [],
     ];
 
     /**
@@ -224,6 +226,31 @@ class Configuration
     public function getDefaultDomain()
     {
         return $this->config['defaultDomain'];
+    }
+
+    /**
+     * Set attribute converters that should be registered. In the form:
+     *
+     *      [ 'converter_name' => '\Full\Class\Name' ]
+     *
+     * @param array $attributeConverters
+     * @return $this
+     */
+    public function setAttributeConverters(array $attributeConverters)
+    {
+        $this->config['attributeConverters'] = $attributeConverters;
+
+        return $this;
+    }
+
+    /**
+     * Get the attribute converters that will be registered.
+     *
+     * @return array
+     */
+    public function getAttributeConverters()
+    {
+        return $this->config['attributeConverters'];
     }
 
     /**

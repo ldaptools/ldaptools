@@ -107,4 +107,21 @@ class ConfigurationSpec extends ObjectBehavior
     {
         $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringSetCacheType('foo.bar');
     }
+
+    function it_should_have_an_array_as_the_attribute_converters()
+    {
+        $this->getAttributeConverters()->shouldBeArray();
+    }
+
+    function it_should_be_able_to_properly_set_the_attribute_converters()
+    {
+        $converters = ['foo' => '\Bar'];
+        $this->setAttributeConverters($converters);
+        $this->getAttributeConverters()->shouldBeEqualTo($converters);
+    }
+
+    function it_should_return_self_after_calling_set_attribute_converters()
+    {
+        $this->setAttributeConverters(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+    }
 }

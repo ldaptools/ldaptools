@@ -51,37 +51,52 @@ class AttributeConverterFactory
             throw new \InvalidArgumentException(sprintf('Attribute converter "%s" is not valid.', $name));
         }
 
-        if (isset(self::$converters[$name])) {
-            $converter = self::$converters[$name];
-        } else {
-            try {
-                $converter = new self::$converterMap[$name]();
-            } catch (\Exception $e) {
-                throw new \RuntimeException(
-                    sprintf('Unable to load attribute converter "%s": %s', $name, $e->getMessage())
-                );
-            }
-            self::$converters[$name] = $converter;
-        }
-
-        return $converter;
+        return self::getInstanceOfConverter($name);
     }
 
     /**
      * Registers a converter so it can be retrieved by its name.
      *
-     * @param string $name
-     * @param AttributeConverterInterface $converter
+     * @param string $name The actual name for the converter in the schema.
+     * @param string $class The fully qualified class name (ie. '\Foo\Bar\Converter')
      */
-    public static function register($name, AttributeConverterInterface $converter)
+    public static function register($name, $class)
     {
-        if (isset(self::$converters[$name])) {
+        if (isset(self::$converterMap[$name])) {
             throw new \InvalidArgumentException(
                 sprintf('The attribute converter name "%s" is already registered.', $name)
             );
         }
 
-        self::$converterMap[$name] = get_class($converter);
-        self::$converters[$name] = $converter;
+        self::$converterMap[$name] = $class;
+    }
+
+    /**
+     * Load a specific converter if needed and send it back.
+     *
+     * @param string $name
+     * @return AttributeConverterInterface
+     */
+    protected static function getInstanceOfConverter($name)
+    {
+        if (isset(self::$converters[$name])) {
+            return self::$converters[$name];
+        }
+
+        try {
+            self::$converters[$name] = new self::$converterMap[$name]();
+        } catch (\Exception $e) {
+            throw new \RuntimeException(
+                sprintf('Unable to load attribute converter "%s": %s', $name, $e->getMessage())
+            );
+        }
+        if (!(self::$converters[$name] instanceof AttributeConverterInterface)) {
+            throw new \RuntimeException(sprintf(
+                'The attribute converter "%s" must extend \LdapTools\AttributeConverter\AttributeConverterInterface.',
+                $name
+            ));
+        }
+
+        return self::$converters[$name];
     }
 }

@@ -252,3 +252,11 @@ objects:
         type: custom_contact
         attributes_to_select:
             - 'fax'
+    custom_converter:
+        type: custom_converter
+        class: foo
+        attributes_to_select: [ 'foo' ]
+        attributes:
+            foo: bar
+        converters:
+            my_bool: [ foo ]

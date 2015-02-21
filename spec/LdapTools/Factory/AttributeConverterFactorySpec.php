@@ -75,12 +75,13 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_throw_InvalidArgumentException_when_the_converter_name_is_already_registered()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringRegister('bool', new ConvertBoolean());
+        $this->shouldThrow('\InvalidArgumentException')->duringRegister('bool', '\LdapTools\AttributeConverter\ConvertBoolean');
     }
 
-    function it_should_error_when_registering_a_converter_that_does_not_implement_AttributeConverterInterface()
+    function it_should_error_when_getting_a_converter_that_does_not_implement_AttributeConverterInterface()
     {
-        $this->shouldThrow('\Exception')->duringRegister('foo_bar', new LdapObjectSchema('foo', 'bar'));
+        $this->register('foo_bar', '\LdapTools\Configuration');
+        $this->shouldThrow('\Exception')->duringGet('foo_bar');
     }
 
     function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
