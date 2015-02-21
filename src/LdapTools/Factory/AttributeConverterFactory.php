@@ -38,7 +38,7 @@ class AttributeConverterFactory
      * Retrieve a registered attribute converter by name.
      *
      * @param $name
-     * @return mixed
+     * @return AttributeConverterInterface
      */
     public static function get($name)
     {
