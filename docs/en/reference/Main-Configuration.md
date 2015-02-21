@@ -108,6 +108,20 @@ An array of options that will be passed to the cache type when it is instantiate
 **Defaults**: No options are passed by default.
 
 -------------------
+#### attribute_converters
+
+An array of convert to class name mappings that will be registered in the `LdapManager` for use in the schemas.
+
+```yaml
+general:
+    attribute_converters:
+        # This class must extend \LdapTools\AttributeConverter\AttributeConverterInterface !
+        my_converter: '\My\Converter\Class'
+```
+
+**Defaults**: No additional attribute converters are registered by default.
+
+-------------------
 
 ### **Domain Section**
 ----------------------
