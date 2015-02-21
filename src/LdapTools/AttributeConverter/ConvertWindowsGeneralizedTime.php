@@ -18,8 +18,6 @@ namespace LdapTools\AttributeConverter;
  */
 class ConvertWindowsGeneralizedTime extends ConvertGeneralizedTime
 {
-    use AttributeConverterTrait;
-
     /**
      * {@inheritdoc}
      */
