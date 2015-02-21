@@ -35,11 +35,6 @@ class AttributeConverterFactory
     ];
 
     /**
-     * @var array A set of converter names and objects that have already been instantiated.
-     */
-    protected static $converters = [];
-
-    /**
      * Retrieve a registered attribute converter by name.
      *
      * @param $name
@@ -79,24 +74,20 @@ class AttributeConverterFactory
      */
     protected static function getInstanceOfConverter($name)
     {
-        if (isset(self::$converters[$name])) {
-            return self::$converters[$name];
-        }
-
         try {
-            self::$converters[$name] = new self::$converterMap[$name]();
+            $converter = new self::$converterMap[$name]();
         } catch (\Exception $e) {
             throw new \RuntimeException(
                 sprintf('Unable to load attribute converter "%s": %s', $name, $e->getMessage())
             );
         }
-        if (!(self::$converters[$name] instanceof AttributeConverterInterface)) {
+        if (!($converter instanceof AttributeConverterInterface)) {
             throw new \RuntimeException(sprintf(
                 'The attribute converter "%s" must extend \LdapTools\AttributeConverter\AttributeConverterInterface.',
                 $name
             ));
         }
 
-        return self::$converters[$name];
+        return $converter;
     }
 }
