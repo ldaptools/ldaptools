@@ -200,4 +200,16 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->getRequiredAttributes()
             ->shouldContain('name');
     }
+
+    function it_should_parse_a_schema_objects_converter_options()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'converter_options')
+            ->getConverterOptions()
+            ->shouldHaveKey('generalized_time');
+        $this->parse('example', 'converter_options')
+            ->getConverterOptions()
+            ->shouldContain(['type' => 'windows']);
+    }
 }

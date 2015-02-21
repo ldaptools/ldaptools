@@ -75,6 +75,11 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $defaultContainer = '';
 
     /**
+     * @var array Any attribute converter options defined.
+     */
+    protected $converterOptions = [];
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -378,5 +383,25 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getDefaultContainer()
     {
         return $this->defaultContainer;
+    }
+
+    /**
+     * Set any options to be passed to specific converters.
+     *
+     * @param array $converterOptions
+     */
+    public function setConverterOptions(array $converterOptions)
+    {
+        $this->converterOptions = $converterOptions;
+    }
+
+    /**
+     * Get the array of converter names and the options that will be passed to them.
+     *
+     * @return array
+     */
+    public function getConverterOptions()
+    {
+        return $this->converterOptions;
     }
 }

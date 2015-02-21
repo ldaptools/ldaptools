@@ -48,6 +48,7 @@ class SchemaYamlParser implements SchemaParserInterface
         'default_values' => 'setDefaultValues',
         'required_attributes' => 'setRequiredAttributes',
         'default_container' => 'setDefaultContainer',
+        'converter_options' => 'setConverterOptions',
     ];
 
     /**

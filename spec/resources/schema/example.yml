@@ -260,3 +260,12 @@ objects:
             foo: bar
         converters:
             my_bool: [ foo ]
+    converter_options:
+        type: converter_options
+        class: opts
+        attributes:
+           foo: bar
+        converters:
+            generalized_time: foo
+        converter_options:
+            generalized_time: { type: windows }
