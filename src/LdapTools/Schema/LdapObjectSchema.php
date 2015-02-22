@@ -165,11 +165,23 @@ class LdapObjectSchema implements CacheableItemInterface
         return $this->converterMap;
     }
 
+    /**
+     * Check if an attribute has a converter defined.
+     *
+     * @param string $attributeName
+     * @return bool
+     */
     public function hasConverter($attributeName)
     {
         return array_key_exists(strtolower($attributeName), array_change_key_case($this->converterMap));
     }
 
+    /**
+     * Get the name of the converter for an attribute.
+     *
+     * @param string $attributeName
+     * @return string
+     */
     public function getConverter($attributeName)
     {
         if (!$this->hasConverter($attributeName)) {
