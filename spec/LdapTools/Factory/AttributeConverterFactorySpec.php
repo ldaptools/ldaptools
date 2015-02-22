@@ -23,42 +23,42 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Factory\AttributeConverterFactory');
     }
 
-    function it_should_return_ConvertBoolean_when_calling_get_with_convert_bool()
+    function it_should_return_ConvertBoolean_when_calling_get_with_bool()
     {
         $this::get('bool')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertBoolean');
     }
 
-    function it_should_return_ConvertGeneralizedTime_when_calling_get_with_convert_generalized_time()
+    function it_should_return_ConvertGeneralizedTime_when_calling_get_with_generalized_time()
     {
         $this::get('generalized_time')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGeneralizedTime');
     }
 
-    function it_should_return_ConvertInteger_when_calling_get_with_convert_int()
+    function it_should_return_ConvertInteger_when_calling_get_with_int()
     {
         $this::get('int')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertInteger');
     }
 
-    function it_should_return_ConvertStringToUtf8_when_calling_get_with_convert_string_to_utf8()
+    function it_should_return_ConvertStringToUtf8_when_calling_get_with_string_to_utf8()
     {
         $this::get('string_to_utf8')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertStringToUtf8');
     }
 
-    function it_should_return_ConvertWindowsGuid_when_calling_get_with_convert_windows_guid()
+    function it_should_return_ConvertWindowsGuid_when_calling_get_with_windows_guid()
     {
         $this::get('windows_guid')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsGuid');
     }
 
-    function it_should_return_ConvertWindowsSid_when_calling_get_with_convert_windows_sid()
+    function it_should_return_ConvertWindowsSid_when_calling_get_with_windows_sid()
     {
         $this::get('windows_sid')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsSid');
     }
 
-    function it_should_return_ConvertWindowsTime_when_calling_get_with_convert_windows_time()
+    function it_should_return_ConvertWindowsTime_when_calling_get_with_windows_time()
     {
         $this::get('windows_time')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsTime');
     }
 
-    function it_should_return_ConvertWindowsGeneralizedTime_when_calling_get_with_convert_windows_generalized_time()
+    function it_should_return_ConvertWindowsGeneralizedTime_when_calling_get_with_windows_generalized_time()
     {
         $this::get('windows_generalized_time')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsGeneralizedTime');
     }
@@ -66,6 +66,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     function it_should_return_EncodeWindowsPassword_when_calling_get_with_encode_windows_password()
     {
         $this::get('encode_windows_password')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\EncodeWindowsPassword');
+    }
+
+    function it_should_return_ConvertPasswordMustChange_when_calling_get_with_password_must_change()
+    {
+        $this::get('password_must_change')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertPasswordMustChange');
     }
 
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
