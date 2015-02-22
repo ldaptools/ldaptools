@@ -83,7 +83,7 @@ class AttributeConverterFactory
         }
         if (!($converter instanceof AttributeConverterInterface)) {
             throw new \RuntimeException(sprintf(
-                'The attribute converter "%s" must extend \LdapTools\AttributeConverter\AttributeConverterInterface.',
+                'The attribute converter "%s" must implement \LdapTools\AttributeConverter\AttributeConverterInterface.',
                 $name
             ));
         }
