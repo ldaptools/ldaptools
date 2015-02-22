@@ -161,14 +161,18 @@ class LdapQueryBuilder
     }
 
     /**
-     * Set the attributes to select from the object.
+     * Set the attributes to select from the object. Either specify a single attribute as a string or an array of
+     * attribute names.
      *
-     * @param array $attributes
+     * @param string|array $attributes
      * @return $this
      */
-    public function select(array $attributes = [])
+    public function select($attributes = [])
     {
-        $this->attributes = $attributes;
+        if (!(is_array($attributes) || is_string($attributes))) {
+            throw new \InvalidArgumentException('The attributes to select should either be a string or an array');
+        }
+        $this->attributes = is_array($attributes) ? $attributes : [ $attributes ];
 
         return $this;
     }

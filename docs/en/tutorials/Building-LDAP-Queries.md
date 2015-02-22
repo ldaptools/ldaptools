@@ -60,12 +60,15 @@ the methods and their general use.
 #### select($attributes)
 
 The `select` method allows you to choose specifically which attributes you would like to return from the query. Simply
-pass an array of attribute names to it that you would like. In the absence of anything passed to it, it will select the
-default set of attributes for the query as defined for the type in the schema.
+pass an array of attribute names to it that you would like, or a single attribute as a string. In the absence of 
+anything passed to it, it will select the default set of attributes for the query as defined for the type in the schema.
 
 Attribute names are looked for in the schema to see if they map to specific LDAP attributes.
 ```php
 $lqb->select(['firstName', 'city', 'state', 'sid']);
+
+// Select only a single attribute
+$lqb->select('guid');
 
 // Attribute names will always be returned in the case you enter it in, irrespective of how LDAP returns the data.
 $lqb->select(['FirstName', 'City', 'State', 'SID']);

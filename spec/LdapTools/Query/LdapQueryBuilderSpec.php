@@ -57,6 +57,18 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->getAttributes()->shouldBeEqualTo($attributes);
     }
 
+    function it_should_allow_a_string_as_a_selected_attribute()
+    {
+        $this->select('dn');
+        $this->getAttributes()->shouldBeEqualTo(['dn']);
+    }
+
+    function it_should_error_when_neither_a_string_or_array_was_passed_to_select()
+    {
+        $this->shouldThrow(new \InvalidArgumentException('The attributes to select should either be a string or an array'))
+            ->duringSelect(false);
+    }
+
     function it_should_return_self_when_calling_select()
     {
         $this->select(['cn'])->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
