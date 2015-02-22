@@ -51,6 +51,7 @@ objects:
                  - 'modified'
              windows_time:
                  - 'passwordLastSet'
+             password_must_change: [ passwordMustChange ]
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             badPasswordCount: badPwdCount
@@ -85,6 +86,7 @@ objects:
             pager: pager
             password: unicodePwd
             passwordLastSet: pwdLastSet
+            passwordMustChange: pwdLastSet
             phoneNumber: telephoneNumber
             poBox: postOfficeBox
             profilePath: profilePath

@@ -40,6 +40,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
 
   * `fromLdap`: Converts a LDAP generalized timestamp into a PHP `\DateTime` object.
 
+#### *password_must_change*
+  * `toLdap`: Converts a PHP bool to either a -1 (false) or 0 (true). This toggles the "Password Must Change" property.
+  
+  * `fromLdap`: Converts a LDAP '0' (true - password must change) or '>0' (false - password doesn't have to change).
+   
 #### *windows_generalized_time*
   * `toLdap`: Converts a PHP `\DateTime` object to the generalized timestamp format string that Active Directory expects.
   

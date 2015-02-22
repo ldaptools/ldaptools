@@ -32,6 +32,7 @@ class AttributeConverterFactory
         'windows_time' => '\LdapTools\AttributeConverter\ConvertWindowsTime',
         'windows_generalized_time' => '\LdapTools\AttributeConverter\ConvertWindowsGeneralizedTime',
         'encode_windows_password' => '\LdapTools\AttributeConverter\EncodeWindowsPassword',
+        'password_must_change' => '\LdapTools\AttributeConverter\ConvertPasswordMustChange',
     ];
 
     /**

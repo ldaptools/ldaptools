@@ -52,6 +52,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | organization | o | string |
 | password | unicodePwd | string |
 | passwordLastSet | pwdLastSet | `\DateTime` |
+| passwordMustChange | pwdLastSet | bool |
 | pager | pager | string |
 | phoneNumber | telephoneNumber | string |
 | poBox | postOfficeBox | string |
