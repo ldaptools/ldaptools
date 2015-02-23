@@ -83,7 +83,7 @@ within the class, and the `value` is the name of the attribute in LDAP (ie. `fir
 These should defined as keys with the converters name with an array of attribute name values:
 
 ```yaml
-    convert_windows_generalized_time:
+    windows_generalized_time:
         - 'created'
         - 'modified'
 ```
@@ -91,6 +91,26 @@ These should defined as keys with the converters name with an array of attribute
 The attribute names can either be the schema defined attribute name, or the actual LDAP attribute name. For a 
 complete listing of possible built-in attribute converters, see this [reference doc](Attribute-Converters.md).
     
+--------------------
+#### converter_options
+
+These should defined as keys with the converters name with an array of options that will be passed to the converter:
+
+```yaml
+    converter_options:
+        user_account_control:
+            defaultValue: '512'
+            uacMap:
+                disabled: '2'
+                passwordNeverExpires: '65536'
+                smartCardRequired: '262144'
+                trustedForDelegation: '262144'
+                passwordIsReversible: '128'
+```
+    
+This results in an array with the keys `defaultValue` and `uacMap` (and their respective arrays) being passed to the
+converter. These options are accessible from within the attribute converter by using `$this->options`.
+
 --------------------
 #### attributes_to_select
 
