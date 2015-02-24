@@ -109,7 +109,7 @@ trait HydratorTrait
         $attributes = [];
 
         foreach ($entry as $key => $value) {
-            if (!is_string($key) ) {
+            if (!is_string($key)) {
                 continue;
             }
             $attributes = $this->setAttributeFromLdap($attributes, $key, $value);

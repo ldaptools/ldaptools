@@ -25,7 +25,8 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         getShouldAggregateValues as parentGetShouldAggregateValues;
     }
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->options = [
             'uacMap' => [],
             'defaultValue' => UserAccountControlFlags::NORMAL_ACCOUNT,

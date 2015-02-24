@@ -282,7 +282,7 @@ class LdapObject
      */
     public function __set($attribute, $value)
     {
-       return $this->set($attribute, $value);
+        return $this->set($attribute, $value);
     }
 
     /**
@@ -293,7 +293,7 @@ class LdapObject
      */
     public function __get($attribute)
     {
-       return $this->get($attribute);
+        return $this->get($attribute);
     }
 
     /**

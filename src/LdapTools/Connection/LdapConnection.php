@@ -428,7 +428,8 @@ class LdapConnection implements LdapConnectionInterface
      * @param string $cookie
      * @throws LdapConnectionException
      */
-    protected function setPagedResultsControl($pageSize, &$cookie) {
+    protected function setPagedResultsControl($pageSize, &$cookie)
+    {
         if ($this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
         }

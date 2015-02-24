@@ -302,7 +302,7 @@ class SchemaYamlParser implements SchemaParserInterface
             $parent = $this->getExtendedDefaultSchemaObject($objectSchema);
         } elseif (isset($objectSchema['extends']) && is_string($objectSchema['extends'])) {
             $parent = $this->getObjectFromSchema($this->schemas[$this->schemaFolder][$schemaName], $objectSchema['extends']);
-        } elseif (isset($objectSchema['extends']) && is_array($objectSchema['extends']) && 2 == count($objectSchema['extends']) ) {
+        } elseif (isset($objectSchema['extends']) && is_array($objectSchema['extends']) && 2 == count($objectSchema['extends'])) {
             $name = reset($objectSchema['extends']);
             $type = $objectSchema[1];
             $this->parseSchemaNameToArray($name);
