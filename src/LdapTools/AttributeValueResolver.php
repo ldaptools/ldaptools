@@ -222,7 +222,7 @@ class AttributeValueResolver
         if ($this->connection) {
             $converter->setLdapConnection($this->connection);
         }
-        if ($this->dn) {
+        if ($this->dn !== null) {
             $converter->setDn($this->dn);
         }
         $converter->setOperationType($this->type);
