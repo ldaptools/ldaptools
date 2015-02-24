@@ -10,7 +10,9 @@
 
 namespace LdapTools\Hydrator;
 
-use LdapTools\Factory\AttributeConverterFactory;
+use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\AttributeValueResolver;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
@@ -35,6 +37,16 @@ trait HydratorTrait
      * @var array Default parameter values that have been set.
      */
     protected $parameters = [];
+
+    /**
+     * @var int The operation type that is requesting this hydration process.
+     */
+    protected $type = AttributeConverterInterface::TYPE_SEARCH_FROM;
+
+    /**
+     * @var LdapConnectionInterface|null
+     */
+    protected $connection;
 
     /**
      * Sets a parameter that can be used within an attribute value.
@@ -143,27 +155,34 @@ trait HydratorTrait
     /**
      * @see HydratorInterface::hydrateBatchToLdap()
      */
-    public function hydrateBatchToLdap($batch)
+    public function hydrateBatchToLdap($batch, $dn = null)
     {
         if (!is_array($batch)) {
             throw new \InvalidArgumentException('Expects an array to convert batch modifications to LDAP.');
         }
 
-        foreach ($batch as &$item) {
-            if (!(LDAP_MODIFY_BATCH_REMOVE_ALL === $item['modtype'])) {
-                $entry = $this->convertValuesToLdap([$item['attrib'] => $item['values']]);
-                $entry = $this->convertNamesToLdap($entry);
-                $item['values'] = reset($entry);
-                $item['attrib'] = key($entry);
-
-            } else {
-                if (!empty($this->schemas)) {
-                    $item['attrib'] = $this->getSchema()->getAttributeToLdap($item['attrib']);
-                }
-            }
+        $batch = $this->convertValuesToLdap($batch, $dn, true);
+        foreach ($batch as $index => $item) {
+            $batch[$index]['attrib'] = $this->getSchema()->getAttributeToLdap($item['attrib']);
         }
 
         return $batch;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setOperationType($type)
+    {
+        $this->type = $type;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setLdapConnection(LdapConnectionInterface $connection)
+    {
+        $this->connection = $connection;
     }
 
     /**
@@ -255,15 +274,7 @@ trait HydratorTrait
             return $entry;
         }
 
-        $schema= $this->getSchema();
-        foreach ($entry as $attribute => $value) {
-            if ($schema->hasConverter($attribute)) {
-                $converter = $schema->getConverter($attribute);
-                $entry[$attribute] = AttributeConverterFactory::get($converter)->fromLdap($value);
-            }
-        }
-
-        return $entry;
+        return $this->getAttributeValueResolver($entry)->fromLdap();
     }
 
     /**
@@ -340,26 +351,17 @@ trait HydratorTrait
      * send back all the attributes.
      *
      * @param array $attributes
+     * @param string|null $dn
+     * @param bool $isBatch
      * @return array
      */
-    protected function convertValuesToLdap(array $attributes)
+    protected function convertValuesToLdap(array $attributes, $dn = null, $isBatch = false)
     {
         if (empty($this->schemas)) {
             return $attributes;
         }
 
-        foreach ($attributes as $attribute => $values) {
-            if ($this->getSchema()->hasConverter($attribute)) {
-                $converter = $this->getSchema()->getConverter($attribute);
-                $values = is_array($values) ? $values : [ $values ];
-                foreach ($values as $index => $value) {
-                    $values[$index] = AttributeConverterFactory::get($converter)->toLdap($value);
-                }
-                $attributes[$attribute] = (count($values) == 1) ? reset($values) : $values;
-            }
-        }
-
-        return $attributes;
+        return $this->getAttributeValueResolver($attributes, $dn)->toLdap($isBatch);
     }
 
     /**
@@ -403,5 +405,30 @@ trait HydratorTrait
     protected function resolveParameters(array $attributes)
     {
         return (new ParameterResolver($attributes, $this->parameters))->resolve();
+    }
+
+    /**
+     * Retrieve the AttributeValueResolver instance with the connection and other information set if needed.
+     *
+     * @param array $entry
+     * @param $dn null|string
+     * @return AttributeValueResolver
+     */
+    protected function getAttributeValueResolver(array $entry, $dn = null)
+    {
+        $dn = isset($entry['dn']) ? $entry['dn'] : $dn;
+        $valueResolver = new AttributeValueResolver(
+            $this->getSchema(),
+            $entry,
+            $this->type
+        );
+        if ($this->connection) {
+            $valueResolver->setLdapConnection($this->connection);
+        }
+        if (!is_null($dn)) {
+            $valueResolver->setDn($dn);
+        }
+
+        return $valueResolver;
     }
 }

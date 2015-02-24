@@ -20,6 +20,26 @@ use LdapTools\Connection\LdapConnectionInterface;
 interface AttributeConverterInterface
 {
     /**
+     * The process requesting the attribute conversion is searching LDAP and sending the value.
+     */
+    const TYPE_SEARCH_FROM = 1;
+
+    /**
+     * The process requesting the attribute conversion is searching LDAP and retrieving the value.
+     */
+    const TYPE_SEARCH_TO = 2;
+
+    /**
+     * The process requesting the attribute conversion is modifying a LDAP entry.
+     */
+    const TYPE_MODIFY = 3;
+
+    /**
+     * The process request the attribute conversion is creating a LDAP entry.
+     */
+    const TYPE_CREATE = 4;
+
+    /**
      * Modify the value so it can be understood by LDAP when it gets sent back.
      *
      * @param $value
@@ -48,4 +68,74 @@ interface AttributeConverterInterface
      * @param array $options
      */
     public function setOptions(array $options);
+
+    /**
+     * Set the LDAP operation type.
+     *
+     * @param $type
+     */
+    public function setOperationType($type);
+
+    /**
+     * Get the LDAP operation type.
+     *
+     * @return int
+     */
+    public function getOperationType();
+
+    /**
+     * Set the DN of the object with the specific value being converted.
+     *
+     * @param string $dn
+     */
+    public function setDn($dn);
+
+    /**
+     * Get the DN of the object with the specific value being converted.
+     *
+     * @return string
+     */
+    public function getDn();
+
+    /**
+     * Set the name of the attribute being converted.
+     *
+     * @param string $attribute
+     */
+    public function setAttribute($attribute);
+
+    /**
+     * Get the name of the attribute being converted.
+     *
+     * @return string
+     */
+    public function getAttribute();
+
+    /**
+     * Get whether or not this converter should aggregate multiple attributes into one value.
+     *
+     * @return bool
+     */
+    public function getShouldAggregateValues();
+
+    /**
+     * Set whether or not this converter should aggregate multiple attributes into one value.
+     *
+     * @param bool $aggregateValues
+     */
+    public function setShouldAggregateValues($aggregateValues);
+
+    /**
+     * Set the last value in the case of an aggregate value.
+     *
+     * @param mixed $value
+     */
+    public function setLastValue($value);
+
+    /**
+     * Get the last value as the result of the value conversion.
+     *
+     * @return mixed
+     */
+    public function getLastValue();
 }

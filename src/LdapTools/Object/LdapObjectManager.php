@@ -10,6 +10,7 @@
 
 namespace LdapTools\Object;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -59,6 +60,8 @@ class LdapObjectManager
 
         $batch = $ldapObject->getBatchModifications();
         $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_OBJECT);
+        $hydrator->setLdapConnection($this->connection);
+        $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $schema = $ldapObject->getType();
 
         if ($schema) {

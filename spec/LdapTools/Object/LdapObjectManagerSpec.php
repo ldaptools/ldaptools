@@ -75,12 +75,12 @@ class LdapObjectManagerSpec extends ObjectBehavior
             [
                 'attrib' => 'givenName',
                 'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => 'Chad',
+                'values' => ['Chad'],
             ],
             [
                 'attrib' => 'sn',
                 'modtype' => LDAP_MODIFY_BATCH_ADD,
-                'values' => 'Sikorra',
+                'values' => ['Sikorra'],
             ],
             [
                 'attrib' => 'sAMAccountName',

@@ -10,6 +10,7 @@
 
 namespace LdapTools;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Object\LdapObjectType;
@@ -206,6 +207,8 @@ class LdapObjectCreator
         if (!empty($this->schema)) {
             $hydrator->setLdapObjectSchemas($this->schema);
         }
+        $hydrator->setLdapConnection($this->connection);
+        $hydrator->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $attributes = $hydrator->hydrateToLdap($this->attributes);
 
         $this->connection->add($this->getDnToUse($attributes), $attributes);

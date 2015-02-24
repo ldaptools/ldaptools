@@ -10,9 +10,8 @@
 
 namespace spec\LdapTools\Factory;
 
-use LdapTools\AttributeConverter\ConvertBoolean;
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
-use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -97,5 +96,25 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     function it_should_let_me_set_the_converter_options_on_a_returned_converter()
     {
         $this->get('windows_guid')->setOptions(['foo' => 'bar'])->shouldBeNull();
+    }
+
+    function it_should_let_me_set_the_converter_operation_type_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->setOperationType(AttributeConverterInterface::TYPE_MODIFY)->shouldBeNull();
+    }
+
+    function it_should_let_me_get_the_converter_operation_type_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->getOperationType()->shouldBeEqualTo(AttributeConverterInterface::TYPE_SEARCH_FROM);
+    }
+
+    function it_should_let_me_set_the_dn_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->setDn('cn=foo,dc=foo,dc=bar')->shouldBeNull();
+    }
+
+    function it_should_let_me_get_the_dn_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->getDn()->shouldBeNull();
     }
 }

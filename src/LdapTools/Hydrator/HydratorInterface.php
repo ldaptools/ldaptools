@@ -10,6 +10,7 @@
 
 namespace LdapTools\Hydrator;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -30,10 +31,11 @@ interface HydratorInterface
     /**
      * Converts a ldap_modify_batch array specification so any schema names and value conversions are accounted for.
      *
-     * @param mixed $batch
+     * @param mixed $batch The batch modification array.
+     * @param string|null $dn The full DN of the object that the modification will be performed against.
      * @return array
      */
-    public function hydrateBatchToLdap($batch);
+    public function hydrateBatchToLdap($batch, $dn = null);
 
     /**
      * Hydrates a single LDAP entry.
@@ -80,4 +82,18 @@ interface HydratorInterface
      * @return array
      */
     public function getSelectedAttributes();
+
+    /**
+     * Set the LDAP connection for the context of this hydration.
+     *
+     * @param LdapConnectionInterface $connection
+     */
+    public function setLdapConnection(LdapConnectionInterface $connection);
+
+    /**
+     * Set the LDAP operation type that is requesting this hydration.
+     *
+     * @param int $type
+     */
+    public function setOperationType($type);
 }

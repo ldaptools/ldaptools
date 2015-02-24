@@ -65,13 +65,13 @@ class LdapObjectHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrateBatchToLdap($ldapObject)
+    public function hydrateBatchToLdap($ldapObject, $dn = null)
     {
         if (!($ldapObject instanceof LdapObject)) {
             throw new \InvalidArgumentException('Expects a LdapObject instance to convert batch modifications to LDAP.');
         }
 
-        return $this->hydrateBatchToLdapWithArray($ldapObject->getBatchModifications());
+        return $this->hydrateBatchToLdapWithArray($ldapObject->getBatchModifications(), $ldapObject->get('dn'));
     }
 
     /**
