@@ -62,6 +62,11 @@ class AttributeValueResolver
     protected $aggregated = [];
 
     /**
+     * @var int The LDAP operation type that the converter is working against.
+     */
+    protected $type;
+
+    /**
      * @var bool Whether or not the conversion process is dealing with a batch modification structure.
      */
     protected $isBatch = false;
