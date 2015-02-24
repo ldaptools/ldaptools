@@ -10,6 +10,7 @@
 
 namespace LdapTools\Query;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Schema\LdapObjectSchema;
@@ -100,6 +101,8 @@ class LdapQuery
             $hydrator->setSelectedAttributes($this->attributes);
             $hydrator->setLdapObjectSchemas(...$this->schemas);
         }
+        $hydrator->setLdapConnection($this->ldap);
+        $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
 
         return $hydrator->hydrateAllFromLdap($this->ldap->search(
             $this->ldapFilter,
