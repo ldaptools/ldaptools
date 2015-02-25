@@ -166,7 +166,7 @@ abstract class BaseOperator
     }
 
     /**
-     * Set whether a converter was used or not.
+     * Set whether a converter should be used or not.
      *
      * @param bool $value
      */
@@ -176,13 +176,33 @@ abstract class BaseOperator
     }
 
     /**
-     * Get whether a converter was used or not.
+     * Get whether a converter should be used or not.
      *
      * @return bool
      */
     public function getUseConverter()
     {
         return $this->shouldUseConverter;
+    }
+
+    /**
+     * Set whether a converter was used or not.
+     *
+     * @param bool $value
+     */
+    public function setWasConverterUsed($value)
+    {
+        $this->converterUsed = (bool) $value;
+    }
+
+    /**
+     * Get whether a converter was used or not.
+     *
+     * @return bool
+     */
+    public function getWasConverterUsed()
+    {
+        return $this->converterUsed;
     }
 
     /**

@@ -125,6 +125,22 @@ class ComparisonSpec extends ObjectBehavior
         $this->getConvertedValue()->shouldBeEqualTo('foo');
     }
 
+    function it_should_be_able_to_set_and_get_whether_a_converter_should_be_used()
+    {
+        $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
+        $this->getUseConverter()->shouldBeEqualTo(true);
+        $this->setUseConverter(false);
+        $this->getUseConverter()->shouldBeEqualTo(false);
+    }
+
+    function it_should_be_able_to_set_and_get_whether_a_converter_was_used()
+    {
+        $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
+        $this->getWasConverterUsed()->shouldBeEqualTo(false);
+        $this->setWasConverterUsed(true);
+        $this->getWasConverterUsed()->shouldBeEqualTo(true);
+    }
+
     public function getMatchers()
     {
         return [
