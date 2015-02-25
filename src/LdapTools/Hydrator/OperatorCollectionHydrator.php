@@ -42,7 +42,7 @@ class OperatorCollectionHydrator
     protected $converterOpts = [];
 
     /**
-     * @param LdapConnectionInterface $connection|null
+     * @param null|LdapConnectionInterface $connection
      */
     public function __construct(LdapConnectionInterface $connection = null)
     {
