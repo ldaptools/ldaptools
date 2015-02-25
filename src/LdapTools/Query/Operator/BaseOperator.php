@@ -206,22 +206,6 @@ abstract class BaseOperator
     }
 
     /**
-     * Applies a schema to the operator to do attribute/value conversion if applicable.
-     *
-     * @param LdapObjectSchema $schema
-     */
-    public function applySchema(LdapObjectSchema $schema)
-    {
-        $this->translatedAttribute = $schema->getAttributeToLdap($this->attribute);
-
-        if ($schema->hasConverter($this->attribute) && $this->shouldUseConverter) {
-            $converter = $schema->getConverter($this->attribute);
-            $this->convertedValue = AttributeConverterFactory::get($converter)->toLdap($this->value);
-            $this->converterUsed = true;
-        }
-    }
-
-    /**
      * Returns the operator translated to its LDAP filter string value.
      *
      * @return string

@@ -189,18 +189,6 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
-     * Iterate through a set of Operators and apply the schema to convert attribute names.
-     *
-     * @param BaseOperator[] $operators
-     */
-    protected function applySchema(BaseOperator ...$operators)
-    {
-        foreach ($operators as $operator) {
-            $operator->applySchema(reset($this->schema));
-        }
-    }
-
-    /**
      * Merges all the Operators into one large array in a specific order. Before doing so, it will apply any schemas
      * that exist.
      *
@@ -209,12 +197,6 @@ class OperatorCollection implements \IteratorAggregate
      */
     protected function sortOperatorsToArray()
     {
-        if (!empty($this->schema)) {
-            foreach ($this->operators as $operators) {
-                $this->applySchema(...$operators);
-            }
-        }
-
         return array_merge(
             $this->operators['from'],
             $this->operators['and'],

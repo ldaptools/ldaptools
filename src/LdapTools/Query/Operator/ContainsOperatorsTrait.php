@@ -10,8 +10,6 @@
 
 namespace LdapTools\Query\Operator;
 
-use LdapTools\Schema\LdapObjectSchema;
-
 /**
  * Common methods and properties needed to represent an Operator that can contain other Operators.
  *
@@ -34,13 +32,6 @@ trait ContainsOperatorsTrait
     public function add(BaseOperator ...$operators)
     {
         $this->children = array_merge($this->children, $operators);
-    }
-
-    public function applySchema(LdapObjectSchema $schema)
-    {
-        foreach ($this->children as $operator) {
-            $operator->applySchema($schema);
-        }
     }
 
     public function __toString()

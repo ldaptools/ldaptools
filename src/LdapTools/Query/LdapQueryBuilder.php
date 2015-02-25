@@ -12,6 +12,7 @@ namespace LdapTools\Query;
 
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Hydrator\OperatorCollectionHydrator;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Query\Builder\ADFilterBuilder;
 use LdapTools\Query\Builder\FilterBuilder;
@@ -388,14 +389,7 @@ class LdapQueryBuilder
      */
     public function getLdapFilter()
     {
-        $operators = $this->operators->toArray();
-        $filter = implode('', $operators);
-
-        if (1 < count($operators)) {
-            $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
-        }
-
-        return $filter;
+        return (new OperatorCollectionHydrator($this->connection))->toLdapFilter($this->operators);
     }
 
     /**
