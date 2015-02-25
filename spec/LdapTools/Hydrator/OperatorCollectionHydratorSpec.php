@@ -78,7 +78,7 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $schema->setConverterMap(['foo' => 'bool', 'bar' => 'bool']);
 
         $collection = new OperatorCollection();
-        $collection->add($filter->eq('foo', false));
+        $collection->add($filter->eq('foo', true));
         $collection->add($filter->bOr($filter->eq('bar', false)));
         $collection->addLdapObjectSchema($schema);
 
