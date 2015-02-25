@@ -109,6 +109,22 @@ class ComparisonSpec extends ObjectBehavior
         $this->__tostring()->shouldBeEqualTo('(foo~=\62\61\72)');
     }
 
+    function it_should_be_able_to_set_and_get_the_value()
+    {
+        $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
+        $this->getValue()->shouldBeEqualTo('bar');
+        $this->setValue('foo');
+        $this->getValue()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_be_able_to_set_and_get_the_convereted_value()
+    {
+        $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
+        $this->getConvertedValue()->shouldBeNull();
+        $this->setConvertedValue('foo');
+        $this->getConvertedValue()->shouldBeEqualTo('foo');
+    }
+
     public function getMatchers()
     {
         return [

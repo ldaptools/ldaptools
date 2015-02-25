@@ -86,6 +86,26 @@ abstract class BaseOperator
     }
 
     /**
+     * Get the converted value.
+     *
+     * @return mixed
+     */
+    public function getConvertedValue()
+    {
+        return $this->convertedValue;
+    }
+
+    /**
+     * Set the converted value.
+     *
+     * @param mixed $value
+     */
+    public function setConvertedValue($value)
+    {
+        $this->convertedValue = $value;
+    }
+
+    /**
      * Get the attribute.
      *
      * @return string|null
@@ -146,6 +166,26 @@ abstract class BaseOperator
     }
 
     /**
+     * Set whether a converter was used or not.
+     *
+     * @param bool $value
+     */
+    public function setUseConverter($value)
+    {
+        $this->shouldUseConverter = (bool) $value;
+    }
+
+    /**
+     * Get whether a converter was used or not.
+     *
+     * @return bool
+     */
+    public function getUseConverter()
+    {
+        return $this->shouldUseConverter;
+    }
+
+    /**
      * Applies a schema to the operator to do attribute/value conversion if applicable.
      *
      * @param LdapObjectSchema $schema
@@ -201,15 +241,5 @@ abstract class BaseOperator
     protected function getValueForQuery()
     {
         return $this->converterUsed ? $this->convertedValue : $this->value;
-    }
-
-    public function setUseConverter($value)
-    {
-        $this->shouldUseConverter = (bool) $value;
-    }
-
-    public function getUseConverter()
-    {
-        return $this->shouldUseConverter;
     }
 }
