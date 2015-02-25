@@ -65,8 +65,6 @@ abstract class BaseOperator
      */
     protected $operatorSymbol = '';
 
-    protected $unescapedValues = null;
-
     /**
      * Get the attribute value.
      *
