@@ -111,6 +111,7 @@ class OperatorCollectionHydrator
             $converter->setLdapConnection($this->connection);
         }
         $converter->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $converter->setAttribute($attribute);
 
         return $converter;
     }
