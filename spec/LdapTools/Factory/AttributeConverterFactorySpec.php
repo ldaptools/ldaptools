@@ -72,6 +72,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('password_must_change')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertPasswordMustChange');
     }
 
+    function it_should_return_ConvertUserAccountControl_when_calling_get_with_user_account_control()
+    {
+        $this::get('user_account_control')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertUserAccountControl');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');
