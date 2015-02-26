@@ -58,7 +58,7 @@ class LdapObjectRepository
      */
     public function findBy(array $attributes)
     {
-        $query = $this->buildQuery()->where($attributes)->getLdapQuery();
+        $query = $this->buildLdapQuery()->where($attributes)->getLdapQuery();
 
         return  $this->hydrationMode ? $query->execute($this->hydrationMode) : $query->execute();
     }
@@ -118,7 +118,7 @@ class LdapObjectRepository
      *
      * @return LdapQueryBuilder
      */
-    public function buildQuery()
+    public function buildLdapQuery()
     {
         $lqb = new LdapQueryBuilder($this->ldap);
 

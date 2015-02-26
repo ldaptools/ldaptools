@@ -130,4 +130,13 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $this->setHydrationMode('array');
         $this->findByFirstName('foo')->shouldBeArray();
     }
+
+    function it_should_return_a_LdapQueryBuilder_instance_when_calling_build_ldap_query()
+    {
+        $this->buildLdapQuery()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+
+        $this->buildLdapQuery()
+            ->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))');
+
+    }
 }

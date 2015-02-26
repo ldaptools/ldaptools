@@ -16,8 +16,8 @@ class CustomUserRepository extends LdapObjectRepository
 {
     public function getAllSmiths()
     {
-        // You can use the buildQuery() method to construct a LdapQueryBuilder instance.
-        return $this->buildQuery()
+        // You can use the buildLdapQuery() method to construct a LdapQueryBuilder instance.
+        return $this->buildLdapQuery()
             ->where(['lastName' => 'Smith'])
             ->getLdapQuery()
             ->execute();
