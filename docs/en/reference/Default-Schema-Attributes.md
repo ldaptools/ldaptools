@@ -37,6 +37,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | emailAddress | mail | string |
 | employeeId | employeeId | string |
 | employeeNumber | employeeNumber | int |
+| exchangeMailboxDatabase | homeMDB | string |
 | exchangePolicyRBAC | msExchRBACPolicyLink | string |
 | exchangePolicyActiveSync | msExchMobileMailboxPolicyLink | string |
 | exchangePolicyRetention | msExchMailboxTemplateLink | string |

@@ -17,6 +17,10 @@ objects:
                     trustedForAllDelegation: '524288'
                     trustedForAnyAuthDelegation: '16777216'
             name_to_dn:
+                exchangeMailboxDatabase:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchMDB
                 exchangePolicyActiveSync:
                     attribute: cn
                     filter:
@@ -83,6 +87,7 @@ objects:
                  - 'trustedForAnyAuthDelegation'
              password_must_change: [ passwordMustChange ]
              name_to_dn:
+                - 'exchangeMailboxDatabase'
                 - 'exchangePolicyRBAC'
                 - 'exchangePolicyActiveSync'
                 - 'exchangePolicyRetention'
@@ -102,6 +107,7 @@ objects:
             emailAddress: mail
             employeeId: employeeId
             employeeNumber: employeeNumber
+            exchangeMailboxDatabase: homeMDB
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
             exchangePolicyRBAC: msExchRBACPolicyLink
             exchangePolicyRetention: msExchMailboxTemplateLink
