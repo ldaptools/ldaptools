@@ -76,12 +76,12 @@ and saving it back to LDAP using the `LdapManager`.
 ```php
 $user = $userRepository->findOneByUsername('jsmith');
 
-// Make some modifications to the user account. All these changes are tracked so it knows how the modify the object.
+// Make some modifications to the user account. All these changes are tracked so it knows how to modify the object.
 $user->setTitle('CEO');
 $user->resetMobilePhone();
 
 // Set a field by a property instead...
-$user.enabled = true;
+$user->disabled = false;
 
 // Now actually save the changes back to LDAP...
 try {
