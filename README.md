@@ -32,7 +32,15 @@ use LdapTools\LdapManager;
 
 $config = (new Configuration())->load('/path/to/ldap/config.yml');
 $ldap = new LdapManager($config);
+```
 
+### Searching LDAP
+
+With the `LdapManager` up and going you can now easily build LDAP queries without having to remember all the special 
+syntax for LDAP filters. All values are also automatically escaped.
+
+```php
+// Get an instance of the query...
 $query = $ldap->buildLdapQuery()
     ->select()
     ->fromUsers()
@@ -56,10 +64,24 @@ $users = $userRepository->findByLastName('Smith');
 // Get the first user whose username equals 'jsmith'. Returns a `LdapObject`.
 $user = $userRepository->findOneByUsername('jsmith');
 echo "First name ".$user->getFirstName()." and last name ".$user->getLastName().PHP_EOL;
+```
 
-// Make some modifications to the user account...
+The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
+
+### Modifying LDAP Objects
+
+Modifying LDAP is as easy as searching for the LDAP object as described above, then making changes directly to the object
+and saving it back to LDAP using the `LdapManager`.
+
+```php
+$user = $userRepository->findOneByUsername('jsmith');
+
+// Make some modifications to the user account. All these changes are tracked so it knows how the modify the object.
 $user->setTitle('CEO');
 $user->resetMobilePhone();
+
+// Set a field by a property instead...
+$user.enabled = true;
 
 // Now actually save the changes back to LDAP...
 try {
@@ -67,14 +89,30 @@ try {
 } catch (\Exception $e) {
     echo "Error updating user! ".$e->getMessage();
 }
+```
 
+### Deleting LDAP Objects
+
+Deleting LDAP objects is a simple matter of searching for the object you want to remove, then passing it to the delete
+method on the `LdapManager`:
+
+```php
 // Decide they no longer work here and should be deleted?
+$user = $userRepository->findOneByUsername('jsmith');
+
 try {
     $ldap->delete($user);
 } catch (\Exception $e) {
     echo "Error deleting user! ".$e->getMessage();
 }
+```
 
+### Creating LDAP Objects
+ 
+Creating LDAP objects is easily performed by just passing what you want the attributes to be and what container/OU the
+object should end up in:
+
+```
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
@@ -101,8 +139,6 @@ $ldapObject->createComputer()
     ->with(['name' => 'MYWOKRSTATION'])
     ->execute();
 ```
-
-The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
 
 ### Documentation
 
