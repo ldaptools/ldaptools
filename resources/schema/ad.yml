@@ -16,6 +16,19 @@ objects:
                     smartCardRequired: '262144'
                     trustedForAllDelegation: '524288'
                     trustedForAnyAuthDelegation: '16777216'
+            name_to_dn:
+                exchangePolicyActiveSync:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchMobileMailboxPolicy
+                exchangePolicyRBAC:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchRBACPolicy
+                exchangePolicyRetention:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchRecipientPolicy
         # These are converters to be applied for going both to and from LDAP.
         converters:
              string_to_utf8:
@@ -69,6 +82,10 @@ objects:
                  - 'trustedForAllDelegation'
                  - 'trustedForAnyAuthDelegation'
              password_must_change: [ passwordMustChange ]
+             name_to_dn:
+                - 'exchangePolicyRBAC'
+                - 'exchangePolicyActiveSync'
+                - 'exchangePolicyRetention'
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             badPasswordCount: badPwdCount
@@ -85,6 +102,9 @@ objects:
             emailAddress: mail
             employeeId: employeeId
             employeeNumber: employeeNumber
+            exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
+            exchangePolicyRBAC: msExchRBACPolicyLink
+            exchangePolicyRetention: msExchMailboxTemplateLink
             fax: facsimileTelephoneNumber
             firstName: givenName
             guid: objectGuid

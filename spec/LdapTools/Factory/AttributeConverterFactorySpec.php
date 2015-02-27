@@ -77,6 +77,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('user_account_control')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertUserAccountControl');
     }
 
+    function it_should_return_ConvertNameToDn_when_calling_get_with_name_to_dn()
+    {
+        $this::get('name_to_dn')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertNameToDn');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

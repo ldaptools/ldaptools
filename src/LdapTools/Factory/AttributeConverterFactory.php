@@ -34,6 +34,7 @@ class AttributeConverterFactory
         'encode_windows_password' => '\LdapTools\AttributeConverter\EncodeWindowsPassword',
         'password_must_change' => '\LdapTools\AttributeConverter\ConvertPasswordMustChange',
         'user_account_control' => '\LdapTools\AttributeConverter\ConvertUserAccountControl',
+        'name_to_dn' => '\LdapTools\AttributeConverter\ConvertNameToDn',
     ];
 
     /**
