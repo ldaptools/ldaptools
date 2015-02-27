@@ -149,13 +149,13 @@ $ldapObject->createComputer()
 
 Browse [the docs folder](/docs/en) for more information about LdapTools.
 
-* [Main Configuration Reference](/docs/en/reference/Main-Configuration.md)
-* [Schema Configuration](/docs/en/reference/Schema-Configuration.md)
-* [Using the LdapManager](/docs/en/tutorials/Using-the-LDAP-Manager.md)
-* [Building LDAP Queries](/docs/en/tutorials/Building-LDAP-Queries.md)
-* [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
-* [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-objects.md)
-* [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
+* [Main Configuration Reference](reference/Main-Configuration.md)
+* [Schema Configuration](reference/Schema-Configuration.md)
+* [Using the LdapManager](tutorials/Using-the-LDAP-Manager.md)
+* [Building LDAP Queries](tutorials/Building-LDAP-Queries.md)
+* [Creating LDAP Objects](tutorials/Creating-LDAP-Objects.md)
+* [Modifying LDAP Objects](tutorials/Modifying-LDAP-objects.md)
+* [Default Schema Attributes](reference/Default-Schema-Attributes.md)
 
 ### TODO
 
