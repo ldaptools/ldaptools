@@ -21,6 +21,7 @@ use LdapTools\Query\UserAccountControlFlags;
  */
 class ConvertUserAccountControl implements AttributeConverterInterface
 {
+    use ConverterUtilitiesTrait;
     use AttributeConverterTrait {
         getShouldAggregateValues as parentGetShouldAggregateValues;
     }
@@ -38,7 +39,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     public function toLdap($value)
     {
-        $this->validateCurrentAttribute();
+        $this->validateCurrentAttribute($this->options['uacMap']);
         if (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_MODIFY) {
             $this->setLastValue($this->getCurrentUacValue());
         } elseif (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_CREATE) {
@@ -53,9 +54,9 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $this->validateCurrentAttribute();
+        $this->validateCurrentAttribute($this->options['uacMap']);
 
-        return (bool) ((int) $value & (int) $this->getMappedValue($this->attribute));
+        return (bool) ((int) $value & (int) $this->getArrayValue($this->options['uacMap'], $this->attribute));
     }
 
     /**
@@ -108,7 +109,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
             return $lastValue;
         }
 
-        $mappedValue = $this->getMappedValue($this->attribute);
+        $mappedValue = $this->getArrayValue($this->options['uacMap'], $this->attribute);
         if ($value) {
             $uac = (int) $lastValue | (int) $mappedValue;
         } else {
@@ -116,25 +117,5 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         }
 
         return (string) $uac;
-    }
-
-    /**
-     * If the current attribute does not exist in the map, then there is no way to determine how to do the calculation.
-     */
-    protected function validateCurrentAttribute()
-    {
-        if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($this->options['uacMap']))) {
-            throw new \RuntimeException(
-                sprintf('You must first define "%s" in the options for this converter.', $this->attribute)
-            );
-        }
-    }
-
-    /**
-     * @param string $attribute
-     */
-    protected function getMappedValue($attribute)
-    {
-        return array_change_key_case($this->options['uacMap'])[strtolower($attribute)];
     }
 }
