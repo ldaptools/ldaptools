@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.9.0 (2015-02-26)
+------------------
+
+  * Implement the ability to easily extend the schema and the defined schema objects.
+  * Implement the ability to register custom converter classes in the config.
+  * add a 'has' magic method to LdapObjects. Can now do things like: if ($user->hasFirstName('Foo'))
+  * Many AD account properties can now be changed by a simple bool (disabled, delegation, passwordNeverExpires, etc).
+  * Add a name to distinguished name converter. Easily translates full DN attributes to their base name and back again.
+  * Many attribute converter changes to allow for increased flexibility and options.
+  * Started to add some Exchange support via attributes (exchangeMailboxDatabase, exchangePolicyActiveSync, etc).
+  
 0.8.0 (2015-02-16)
 ------------------
 
