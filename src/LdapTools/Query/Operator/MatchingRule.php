@@ -10,6 +10,8 @@
 
 namespace LdapTools\Query\Operator;
 
+use LdapTools\Utilities\LdapUtilities;
+
 /**
  * Use LDAP matching rule OIDs.
  *
@@ -46,7 +48,7 @@ class MatchingRule extends BaseOperator
             .$this->getAttributeToQuery()
             .':'.$this->oid.':'
             .$this->operatorSymbol
-            .$this->escapeValue($this->getValueForQuery())
+            .LdapUtilities::escapeValue($this->getValueForQuery())
             .self::SEPARATOR_END;
     }
 }

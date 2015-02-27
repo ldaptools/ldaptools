@@ -10,8 +10,7 @@
 
 namespace LdapTools\Query\Operator;
 
-use LdapTools\Factory\AttributeConverterFactory;
-use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * The base Operator implementation.
@@ -215,21 +214,8 @@ abstract class BaseOperator
         return self::SEPARATOR_START
             .$this->getAttributeToQuery()
             .$this->operatorSymbol
-            .$this->escapeValue($this->getValueForQuery())
+            .LdapUtilities::escapeValue($this->getValueForQuery())
             .self::SEPARATOR_END;
-    }
-
-    /**
-     * Escape any special characters for LDAP.
-     *
-     * @param mixed $value The value to escape.
-     * @param null|string $ignore The characters to ignore.
-     * @return string The escaped value.
-     */
-    protected function escapeValue($value, $ignore = null)
-    {
-        // If this is a hexadecimal escaped string, then do not escape it.
-        return preg_match("/^(\\\[0-9a-fA-F]{2})+$/", (string) $value) ? $value : ldap_escape($value, $ignore);
     }
 
     /**

@@ -11,6 +11,7 @@
 namespace LdapTools\Query\Operator;
 
 use LdapTools\Exception\LdapQueryException;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Represents a LDAP wildcard search using a '*'. This is used to help escape the proper values for the filter.
@@ -75,13 +76,13 @@ class Wildcard extends Comparison
     public function __toString()
     {
         if ($this->wildcardType == self::CONTAINS) {
-            $value = '*'.$this->escapeValue($this->getValueForQuery()).'*';
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery()).'*';
         } elseif ($this->wildcardType == self::STARTS_WITH) {
-            $value = $this->escapeValue($this->getValueForQuery()).'*';
+            $value = LdapUtilities::escapeValue($this->getValueForQuery()).'*';
         } elseif ($this->wildcardType == self::ENDS_WITH) {
-            $value = '*'.$this->escapeValue($this->getValueForQuery());
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery());
         } elseif ($this->wildcardType == self::LIKE) {
-            $value = $this->escapeValue($this->getValueForQuery(), '*');
+            $value = LdapUtilities::escapeValue($this->getValueForQuery(), '*');
         } else {
             $value = '*';
         }
