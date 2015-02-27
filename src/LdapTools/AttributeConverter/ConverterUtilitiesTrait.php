@@ -18,6 +18,11 @@ namespace LdapTools\AttributeConverter;
 trait ConverterUtilitiesTrait
 {
     /**
+     * {@inheritdoc}
+     */
+    abstract public function getAttribute();
+
+    /**
      * If the current attribute does not exist in the array, then throw an error.
      *
      * @param $options
@@ -26,7 +31,7 @@ trait ConverterUtilitiesTrait
     {
         if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($options))) {
             throw new \RuntimeException(
-                sprintf('You must first define "%s" in the options for this converter.', $this->attribute)
+                sprintf('You must first define "%s" in the options for this converter.', $this->getAttribute())
             );
         }
     }
