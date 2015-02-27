@@ -112,7 +112,7 @@ try {
 Creating LDAP objects is easily performed by just passing what you want the attributes to be and what container/OU the
 object should end up in:
 
-```
+```php
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
