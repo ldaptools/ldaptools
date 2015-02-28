@@ -160,11 +160,17 @@ trait AttributeConverterTrait
         $this->lastValue = $value;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setShouldAggregateValues($aggregateValues)
     {
         $this->aggregateValues = (bool) $aggregateValues;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getShouldAggregateValues()
     {
         return $this->aggregateValues;
