@@ -10,8 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
-use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\UserAccountControlFlags;
+use LdapTools\Utilities\ConverterUtilitiesTrait;
 
 /**
  * Uses a User Account Control Mapping from the schema and the current attribute/last value context to properly convert
@@ -41,7 +41,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     {
         $this->validateCurrentAttribute($this->options['uacMap']);
         if (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_MODIFY) {
-            $this->setLastValue($this->getCurrentUacValue());
+            $this->setLastValue($this->getCurrentLdapAttributeValue('userAccountControl'));
         } elseif (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_CREATE) {
             $this->setLastValue($this->options['defaultValue']);
         }
@@ -65,32 +65,6 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     public function getShouldAggregateValues()
     {
         return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
-    }
-
-    /**
-     * If the context is a modification, then the current User Account Control value is needed to do the proper bitwise
-     * value calculations so as to not squash other values within this attribute.
-     *
-     * @return string
-     */
-    protected function getCurrentUacValue()
-    {
-        if (!$this->getDn() || !$this->getLdapConnection()) {
-            throw new \RuntimeException('Unable to query for the current userAccountControl attribute.');
-        }
-
-        $query = new LdapQueryBuilder($this->getLdapConnection());
-        $result = $query->select('userAccountControl')
-            ->where(['distinguishedName' => $this->getDn()])
-            ->getLdapQuery()
-            ->execute();
-
-        if ($result->count() == 0) {
-            throw new \RuntimeException(sprintf('Unable to find LDAP object: %s', $this->getDn()));
-        }
-        $object = $result->toArray()[0];
-
-        return $object->getUserAccountControl();
     }
 
     /**
