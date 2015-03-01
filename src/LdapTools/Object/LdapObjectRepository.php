@@ -8,10 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools;
+namespace LdapTools\Object;
 
 use LdapTools\Connection\LdapConnectionInterface;
-use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Schema\LdapObjectSchema;
 

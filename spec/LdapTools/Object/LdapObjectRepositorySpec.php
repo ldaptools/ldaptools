@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools;
+namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnection;
@@ -90,7 +90,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\LdapObjectRepository');
+        $this->shouldHaveType('LdapTools\Object\LdapObjectRepository');
     }
 
     function it_should_call_findOneByGuid_and_return_a_LdapObject()

@@ -108,7 +108,7 @@ class LdapManagerSpec extends ObjectBehavior
 
     function it_should_return_a_ldap_object_repository_when_calling_getRepository()
     {
-        $this->getRepository('user')->shouldHaveType('\LdapTools\LdapObjectRepository');
+        $this->getRepository('user')->shouldHaveType('\LdapTools\Object\LdapObjectRepository');
     }
 
     function it_should_error_when_calling_getRepository_for_a_type_that_does_not_exist()
@@ -118,7 +118,7 @@ class LdapManagerSpec extends ObjectBehavior
 
     function it_should_return_a_ldap_object_creator_when_calling_createLdapObject()
     {
-        $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     /**

@@ -4,13 +4,13 @@
 A LDAP Object Repository gives a way to encapsulate and reuse common queries you may run against LDAP. So rather than
 recoding the same query in several spots, you can code it once in the repository then use the repository method instead.
 
-Your custom repository class should extend the `\LdapTools\LdapObjectRepository` class. For instance, your class could
-be something like:
+Your custom repository class should extend the `\LdapTools\Object\LdapObjectRepository` class. For instance, your class
+could be something like:
 
 ```php
 namespace Acme\Demo;
 
-use LdapTools\LdapObjectRepository;
+use LdapTools\Object\LdapObjectRepository;
 
 class CustomUserRepository extends LdapObjectRepository
 {

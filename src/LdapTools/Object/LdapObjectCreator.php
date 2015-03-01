@@ -8,12 +8,11 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools;
+namespace LdapTools\Object;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\LdapObjectSchemaFactory;
-use LdapTools\Object\LdapObjectType;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Schema\LdapObjectSchema;
 

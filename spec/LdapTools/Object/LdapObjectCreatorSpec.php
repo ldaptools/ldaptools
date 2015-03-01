@@ -1,6 +1,6 @@
 <?php
 
-namespace spec\LdapTools;
+namespace spec\LdapTools\Object;
 
 use LdapTools\AttributeConverter\EncodeWindowsPassword;
 use LdapTools\Configuration;
@@ -20,7 +20,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $connection->__toString()->willReturn('example.com');
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
         $factory = new LdapObjectSchemaFactory($cache, $parser);
 
@@ -29,47 +29,47 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\LdapObjectCreator');
+        $this->shouldHaveType('LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_adding_attributes()
     {
-        $this->with(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->with(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_creating_a_user()
     {
-        $this->createUser()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->createUser()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_creating_a_group()
     {
-        $this->createGroup()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->createGroup()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_creating_a_contact()
     {
-        $this->createContact()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->createContact()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_creating_a_computer()
     {
-        $this->createComputer()->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->createComputer()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_setting_the_container()
     {
-        $this->in('dc=foo,dc=bar')->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->in('dc=foo,dc=bar')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_setting_a_parameter()
     {
-        $this->setParameter('foo', 'bar')->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->setParameter('foo', 'bar')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_chain_calls_when_setting_the_dn()
     {
-        $this->setDn('cn=foo,dc=example,dc=local')->shouldReturnAnInstanceOf('\LdapTools\LdapObjectCreator');
+        $this->setDn('cn=foo,dc=example,dc=local')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
     function it_should_throw_an_exception_when_passing_an_invalid_object_to_create()
@@ -161,7 +161,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $connection->add('cn=foobar,ou=foo,ou=bar,dc=example,dc=local', Argument::any())->willReturn(null);
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
         $factory = new LdapObjectSchemaFactory($cache, $parser);
 
@@ -179,7 +179,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $connection->add('cn=foobar,ou=employees,dc=example,dc=local', Argument::any())->willReturn(null);
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
         $factory = new LdapObjectSchemaFactory($cache, $parser);
 

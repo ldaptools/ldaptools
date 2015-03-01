@@ -159,7 +159,7 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_return_the_default_repository_when_calling_getRepository()
     {
-        $this->getRepository()->shouldBeEqualTo('\LdapTools\LdapObjectRepository');
+        $this->getRepository()->shouldBeEqualTo('\LdapTools\Object\LdapObjectRepository');
     }
 
     function it_should_set_the_repository_when_calling_setRepository()

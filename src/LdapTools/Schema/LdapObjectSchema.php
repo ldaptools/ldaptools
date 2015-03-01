@@ -67,7 +67,7 @@ class LdapObjectSchema implements CacheableItemInterface
     /**
      * @var string The repository to use for this object.
      */
-    protected $repository = '\LdapTools\LdapObjectRepository';
+    protected $repository = '\LdapTools\Object\LdapObjectRepository';
 
     /**
      * @var string The default ou/container where the object should reside in LDAP when created.

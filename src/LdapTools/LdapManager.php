@@ -16,7 +16,9 @@ use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
+use LdapTools\Object\LdapObjectCreator;
 use LdapTools\Object\LdapObjectManager;
+use LdapTools\Object\LdapObjectRepository;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
