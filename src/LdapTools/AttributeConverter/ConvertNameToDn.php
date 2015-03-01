@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
