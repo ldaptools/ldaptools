@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools;
+namespace spec\LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
@@ -101,7 +101,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\AttributeValueResolver');
+        $this->shouldHaveType('LdapTools\Resolver\AttributeValueResolver');
     }
 
     function it_should_allow_setting_the_dn()

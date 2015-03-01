@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools;
+namespace LdapTools\Resolver;
 
 /**
  * Iterates over the attributes to process and replace parameter values in the required order based on dependencies.

@@ -11,9 +11,9 @@
 namespace LdapTools\Hydrator;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\AttributeValueResolver;
 use LdapTools\Connection\LdapConnectionInterface;
-use LdapTools\ParameterResolver;
+use LdapTools\Resolver\AttributeValueResolver;
+use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**

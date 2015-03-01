@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools;
+namespace spec\LdapTools\Resolver;
 
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -31,7 +31,7 @@ class ParameterResolverSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\ParameterResolver');
+        $this->shouldHaveType('LdapTools\Resolver\ParameterResolver');
     }
 
     function it_should_return_an_array_when_calling_resolve()
