@@ -202,6 +202,6 @@ trait AttributeConverterTrait
      */
     public function setBatchOperationType($batchOperationType)
     {
-        $this->batchOpType = (bool) $batchOperationType;
+        $this->batchOpType = $batchOperationType;
     }
 }

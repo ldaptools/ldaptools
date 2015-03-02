@@ -149,14 +149,14 @@ interface AttributeConverterInterface
     /**
      * Get the type of batch operation that is being converted.
      *
-     * @return string
+     * @return int
      */
     public function getBatchOperationType();
 
     /**
      * Set the batch operation type being converted.
      *
-     * @param bool $batchOpType
+     * @param int $batchOpType
      */
     public function setBatchOperationType($batchOpType);
 }
