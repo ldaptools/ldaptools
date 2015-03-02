@@ -43,11 +43,6 @@ class Batch
     protected $modtype;
 
     /**
-     * @var bool Whether or not the value for this batch has been converted to be sent to LDAP.
-     */
-    protected $isConverted = false;
-
-    /**
      * @param int $modtype
      * @param string $attribute
      * @param array $values
