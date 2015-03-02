@@ -70,7 +70,7 @@ class LdapObjectHydrator implements HydratorInterface
             throw new \InvalidArgumentException('Expects a LdapObject instance to convert batch modifications to LDAP.');
         }
 
-        $batches = $this->convertValuesToLdap($ldapObject->getBatchCollection(), $dn, true);
+        $batches = $this->convertValuesToLdap($ldapObject->getBatchCollection(), $dn);
         foreach ($batches as $batch) {
             /** @var \LdapTools\BatchModify\Batch $batch */
             $batch->setAttribute(
