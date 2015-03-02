@@ -52,7 +52,6 @@ class Batch
         $this->setModType($modtype);
         $this->setValues($values);
         $this->attribute = $attribute;
-
     }
 
     /**

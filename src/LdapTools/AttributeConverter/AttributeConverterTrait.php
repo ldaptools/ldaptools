@@ -55,6 +55,11 @@ trait AttributeConverterTrait
     protected $aggregateValues;
 
     /**
+     * @var int|null The batch action type for the conversion.
+     */
+    protected $batchOpType;
+
+    /**
      * Sets the current LdapConnection for access by the converter.
      *
      * @param LdapConnectionInterface $connection
@@ -94,6 +99,14 @@ trait AttributeConverterTrait
     public function setOptions(array $options)
     {
         $this->options = array_merge($this->options, $options);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOptions()
+    {
+        return $this->options;
     }
 
     /**
@@ -174,5 +187,21 @@ trait AttributeConverterTrait
     public function getShouldAggregateValues()
     {
         return $this->aggregateValues;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getBatchOperationType()
+    {
+        return $this->batchOpType;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setBatchOperationType($batchOperationType)
+    {
+        $this->batchOpType = (bool) $batchOperationType;
     }
 }

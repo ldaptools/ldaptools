@@ -70,6 +70,13 @@ interface AttributeConverterInterface
     public function setOptions(array $options);
 
     /**
+     * Gets the options that may be recognized by the converter.
+     *
+     * @return array
+     */
+    public function getOptions();
+
+    /**
      * Set the LDAP operation type.
      *
      * @param $type
@@ -138,4 +145,18 @@ interface AttributeConverterInterface
      * @return mixed
      */
     public function getLastValue();
+
+    /**
+     * Get the type of batch operation that is being converted.
+     *
+     * @return string
+     */
+    public function getBatchOperationType();
+
+    /**
+     * Set the batch operation type being converted.
+     *
+     * @param bool $batchOpType
+     */
+    public function setBatchOperationType($batchOpType);
 }
