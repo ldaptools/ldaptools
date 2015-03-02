@@ -92,25 +92,6 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $this->shouldThrow('\InvalidArgumentException')->duringHydrateToLdap([]);
     }
 
-    function it_should_hydrate_an_object_to_ldap()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setAttributeMap([
-            'firstName' => 'givenName',
-            'lastName' => 'sn',
-            'emailAddress' => 'mail',
-            'name' => 'cn'
-        ]);
-        $user = new LdapObject($this->objectToLdap);
-
-        $this->setLdapObjectSchemas($schema);
-        $this->setParameter('_domain_', 'foo.bar');
-        $this->hydrateToLdap($user)->shouldHaveKeyWithValue('givenName', 'Egon');
-        $this->hydrateToLdap($user)->shouldHaveKeyWithValue('sn', 'Spengler');
-        $this->hydrateToLdap($user)->shouldHaveKeyWithValue('mail', 'Egon.Spengler@foo.bar');
-        $this->hydrateToLdap($user)->shouldHaveKeyWithValue('cn', 'Egon');
-    }
-
     function it_should_hydrate_an_entry_from_ldap_to_a_ldap_object()
     {
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
@@ -156,8 +137,8 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $ldapObject->remove('username', 'csikorra');
         $ldapObject->reset('emailAddress');
 
-        $this->hydrateBatchToLdap($ldapObject)->shouldBeEqualTo($batch);
-        $this->hydrateBatchToLdap($ldapObject)->shouldHaveCount(4);
+        $this->hydrateToLdap($ldapObject)->shouldBeEqualTo($batch);
+        $this->hydrateToLdap($ldapObject)->shouldHaveCount(4);
     }
 
     public function getMatchers()

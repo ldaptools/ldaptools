@@ -11,6 +11,7 @@
 namespace LdapTools\Object;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -58,7 +59,7 @@ class LdapObjectManager
     {
         $this->validateObject($ldapObject);
 
-        $batch = $ldapObject->getBatchModifications();
+        $batches = $ldapObject->getBatchCollection();
         $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_OBJECT);
         $hydrator->setLdapConnection($this->connection);
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
@@ -67,11 +68,11 @@ class LdapObjectManager
         if ($schema) {
             $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $schema);
             $hydrator->setLdapObjectSchemas($schema);
-            $batch = $hydrator->hydrateBatchToLdap($ldapObject);
+            $batches = $hydrator->hydrateToLdap($ldapObject);
         }
 
-        $this->connection->modifyBatch($ldapObject->get('dn'), $batch);
-        $ldapObject->clearBatchModifications();
+        $this->connection->modifyBatch($ldapObject->get('dn'), $batches);
+        $ldapObject->setBatchCollection(new BatchCollection());
     }
 
     /**

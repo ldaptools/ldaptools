@@ -11,8 +11,10 @@
 namespace LdapTools\Hydrator;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Resolver\AttributeValueResolver;
+use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
@@ -153,23 +155,6 @@ trait HydratorTrait
     }
 
     /**
-     * @see HydratorInterface::hydrateBatchToLdap()
-     */
-    public function hydrateBatchToLdap($batch, $dn = null)
-    {
-        if (!is_array($batch)) {
-            throw new \InvalidArgumentException('Expects an array to convert batch modifications to LDAP.');
-        }
-
-        $batch = $this->convertValuesToLdap($batch, $dn, true);
-        foreach ($batch as $index => $item) {
-            $batch[$index]['attrib'] = $this->getSchema()->getAttributeToLdap($item['attrib']);
-        }
-
-        return $batch;
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function setOperationType($type)
@@ -273,8 +258,14 @@ trait HydratorTrait
         if (empty($this->schemas)) {
             return $entry;
         }
+        $valueResolver = new AttributeValueResolver(
+            $this->getSchema(),
+            $entry,
+            $this->type
+        );
+        $this->configureValueResolver($valueResolver);
 
-        return $this->getAttributeValueResolver($entry)->fromLdap();
+        return $valueResolver->fromLdap();
     }
 
     /**
@@ -350,18 +341,24 @@ trait HydratorTrait
      * Checks for attributes assigned an attribute converter. It will replace the value with the converted value then
      * send back all the attributes.
      *
-     * @param array $attributes
+     * @param array|BatchCollection $values
      * @param string|null $dn
-     * @param bool $isBatch
-     * @return array
+     * @return array|BatchCollection
      */
-    protected function convertValuesToLdap(array $attributes, $dn = null, $isBatch = false)
+    protected function convertValuesToLdap($values, $dn = null)
     {
         if (empty($this->schemas)) {
-            return $attributes;
+            return $values;
         }
+        $class =  ($values instanceof BatchCollection) ? '\LdapTools\Resolver\BatchValueResolver' : '\LdapTools\Resolver\AttributeValueResolver';
+        $valueResolver = new $class(
+            $this->getSchema(),
+            $values,
+            $this->type
+        );
+        $this->configureValueResolver($valueResolver, $dn);
 
-        return $this->getAttributeValueResolver($attributes, $dn)->toLdap($isBatch);
+        return $valueResolver->toLdap();
     }
 
     /**
@@ -410,25 +407,17 @@ trait HydratorTrait
     /**
      * Retrieve the AttributeValueResolver instance with the connection and other information set if needed.
      *
-     * @param array $entry
+     * @param BaseValueResolver $valueResolver
      * @param $dn null|string
-     * @return AttributeValueResolver
      */
-    protected function getAttributeValueResolver(array $entry, $dn = null)
+    protected function configureValueResolver(BaseValueResolver $valueResolver, $dn = null)
     {
         $dn = isset($entry['dn']) ? $entry['dn'] : $dn;
-        $valueResolver = new AttributeValueResolver(
-            $this->getSchema(),
-            $entry,
-            $this->type
-        );
         if ($this->connection) {
             $valueResolver->setLdapConnection($this->connection);
         }
         if (!is_null($dn)) {
             $valueResolver->setDn($dn);
         }
-
-        return $valueResolver;
     }
 }

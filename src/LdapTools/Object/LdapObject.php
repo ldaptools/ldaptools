@@ -10,6 +10,9 @@
 
 namespace LdapTools\Object;
 
+use LdapTools\BatchModify\Batch;
+use LdapTools\BatchModify\BatchCollection;
+
 /**
  * Represents a LDAP Object.
  *
@@ -50,9 +53,9 @@ class LdapObject
     protected $attributes = [];
 
     /**
-     * @var array All of the batch modifications that have been made.
+     * @var BatchCollection A collection of Batch objects for changes to be sent to LDAP.
      */
-    protected $modifications = [];
+    protected $batches;
 
     /**
      * @param array $attributes
@@ -66,6 +69,7 @@ class LdapObject
         $this->class = $class;
         $this->category = $category;
         $this->type = $type;
+        $this->batches = new BatchCollection();
     }
 
     /**
@@ -159,7 +163,7 @@ class LdapObject
         } else {
             $this->attributes[$attribute] = $value;
         }
-        $this->addBatchModification($attribute, LDAP_MODIFY_BATCH_REPLACE, $value);
+        $this->batches->add(new Batch(Batch::TYPE['REPLACE'], $attribute, $value));
 
         return $this;
     }
@@ -177,7 +181,7 @@ class LdapObject
             $attribute = $this->resolveAttributeName($attribute);
             $this->attributes[$attribute] = $this->removeAttributeValue($this->attributes[$attribute], $value);
         }
-        $this->addBatchModification($attribute, LDAP_MODIFY_BATCH_REMOVE, $value);
+        $this->batches->add(new Batch(Batch::TYPE['REMOVE'], $attribute, $value));
 
         return $this;
     }
@@ -194,7 +198,7 @@ class LdapObject
             $attribute = $this->resolveAttributeName($attribute);
             unset($this->attributes[$attribute]);
         }
-        $this->addBatchModification($attribute, LDAP_MODIFY_BATCH_REMOVE_ALL, null);
+        $this->batches->add(new Batch(Batch::TYPE['REMOVE_ALL'], $attribute));
 
         return $this;
     }
@@ -214,7 +218,7 @@ class LdapObject
         } else {
             $this->attributes[$attribute] = $value;
         }
-        $this->addBatchModification($attribute, LDAP_MODIFY_BATCH_ADD, $value);
+        $this->batches->add(new Batch(Batch::TYPE['ADD'], $attribute, $value));
 
         return $this;
     }
@@ -230,23 +234,24 @@ class LdapObject
     }
 
     /**
-     * Get the batch modifications array.
+     * Get the BatchCollection object.
      *
-     * @return array
+     * @return BatchCollection
      */
-    public function getBatchModifications()
+    public function getBatchCollection()
     {
-        return $this->modifications;
+        return $this->batches;
     }
 
     /**
-     * Clears the batch modifications array.
+     * Sets the BatchCollection.
      *
+     * @param BatchCollection $batches
      * @return $this
      */
-    public function clearBatchModifications()
+    public function setBatchCollection(BatchCollection $batches)
     {
-        $this->modifications = [];
+        $this->batches = $batches;
 
         return $this;
     }
@@ -339,25 +344,6 @@ class LdapObject
         }
 
         return reset($result);
-    }
-
-    /**
-     * Adds a batch modification for the ldap_batch_modify method.
-     *
-     * @param string $attribute
-     * @param int $modType
-     * @param mixed $value
-     */
-    protected function addBatchModification($attribute, $modType, $value)
-    {
-        $modification = [
-            'attrib' => $attribute,
-            'modtype' => $modType,
-        ];
-        if (!is_null($value)) {
-            $modification['values'] = is_array($value) ? $value : [ $value ];
-        }
-        $this->modifications[] = $modification;
     }
 
     /**

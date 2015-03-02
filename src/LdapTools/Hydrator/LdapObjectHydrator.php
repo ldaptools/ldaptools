@@ -24,7 +24,6 @@ class LdapObjectHydrator implements HydratorInterface
         hydrateFromLdap as hydrateFromLdapToArray;
         hydrateAllFromLdap as hydrateAllFromLdapToObjects;
         hydrateToLdap as hydrateToLdapWithArray;
-        hydrateBatchToLdap as hydrateBatchToLdapWithArray;
     }
 
     /**
@@ -65,24 +64,20 @@ class LdapObjectHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function hydrateBatchToLdap($ldapObject, $dn = null)
+    public function hydrateToLdap($ldapObject, $dn = null)
     {
         if (!($ldapObject instanceof LdapObject)) {
             throw new \InvalidArgumentException('Expects a LdapObject instance to convert batch modifications to LDAP.');
         }
 
-        return $this->hydrateBatchToLdapWithArray($ldapObject->getBatchModifications(), $ldapObject->get('dn'));
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function hydrateToLdap($ldapObject)
-    {
-        if (!($ldapObject instanceof LdapObject)) {
-            throw new \InvalidArgumentException('Expects a LdapObject instance to convert data to LDAP.');
+        $batches = $this->convertValuesToLdap($ldapObject->getBatchCollection(), $dn, true);
+        foreach ($batches as $batch) {
+            /** @var \LdapTools\BatchModify\Batch $batch */
+            $batch->setAttribute(
+                $this->getSchema()->getAttributeToLdap($batch->getAttribute())
+            );
         }
 
-        return $this->hydrateToLdapWithArray($ldapObject->toArray());
+        return $batches->getBatchArray();
     }
 }

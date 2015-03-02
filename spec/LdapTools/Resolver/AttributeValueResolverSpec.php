@@ -142,7 +142,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
 
         $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
-        $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_MODIFY);
+        $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
 
@@ -160,85 +160,6 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $this->fromLdap()->shouldHaveKeyWithValue('username','chad');
         $this->fromLdap()->shouldHaveKeyWithValue('emailAddress','Chad.Sikorra@gmail.com');
         $this->fromLdap()->shouldHaveKeyWithValue('passwordMustChange', true);
-    }
-
-    function it_should_convert_values_to_ldap_with_a_batch_modification()
-    {
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
-        $ldapObject->set('disabled', true);
-        $ldapObject->set('trustedForAllDelegation', true);
-        $ldapObject->set('username', 'foo');
-        $ldapObject->add('emailAddress', 'chad.sikorra@gmail.com');
-        $ldapObject->remove('phoneNumber','555-5555');
-        $ldapObject->reset('pager');
-
-        $uacBatch = [
-            'attrib' => 'userAccountControl',
-            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-            'values' => ["524802"]
-        ];
-        $usernameBatch = [
-            'attrib' => 'username',
-            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-            'values' => ["foo"]
-        ];
-        $emailBatch = [
-            'attrib' => 'emailAddress',
-            'modtype' => LDAP_MODIFY_BATCH_ADD,
-            'values' => ["chad.sikorra@gmail.com"]
-        ];
-        $phoneBatch = [
-            'attrib' => 'phoneNumber',
-            'modtype' => LDAP_MODIFY_BATCH_REMOVE,
-            'values' => ["555-5555"]
-        ];
-        $pagerBatch = [
-            'attrib' => 'pager',
-            'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
-        ];
-        $batch = $ldapObject->getBatchModifications();
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
-        $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
-        $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->toLdap(true)->shouldHaveCount(5);
-        $this->toLdap(true)->shouldContain($uacBatch);
-        $this->toLdap(true)->shouldContain($usernameBatch);
-        $this->toLdap(true)->shouldContain($emailBatch);
-        $this->toLdap(true)->shouldContain($phoneBatch);
-        $this->toLdap(true)->shouldContain($pagerBatch);
-    }
-
-    public function it_should_error_trying_to_do_a_non_set_method_on_a_single_aggregated_value()
-    {
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
-        $ldapObject->remove('disabled', true);
-
-        $batch = $ldapObject->getBatchModifications();
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
-        $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
-        $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->shouldThrow(new \LogicException('Unable to modify "disabled". You can only use the "set" method to modify this attribute.'))
-            ->duringToLdap(true);
-    }
-
-    public function it_should_error_trying_to_do_a_non_set_method_on_many_aggregated_values()
-    {
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
-        $ldapObject->set('disabled', true);
-        $ldapObject->add('trustedForAllDelegation', true);
-
-        $batch = $ldapObject->getBatchModifications();
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
-        $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
-        $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->shouldThrow(new \LogicException('Unable to modify "trustedForAllDelegation". You can only use the "set" method to modify this attribute.'))
-            ->duringToLdap(true);
     }
 
     public function getMatchers()

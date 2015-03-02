@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Object;
 
+use LdapTools\BatchModify\BatchCollection;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -232,16 +233,16 @@ class LdapObjectSpec extends ObjectBehavior
         $this->isType('computer')->shouldBeEqualTo(false);
     }
 
-    function it_should_add_batch_modifications_for_each_action()
+    function it_should_add_to_the_batch_collection_for_each_action()
     {
         $this->addFirstName('Foo');
-        $this->getBatchModifications()->shouldHaveCount(1);
+        $this->getBatchCollection()->getBatchArray()->shouldHaveCount(1);
         $this->removeLastName('Sikorra');
-        $this->getBatchModifications()->shouldHaveCount(2);
+        $this->getBatchCollection()->getBatchArray()->shouldHaveCount(2);
         $this->reset('emailAddress');
-        $this->getBatchModifications()->shouldHaveCount(3);
+        $this->getBatchCollection()->getBatchArray()->shouldHaveCount(3);
         $this->set('phoneNumber', '555-5555');
-        $this->getBatchModifications()->shouldHaveCount(4);
+        $this->getBatchCollection()->getBatchArray()->shouldHaveCount(4);
     }
 
     function it_should_return_the_ldap_type_when_calling_get_type()
@@ -255,8 +256,8 @@ class LdapObjectSpec extends ObjectBehavior
         $this->removeLastName('Sikorra');
         $this->reset('emailAddress');
         $this->set('phoneNumber', '555-5555');
-        $this->getBatchModifications()->shouldHaveCount(4);
-        $this->clearBatchModifications()->getBatchModifications()->shouldHaveCount(0);
+        $this->getBatchCollection()->getBatchArray()->shouldHaveCount(4);
+        $this->setBatchCollection(new BatchCollection())->getBatchCollection()->getBatchArray()->shouldHaveCount(0);
     }
 
     function it_should_check_for_an_attribute_when_calling_the_magical_has()
