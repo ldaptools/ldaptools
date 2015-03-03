@@ -111,12 +111,11 @@ class AttributeValueResolver extends BaseValueResolver
     protected function iterateAggregates(array $toAggregate, $values, AttributeConverterInterface $converter)
     {
         foreach ($toAggregate as $aggregate) {
-            if (!isset($this->entry[$aggregate]) || ($aggregate == end($this->aggregated))) {
-                continue;
+            if (isset($this->entry[$aggregate])) {
+                $values = $this->getConvertedValues($this->entry[$aggregate], $aggregate, 'toLdap', $converter);
+                $converter->setLastValue($values);
+                $this->converted[] = $aggregate;
             }
-            $values = $this->getConvertedValues($this->entry[$aggregate], $aggregate, 'toLdap', $converter);
-            $converter->setLastValue($values);
-            $this->converted[] = $aggregate;
         }
 
         return $values;

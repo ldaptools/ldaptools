@@ -82,16 +82,17 @@ class BatchValueResolver extends BaseValueResolver
      */
     protected function iterateAggregates(array $toAggregate, $values, AttributeConverterInterface $converter)
     {
-        // Make sure to validate the current batch.
-        $this->validateBatchAggregate($this->batches->get($this->currentBatchIndex));
         $batches = $this->getBatchesForAttributes($toAggregate);
 
         foreach ($batches as $index => $batch) {
             /** @var Batch $batch */
-            $this->validateBatchAggregate($batch);
+            $this->validateBatchAggregate($batch, $converter);
+            $converter->setBatch($batch);
             $values = $this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap', $converter);
             $converter->setLastValue($values);
-            $this->batches->remove($index);
+            if ($index !== $this->currentBatchIndex) {
+                $this->batches->remove($index);
+            }
         }
 
         return $values;
@@ -109,12 +110,7 @@ class BatchValueResolver extends BaseValueResolver
 
         foreach ($this->batches as $index => $batch) {
             /** @var Batch $batch */
-            if (!in_array(strtolower($batch->getAttribute()), array_map('strtolower', $attributes))) {
-                continue;
-            }
-            // Only add it if it isn't the current batch being processed. It's possible that 'set' was called multiple
-            // times, even though that probably wouldn't make much sense...
-            if ($this->currentBatchIndex != $index) {
+            if (in_array(strtolower($batch->getAttribute()), array_map('strtolower', $attributes))) {
                 $batches[$index] = $batch;
             }
         }
@@ -127,13 +123,15 @@ class BatchValueResolver extends BaseValueResolver
      * 'remove') are not valid. Additionally, all batch modification array keys should be present.
      *
      * @param Batch $batch
+     * @param AttributeConverterInterface $converter
      */
-    protected function validateBatchAggregate(Batch $batch)
+    protected function validateBatchAggregate(Batch $batch, AttributeConverterInterface $converter)
     {
-        if (!$batch->isTypeReplace()) {
+        if (!$converter->isBatchSupported($batch)) {
             throw new \LogicException(sprintf(
-                'Unable to modify "%s". You can only use the "set" method to modify this attribute.',
-                $batch->getAttribute()
+                'Unable to modify "%s". The "%s" action is not allowed.',
+                $batch->getAttribute(),
+                array_search($batch->getModType(), Batch::TYPE)
             ));
         }
     }

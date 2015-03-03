@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\BatchModify\Batch;
 use LdapTools\Query\UserAccountControlFlags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 
@@ -91,5 +92,13 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         }
 
         return (string) $uac;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBatchSupported(Batch $batch)
+    {
+        return $batch->isTypeReplace();
     }
 }

@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Factory;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -126,5 +127,30 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     function it_should_let_me_get_the_dn_on_a_returned_converter()
     {
         $this->get('windows_guid')->getDn()->shouldBeNull();
+    }
+
+    function it_should_let_me_get_the_last_value_returned_converter()
+    {
+        $this->get('windows_guid')->getLastValue()->shouldBeNull();
+    }
+
+    function it_should_let_me_set_the_last_value_returned_converter()
+    {
+        $this->get('windows_guid')->setLastValue('foo')->shouldBeNull();
+    }
+
+    function it_should_let_me_set_the_batch_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->setBatch(new Batch(1,'foo','bar'))->shouldBeNull();
+    }
+
+    function it_should_let_me_get_the_batch_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->getBatch()->shouldBeNull();
+    }
+
+    function it_should_let_me_check_a_batch_is_supported_on_the_converter()
+    {
+        $this->get('windows_guid')->isBatchSupported(new Batch(1,'foo','bar'))->shouldBeBool();
     }
 }

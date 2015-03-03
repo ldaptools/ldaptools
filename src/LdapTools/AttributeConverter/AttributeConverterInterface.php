@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 
 /**
@@ -147,16 +148,24 @@ interface AttributeConverterInterface
     public function getLastValue();
 
     /**
-     * Get the type of batch operation that is being converted.
+     * Get the batch object.
      *
-     * @return int
+     * @return Batch
      */
-    public function getBatchOperationType();
+    public function getBatch();
 
     /**
-     * Set the batch operation type being converted.
+     * Set the batch object.
      *
-     * @param int $batchOpType
+     * @param Batch $batch
      */
-    public function setBatchOperationType($batchOpType);
+    public function setBatch(Batch $batch);
+
+    /**
+     * Return whether this batch is a supported type for the converter.
+     *
+     * @param Batch $batch
+     * @return bool
+     */
+    public function isBatchSupported(Batch $batch);
 }

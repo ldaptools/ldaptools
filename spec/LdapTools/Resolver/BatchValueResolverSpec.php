@@ -129,7 +129,6 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
-        $batch = $ldapObject->getBatchCollection()->getBatchArray();
         $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
@@ -154,7 +153,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->shouldThrow(new \LogicException('Unable to modify "disabled". You can only use the "set" method to modify this attribute.'))
+        $this->shouldThrow(new \LogicException('Unable to modify "disabled". The "REMOVE" action is not allowed.'))
             ->duringToLdap();
     }
 
@@ -170,7 +169,6 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->shouldThrow(new \LogicException('Unable to modify "trustedForAllDelegation". You can only use the "set" method to modify this attribute.'))
-            ->duringToLdap();
+        $this->shouldThrow(new \LogicException('Unable to modify "trustedForAllDelegation". The "ADD" action is not allowed.'))->duringToLdap();
     }
 }

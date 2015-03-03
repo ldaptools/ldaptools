@@ -107,15 +107,16 @@ abstract class BaseValueResolver
     protected function getConvertedValues($values, $attribute, $direction, $aggregate = null)
     {
         $values = is_array($values) ? $values : [$values];
-        $converter = null;
+        $converter = is_null($aggregate) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $aggregate;
+
+        if (is_null($aggregate) && $converter->getShouldAggregateValues() && $direction == 'toLdap') {
+            return $this->convertAggregateValues($attribute, $values, $converter);
+        }
 
         foreach ($values as $index => $value) {
             $converter = is_null($aggregate) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $aggregate;
             $converter->setAttribute($attribute);
             $values[$index] = $converter->$direction($value);
-        }
-        if (!is_null($converter) && $converter->getShouldAggregateValues() && is_null($aggregate) && $direction == 'toLdap') {
-            $values = $this->convertAggregateValues($attribute, $values, $converter);
         }
 
         return $values;
@@ -134,9 +135,6 @@ abstract class BaseValueResolver
         $this->aggregated[] = $attribute;
         $converterName = $this->schema->getConverter($attribute);
         $toAggregate = array_keys($this->schema->getConverterMap(), $converterName);
-
-        $values = (count($values) == 1) ? reset($values) : $values;
-        $converter->setLastValue($values);
         $values = $this->iterateAggregates($toAggregate, $values, $converter);
 
         return is_array($values) ? $values : [$values];

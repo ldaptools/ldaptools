@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 
 /**
@@ -55,9 +56,9 @@ trait AttributeConverterTrait
     protected $aggregateValues;
 
     /**
-     * @var int|null The batch action type for the conversion.
+     * @var Batch|null The batch object for the conversion.
      */
-    protected $batchOpType;
+    protected $batch;
 
     /**
      * Sets the current LdapConnection for access by the converter.
@@ -192,16 +193,24 @@ trait AttributeConverterTrait
     /**
      * {@inheritdoc}
      */
-    public function getBatchOperationType()
+    public function getBatch()
     {
-        return $this->batchOpType;
+        return $this->batch;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function setBatchOperationType($batchOperationType)
+    public function setBatch(Batch $batch)
     {
-        $this->batchOpType = $batchOperationType;
+        $this->batch = $batch;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBatchSupported(Batch $batch)
+    {
+        return (bool) $batch;
     }
 }
