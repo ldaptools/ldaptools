@@ -110,13 +110,9 @@ abstract class BaseValueResolver
         $converter = is_null($aggregate) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $aggregate;
 
         if (is_null($aggregate) && $converter->getShouldAggregateValues() && $direction == 'toLdap') {
-            return $this->convertAggregateValues($attribute, $values, $converter);
-        }
-
-        foreach ($values as $index => $value) {
-            $converter = is_null($aggregate) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $aggregate;
-            $converter->setAttribute($attribute);
-            $values[$index] = $converter->$direction($value);
+            $values = $this->convertAggregateValues($attribute, $values, $converter);
+        } else {
+            $values = $this->doConvertValues($attribute, $values, $direction, $aggregate);
         }
 
         return $values;
@@ -162,5 +158,26 @@ abstract class BaseValueResolver
         $converter->setOperationType($this->type);
 
         return $converter;
+    }
+
+    /**
+     * Convert a set of values for an attribute.
+     *
+     * @param string $attribute
+     * @param array $values
+     * @param string $direction
+     * @param AttributeConverterInterface|null $converter
+     * @return mixed
+     */
+    protected function doConvertValues($attribute, array $values, $direction, AttributeConverterInterface $converter = null)
+    {
+        $converter = is_null($converter) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $converter;
+
+        foreach ($values as $index => $value) {
+            $converter->setAttribute($attribute);
+            $values[$index] = $converter->$direction($value);
+        }
+
+        return $values;
     }
 }
