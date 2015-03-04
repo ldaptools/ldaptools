@@ -172,10 +172,14 @@ abstract class BaseValueResolver
     protected function doConvertValues($attribute, array $values, $direction, AttributeConverterInterface $converter = null)
     {
         $converter = is_null($converter) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $converter;
+        $converter->setAttribute($attribute);
 
-        foreach ($values as $index => $value) {
-            $converter->setAttribute($attribute);
-            $values[$index] = $converter->$direction($value);
+        if ($converter->getIsMultiValuedConverter()) {
+            $values = $converter->$direction($values);
+        } else {
+            foreach ($values as $index => $value) {
+                $values[$index] = $converter->$direction($value);
+            }
         }
 
         return $values;

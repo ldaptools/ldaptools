@@ -168,4 +168,18 @@ interface AttributeConverterInterface
      * @return bool
      */
     public function isBatchSupported(Batch $batch);
+
+    /**
+     * Set whether this converter should the full array of attributes passed to it rather than one at a time.
+     *
+     * @param bool $isMultiValuedConverter
+     */
+    public function setIsMultiValuedConverter($isMultiValuedConverter);
+
+    /**
+     * Get whether this converter should the full array of attributes passed to it rather than one at a time.
+     *
+     * @return bool
+     */
+    public function getIsMultiValuedConverter();
 }

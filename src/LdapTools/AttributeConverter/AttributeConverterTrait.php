@@ -61,6 +61,11 @@ trait AttributeConverterTrait
     protected $batch;
 
     /**
+     * @var bool Whether the values should be passed one by one to the converter or as an array of the values.
+     */
+    protected $isMultiValuedConverter = false;
+
+    /**
      * Sets the current LdapConnection for access by the converter.
      *
      * @param LdapConnectionInterface $connection
@@ -212,5 +217,21 @@ trait AttributeConverterTrait
     public function isBatchSupported(Batch $batch)
     {
         return (bool) $batch;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setIsMultiValuedConverter($isMultiValuedConverter)
+    {
+        $this->isMultiValuedConverter = (bool) $isMultiValuedConverter;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIsMultiValuedConverter()
+    {
+        return $this->isMultiValuedConverter;
     }
 }

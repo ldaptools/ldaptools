@@ -90,7 +90,8 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_throw_InvalidArgumentException_when_the_converter_name_is_already_registered()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringRegister('bool', '\LdapTools\AttributeConverter\ConvertBoolean');
+        $this->shouldThrow('\InvalidArgumentException')->duringRegister('bool',
+            '\LdapTools\AttributeConverter\ConvertBoolean');
     }
 
     function it_should_error_when_getting_a_converter_that_does_not_implement_AttributeConverterInterface()
@@ -141,7 +142,7 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_let_me_set_the_batch_on_a_returned_converter()
     {
-        $this->get('windows_guid')->setBatch(new Batch(1,'foo','bar'))->shouldBeNull();
+        $this->get('windows_guid')->setBatch(new Batch(1, 'foo', 'bar'))->shouldBeNull();
     }
 
     function it_should_let_me_get_the_batch_on_a_returned_converter()
@@ -151,6 +152,16 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_let_me_check_a_batch_is_supported_on_the_converter()
     {
-        $this->get('windows_guid')->isBatchSupported(new Batch(1,'foo','bar'))->shouldBeBool();
+        $this->get('windows_guid')->isBatchSupported(new Batch(1, 'foo', 'bar'))->shouldBeBool();
+    }
+
+    function it_should_let_me_get_whether_this_is_a_multivalued_converter_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->getIsMultiValuedConverter()->shouldBeBool();
+    }
+
+    function it_should_let_me_set_whether_this_is_a_multivalued_converter_on_a_returned_converter()
+    {
+        $this->get('windows_guid')->setIsMultiValuedConverter(true)->shouldBeNull();
     }
 }
