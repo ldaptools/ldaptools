@@ -103,7 +103,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     {
         $matches = preg_grep('/^'.strtoupper($type).':(.*)$/', $proxyAddresses);
 
-        return (count($matches) == 0) ? '' : substr_replace(reset($matches), '', 0, (strlen($type) + 1));
+        return (count($matches) == 0) ? '' : [substr_replace(reset($matches), '', 0, (strlen($type) + 1))];
     }
 
     /**

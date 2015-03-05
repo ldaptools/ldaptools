@@ -71,13 +71,13 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         // 514 represents a "normal account" with the disabled bit set.
         $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo($smtp);
         $this->setAttribute('exchangeDefaultSmtpAddress');
-        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo('foo.bar@foo.com');
+        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo(['foo.bar@foo.com']);
     }
 
     function it_should_return_the_default_address_for_a_specific_type_of_address_if_requested()
     {
         $this->setAttribute('exchangeDefaultSmtpAddress');
-        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo('foo.bar@foo.com');
+        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo(['foo.bar@foo.com']);
     }
 
     function it_should_return_an_empty_string_for_the_default_address_if_it_cannot_be_found()
