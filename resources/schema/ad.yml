@@ -33,6 +33,12 @@ objects:
                     attribute: cn
                     filter:
                         objectClass: msExchRecipientPolicy
+            exchange_proxy_address:
+                addressType:
+                    exchangeSmtpAddresses: 'smtp'
+                    exchangeDefaultSmtpAddress: 'smtp'
+                default:
+                    - 'exchangeDefaultSmtpAddress'
         # These are converters to be applied for going both to and from LDAP.
         converters:
              string_to_utf8:
@@ -91,6 +97,9 @@ objects:
                 - 'exchangePolicyRBAC'
                 - 'exchangePolicyActiveSync'
                 - 'exchangePolicyRetention'
+             exchange_proxy_address:
+                - 'exchangeSmtpAddresses'
+                - 'exchangeDefaultSmtpAddress'
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             badPasswordCount: badPwdCount
@@ -111,6 +120,8 @@ objects:
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
             exchangePolicyRBAC: msExchRBACPolicyLink
             exchangePolicyRetention: msExchMailboxTemplateLink
+            exchangeSmtpAddresses: proxyAddress
+            exchangeDefaultSmtpAddress: proxyAddress
             fax: facsimileTelephoneNumber
             firstName: givenName
             guid: objectGuid

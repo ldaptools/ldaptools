@@ -83,6 +83,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('name_to_dn')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertNameToDn');
     }
 
+    function it_should_return_ConvertExchangeProxyAddress_when_calling_get_with_exchange_proxy_address()
+    {
+        $this::get('exchange_proxy_address')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

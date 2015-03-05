@@ -35,6 +35,7 @@ class AttributeConverterFactory
         'password_must_change' => '\LdapTools\AttributeConverter\ConvertPasswordMustChange',
         'user_account_control' => '\LdapTools\AttributeConverter\ConvertUserAccountControl',
         'name_to_dn' => '\LdapTools\AttributeConverter\ConvertNameToDn',
+        'exchange_proxy_address' => '\LdapTools\AttributeConverter\ConvertExchangeProxyAddress',
     ];
 
     /**
