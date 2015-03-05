@@ -22,7 +22,7 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 
     protected $expectedSearch = [
         '(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72))',
-        ['proxyAddress'],
+        ['proxyAddresses'],
         null,
         "subtree",
         null,
@@ -31,7 +31,7 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
     protected $expectedResult = [
         'count' => 1,
         0 => [
-            'proxyAddress' => [
+            'proxyAddresses' => [
                 'count' => 3,
                 0 => "smtp:foo@foo.bar",
                 1 => "SMTP:Foo.Bar@foo.bar",

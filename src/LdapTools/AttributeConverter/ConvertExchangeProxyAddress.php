@@ -39,7 +39,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     {
         $this->validateCurrentAttribute($this->getOptions()['addressType']);
         if (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_MODIFY) {
-            $this->setLastValue($this->getCurrentLdapAttributeValue('proxyAddress'));
+            $this->setLastValue($this->getCurrentLdapAttributeValue('proxyAddresses'));
         } elseif (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_CREATE) {
             $this->setLastValue([]);
         }
