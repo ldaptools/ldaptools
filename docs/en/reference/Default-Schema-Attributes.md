@@ -41,8 +41,8 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | exchangePolicyRBAC | msExchRBACPolicyLink | string |
 | exchangePolicyActiveSync | msExchMobileMailboxPolicyLink | string |
 | exchangePolicyRetention | msExchMailboxTemplateLink | string |
-| exchangeSmtpAddresses | proxyAddress | array |
-| exchangeDefaultSmtpAddress | proxyAddress | string |
+| exchangeSmtpAddresses | proxyAddresses | array |
+| exchangeDefaultSmtpAddress | proxyAddresses | string |
 | fax | facsimileTelephoneNumber | string |
 | firstName | givenName | string |
 | guid | objectGuid | string |
