@@ -120,8 +120,8 @@ objects:
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
             exchangePolicyRBAC: msExchRBACPolicyLink
             exchangePolicyRetention: msExchMailboxTemplateLink
-            exchangeSmtpAddresses: proxyAddress
-            exchangeDefaultSmtpAddress: proxyAddress
+            exchangeSmtpAddresses: proxyAddresses
+            exchangeDefaultSmtpAddress: proxyAddresses
             fax: facsimileTelephoneNumber
             firstName: givenName
             guid: objectGuid
