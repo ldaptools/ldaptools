@@ -88,6 +88,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('exchange_proxy_address')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
     }
 
+    function it_should_return_ConvertLogonWorkstations_when_calling_get_with_logon_workstations()
+    {
+        $this::get('logon_workstations')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLogonWorkstations');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

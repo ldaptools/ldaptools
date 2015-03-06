@@ -100,6 +100,7 @@ objects:
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
+             logon_workstations: [ logonWorkstations ]
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             badPasswordCount: badPwdCount
@@ -132,6 +133,7 @@ objects:
             initials: initials
             ipPhone: ipPhone
             lastName: sn
+            logonWorkstations: userWorkstations
             middleName: middleName
             mobilePhone: mobile
             modified: whenChanged

@@ -53,6 +53,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | initials | initials | string |
 | ipPhone | ipPhone | string |
 | lastName | sn | string |
+| logonWorkstations | userWorkstations | array |
 | middleName | middleName | string |
 | mobilePhone | mobile | string |
 | office | physicalDeliveryOfficeName  | string |
