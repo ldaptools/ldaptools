@@ -84,6 +84,6 @@ trait ConverterUtilitiesTrait
         /** @var \LdapTools\Object\LdapObject $object */
         $object = $result->toArray()[0];
 
-        return $object->get($attribute);
+        return $object->has($attribute) ? $object->get($attribute) : null;
     }
 }
