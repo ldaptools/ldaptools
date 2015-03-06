@@ -22,10 +22,7 @@ use LdapTools\Utilities\ConverterUtilitiesTrait;
  */
 class ConvertUserAccountControl implements AttributeConverterInterface
 {
-    use ConverterUtilitiesTrait;
-    use AttributeConverterTrait {
-        getShouldAggregateValues as parentGetShouldAggregateValues;
-    }
+    use ConverterUtilitiesTrait, AttributeConverterTrait;
 
     public function __construct()
     {
