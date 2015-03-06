@@ -10,6 +10,7 @@
 
 namespace LdapTools\Utilities;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -28,6 +29,21 @@ trait ConverterUtilitiesTrait
      * {@inheritdoc}
      */
     abstract public function getDn();
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function getLastValue();
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function setLastValue($value);
+
+    /**
+     * {@inheritdoc}
+     */
+    abstract public function getOperationType();
 
     /**
      * {@inheritdoc}
@@ -85,5 +101,22 @@ trait ConverterUtilitiesTrait
         $object = $result->toArray()[0];
 
         return $object->has($attribute) ? $object->get($attribute) : null;
+    }
+
+    /**
+     * Specify an attribute to query to set as the last value. If that is not found, have it set the value specified by
+     * whatever you pass to $default.
+     *
+     * @param string $attribute
+     * @param mixed $default
+     */
+    protected function setDefaultLastValue($attribute, $default)
+    {
+        if (empty($this->getLastValue()) && $this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY) {
+            $original = $this->getCurrentLdapAttributeValue($attribute);
+            $this->setLastValue(is_null($original) ? $default : $original);
+        } elseif (empty($this->getLastValue()) && $this->getOperationType() == AttributeConverterInterface::TYPE_CREATE) {
+            $this->setLastValue($default);
+        }
     }
 }

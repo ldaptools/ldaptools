@@ -41,11 +41,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     public function toLdap($value)
     {
         $this->validateCurrentAttribute($this->options['uacMap']);
-        if (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_MODIFY) {
-            $this->setLastValue($this->getCurrentLdapAttributeValue('userAccountControl'));
-        } elseif (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_CREATE) {
-            $this->setLastValue($this->options['defaultValue']);
-        }
+        $this->setDefaultLastValue('userAccountControl', $this->getOptions()['defaultValue']);
 
         return $this->modifyUacValue((bool) $value);
     }

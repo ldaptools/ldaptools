@@ -38,12 +38,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     public function toLdap($value)
     {
         $this->validateCurrentAttribute($this->getOptions()['addressType']);
-        if (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_MODIFY) {
-            $originalValue = $this->getCurrentLdapAttributeValue('proxyAddresses');
-            $this->setLastValue(is_null($originalValue) ? [] : $originalValue);
-        } elseif (empty($this->getLastValue()) && $this->getOperationType() == self::TYPE_CREATE) {
-            $this->setLastValue([]);
-        }
+        $this->setDefaultLastValue('proxyAddresses', []);
 
         $this->modifyAddressArray($value);
         if ($this->getOperationType() == self::TYPE_MODIFY) {
