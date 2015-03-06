@@ -29,10 +29,10 @@ class ConvertUserAccountControl implements AttributeConverterInterface
 
     public function __construct()
     {
-        $this->options = [
+        $this->setOptions([
             'uacMap' => [],
             'defaultValue' => UserAccountControlFlags::NORMAL_ACCOUNT,
-        ];
+        ]);
     }
 
     /**
@@ -40,7 +40,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     public function toLdap($value)
     {
-        $this->validateCurrentAttribute($this->options['uacMap']);
+        $this->validateCurrentAttribute($this->getOptions()['uacMap']);
         $this->setDefaultLastValue('userAccountControl', $this->getOptions()['defaultValue']);
 
         return $this->modifyUacValue((bool) $value);
@@ -51,9 +51,9 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $this->validateCurrentAttribute($this->options['uacMap']);
+        $this->validateCurrentAttribute($this->getOptions()['uacMap']);
 
-        return (bool) ((int) $value & (int) $this->getArrayValue($this->options['uacMap'], $this->attribute));
+        return (bool) ((int) $value & (int) $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute()));
     }
 
     /**
@@ -80,7 +80,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
             return $lastValue;
         }
 
-        $mappedValue = $this->getArrayValue($this->options['uacMap'], $this->attribute);
+        $mappedValue = $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute());
         if ($value) {
             $uac = (int) $lastValue | (int) $mappedValue;
         } else {
