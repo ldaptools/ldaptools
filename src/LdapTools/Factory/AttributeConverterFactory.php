@@ -37,6 +37,7 @@ class AttributeConverterFactory
         'name_to_dn' => '\LdapTools\AttributeConverter\ConvertNameToDn',
         'exchange_proxy_address' => '\LdapTools\AttributeConverter\ConvertExchangeProxyAddress',
         'logon_workstations' => '\LdapTools\AttributeConverter\ConvertLogonWorkstations',
+        'account_expires' => '\LdapTools\AttributeConverter\ConvertAccountExpiration',
     ];
 
     /**

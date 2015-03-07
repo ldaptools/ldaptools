@@ -23,6 +23,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
+| accountExpirationDate | accountExpires | `\DateTime|false` |
 | badPasswordCount | badPwdCount | int |
 | city | l | string |
 | company | company | string |

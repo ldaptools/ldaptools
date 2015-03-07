@@ -93,6 +93,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('logon_workstations')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLogonWorkstations');
     }
 
+    function it_should_return_ConvertAccountExpiration_when_calling_get_with_account_expires()
+    {
+        $this::get('account_expires')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertAccountExpiration');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

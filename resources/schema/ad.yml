@@ -101,8 +101,10 @@ objects:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
              logon_workstations: [ logonWorkstations ]
+             account_expires: [ accountExpirationDate ]
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
+            accountExpirationDate: accountExpires
             badPasswordCount: badPwdCount
             city: l
             company: company
