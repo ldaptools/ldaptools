@@ -20,7 +20,7 @@ class EncodeWindowsPasswordSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\EncodeWindowsPassword');
     }
 
-    function it_should_implement_AttributeConverterInferface()
+    function it_should_implement_AttributeConverterInterface()
     {
         $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
     }

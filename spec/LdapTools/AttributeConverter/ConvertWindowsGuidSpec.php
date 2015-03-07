@@ -24,7 +24,7 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertWindowsGuid');
     }
 
-    function it_should_implement_AttributeConverterInferface()
+    function it_should_implement_AttributeConverterInterface()
     {
         $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
     }

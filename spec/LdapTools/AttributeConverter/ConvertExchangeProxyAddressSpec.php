@@ -64,9 +64,9 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
     }
 
-    function it_is_initializable()
+    function it_should_implement_AttributeConverterInterface()
     {
-        $this->shouldHaveType('LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
+        $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
     }
 
     function it_should_convert_an_array_of_addresses_to_an_array_of_specific_address_types()

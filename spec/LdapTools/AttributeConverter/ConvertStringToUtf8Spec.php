@@ -20,7 +20,7 @@ class ConvertStringToUtf8Spec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertStringToUtf8');
     }
 
-    function it_should_implement_AttributeConverterInferface()
+    function it_should_implement_AttributeConverterInterface()
     {
         $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
     }
