@@ -124,6 +124,7 @@ objects:
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
             exchangePolicyRBAC: msExchRBACPolicyLink
             exchangePolicyRetention: msExchMailboxTemplateLink
+            exchangeSendOnBehalfOf: publicDelegates
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
             fax: facsimileTelephoneNumber
