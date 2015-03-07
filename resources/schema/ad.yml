@@ -63,6 +63,7 @@ objects:
                  - 'otherName'
                  - 'poBox'
                  - 'profilePath'
+                 - 'servicePrincipalNames'
                  - 'state'
                  - 'streetAddress'
                  - 'scriptPath'
@@ -152,6 +153,7 @@ objects:
             poBox: postOfficeBox
             profilePath: profilePath
             scriptPath: scriptPath
+            servicePrincipalNames: servicePrincipalName
             sid: objectSid
             smartCardRequired: userAccountControl
             state: st

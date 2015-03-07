@@ -69,6 +69,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | poBox | postOfficeBox | string |
 | profilePath | profilePath | string |
 | scriptPath | scriptPath | string |
+| servicePrincipalNames | servicePrincipalName | array |
 | sid | objectSid | string |
 | smartCardRequired | userAccountControl | bool |
 | state | st | string |
