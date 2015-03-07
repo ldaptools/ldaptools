@@ -64,6 +64,11 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
     }
 
+    function it_is_initializable()
+    {
+        $this->shouldHaveType('LdapTools\AttributeConverter\ConvertExchangeProxyAddress');
+    }
+
     function it_should_convert_an_array_of_addresses_to_an_array_of_specific_address_types()
     {
         $smtp = ['foo@bar.com','foo.bar@foo.com'];
