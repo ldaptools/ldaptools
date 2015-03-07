@@ -29,6 +29,11 @@ class ConvertNameToDnSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertNameToDn');
     }
 
+    function it_should_implement_AttributeConverterInterface()
+    {
+        $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
+    }
+
     function it_should_convert_a_dn_to_a_normal_name()
     {
         $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('Foo');

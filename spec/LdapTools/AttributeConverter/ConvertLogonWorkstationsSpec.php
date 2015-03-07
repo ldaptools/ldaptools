@@ -52,6 +52,11 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertLogonWorkstations');
     }
 
+    function it_should_implement_AttributeConverterInterface()
+    {
+        $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
+    }
+
     function it_should_convert_a_string_of_comma_separated_workstations_to_an_array()
     {
         $this->fromLdap(['foo,bar'])->shouldBeEqualTo(['foo','bar']);
