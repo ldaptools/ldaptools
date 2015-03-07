@@ -58,6 +58,7 @@ objects:
                  - 'homePage'
                  - 'initials'
                  - 'lastName'
+                 - 'manager'
                  - 'office'
                  - 'organization'
                  - 'otherName'
@@ -138,6 +139,7 @@ objects:
             ipPhone: ipPhone
             lastName: sn
             logonWorkstations: userWorkstations
+            manager: manager
             middleName: middleName
             mobilePhone: mobile
             modified: whenChanged
