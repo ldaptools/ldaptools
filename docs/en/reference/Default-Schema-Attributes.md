@@ -38,7 +38,9 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | emailAddress | mail | string |
 | employeeId | employeeId | string |
 | employeeNumber | employeeNumber | int |
+| exchangeAlias | mailNickname | string |
 | exchangeMailboxDatabase | homeMDB | string |
+| exchangeMailboxGuid | msExchMailboxGUID | string |
 | exchangePolicyRBAC | msExchRBACPolicyLink | string |
 | exchangePolicyActiveSync | msExchMobileMailboxPolicyLink | string |
 | exchangePolicyRetention | msExchMailboxTemplateLink | string |
@@ -94,6 +96,10 @@ These are typical LDAP group objects (`objectClass=group`).
 | description | description | string |
 | displayName | displayName | string |
 | dn | dn | string |
+| emailAddress | mail | string |
+| exchangeAlias | mailNickname | string |
+| exchangeSmtpAddresses | proxyAddresses | array |
+| exchangeDefaultSmtpAddress | proxyAddresses | string |
 | guid | objectGuid | string |
 | members | member | array|
 | modified |whenModified | `\DateTime` |
@@ -137,6 +143,9 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 | displayName | displayName | string |
 | dn | dn | string |
 | emailAddress | mail | string |
+| exchangeAlias | mailNickname | string |
+| exchangeSmtpAddresses | proxyAddresses | array |
+| exchangeDefaultSmtpAddress | proxyAddresses | string |
 | firstName | givenName | string |
 | guid | objectGuid | string |
 | lastName | sn | string |

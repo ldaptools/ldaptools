@@ -45,6 +45,7 @@ objects:
                  - 'badPasswordCount'
                  - 'employeeNumber'
              windows_guid:
+                 - 'exchangeMailboxGuid'
                  - 'guid'
              encode_windows_password:
                  - 'password'
@@ -90,7 +91,9 @@ objects:
             emailAddress: mail
             employeeId: employeeId
             employeeNumber: employeeNumber
+            exchangeAlias: mailNickname
             exchangeMailboxDatabase: homeMDB
+            exchangeMailboxGuid: msExchMailboxGUID
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
             exchangePolicyRBAC: msExchRBACPolicyLink
             exchangePolicyRetention: msExchMailboxTemplateLink
@@ -159,6 +162,9 @@ objects:
         type: group
         class: group
         converters:
+             exchange_proxy_address:
+                - 'exchangeSmtpAddresses'
+                - 'exchangeDefaultSmtpAddress'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -180,12 +186,22 @@ objects:
                     scopeDomainLocal: '4'
                     scopeGlobal: '2'
                     scopeUniversal: '8'
+            exchange_proxy_address:
+                addressType:
+                    exchangeSmtpAddresses: 'smtp'
+                    exchangeDefaultSmtpAddress: 'smtp'
+                default:
+                    - 'exchangeDefaultSmtpAddress'
         attributes:
             accountName: sAMAccountName
             created: whenCreated
             description: description
             displayName: displayname
             dn: distinguishedName
+            emailAddress: mail
+            exchangeAlias: mailNickname
+            exchangeSmtpAddresses: proxyAddresses
+            exchangeDefaultSmtpAddress: proxyAddresses
             guid: objectGuid
             members: member
             modified: whenChanged
@@ -246,6 +262,9 @@ objects:
         type: contact
         category: contact
         converters:
+             exchange_proxy_address:
+                - 'exchangeSmtpAddresses'
+                - 'exchangeDefaultSmtpAddress'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -253,12 +272,22 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+        converter_options:
+            exchange_proxy_address:
+                addressType:
+                    exchangeSmtpAddresses: 'smtp'
+                    exchangeDefaultSmtpAddress: 'smtp'
+                default:
+                    - 'exchangeDefaultSmtpAddress'
         attributes:
             created: whenCreated
             description: description
             displayName: displayName
             dn: distinguishedName
             emailAddress: mail
+            exchangeAlias: mailNickname
+            exchangeSmtpAddresses: proxyAddresses
+            exchangeDefaultSmtpAddress: proxyAddresses
             firstName: givenName
             guid: objectGuid
             lastName: sn
