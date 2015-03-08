@@ -138,6 +138,7 @@ objects:
             zipCode: postalCode
         # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
         attributes_to_select:
+            - 'name'
             - 'firstName'
             - 'lastName'
             - 'username'
