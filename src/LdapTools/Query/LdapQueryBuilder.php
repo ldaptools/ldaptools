@@ -289,7 +289,7 @@ class LdapQueryBuilder
     /**
      * Add an operator object to the query.
      *
-     * @param BaseOperator ...$operators
+     * @param BaseOperator[] $operators
      * @return $this
      */
     public function add(BaseOperator ...$operators)
