@@ -152,7 +152,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      */
     protected function modifyAddresses(array $addresses)
     {
-        $values = $this->getLastValue();
+        $values = is_array($this->getLastValue()) ? $this->getLastValue() : [$this->getLastValue()];
 
         if ($this->getOperationType() == self::TYPE_CREATE || ($this->getBatch() && $this->getBatch()->isTypeAdd())) {
             $values = array_merge($values, $addresses);
@@ -172,7 +172,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      */
     protected function modifyDefaultAddress($defaultAddress)
     {
-        $values = $this->getLastValue();
+        $values = is_array($this->getLastValue()) ? $this->getLastValue() : [$this->getLastValue()];
 
         $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
         $isAddressInArray = in_array(strtolower($defaultAddress), array_map('strtolower', $values));
