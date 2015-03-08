@@ -302,7 +302,7 @@ class LdapQueryBuilder
     /**
      * Call this to help build additional query statements in an object-oriented fashion.
      *
-     * @return FilterBuilder
+     * @return FilterBuilder|ADFilterBuilder
      */
     public function filter()
     {

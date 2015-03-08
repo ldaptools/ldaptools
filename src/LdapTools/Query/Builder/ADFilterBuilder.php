@@ -10,6 +10,7 @@
 
 namespace LdapTools\Query\Builder;
 
+use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Query\MatchingRuleOid;
 use LdapTools\Query\Operator\MatchingRule;
 use LdapTools\Query\UserAccountControlFlags;
@@ -22,29 +23,16 @@ use LdapTools\Query\UserAccountControlFlags;
 class ADFilterBuilder extends FilterBuilder
 {
     /**
-     * The User Account Control attribute.
+     * Attribute mapping.
      */
-    const ATTR_UAC = 'userAccountControl';
-
-    /**
-     * The attribute that specifies the time at which the account was locked.
-     */
-    const ATTR_LOCKOUT_TIME = 'lockoutTime';
-
-    /**
-     * The attribute that specifies the time at which the password was list set.
-     */
-    const ATTR_PASSWORD_LAST_SET = 'pwdLastSet';
-
-    /**
-     * The attribute for group membership of an object.
-     */
-    const ATTR_MEMBER_OF = 'memberOf';
-
-    /**
-     * The attribute for members belonging to an object.
-     */
-    const ATTR_MEMBER = 'member';
+    const ATTR = [
+        'UAC' => 'userAccountControl',
+        'LOCKOUT_TIME' => 'lockoutTime',
+        'PASSWORD_LAST_SET' => 'pwdLastSet',
+        'MEMBER_OF' => 'memberOf',
+        'MEMBER' => 'member',
+        'GROUP_TYPE' => 'groupType',
+    ];
 
     /**
      * Checks for disabled accounts via a bitwise AND comparison on userAccountControl.
@@ -53,7 +41,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function accountIsDisabled()
     {
-        return $this->bitwiseAnd(self::ATTR_UAC, UserAccountControlFlags::DISABLED);
+        return $this->bitwiseAnd(self::ATTR['UAC'], UserAccountControlFlags::DISABLED);
     }
 
     /**
@@ -63,7 +51,69 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function accountIsLocked()
     {
-        return $this->gte(self::ATTR_LOCKOUT_TIME, 1);
+        return $this->gte(self::ATTR['LOCKOUT_TIME'], 1);
+    }
+
+    /**
+     * Check for a specific AD group type by its flag.
+     *
+     * @see \LdapTools\Query\GroupTypeFlags
+     * @param int $flag A constant from GroupTypeFlags
+     * @return \LdapTools\Query\Operator\MatchingRule
+     */
+    public function groupIsType($flag)
+    {
+        return $this->bitwiseAnd(self::ATTR['GROUP_TYPE'], $flag);
+    }
+
+    /**
+     * Checks for groups that are security enabled.
+     *
+     * @return \LdapTools\Query\Operator\MatchingRule
+     */
+    public function groupIsSecurityEnabled()
+    {
+        return $this->groupIsType(GroupTypeFlags::SECURITY_ENABLED);
+    }
+
+    /**
+     * Check for groups that are distribution lists.
+     *
+     * @return \LdapTools\Query\Operator\bNot
+     */
+    public function groupIsDistribution()
+    {
+        return $this->bNot($this->groupIsType(GroupTypeFlags::SECURITY_ENABLED));
+    }
+
+    /**
+     * Checks for groups that are global in scope.
+     *
+     * @return \LdapTools\Query\Operator\MatchingRule
+     */
+    public function groupIsGlobal()
+    {
+        return $this->groupIsType(GroupTypeFlags::GLOBAL_GROUP);
+    }
+
+    /**
+     * Checks for groups that are universal in scope.
+     *
+     * @return \LdapTools\Query\Operator\MatchingRule
+     */
+    public function groupIsUniversal()
+    {
+        return $this->groupIsType(GroupTypeFlags::UNIVERSAL_GROUP);
+    }
+
+    /**
+     * Checks for groups that are domain local in scope.
+     *
+     * @return \LdapTools\Query\Operator\MatchingRule
+     */
+    public function groupIsDomainLocal()
+    {
+        return $this->groupIsType(GroupTypeFlags::DOMAIN_LOCAL_GROUP);
     }
 
     /**
@@ -73,7 +123,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function passwordNeverExpires()
     {
-        return $this->bitwiseAnd(self::ATTR_UAC, UserAccountControlFlags::PASSWORD_NEVER_EXPIRES);
+        return $this->bitwiseAnd(self::ATTR['UAC'], UserAccountControlFlags::PASSWORD_NEVER_EXPIRES);
     }
 
     /**
@@ -83,7 +133,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function passwordMustChange()
     {
-        return $this->eq(self::ATTR_PASSWORD_LAST_SET, 0);
+        return $this->eq(self::ATTR['PASSWORD_LAST_SET'], 0);
     }
 
     /**
@@ -94,7 +144,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function isRecursivelyMemberOf($groupDn)
     {
-        return new MatchingRule(self::ATTR_MEMBER_OF, MatchingRuleOid::IN_CHAIN, $groupDn);
+        return new MatchingRule(self::ATTR['MEMBER_OF'], MatchingRuleOid::IN_CHAIN, $groupDn);
     }
 
     /**
@@ -105,6 +155,6 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function hasMemberRecursively($objectDn)
     {
-        return new MatchingRule(self::ATTR_MEMBER, MatchingRuleOid::IN_CHAIN, $objectDn);
+        return new MatchingRule(self::ATTR['MEMBER'], MatchingRuleOid::IN_CHAIN, $objectDn);
     }
 }
