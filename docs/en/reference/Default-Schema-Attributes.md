@@ -97,7 +97,9 @@ These are typical LDAP group objects (`objectClass=group`).
 | displayName | displayName | string |
 | dn | dn | string |
 | emailAddress | mail | string |
+| exchangeAddressBookFlags | msExchAddressBookFlags | int |
 | exchangeAlias | mailNickname | string |
+| exchangeInternalOnly | msExchRequireAuthToSendTo | bool |
 | exchangeSmtpAddresses | proxyAddresses | array |
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
 | guid | objectGuid | string |

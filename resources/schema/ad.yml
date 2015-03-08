@@ -162,9 +162,13 @@ objects:
         type: group
         class: group
         converters:
+             bool:
+                - 'exchangeInternalOnly'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
+             int:
+                - 'exchangeAddressBookFlags'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -199,7 +203,9 @@ objects:
             displayName: displayname
             dn: distinguishedName
             emailAddress: mail
+            exchangeAddressBookFlags: msExchAddressBookFlags
             exchangeAlias: mailNickname
+            exchangeInternalOnly: msExchRequireAuthToSendTo
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
             guid: objectGuid
