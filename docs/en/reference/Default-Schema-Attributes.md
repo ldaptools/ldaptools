@@ -98,7 +98,12 @@ These are typical LDAP group objects (`objectClass=group`).
 | members | member | array|
 | modified |whenModified | `\DateTime` |
 | name | cn | string |
+| scopeDomainLocal | groupType | bool |
+| scopeGlobal | groupType | bool |
+| scopeUniversal | groupType | bool |
 | sid | objectSid | string |
+| typeSecurity | groupType | bool |
+| typeDistribution | groupType | bool |
 
 #### AD Computer Types
 

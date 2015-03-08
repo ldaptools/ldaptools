@@ -93,6 +93,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('account_expires')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertAccountExpiration');
     }
 
+    function it_should_return_ConvertGroupType_when_calling_get_with_group_type()
+    {
+        $this::get('group_type')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGroupType');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

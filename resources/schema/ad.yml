@@ -165,6 +165,20 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+        converter_options:
+            group_type:
+                defaultValue: '-2147483646'
+                distribution: typeDistribution
+                types:
+                    scope: [ scopeDomainLocal, scopeGlobal, scopeUniversal ]
+                    type: [ typeBuiltin, typeSecurity, typeDistribution ]
+                typeMap:
+                    typeBuiltin: '1'
+                    typeSecurity: '2147483648'
+                    typeDistribution: '2147483648'
+                    scopeDomainLocal: '4'
+                    scopeGlobal: '2'
+                    scopeUniversal: '8'
         attributes:
             accountName: sAMAccountName
             created: whenCreated
@@ -176,6 +190,11 @@ objects:
             modified: whenChanged
             name: cn
             sid: objectSid
+            typeSecurity: groupType
+            typeDistribution: groupType
+            scopeDomainLocal: groupType
+            scopeGlobal: groupType
+            scopeUniversal: groupType
         attributes_to_select:
             - 'name'
             - 'dn'
