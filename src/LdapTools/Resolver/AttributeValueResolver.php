@@ -75,14 +75,17 @@ class AttributeValueResolver extends BaseValueResolver
         $direction = $toLdap ? 'toLdap' : 'fromLdap';
 
         foreach ($attributes as $attribute => $values) {
-            if (!$this->schema->hasConverter($attribute) || isset($this->converted[$attribute])) {
-                continue;
+            // No converter, but the value should still be encoded.
+            if (!$this->schema->hasConverter($attribute) && !isset($this->converted[$attribute])) {
+                $attributes[$attribute] = $this->encodeValues($values);
+            // Only continue if it has a converter and has not already been converted.
+            } elseif ($this->schema->hasConverter($attribute) && !isset($this->converted[$attribute])) {
+                $values = $this->getConvertedValues($values, $attribute, $direction);
+                if (in_array($attribute, $this->aggregated)) {
+                    $attribute = $this->schema->getAttributeToLdap($attribute);
+                }
+                $attributes[$attribute] = (count($values) == 1) ? reset($values) : $values;
             }
-            $values = $this->getConvertedValues($values, $attribute, $direction);
-            if (in_array($attribute, $this->aggregated)) {
-                $attribute = $this->schema->getAttributeToLdap($attribute);
-            }
-            $attributes[$attribute] = (count($values) == 1) ? reset($values) : $values;
         }
 
         return $this->removeAggregatedValues($attributes);

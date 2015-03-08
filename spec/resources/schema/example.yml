@@ -5,27 +5,6 @@ objects:
         category: person
         repository: '\Foo\Bar'
         converters:
-            string_to_utf8:
-                - 'firstName'
-                - 'lastName'
-                - 'initials'
-                - 'displayName'
-                - 'description'
-                - 'emailAddress'
-                - 'streetAddress'
-                - 'city'
-                - 'state'
-                - 'zipCode'
-                - 'poBox'
-                - 'country'
-                - 'office'
-                - 'company'
-                - 'department'
-                - 'homeDirectory'
-                - 'homeDrive'
-                - 'profilePath'
-                - 'scriptPath'
-                - 'name'
             windows_time:
                 - 'created'
                 - 'modified'
@@ -90,9 +69,6 @@ objects:
         class: group
         repository: '\LdapTools\Configuration'
         converters:
-             string_to_utf8:
-                 - 'description'
-                 - 'displayName'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -118,15 +94,6 @@ objects:
         type: computer
         category: computer
         converters:
-             string_to_utf8:
-                 - 'accountName'
-                 - 'description'
-                 - 'displayName'
-                 - 'dnsHostName'
-                 - 'location'
-                 - 'os'
-                 - 'osServicePack'
-                 - 'osVersion'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -164,16 +131,6 @@ objects:
         type: contact
         category: contact
         converters:
-             string_to_utf8:
-                 - 'name'
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'emailAddress'
-                 - 'firstName'
-                 - 'lastName'
-                 - 'name'
-                 - 'phoneNumber'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -210,15 +167,6 @@ objects:
         type: noname
         category: user
         converters:
-             string_to_utf8:
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'emailAddress'
-                 - 'firstName'
-                 - 'lastName'
-                 - 'name'
-                 - 'phoneNumber'
              windows_guid:
                  - 'guid'
              windows_sid:

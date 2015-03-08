@@ -6,28 +6,6 @@ objects:
         class: inetOrgPerson
         # These are converters to be applied for going both to and from LDAP.
         converters:
-             string_to_utf8:
-                 - 'city'
-                 - 'company'
-                 - 'country'
-                 - 'department'
-                 - 'departmentNumber'
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'emailAddress'
-                 - 'employeeNumber'
-                 - 'firstName'
-                 - 'homeDirectory'
-                 - 'homeDrive'
-                 - 'initials'
-                 - 'lastName'
-                 - 'name'
-                 - 'office'
-                 - 'poBox'
-                 - 'state'
-                 - 'streetAddress'
-                 - 'zipCode'
              generalized_time:
                  - 'created'
                  - 'modified'
@@ -71,9 +49,6 @@ objects:
         type: group
         class: groupOfUniqueNames
         converters:
-             string_to_utf8:
-                 - 'description'
-                 - 'name'
              generalized_time:
                  - 'created'
                  - 'modified'

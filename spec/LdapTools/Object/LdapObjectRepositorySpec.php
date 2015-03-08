@@ -80,6 +80,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $config->setCacheType('none');
         $ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->willReturn($this->ldapEntries);
         $ldap->getLdapType()->willReturn(LdapConnection::TYPE_AD);
+        $ldap->getEncoding()->willReturn('UTF-8');
 
         $cache = CacheFactory::get($config->getCacheType(), $config->getCacheOptions());
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
@@ -137,6 +138,5 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
         $this->buildLdapQuery()
             ->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))');
-
     }
 }

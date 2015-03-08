@@ -210,3 +210,11 @@ The schema name to use for this domain. This typically refers to the name of the
 defined by the `schema_folder` directive in the general section. 
 
 **Default**: The same value set for `ldap_type`.
+
+-------------------------------
+#### encoding
+
+The encoding to use for this domain. Usernames, passwords, and any values not explicitly assigned to an Attribute
+Converter will be encoded with this encoding choice.
+
+**Default**: UTF-8

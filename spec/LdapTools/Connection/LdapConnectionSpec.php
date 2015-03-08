@@ -117,6 +117,11 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->__toString()->shouldBeEqualTo('example.com');
     }
 
+    function it_should_have_UTF8_encoding_by_default()
+    {
+        $this->getEncoding()->shouldBeEqualTo('UTF-8');
+    }
+
     public function getMatchers()
     {
         return [

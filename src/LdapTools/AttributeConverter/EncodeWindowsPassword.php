@@ -10,6 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Utilities\LdapUtilities;
+
 /**
  * Takes a plain-string password and converts it to a UTF-16 encoded unicode string containing the password surrounded
  * by quotation marks. Additionally, this is only ever going to be a toLdap() conversion as AD will never return the
@@ -26,7 +28,9 @@ class EncodeWindowsPassword implements AttributeConverterInterface
      */
     public function toLdap($password)
     {
-        return iconv("UTF-8", "UTF-16LE", '"'.(new ConvertStringToUtf8())->toLdap($password).'"');
+        $password = is_null($this->getLdapConnection()) ? $password : LdapUtilities::encode($password, $this->getLdapConnection()->getEncoding());
+
+        return iconv("UTF-8", "UTF-16LE", '"'.$password.'"');
     }
 
     /**

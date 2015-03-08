@@ -13,7 +13,7 @@ namespace LdapTools\Connection;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
-use LdapTools\AttributeConverter\ConvertStringToUtf8;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * A LDAP connection class that provides an OOP style wrapper around the ldap_* functions.
@@ -75,11 +75,6 @@ class LdapConnection implements LdapConnectionInterface
     protected $type;
 
     /**
-     * @var ConvertStringToUtf8
-     */
-    protected $utf8;
-
-    /**
      * @var LdapServerPool
      */
     protected $serverPool;
@@ -95,7 +90,6 @@ class LdapConnection implements LdapConnectionInterface
     public function __construct(DomainConfiguration $config)
     {
         $this->serverPool = new LdapServerPool($config->getServers(), $config->getPort());
-        $this->utf8 = new ConvertStringToUtf8();
         $this->config = $config;
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());
@@ -239,6 +233,14 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getEncoding()
+    {
+        return $this->config->getEncoding();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setPagedResults($pagedResults)
     {
         $this->pagedResults = (bool) $pagedResults;
@@ -325,22 +327,14 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Encodes a string before sending it to LDAP. The encoding type should probably just be a config directive with a
-     * default of UTF-8.
+     * Encodes a string before sending it to LDAP.
      *
      * @param string $string
      * @return string
      */
-    protected function encodeString($string)
+    protected function encode($string)
     {
-        // LDAPv3 expects UTF-8 by default for strings, so encode it here in case of special characters for the bind.
-        if (isset($this->optionsOnConnect[LDAP_OPT_PROTOCOL_VERSION])
-            && $this->optionsOnConnect[LDAP_OPT_PROTOCOL_VERSION] == 3
-        ) {
-            $string = $this->utf8->toLdap($string);
-        }
-
-        return $string;
+        return LdapUtilities::encode($string, $this->getEncoding());
     }
 
     /**
@@ -398,7 +392,7 @@ class LdapConnection implements LdapConnectionInterface
         if ($anonymous) {
             $this->isBound = @ldap_bind($this->connection);
         } else {
-            $this->isBound = @ldap_bind($this->connection, $this->encodeString($username), $this->encodeString($password));
+            $this->isBound = @ldap_bind($this->connection, $this->encode($username), $this->encode($password));
         }
 
         if (!$this->isBound) {

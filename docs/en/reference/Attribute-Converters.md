@@ -30,11 +30,6 @@ process and the converter may use the connection to make LDAP calls to resolve d
 
   * `fromLdap`: Converts a LDAP numeric string to a PHP int.
   
-#### *string_to_utf8*
-  * `toLdap`: Converts a string to a UTF8 encoded string.
-
-  * `fromLdap`: Returns the UTF8 string from LDAP.
-  
 #### *generalized_time*
   * `toLdap`: Converts a PHP `\DateTime` object to a generalized timestamp string.
 

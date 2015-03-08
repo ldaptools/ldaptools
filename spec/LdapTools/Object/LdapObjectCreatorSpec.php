@@ -18,6 +18,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -90,6 +91,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             Argument::withEntry('unicodePwd', (new EncodeWindowsPassword())->toLdap('12345'))
         );
         $connection->getSchemaName()->willReturn('ad');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->__toString()->willReturn('example.com');
         $connection->add("cn=somedude,dc=foo,dc=bar", $arg)->willReturn(null);
 
@@ -113,6 +115,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->add("cn=chad,ou=users,dc=foo,dc=bar", Argument::any())->willReturn(null);
 
         $config = new Configuration();
@@ -132,6 +135,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->add('cn=foo\\3d\\2cbar,dc=foo,dc=bar', Argument::withEntry('sAMAccountName', 'foobar'))->willReturn(null);
 
         $config = new Configuration();
@@ -158,6 +162,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->add('cn=foobar,ou=foo,ou=bar,dc=example,dc=local', Argument::any())->willReturn(null);
 
         $config = new Configuration();
@@ -176,6 +181,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->add('cn=foobar,ou=employees,dc=example,dc=local', Argument::any())->willReturn(null);
 
         $config = new Configuration();

@@ -220,6 +220,18 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getServerSelection()->shouldBeEqualTo(LdapServerPool::SELECT_ORDER);
     }
 
+    function it_should_return_self_when_setting_the_encoding()
+    {
+        $this->setEncoding('UTF-8')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+    }
+
+    function it_should_have_the_correct_encoding_after_calling_setEncoding()
+    {
+        $this->getEncoding()->shouldBeEqualTo('UTF-8');
+        $this->setEncoding('Foo');
+        $this->getEncoding()->shouldBeEqualTo('Foo');
+    }
+
     function it_should_load_an_array_for_the_configuration()
     {
         $config = [

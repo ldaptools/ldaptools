@@ -14,6 +14,7 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * The base value resolver for sending data back to LDAP.
@@ -183,5 +184,28 @@ abstract class BaseValueResolver
         }
 
         return $values;
+    }
+
+    /**
+     * Encodes any values with the needed type for LDAP.
+     *
+     * @param array|string $values
+     * @return array
+     */
+    protected function encodeValues($values)
+    {
+        if (is_null($this->connection)) {
+            return $values;
+        }
+        $encoded = is_array($values) ? $values : [$values];
+
+        foreach ($encoded as $index => $value) {
+            if (is_string($value)) {
+                $encoded[$index] = LdapUtilities::encode($value, $this->connection->getEncoding());
+            }
+        }
+
+        // This is to pass it back the same way it was received. ldap_modify_batch is picky about values being an array.
+        return is_array($values) ? $encoded : reset($encoded);
     }
 }

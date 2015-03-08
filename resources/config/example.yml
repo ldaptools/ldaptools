@@ -46,6 +46,8 @@ domains:
         # Optional: When more than one server is listed for a domain, choose which one is selected for the
         #   connection. The possible choices are: order (tried in the order they appear), random. Default: order
         server_selection: order
+        # Optional: The encoding type to use. Default: UTF-8
+        encoding: UTF-8
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

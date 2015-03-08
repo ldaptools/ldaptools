@@ -38,11 +38,6 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('int')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertInteger');
     }
 
-    function it_should_return_ConvertStringToUtf8_when_calling_get_with_string_to_utf8()
-    {
-        $this::get('string_to_utf8')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertStringToUtf8');
-    }
-
     function it_should_return_ConvertWindowsGuid_when_calling_get_with_windows_guid()
     {
         $this::get('windows_guid')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsGuid');

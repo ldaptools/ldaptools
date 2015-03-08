@@ -66,4 +66,28 @@ class LdapUtilities
 
         return $pieces;
     }
+
+    /**
+     * Encode a string for LDAP with a specific encoding type.
+     *
+     * @param string $value The value to encode.
+     * @param string $toEncoding The encoding type to use (ie. UTF-8)
+     * @return string The encoded value.
+     */
+    public static function encode($value, $toEncoding)
+    {
+        // If the encoding is already UTF-8, and that's what was requested, then just send the value back.
+        if ($toEncoding == 'UTF-8' && preg_match('//u', $value)) {
+            return $value;
+        }
+
+        if (function_exists('mb_detect_encoding')) {
+            $value = iconv(mb_detect_encoding($value, mb_detect_order(), true), $toEncoding, $value);
+        } else {
+            // How else to better handle if they don't have mb_* ? The below is definitely not an optimal solution.
+            $value = utf8_encode($value);
+        }
+
+        return $value;
+    }
 }

@@ -30,6 +30,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
@@ -56,6 +57,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->delete('cn=foo,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
@@ -94,6 +96,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         ];
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->modifyBatch('cn=foo,dc=foo,dc=bar', $batch)->willReturn(null);
 
         $config = new Configuration();
@@ -115,6 +118,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
@@ -132,6 +136,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo\2c bar', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
@@ -149,6 +154,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
@@ -166,6 +172,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
@@ -184,6 +191,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->getLdapType()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
         $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn([]);
 
@@ -203,6 +211,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->getLdapType()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
+        $connection->getEncoding()->willReturn('UTF-8');
         $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
         $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn($this->ldapEntries);
 

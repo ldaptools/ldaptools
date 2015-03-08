@@ -47,4 +47,10 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldContain('Foo=bar');
         $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldHaveCount(3);
     }
+
+    function it_should_encode_values_to_the_desired_type()
+    {
+        // How to properly test this?
+        $this::encode('foo', 'UTF-8')->shouldBeEqualTo('foo');
+    }
 }

@@ -41,37 +41,6 @@ objects:
                     - 'exchangeDefaultSmtpAddress'
         # These are converters to be applied for going both to and from LDAP.
         converters:
-             string_to_utf8:
-                 - 'city'
-                 - 'company'
-                 - 'country'
-                 - 'department'
-                 - 'description'
-                 - 'displayName'
-                 - 'division'
-                 - 'dn'
-                 - 'emailAddress'
-                 - 'employeeId'
-                 - 'firstName'
-                 - 'homeDirectory'
-                 - 'homeDrive'
-                 - 'homePage'
-                 - 'initials'
-                 - 'lastName'
-                 - 'manager'
-                 - 'office'
-                 - 'organization'
-                 - 'otherName'
-                 - 'poBox'
-                 - 'profilePath'
-                 - 'servicePrincipalNames'
-                 - 'state'
-                 - 'streetAddress'
-                 - 'scriptPath'
-                 - 'title'
-                 - 'username'
-                 - 'upn'
-                 - 'zipCode'
              int:
                  - 'badPasswordCount'
                  - 'employeeNumber'
@@ -189,12 +158,6 @@ objects:
         type: group
         class: group
         converters:
-             string_to_utf8:
-                 - 'accountName'
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'name'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -226,16 +189,6 @@ objects:
         type: computer
         category: computer
         converters:
-             string_to_utf8:
-                 - 'accountName'
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'dnsHostName'
-                 - 'location'
-                 - 'os'
-                 - 'osServicePack'
-                 - 'osVersion'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -273,16 +226,6 @@ objects:
         type: contact
         category: contact
         converters:
-             string_to_utf8:
-                 - 'name'
-                 - 'description'
-                 - 'displayName'
-                 - 'dn'
-                 - 'emailAddress'
-                 - 'firstName'
-                 - 'lastName'
-                 - 'name'
-                 - 'phoneNumber'
              windows_guid:
                  - 'guid'
              windows_sid:

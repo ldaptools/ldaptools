@@ -75,8 +75,6 @@ class AttributeValueResolverSpec extends ObjectBehavior
             'trustedForAllDelegation' => 'userAccountControl',
         ]);
         $schema->setConverterMap([
-            'username' => 'string_to_utf8',
-            'emailAddress' => 'string_to_utf8',
             'disabled' => 'user_account_control',
             'passwordMustChange' => 'password_must_change',
             'trustedForAllDelegation' => 'user_account_control',
@@ -142,6 +140,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
 
         $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
+        $this->connection->getEncoding()->willReturn('UTF-8');
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');

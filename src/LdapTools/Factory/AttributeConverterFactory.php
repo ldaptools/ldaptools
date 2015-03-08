@@ -26,7 +26,6 @@ class AttributeConverterFactory
         'bool' => '\LdapTools\AttributeConverter\ConvertBoolean',
         'generalized_time' => '\LdapTools\AttributeConverter\ConvertGeneralizedTime',
         'int' => '\LdapTools\AttributeConverter\ConvertInteger',
-        'string_to_utf8' => '\LdapTools\AttributeConverter\ConvertStringToUtf8',
         'windows_guid' => '\LdapTools\AttributeConverter\ConvertWindowsGuid',
         'windows_sid' => '\LdapTools\AttributeConverter\ConvertWindowsSid',
         'windows_time' => '\LdapTools\AttributeConverter\ConvertWindowsTime',

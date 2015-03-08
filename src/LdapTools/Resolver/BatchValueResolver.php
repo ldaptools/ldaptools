@@ -52,14 +52,17 @@ class BatchValueResolver extends BaseValueResolver
     {
         foreach ($this->batches as $index => $batch) {
             /** @var Batch $batch */
-            if (!$this->batchCanConvert($batch) || !$this->batches->has($index)) {
+            if (!$this->batches->has($index) || $batch->isTypeRemoveAll()) {
                 continue;
-            }
-            $this->currentBatchIndex = $index;
-            $batch->setValues($this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap'));
+            } elseif (!$this->schema->hasConverter($batch->getAttribute())) {
+                $batch->setValues($this->encodeValues($batch->getValues()));
+            } else {
+                $this->currentBatchIndex = $index;
+                $batch->setValues($this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap'));
 
-            if (in_array($batch->getAttribute(), $this->aggregated)) {
-                $batch->setAttribute($this->schema->getAttributeToLdap($batch->getAttribute()));
+                if (in_array($batch->getAttribute(), $this->aggregated)) {
+                    $batch->setAttribute($this->schema->getAttributeToLdap($batch->getAttribute()));
+                }
             }
         }
 

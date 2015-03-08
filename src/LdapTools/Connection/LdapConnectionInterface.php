@@ -155,6 +155,13 @@ interface LdapConnectionInterface
     public function getSchemaName();
 
     /**
+     * Get the encoding type used by this connection.
+     *
+     * @return string
+     */
+    public function getEncoding();
+
+    /**
      * Get the LDAP type that the connection was set as (ie. ad, openldap).
      *
      * @return string

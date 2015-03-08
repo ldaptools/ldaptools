@@ -50,6 +50,7 @@ class DomainConfiguration
         'lazy_bind' => 'lazyBind',
         'schema_name' => 'schemaName',
         'server_selection' => 'serverSelection',
+        'encoding' => 'encoding'
     ];
 
     /**
@@ -80,6 +81,7 @@ class DomainConfiguration
         'lazyBind' => false,
         'schemaName' => '',
         'serverSelection' => LdapServerPool::SELECT_ORDER,
+        'encoding' => 'UTF-8',
     ];
 
     /**
@@ -396,6 +398,29 @@ class DomainConfiguration
     public function getSchemaName()
     {
         return $this->config['schemaName'];
+    }
+
+    /**
+     * Set the encoding type to use.
+     *
+     * @param string $encoding
+     * @return $this
+     */
+    public function setEncoding($encoding)
+    {
+        $this->config['encoding'] = $encoding;
+
+        return $this;
+    }
+
+    /**
+     * Get the encoding type to use.
+     *
+     * @return string
+     */
+    public function getEncoding()
+    {
+        return $this->config['encoding'];
     }
 
     /**
