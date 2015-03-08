@@ -95,4 +95,14 @@ class ADFilterBuilderSpec extends ObjectBehavior
         $this->groupIsUniversal()->getAttribute()->shouldBeEqualTo('groupType');
         $this->groupIsUniversal()->getValue()->shouldBeEqualTo(GroupTypeFlags::UNIVERSAL_GROUP);
     }
+
+    function it_should_return_bAnd_when_calling_accountExpires()
+    {
+        $this->accountExpires()->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bAnd');
+    }
+
+    function it_should_return_bOr_when_calling_accountNeverExpires()
+    {
+        $this->accountNeverExpires()->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bOr');
+    }
 }

@@ -32,7 +32,34 @@ class ADFilterBuilder extends FilterBuilder
         'MEMBER_OF' => 'memberOf',
         'MEMBER' => 'member',
         'GROUP_TYPE' => 'groupType',
+        'ACCOUNT_EXPIRES' => 'accountExpires',
     ];
+
+    /**
+     * Checks for accounts that are set to expire at a certain date.
+     *
+     * @return \LdapTools\Query\Operator\bAnd
+     */
+    public function accountExpires()
+    {
+        return $this->bAnd(
+            $this->gte(self::ATTR['ACCOUNT_EXPIRES'], '1'),
+            $this->lte(self::ATTR['ACCOUNT_EXPIRES'], '9223372036854775806')
+        );
+    }
+
+    /**
+     * Checks for accounts that never expire.
+     *
+     * @return \LdapTools\Query\Operator\bOr
+     */
+    public function accountNeverExpires()
+    {
+        return $this->bOr(
+            $this->eq(self::ATTR['ACCOUNT_EXPIRES'], '0'),
+            $this->eq(self::ATTR['ACCOUNT_EXPIRES'], '9223372036854775807')
+        );
+    }
 
     /**
      * Checks for disabled accounts via a bitwise AND comparison on userAccountControl.
