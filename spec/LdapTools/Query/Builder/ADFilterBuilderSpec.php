@@ -105,4 +105,9 @@ class ADFilterBuilderSpec extends ObjectBehavior
     {
         $this->accountNeverExpires()->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bOr');
     }
+
+    function it_should_return_Wildcard_when_calling_mailEnabled()
+    {
+        $this->mailEnabled()->shouldReturnAnInstanceOf('LdapTools\Query\Operator\Wildcard');
+    }
 }

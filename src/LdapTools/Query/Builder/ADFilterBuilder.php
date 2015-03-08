@@ -33,6 +33,7 @@ class ADFilterBuilder extends FilterBuilder
         'MEMBER' => 'member',
         'GROUP_TYPE' => 'groupType',
         'ACCOUNT_EXPIRES' => 'accountExpires',
+        'PROXY_ADDRESSES' => 'proxyAddresses',
     ];
 
     /**
@@ -141,6 +142,16 @@ class ADFilterBuilder extends FilterBuilder
     public function groupIsDomainLocal()
     {
         return $this->groupIsType(GroupTypeFlags::DOMAIN_LOCAL_GROUP);
+    }
+
+    /**
+     * Checks for the existence of an attribute that should only be set on mail-enabled objects.
+     *
+     * @return \LdapTools\Query\Operator\Wildcard
+     */
+    public function mailEnabled()
+    {
+        return $this->present(self::ATTR['PROXY_ADDRESSES']);
     }
 
     /**
