@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.10.0 (2015-03-08)
+------------------
+
+  * Make the string encoder to LDAP a domain level configuration that no longer requires an attribute converter.
+  * Implement a proxyAddresses converter for adding/remove/setting Exchange SMTP addresses.
+  * Implement a converter for the AD "log on to..." computer list.
+  * Implement a converter to easily set the AD account expiration attribute.
+  * Implement a groupType converter to easily switch a group between Global, Universal, Security Enabled, etc.
+  * Add more Exchange attributes to the schema.
+  * More LDAP query filter builder helpers: Group Types, Account Expiration
+  * Lots of code clean-up and reorganization.
+  
 0.9.0 (2015-02-26)
 ------------------
 
