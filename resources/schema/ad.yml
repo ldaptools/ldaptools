@@ -41,6 +41,8 @@ objects:
                     - 'exchangeDefaultSmtpAddress'
         # These are converters to be applied for going both to and from LDAP.
         converters:
+             bool:
+                 - 'exchangeHideFromGAL'
              int:
                  - 'badPasswordCount'
                  - 'employeeNumber'
@@ -92,6 +94,7 @@ objects:
             employeeId: employeeId
             employeeNumber: employeeNumber
             exchangeAlias: mailNickname
+            exchangeHideFromGAL: msExchHideFromAddressLists
             exchangeMailboxDatabase: homeMDB
             exchangeMailboxGuid: msExchMailboxGUID
             exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
@@ -163,6 +166,7 @@ objects:
         class: group
         converters:
              bool:
+                - 'exchangeHideFromGAL'
                 - 'exchangeInternalOnly'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
@@ -205,6 +209,7 @@ objects:
             emailAddress: mail
             exchangeAddressBookFlags: msExchAddressBookFlags
             exchangeAlias: mailNickname
+            exchangeHideFromGAL: msExchHideFromAddressLists
             exchangeInternalOnly: msExchRequireAuthToSendTo
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
@@ -268,6 +273,8 @@ objects:
         type: contact
         category: contact
         converters:
+             bool:
+                - 'exchangeHideFromGAL'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
@@ -292,6 +299,7 @@ objects:
             dn: distinguishedName
             emailAddress: mail
             exchangeAlias: mailNickname
+            exchangeHideFromGAL: msExchHideFromAddressLists
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
             firstName: givenName

@@ -39,6 +39,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | employeeId | employeeId | string |
 | employeeNumber | employeeNumber | int |
 | exchangeAlias | mailNickname | string |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
 | exchangeMailboxDatabase | homeMDB | string |
 | exchangeMailboxGuid | msExchMailboxGUID | string |
 | exchangePolicyRBAC | msExchRBACPolicyLink | string |
@@ -99,6 +100,7 @@ These are typical LDAP group objects (`objectClass=group`).
 | emailAddress | mail | string |
 | exchangeAddressBookFlags | msExchAddressBookFlags | int |
 | exchangeAlias | mailNickname | string |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
 | exchangeInternalOnly | msExchRequireAuthToSendTo | bool |
 | exchangeSmtpAddresses | proxyAddresses | array |
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
@@ -146,6 +148,7 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 | dn | dn | string |
 | emailAddress | mail | string |
 | exchangeAlias | mailNickname | string |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
 | exchangeSmtpAddresses | proxyAddresses | array |
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
 | firstName | givenName | string |
