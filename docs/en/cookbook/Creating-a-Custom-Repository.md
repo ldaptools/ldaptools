@@ -25,12 +25,15 @@ class CustomUserRepository extends LdapObjectRepository
 }
 ```
 
-Then make sure to define your new repository in the the schema config as a directive underneat the `user` object type:
+Then make sure to define your new repository in the the schema config as a directive underneath the `user` object type:
 
 ```yaml
+# If you just want a custom repository for the default user type, you could use a schema that extends the default...
+#
+# extends_default: ad
 objects:
     #...
-    user_type:
+    user:
         #...
         repository: '\Acme\Demo\CustomUserRepository'
 ```
