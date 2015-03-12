@@ -64,3 +64,19 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Encodes a string to its unicodePwd representation, which is a quote encased UTF-16LE encoded value.
   
   * `fromLdap`: This will not do anything since a unicodePwd attribute cannot be queried.
+  
+#### *exchange_proxy_address*
+  * `toLdap`: Takes an array of email addresses and formats them properly for the proxyAddresses attribute.
+  
+  * `fromLdap`: Parses through the proxyAddresses attribute to return only the address portion for a specific address type.
+  
+#### *logon_workstations*
+  * `toLdap`: Takes an array of computer names and formats it as a comma-separated list for LDAP.
+  
+  * `fromLdap`: Formats the comma-separated list from LDAP as an array of computer names.
+  
+#### *account_expires*
+  * `toLdap`: Takes either a bool false (never expires) or a `\DateTime` object for when it should expire.
+  
+  * `fromLdap`: Will either be false (never expires) or a `\DateTime` object of when it will expire.
+  
