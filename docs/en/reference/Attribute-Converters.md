@@ -80,3 +80,8 @@ process and the converter may use the connection to make LDAP calls to resolve d
   
   * `fromLdap`: Will either be false (never expires) or a `\DateTime` object of when it will expire.
   
+#### *group_type*
+  * `toLdap`: Takes a bool and switches the group between domain local, universal, global, security, or distribution.
+
+  * `fromLdap`: Depending on the attribute, does a bitwise conversion to set a specific type as true or false.
+  
