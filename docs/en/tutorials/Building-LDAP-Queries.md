@@ -423,3 +423,51 @@ $users = $query->select()
     ->getLdapQuery()
     ->execute();
 ```
+
+------------------------
+#### mailEnabled()
+---
+
+Performs a simple check to determine whether an LDAP object is mail-enabled (ie. can receive email from Exchange).
+
+------------------------
+#### groupIsDomainLocal()
+---
+
+Performs a bitwiseAnd check to determine whether a group is domain local in scope.
+
+------------------------
+#### groupIsGlobal()
+---
+
+Performs a bitwiseAnd check to determine whether a group is global in scope.
+
+------------------------
+#### groupIsUniversal()
+---
+
+Performs a bitwiseAnd check to determine whether a group is universal in scope.
+
+------------------------
+#### groupIsSecurityEnabled()
+---
+
+Performs a bitwiseAnd check to determine whether a group is security enabled.
+
+------------------------
+#### groupIsUniversal()
+---
+
+Performs negation of the security enabled bitwiseAnd check to determine whether a group is a distribution type.
+
+------------------------
+#### accountExpires()
+---
+
+Performs a check to determine if the account is set to expire at a certain date.
+
+------------------------
+#### accountNeverExpires()
+---
+
+Performs a check to determine if the account is set to never expire.
