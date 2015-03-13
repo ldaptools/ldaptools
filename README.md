@@ -149,7 +149,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Using the LdapManager](/docs/en/tutorials/Using-the-LDAP-Manager.md)
 * [Building LDAP Queries](/docs/en/tutorials/Building-LDAP-Queries.md)
 * [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
-* [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-objects.md)
+* [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-Objects.md)
 * [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
 
 ### TODO
