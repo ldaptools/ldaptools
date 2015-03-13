@@ -148,8 +148,8 @@ The password to use when binding to LDAP.
 -------------------------------
 #### servers **(REQUIRED)**
 
-An array of LDAP servers (ie. `[ 'dc01' ]`). When more than one is used it will attempt it each server until it finds
-one it can connect to.
+An array of LDAP servers (ie. `[ 'dc01' ]`). When more than one server name is used it will attempt each one until it
+successfully connects.
 
 -------------------------------
 #### server_selection
