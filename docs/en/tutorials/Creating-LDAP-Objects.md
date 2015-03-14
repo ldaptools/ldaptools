@@ -90,7 +90,7 @@ not have to call this. The DN is determined automatically based off the `name` a
 location you specified with the `in($container)` method.
 
 ------------------------
-#### setParameter($container)
+#### setParameter($name, $value)
 
 This allows you to set any parameter you want that you can later use within an attribute value to have it resolve to the
 parameter value. See the full explanation of parameters near the start of this document.
