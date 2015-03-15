@@ -14,3 +14,37 @@ if ($ldapManager->authenticate($username, $password)) {
 
 This method actually uses the already existing `authenticate()` method of the `LdapConnection` class in the current
 context and is included as a quick shortcut for not having to do `$ldapManager->getConnection()->authenticate($username, $password)`.
+
+## Authentication Error Messages
+
+There are many times where you may want to provide a more meaningful response as to why authentication for a user has
+failed. This information is possible to get by passing additional optional variables to the `authenticate()` method.
+ 
+```php
+ 
+// With your LdapManager class already instantiated...
+if ($ldapManager->authenticate($username, $password, $message, $code)) {
+     echo "Error ($code): $message";
+}
+```
+
+When using Active Directory, the above can give you very helpful information as to why the user cannot log in. Such as a
+disabled account, a locked account, or an account whose password needs to change before they can login again. The most
+common error codes you may see in AD:
+
+| Error Number | Constant | Description |
+| ------------ | ----------- |
+| 1317 | `ACCOUNT_INVALID` | Account does not exist. |
+| 1326 | `ACCOUNT_CREDENTIALS_INVALID` | Account password is invalid. |
+| 1327 | `ACCOUNT_RESTRICTIONS` | Account Restrictions prevent this user from signing in. |
+| 1328 | `ACCOUNT_RESTRICTIONS_TIME` | Time Restriction - The account cannot login at this time. |
+| 1329 | `ACCOUNT_RESTRICTIONS_DEVICE` | Device Restriction - The account is not allowed to log on to this computer. |
+| 1330 | `ACCOUNT_PASSWORD_EXPIRED` | The password for the account has expired. |
+| 1331 | `ACCOUNT_DISABLED` | The account is currently disabled. |
+| 1384 | `ACCOUNT_CONTEXT_IDS` | The account is a member of too many groups and cannot be logged on. |
+| 1793 | `ACCOUNT_EXPIRED` | The account has expired. |
+| 1907 | `ACCOUNT_PASSWORD_MUST_CHANGE` | The accounts password must change before it can login. |
+| 1909 | `ACCOUNT_LOCKED` | The account is currently locked out. |
+
+All constants are located in `\LdapTools\Connection\ADResponseCodes`. You should use those constants to compare against 
+the received error number to take a specific action for an event.

@@ -111,7 +111,7 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function authenticate($username, $password)
+    public function authenticate($username, $password, &$errorMessage = false, &$errorCode = false)
     {
         if (!$username || !$password) {
             throw new \InvalidArgumentException("You must specify a username and password.");
@@ -123,6 +123,8 @@ class LdapConnection implements LdapConnectionInterface
             $authenticated = (bool) $this->close()->connect($username, $password);
         } catch (LdapBindException $e) {
             $authenticated = false;
+            $errorMessage = ($errorMessage === false) ?: $this->getLastError();
+            $errorCode = ($errorCode === false) ?: $this->getExtendedErrorNumber();
         }
         $this->close();
 
@@ -178,7 +180,15 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getLastError()
     {
-        return ldap_error($this->connection);
+        return LastErrorStrategy::getInstance($this->getLdapType(), $this->connection)->getLastErrorMessage();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtendedErrorNumber()
+    {
+        return LastErrorStrategy::getInstance($this->getLdapType(), $this->connection)->getExtendedErrorNumber();
     }
 
     /**
@@ -327,17 +337,6 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Encodes a string before sending it to LDAP.
-     *
-     * @param string $string
-     * @return string
-     */
-    protected function encode($string)
-    {
-        return LdapUtilities::encode($string, $this->getEncoding());
-    }
-
-    /**
      * Given a scope type, get the corresponding LDAP function to use.
      *
      * @param string $scope
@@ -380,19 +379,24 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Binds to LDAP with the supplied credentials or anonymously if specified.
+     * Binds to LDAP with the supplied credentials or anonymously if specified. You should NOT have to use this directly.
+     * Instead you should call either 'connect()' or 'authenticate()'.
      *
      * @param string $username The username to bind with.
      * @param string $password The password to bind with.
      * @param bool $anonymous Whether this is an anonymous bind attempt.
      * @throws LdapBindException
      */
-    protected function bind($username, $password, $anonymous)
+    protected function bind($username, $password, $anonymous = false)
     {
         if ($anonymous) {
             $this->isBound = @ldap_bind($this->connection);
         } else {
-            $this->isBound = @ldap_bind($this->connection, $this->encode($username), $this->encode($password));
+            $this->isBound = @ldap_bind(
+                $this->connection,
+                LdapUtilities::encode($username, $this->getEncoding()),
+                LdapUtilities::encode($password, $this->getEncoding())
+            );
         }
 
         if (!$this->isBound) {

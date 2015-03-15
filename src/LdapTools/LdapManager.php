@@ -223,15 +223,19 @@ class LdapManager
     }
 
     /**
-     * A shorthand method for verifying a username/password combination against LDAP.
+     * A shorthand method for verifying a username/password combination against LDAP. Optionally you can pass a variable
+     * to store the error message or error number returned from LDAP for more detailed information on authentication
+     * failures.
      *
      * @param string $user
      * @param string $password
+     * @param bool|string $errorMessage Optionally, this will store the LDAP error message on failure.
+     * @param bool|string $errorNumber Optionally, this will store the LDAP error number on failure.
      * @return bool
      */
-    public function authenticate($user, $password)
+    public function authenticate($user, $password, &$errorMessage = false, &$errorNumber = false)
     {
-        return $this->getConnection()->authenticate($user, $password);
+        return $this->getConnection()->authenticate($user, $password, $errorMessage, $errorNumber);
     }
 
     /**

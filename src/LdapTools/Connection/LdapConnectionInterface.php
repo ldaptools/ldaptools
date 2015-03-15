@@ -50,11 +50,13 @@ interface LdapConnectionInterface
      *
      * @param string $username
      * @param string $password
+     * @param bool|string $errorMessage Optionally, the last LDAP error message will be set here if any occurs.
+     * @param bool|string $errorNumber Optionally, the last LDAP error number will be set here if any occurs.
      * @return bool
      * @throws \LdapTools\Exception\LdapBindException If re-binding fails after authentication.
      * @throws \LdapTools\Exception\LdapConnectionException If re-connecting fails after authentication.
      */
-    public function authenticate($username, $password);
+    public function authenticate($username, $password, &$errorMessage = false, &$errorNumber = false);
 
     /**
      * Perform a query against LDAP.
@@ -146,6 +148,13 @@ interface LdapConnectionInterface
      * @return string
      */
     public function getLastError();
+
+    /**
+     * Get the extended error number from LDAP for the last operation.
+     *
+     * @return int
+     */
+    public function getExtendedErrorNumber();
 
     /**
      * Get the schema name used by this connection.
