@@ -45,9 +45,10 @@ $query = $ldap->buildLdapQuery()
     ->select()
     ->fromUsers()
     ->where(['firstName' => 'Foo'])
-    ->orWhere(['firstName' => 'Bar']);
+    ->orWhere(['lastName' => 'Bar'])
+    ->orWhere(['lastName' => 'Smith']);
     
-// Returns a `LdapObjectCollection` of all users whose first name is 'Foo' or 'Bar'
+// Returns a `LdapObjectCollection` of all users whose first name is 'Foo' and last name is 'Bar' or 'Smith'
 $users = $query->getLdapQuery()->execute();
 
 echo "Found ".$users->count()." user(s).".PHP_EOL;
