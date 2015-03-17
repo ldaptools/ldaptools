@@ -203,6 +203,35 @@ $rootDse = $lqb->where($lqb->filter->present('objectClass'))
                 ->execute();
 ```
 
+------------------------ 
+#### addOrderBy($attribute, $direction = 'ASC')
+
+This method sets the attribute to order the results by in either ascending (default) or descending order. Calling this 
+overwrites any already set orderBy statements. To stack multiple order statements call `addOrderBy($attribute)`.
+
+```php
+// Order results by last name (ascending).
+$users = $lqb->select()
+    ->fromUsers()
+    ->where(['firstName' => 'John'])
+    ->orderBy('lastName') 
+    ->execute();
+    
+// Order results by last name (descending) and first name (ascending).
+$users = $lqb->select()
+    ->fromUsers()
+    ->where(['state' => 'Wisconsin'])
+    ->orderBy('lastName', 'DESC')
+    ->addOrderBy('firstName', 'ASC')
+    ->execute();
+```
+
+------------------------ 
+#### addOrderBy($attribute, $direction = 'ASC')
+
+This method works the same as `orderBy($attribute)`, only calling this one will not overwrite already declared order-by 
+statements. Call this when you want to order by multiple attributes.
+
 ------------------------
 #### setPageSize($size)
 

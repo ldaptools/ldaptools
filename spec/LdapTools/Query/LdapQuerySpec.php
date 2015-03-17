@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Query;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Factory\HydratorFactory;
 use LdapTools\Query\LdapQuery;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -62,7 +63,7 @@ class LdapQuerySpec extends ObjectBehavior
 
     function let(LdapConnection $ldap)
     {
-        $ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
+        $ldap->search(Argument::any(), ["cn", "givenName", "foo"], Argument::any(), Argument::any(), Argument::any())
             ->willReturn($this->ldapEntries);
         $this->beConstructedWith($ldap);
     }
@@ -74,6 +75,7 @@ class LdapQuerySpec extends ObjectBehavior
 
     function it_should_return_a_LdapObjectCollection_by_default()
     {
+        $this->setAttributes(["cn", "givenName", "foo"]);
         $this->execute()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
@@ -116,5 +118,23 @@ class LdapQuerySpec extends ObjectBehavior
         $schema = new LdapObjectSchema('foo','bar');
 
         $this->setLdapObjectSchemas($schema)->getLdapObjectSchemas()->shouldBeEqualTo([$schema]);
+    }
+
+    function it_should_set_the_order_by_attributes()
+    {
+        $this->setOrderBy(['foo' => 'ASC'])->getOrderBy()->shouldBeEqualTo(['foo' => 'ASC']);
+    }
+
+    function it_should_have_an_empty_array_for_the_default_order_by()
+    {
+        $this->getOrderBy()->shouldBeEqualTo([]);
+    }
+
+    function it_should_add_order_by_attributes_to_the_selection_if_not_explicitly_done()
+    {
+        $this->setOrderBy(['foo' => 'ASC']);
+        $this->setAttributes(['cn', 'givenName']);
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->execute(HydratorFactory::TO_ARRAY);
     }
 }

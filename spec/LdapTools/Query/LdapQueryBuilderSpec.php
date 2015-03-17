@@ -227,4 +227,24 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->andWhere(['bar' => 'foo']);
         $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
     }
+
+    function it_should_add_an_order_by_attribute_defaulting_to_asc()
+    {
+        $this->where(['foo' => 'bar'])->orderBy('foo')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['foo' => 'ASC']);
+    }
+
+    function it_should_add_an_order_by_attribute_defaulting_with_a_specific_direction()
+    {
+        $this->where(['foo' => 'bar'])->orderBy('foo','DESC')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['foo' => 'DESC']);
+    }
+
+    function it_should_stack_order_by_attributes_when_calling_addOrderBy()
+    {
+        $this->where(['foo' => 'bar'])->orderBy('foo','DESC')->addOrderBy('bar')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['foo' => 'DESC','bar' => 'ASC']);
+    }
+
+    function it_should_overwrite_order_by_attributes_when_calling_orderBy()
+    {
+        $this->where(['foo' => 'bar'])->orderBy('foo','DESC')->orderBy('bar')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['bar' => 'ASC']);
+    }
 }

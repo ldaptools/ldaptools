@@ -13,6 +13,7 @@ namespace LdapTools\Hydrator;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Query\LdapResultSorter;
 use LdapTools\Resolver\AttributeValueResolver;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
@@ -49,6 +50,21 @@ trait HydratorTrait
      * @var LdapConnectionInterface|null
      */
     protected $connection;
+
+    /**
+     * @var array The attributes to order by.
+     */
+    protected $orderBy = [];
+
+    /**
+     * Set the attributes to sort by.
+     *
+     * @param array $orderBy
+     */
+    public function setOrderBy(array $orderBy)
+    {
+        $this->orderBy = $orderBy;
+    }
 
     /**
      * Sets a parameter that can be used within an attribute value.
@@ -133,6 +149,9 @@ trait HydratorTrait
         for ($i = 0; $i < $entryCount; $i++) {
             $results[] = $this->hydrateFromLdap($entries[$i]);
         }
+        if (!empty($this->orderBy)) {
+            $results = $this->sortResults($results);
+        }
 
         return $results;
     }
@@ -168,6 +187,29 @@ trait HydratorTrait
     public function setLdapConnection(LdapConnectionInterface $connection)
     {
         $this->connection = $connection;
+    }
+
+    /**
+     * Takes a LDAP result set and passes it on to the sorter. Makes sure that orderBy attributes are in the correct
+     * case first, if possible.
+     *
+     * @param array $results
+     * @return array
+     */
+    protected function sortResults(array $results)
+    {
+
+        $orderBy = [];
+        if (!empty($this->schemas)) {
+            // Ignore case differences to ease later comparisons.
+            foreach ($this->orderBy as $attribute => $direction) {
+                $orderBy[$this->getAttributeNameAsRequested($attribute)] = $direction;
+            }
+        } else {
+            $orderBy = $this->orderBy;
+        }
+
+        return (new LdapResultSorter($orderBy))->sort($results);
     }
 
     /**

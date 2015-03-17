@@ -72,6 +72,11 @@ class LdapQueryBuilder
     protected $defaultAttributes = [];
 
     /**
+     * @var array The attributes to order by, if any. They will be in ['attribute' => 'ASC'] form.
+     */
+    protected $orderBy = [];
+
+    /**
      * @var OperatorCollection
      */
     protected $operators;
@@ -300,6 +305,33 @@ class LdapQueryBuilder
     }
 
     /**
+     * Set the attribute to order by. This will override anything already explicitly set to be ordered. To order on
+     * multiple attributes use 'addOrderBy', which allows the attribute ordering to stack.
+     *
+     * @param string $attribute The attribute name
+     * @param string $direction Either 'ASC' or 'DESC'. Defaults to 'ASC'.
+     */
+    public function orderBy($attribute, $direction = LdapQuery::ORDER['ASC'])
+    {
+        $this->orderBy = [$attribute => $direction];
+
+        return $this;
+    }
+
+    /**
+     * Add an attribute to be ordered for the returned results and set the direction for the ordering.
+     *
+     * @param string $attribute The attribute name
+     * @param string $direction Either 'ASC' or 'DESC'. Defaults to 'ASC'.
+     */
+    public function addOrderBy($attribute, $direction = LdapQuery::ORDER['ASC'])
+    {
+        $this->orderBy[$attribute] = $direction;
+
+        return $this;
+    }
+
+    /**
      * Call this to help build additional query statements in an object-oriented fashion.
      *
      * @return FilterBuilder|ADFilterBuilder
@@ -377,6 +409,7 @@ class LdapQueryBuilder
             ->setBaseDn($this->baseDn)
             ->setPageSize($this->pageSize)
             ->setScope($this->scope)
+            ->setOrderBy($this->orderBy)
             ->setAttributes($this->getAttributesToSelect())
             ->setLdapFilter($this->getLdapFilter())
             ->setLdapObjectSchemas(...$this->operators->getLdapObjectSchemas());

@@ -38,6 +38,14 @@ class LdapQuery
     const SCOPE_BASE = 'base';
 
     /**
+     * The valid ordering types for data hydrated from LDAP.
+     */
+    const ORDER = [
+        'ASC' => 'ASC',
+        'DESC' => 'DESC',
+    ];
+
+    /**
      * @var string The scope level for the search.
      */
     protected $scope = self::SCOPE_SUBTREE;
@@ -61,6 +69,11 @@ class LdapQuery
      * @var array The LDAP attribute names to retrieve as passed to this query.
      */
     protected $attributes = [];
+
+    /**
+     * @var array The attributes to order by, if any. They will be in ['attribute' => 'ASC'] form.
+     */
+    protected $orderBy = [];
 
     /**
      * @var null|string The BaseDN search scope.
@@ -95,14 +108,15 @@ class LdapQuery
     public function execute($hydratorType = HydratorFactory::TO_OBJECT)
     {
         $hydrator = $this->hydratorFactory->get($hydratorType);
-        $attributes = empty($this->schemas) ? $this->attributes : $this->getAttributesToLdap($this->attributes);
+        $attributes = $this->getAttributesToLdap($this->attributes);
 
         if (!empty($this->schemas)) {
-            $hydrator->setSelectedAttributes($this->attributes);
+            $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->attributes));
             $hydrator->setLdapObjectSchemas(...$this->schemas);
         }
         $hydrator->setLdapConnection($this->ldap);
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
+        $hydrator->setOrderBy($this->orderBy);
 
         return $hydrator->hydrateAllFromLdap($this->ldap->search(
             $this->ldapFilter,
@@ -254,6 +268,40 @@ class LdapQuery
     {
         return $this->schemas;
     }
+
+    /**
+     * Set the attributes to order the results by.
+     *
+     * @param array $orderBy In the form of ['attribute' => 'ASC', ...]
+     * @return $this
+     */
+    public function setOrderBy(array $orderBy)
+    {
+        // Validate and force the case for the direction.
+        foreach ($orderBy as $attribute => $direction) {
+            if (!in_array(strtoupper($direction), self::ORDER)) {
+                throw new \InvalidArgumentException(sprintf(
+                    'Order direction "%s" is invalid. Valid values are ASC and DESC',
+                    $direction
+                ));
+            }
+            $orderBy[$attribute] = strtoupper($direction);
+        }
+        $this->orderBy = $orderBy;
+
+        return $this;
+    }
+
+    /**
+     * Get the attributes to order the results by.
+     *
+     * @return array
+     */
+    public function getOrderBy()
+    {
+        return $this->orderBy;
+    }
+
     /**
      * If there are schemas present, then translate selected attributes to retrieve to their LDAP names.
      *
@@ -262,13 +310,36 @@ class LdapQuery
      */
     protected function getAttributesToLdap(array $attributes)
     {
-        $schema = $this->schemas[0];
-        $newAttributes = [];
-
-        foreach ($attributes as $attribute) {
-            $newAttributes[] = $schema->getAttributeToLdap($attribute);
+        if (!empty($this->orderBy)) {
+            $attributes = $this->mergeOrderByAttributes($attributes);
         }
 
-        return $newAttributes;
+        if (!empty($this->schemas)) {
+            $schema = reset($this->schemas);
+            $newAttributes = [];
+            foreach ($attributes as $attribute) {
+                $newAttributes[] = $schema->getAttributeToLdap($attribute);
+            }
+            $attributes = $newAttributes;
+        }
+
+        return $attributes;
+    }
+
+    /**
+     * If any attributes that were requested to be ordered by are not explicitly in the attribute selection, add them.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function mergeOrderByAttributes(array $attributes)
+    {
+        foreach (array_keys($this->orderBy) as $attribute) {
+            if (!in_array(strtolower($attribute), array_map('strtolower', $attributes))) {
+                $attributes[] = $attribute;
+            }
+        }
+
+        return $attributes;
     }
 }

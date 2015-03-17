@@ -263,6 +263,15 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->hydrateToLdap($attributes)->shouldContain('TRUE');
     }
 
+    function it_should_return_ordered_results_when_specified_and_hydrating_all_entries_from_ldap()
+    {
+        $this->setOrderBy(['givenName' => 'ASC']);
+        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveCount(2);
+        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenname', 'Archie');
+        $this->setOrderBy(['givenName' => 'DESC']);
+        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenname', 'John');
+    }
+
     public function getMatchers()
     {
         return [
@@ -277,7 +286,12 @@ class ArrayHydratorSpec extends ObjectBehavior
             },
             'haveKeyWithValue' => function($subject, $key, $value) {
                 return isset($subject[$key]) && ($subject[$key] === $value);
-            }
+            },
+            'haveFirstValue' => function ($subject, $key, $value) {
+                $subject = reset($subject);
+                $subject = is_array($subject) ? $subject[$key] : $subject->get($key);
+                return ($subject === $value);
+            },
         ];
     }
 }
