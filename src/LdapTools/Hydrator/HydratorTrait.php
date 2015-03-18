@@ -198,7 +198,6 @@ trait HydratorTrait
      */
     protected function sortResults(array $results)
     {
-
         $orderBy = [];
         if (!empty($this->schemas)) {
             // Ignore case differences to ease later comparisons.
