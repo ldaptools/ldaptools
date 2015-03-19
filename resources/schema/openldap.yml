@@ -62,3 +62,21 @@ objects:
             - 'name'
             - 'description'
             - 'created'
+    ou:
+        type: ou
+        class: organizationalUnit
+        converters:
+             generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: createTimestamp
+            dn: dn
+            modified: modifyTimestamp
+            name: ou
+        attributes_to_select:
+            - 'name'
+        default_values:
+            objectclass: [ 'top', 'organizationalUnit' ]
+        required_attributes:
+            - 'name'

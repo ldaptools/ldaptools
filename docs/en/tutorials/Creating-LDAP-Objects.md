@@ -33,6 +33,12 @@ $ldapObject->createComputer()
     ->in('dc=example,dc=local')
     ->with(['name' => 'MYWOKRSTATION'])
     ->execute();
+    
+// Creates an OU object...
+$ldapObject->createOU()
+    ->in('dc=example,dc=local')
+    ->with(['name' => 'Employees'])
+    ->execute();
 ```
 
 ## Using Parameters in Attribute Values
@@ -94,6 +100,37 @@ location you specified with the `in($container)` method.
 
 This allows you to set any parameter you want that you can later use within an attribute value to have it resolve to the
 parameter value. See the full explanation of parameters near the start of this document.
+
+------------------------
+#### createUser()
+
+This specifies that the resulting object should be a user LDAP object type.
+
+------------------------
+#### createGroup()
+
+This specifies that the resulting object should be a group LDAP object type.
+
+------------------------
+#### createOU()
+
+This specifies that the resulting object should be a OU LDAP object type.
+
+------------------------
+#### createComputer()
+
+This specifies that the resulting object should be a computer LDAP object type.
+
+------------------------
+#### createContact()
+
+This specifies that the resulting object should be a contact LDAP object type.
+
+------------------------
+#### create($type)
+
+This allows you to manually specify a LDAP object type from the schema that you would like to create. This is the method
+that all the other shorthand `create*` methods actually call. 
 
 ------------------------
 #### execute()

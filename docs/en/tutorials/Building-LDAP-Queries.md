@@ -104,7 +104,7 @@ $lqb->from(LdapObjectType::COMPUTER);
 ------------------------
 #### fromUsers()
 
-A convenience shortcut of the the `from` method to select from LDAP `user` types.
+A convenience shortcut of the `from` method to select from LDAP `user` types.
 
 ```php
 // Search for users
@@ -114,11 +114,21 @@ $lqb->fromUsers();
 ------------------------
 #### fromGroups()
 
-A convenience shortcut of the the `from` method to select from LDAP `group` types.
+A convenience shortcut of the `from` method to select from LDAP `group` types.
 
 ```php
 // Search for groups
 $lqb->fromGroups();
+```
+
+------------------------
+#### fromOUs()
+
+A convenience shortcut of the `from` method to select from LDAP `ou` types.
+
+```php
+// Search for OUs
+$lqb->fromOUs();
 ```
 
 ------------------------

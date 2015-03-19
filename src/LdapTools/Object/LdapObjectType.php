@@ -36,4 +36,9 @@ class LdapObjectType
      * A computer object.
      */
     const COMPUTER = 'computer';
+
+    /**
+     * An OU object.
+     */
+    const OU = 'ou';
 }

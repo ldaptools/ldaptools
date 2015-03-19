@@ -9,10 +9,12 @@ used when generating queries and returning data from LDAP.
   * [Groups](#ad-group-types)
   * [Computers](#ad-computer-types)
   * [Contacts](#ad-contact-types)
+  * [OUs](#ad-ou-types)
 
 #### OpenLDAP Schema
   * [Users](#openldap-user-types)
   * [Groups](#openldap-group-types)
+  * [OUs](#openldap-ou-types)
 
 ### The Active Directory Schema
 ---
@@ -158,6 +160,25 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 | phoneNumber | telephoneNumber | string |
 | sid | objectSid | string |
 
+#### AD OU Types
+
+These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| city | l | string |
+| country | c | string |
+| created | whenCreated | `\DateTime` | 
+| description | description | string |
+| dn | dn | string |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| name | ou | string |
+| sid | objectSid | string |
+| state | st | string |
+| streetAddress | streetAddress | string |
+| zipCode | postalCode | string |
+
 ### The OpenLDAP Schema
 ---
 
@@ -208,3 +229,14 @@ These are typical LDAP group objects (`objectClass=groupOfUniqueNames`).
 | members | uniqueMembers | array|
 | modified | modifyTimestamp | `\DateTime` |
 | name | cn | string |
+
+#### OpenLDAP OU Types
+
+These are typical LDAP OU objects (`objectClass=organizationalUnit`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| created | createTimestamp | `\DateTime` |
+| dn | dn | string |
+| modified | modifyTimestamp | `\DateTime` |
+| name | ou | string |

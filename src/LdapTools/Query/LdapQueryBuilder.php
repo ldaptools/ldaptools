@@ -234,6 +234,18 @@ class LdapQueryBuilder
     }
 
     /**
+     * A convenience method to select from OU object types.
+     *
+     * @return $this
+     */
+    public function fromOUs()
+    {
+        $this->from(LdapObjectType::OU);
+
+        return $this;
+    }
+
+    /**
      * Create a logical 'and' from the passed statements. Either pass a key => value array with attribute names and
      * expected values (which will be compared in terms of equality) or pass arbitrary Operator objects using the
      * 'filter' method shortcuts or some other way.

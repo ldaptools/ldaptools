@@ -138,6 +138,16 @@ class LdapObjectCreator
     }
 
     /**
+     * Shorthand method for creating an OU LDAP object.
+     */
+    public function createOU()
+    {
+        $this->create(LdapObjectType::OU);
+
+        return $this;
+    }
+
+    /**
      * Sets the attributes the object will be created with.
      *
      * @param array $attributes

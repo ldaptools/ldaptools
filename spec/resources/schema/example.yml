@@ -163,6 +163,39 @@ objects:
         required_attributes:
             - 'name'
             - 'emailAddress'
+    ou:
+        type: ou
+        class: organizationalUnit
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            city: l
+            country: c
+            created: whenCreated
+            description: description
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            name: ou
+            sid: objectSid
+            state: st
+            streetAddress: streetAddress
+            zipCode: postalCode
+        attributes_to_select:
+            - 'description'
+            - 'name'
+            - 'guid'
+            - 'sid'
+        default_values:
+            objectclass: [ 'top', 'organizationalUnit' ]
+        required_attributes:
+            - 'name'
     without_name:
         type: noname
         category: user

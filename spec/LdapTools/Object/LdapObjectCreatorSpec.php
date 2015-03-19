@@ -58,6 +58,11 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->createComputer()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
+    function it_should_chain_calls_when_creating_an_ou()
+    {
+        $this->createOU()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
+    }
+
     function it_should_chain_calls_when_setting_the_container()
     {
         $this->in('dc=foo,dc=bar')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');

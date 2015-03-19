@@ -99,6 +99,11 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->fromGroups()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
     }
 
+    function it_should_return_self_when_calling_fromOUs()
+    {
+        $this->fromOUs()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+    }
+
     function it_should_return_self_when_calling_where()
     {
         $this->where(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
@@ -246,5 +251,12 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     function it_should_overwrite_order_by_attributes_when_calling_orderBy()
     {
         $this->where(['foo' => 'bar'])->orderBy('foo','DESC')->orderBy('bar')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['bar' => 'ASC']);
+    }
+
+    function it_should_filter_by_OUs_when_calling_fromOUs()
+    {
+        $filter = '(objectClass=\6f\72\67\61\6e\69\7a\61\74\69\6f\6e\61\6c\55\6e\69\74)';
+        $this->fromOUs();
+        $this->getLdapFilter()->shouldBeEqualTo($filter);
     }
 }

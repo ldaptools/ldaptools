@@ -46,9 +46,11 @@ $query = $ldap->buildLdapQuery()
     ->fromUsers()
     ->where(['firstName' => 'Foo'])
     ->orWhere(['lastName' => 'Bar'])
-    ->orWhere(['lastName' => 'Smith']);
+    ->orWhere(['lastName' => 'Smith'])
+    ->orderBy('state');
     
 // Returns a `LdapObjectCollection` of all users whose first name is 'Foo' and last name is 'Bar' or 'Smith'
+// The result set will also be ordered by state name (ascending).
 $users = $query->getLdapQuery()->execute();
 
 echo "Found ".$users->count()." user(s).".PHP_EOL;
@@ -138,6 +140,12 @@ $ldapObject->createContact()
 $ldapObject->createComputer()
     ->in('dc=example,dc=local')
     ->with(['name' => 'MYWOKRSTATION'])
+    ->execute();
+    
+// Creates an OU object...
+$ldapObject->createOU()
+    ->in('dc=example,dc=local')
+    ->with(['name' => 'Employees'])
     ->execute();
 ```
 
