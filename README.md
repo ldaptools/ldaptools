@@ -5,7 +5,7 @@ LdapTools is a feature-rich LDAP library for PHP 5.6+. It was designed to be cus
 directory service, but contains default attribute converters and schemas for Active Directory and OpenLDAP. 
  
  * A fluent and easy to understand syntax for generating LDAP queries.
- * Easily create common LDAP objects (Users, Groups, Contacts, Computers).
+ * Easily create common LDAP objects (Users, Groups, Contacts, Computers, OUs).
  * Easily modify LDAP objects with automatic setters/getters/properties/etc.
  * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
  * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
