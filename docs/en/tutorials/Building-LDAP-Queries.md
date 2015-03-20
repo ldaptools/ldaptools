@@ -87,7 +87,7 @@ $lqb->select(['givenName', 'l', 'objectSid', 'sid']);
 #### from($ldapType)
 
 The `from` method requires an argument for the LDAP type. This type must be defined in your LDAP schema. Common types
-that are in the schema by default include: `user`, `group`, `contact`, `computer`. These types are defined as constants
+that are in the schema by default include: `user`, `group`, `contact`, `computer`, `ou`. These types are defined as constants
 in the `\LdapTools\Object\LdapObjectTypes` class. Using this method makes the query aware of the attribute name mapping
 and converters defined for the type.
 
