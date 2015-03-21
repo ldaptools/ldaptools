@@ -50,7 +50,7 @@ attribute functions like an array and maps to to the "Log on To..." section of a
 ```php
 
 // A LdapObject as the result of a search. Set the workstations allowed...
-$user->setLogonWorkstations(['PC01, 'PC02', 'PC03']);
+$user->setLogonWorkstations(['PC01', 'PC02', 'PC03']);
 
 // Add only one workstation...
 $user->addLogonWorkstations('PC04');
