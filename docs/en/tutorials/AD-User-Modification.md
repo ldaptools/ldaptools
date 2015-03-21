@@ -41,3 +41,20 @@ This table contains many useful AD attributes you can toggle with a simple `true
 | smartCardRequired | Set that a smart card is required for interactive login. |
 | trustedForAllDelegation | Trust the user for delegation to any service (Kerberos). |
 | trustedForAnyAuthDelegation | Delegate using any authentication protocol (When selected for delegation to specific services only). |
+
+## User Log On To Workstations List 
+
+To easily modify the workstations that an account can log into, you can use the `logonWorkstations` attribute. This
+attribute functions like an array and maps to to the "Log on To..." section of an account.
+
+```php
+
+// A LdapObject as the result of a search. Set the workstations allowed...
+$user->setLogonWorkstations(['PC01, 'PC02', PC03');
+
+// Add only one workstation...
+$user->addLogonWorkstations('PC04');
+
+// Remove one of the workstations...
+$user->removeLogonWorkstations('PC01');
+```
