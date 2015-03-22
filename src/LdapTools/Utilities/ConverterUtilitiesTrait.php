@@ -28,6 +28,11 @@ trait ConverterUtilitiesTrait
     /**
      * {@inheritdoc}
      */
+    abstract public function getBatch();
+
+    /**
+     * {@inheritdoc}
+     */
     abstract public function getDn();
 
     /**
