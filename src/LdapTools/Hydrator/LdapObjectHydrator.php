@@ -54,11 +54,7 @@ class LdapObjectHydrator implements HydratorInterface
      */
     public function hydrateAllFromLdap(array $entries)
     {
-        $collection = new LdapObjectCollection();
-        $ldapObjects = $this->hydrateAllFromLdapToObjects($entries);
-        $collection->add(...$ldapObjects);
-
-        return $collection;
+        return new LdapObjectCollection(...$this->hydrateAllFromLdapToObjects($entries));
     }
 
     /**
