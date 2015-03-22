@@ -58,3 +58,18 @@ $user->addLogonWorkstations('PC04');
 // Remove one of the workstations...
 $user->removeLogonWorkstations('PC01');
 ```
+
+## Account Expiration Date
+
+To modify the date at which an account will expire, which will prevent the user from logging in past that time, you can 
+use the `accountExpirationDate` attribute. This attribute accepts either a bool `false` (the account never expires) or
+ a PHP `\DateTime` object specifying the date at which the account should expire.
+ 
+```php
+
+// A LdapObject as the result of a search. Set the account to never expire.
+$user->setAccountExpirationDate(false);
+
+// Instead, set the account to expire sometime in the future.
+$user->setAccountExpirationDate(new \DateTime('2228-3-22'));
+```
