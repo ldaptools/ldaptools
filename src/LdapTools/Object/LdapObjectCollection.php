@@ -23,6 +23,14 @@ class LdapObjectCollection implements \IteratorAggregate
     protected $objects = [];
 
     /**
+     * @param LdapObject[] ...$ldapObjects
+     */
+    public function __construct(LdapObject ...$ldapObjects)
+    {
+        $this->objects = $ldapObjects;
+    }
+
+    /**
      * Add LdapObjects to the collection.
      *
      * @param LdapObject[] ...$ldapObjects
@@ -63,5 +71,65 @@ class LdapObjectCollection implements \IteratorAggregate
     public function count()
     {
         return count($this->objects);
+    }
+
+    /**
+     * Sets the collection array pointer to the first element and returns it.
+     *
+     * @return LdapObject
+     */
+    public function first()
+    {
+        return reset($this->objects);
+    }
+
+    /**
+     * Sets the collection array pointer to the last element and returns it.
+     *
+     * @return LdapObject
+     */
+    public function last()
+    {
+        return end($this->objects);
+    }
+
+    /**
+     * Gets the currently element in the collection array.
+     *
+     * @return LdapObject
+     */
+    public function current()
+    {
+        return current($this->objects);
+    }
+
+    /**
+     * Sets the collection array pointer to the next element and returns it.
+     *
+     * @return LdapObject
+     */
+    public function next()
+    {
+        return next($this->objects);
+    }
+
+    /**
+     * Sets the collection array pointer to the previous element and returns it.
+     *
+     * @return LdapObject
+     */
+    public function previous()
+    {
+        return prev($this->objects);
+    }
+
+    /**
+     * Gets the index of the current position in the collection.
+     *
+     * @return int
+     */
+    public function key()
+    {
+        return key($this->objects);
     }
 }

@@ -16,6 +16,16 @@ use Prophecy\Argument;
 
 class LdapObjectCollectionSpec extends ObjectBehavior
 {
+    protected $ldapObjects = [];
+
+    function let()
+    {
+        $this->ldapObjects[] = new LdapObject(['firstName' => 'Natalie'],['user'],'user','user');
+        $this->ldapObjects[] = new LdapObject(['firstName' => 'Scott'],['user'],'user','user');
+        $this->ldapObjects[] = new LdapObject(['firstName' => 'Timmy'],['user'],'user','user');
+        $this->ldapObjects[] = new LdapObject(['firstName' => 'Chad'],['user'],'user','user');
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Object\LdapObjectCollection');
@@ -24,6 +34,12 @@ class LdapObjectCollectionSpec extends ObjectBehavior
     function it_should_implement_an_interator()
     {
         $this->shouldHaveType('\IteratorAggregate');
+    }
+
+    function it_should_expect_any_number_of_objects_to_the_constructor()
+    {
+        $this->beConstructedWith(...$this->ldapObjects);
+        $this->count()->shouldBeEqualTo(4);
     }
 
     function it_should_add_objects_to_the_collection()
@@ -43,5 +59,45 @@ class LdapObjectCollectionSpec extends ObjectBehavior
         $this->add(new LdapObject(['foo' => 'bar']));
         $this->toArray()->shouldBeArray();
         $this->toArray()->shouldHaveCount(1);
+    }
+
+    function it_should_get_the_last_item_of_the_collection()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->last()->getFirstName()->shouldBeEqualTo('Chad');
+    }
+
+    function it_should_get_the_first_item_of_the_collection()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->last()->getFirstName()->shouldBeEqualTo('Chad');
+        $this->first()->getFirstName()->shouldBeEqualTo('Natalie');
+    }
+
+    function it_should_advance_to_the_next_item_when_calling_next()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->next()->getFirstName()->shouldBeEqualTo('Scott');
+    }
+
+    function it_should_go_back_to_the_previous_item_when_calling_previous()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->next()->getFirstName()->shouldBeEqualTo('Scott');
+        $this->previous()->getFirstName()->shouldBeEqualTo('Natalie');
+    }
+
+    function it_should_get_the_current_object_when_calling_current()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->last();
+        $this->previous();
+        $this->current()->getFirstName()->shouldBeEqualTo('Timmy');
+    }
+
+    function it_should_get_the_current_index_when_calling_key()
+    {
+        $this->add(...$this->ldapObjects);
+        $this->key()->shouldBeEqualTo(0);
     }
 }
