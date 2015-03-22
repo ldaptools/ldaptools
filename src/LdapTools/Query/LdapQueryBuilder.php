@@ -534,6 +534,11 @@ class LdapQueryBuilder
         }
     }
 
+    /**
+     * Get the attributes that will be selected based on whether a specific selection was called for or not.
+     *
+     * @return array
+     */
     protected function getAttributesToSelect()
     {
         return !empty($this->attributes) ? $this->attributes : $this->defaultAttributes;
