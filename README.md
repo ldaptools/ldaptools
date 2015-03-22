@@ -1,4 +1,4 @@
-# LdapTools [![Build Status](https://travis-ci.org/ldaptools/ldaptools.svg)](https://travis-ci.org/ldaptools/ldaptools) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ldaptools/ldaptools/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ldaptools/ldaptools/?branch=master)
+# LdapTools [![Build Status](https://travis-ci.org/ldaptools/ldaptools.svg)](https://travis-ci.org/ldaptools/ldaptools) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/ldaptools/ldaptools/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/ldaptools/ldaptools/?branch=master) [![Latest Stable Version](https://poser.pugx.org/ldaptools/ldaptools/v/stable.svg)](https://packagist.org/packages/ldaptools/ldaptools)
 -----------
 
 LdapTools is a feature-rich LDAP library for PHP 5.6+. It was designed to be customizable for use with pretty much any 
