@@ -38,6 +38,7 @@ class AttributeConverterFactory
         'logon_workstations' => '\LdapTools\AttributeConverter\ConvertLogonWorkstations',
         'account_expires' => '\LdapTools\AttributeConverter\ConvertAccountExpiration',
         'group_type' => '\LdapTools\AttributeConverter\ConvertGroupType',
+        'gpo_link' => '\LdapTools\AttributeConverter\ConvertGPLink',
     ];
 
     /**

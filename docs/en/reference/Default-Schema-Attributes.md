@@ -171,6 +171,7 @@ These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
 | created | whenCreated | `\DateTime` | 
 | description | description | string |
 | dn | dn | string |
+| gpoLinks | gPLink | array |
 | guid | objectGuid | string |
 | modified | whenModified | `\DateTime` |
 | name | ou | string |

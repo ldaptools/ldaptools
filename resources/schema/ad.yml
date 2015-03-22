@@ -332,12 +332,14 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+             gpo_link: [ gpoLinks ]
         attributes:
             city: l
             country: c
             created: whenCreated
             description: description
             dn: distinguishedName
+            gpoLinks: gPLink
             guid: objectGuid
             modified: whenChanged
             name: ou

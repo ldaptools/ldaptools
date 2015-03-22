@@ -119,4 +119,24 @@ trait ConverterUtilitiesTrait
             $this->setLastValue($default);
         }
     }
+
+    /**
+     * Modifies a multivalued attribute array based off the original values, the new values, and the modification type.
+     *
+     * @param array $values
+     * @param array $newValues
+     * @return array
+     */
+    protected function modifyMultivaluedAttribute(array $values, array $newValues)
+    {
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_CREATE || ($this->getBatch() && $this->getBatch()->isTypeAdd())) {
+            $values = array_merge($values, $newValues);
+        } elseif ($this->getBatch() && $this->getBatch()->isTypeReplace()) {
+            $values = $newValues;
+        } elseif ($this->getBatch() && $this->getBatch()->isTypeRemove()) {
+            $values = array_diff($values, $newValues);
+        }
+
+        return $values;
+    }
 }

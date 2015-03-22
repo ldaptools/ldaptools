@@ -60,14 +60,7 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
     protected function modifyWorkstations(array $workstations)
     {
         $values = array_filter(explode(',', $this->getLastValue())) ?: [];
-
-        if ($this->getOperationType() == self::TYPE_CREATE || ($this->getBatch() && $this->getBatch()->isTypeAdd())) {
-            $values = array_merge($values, $workstations);
-        } elseif ($this->getBatch() && $this->getBatch()->isTypeReplace()) {
-            $values = $workstations;
-        } elseif ($this->getBatch() && $this->getBatch()->isTypeRemove()) {
-            $values = array_diff($values, $workstations);
-        }
+        $values = $this->modifyMultivaluedAttribute($values, $workstations);
 
         $this->setLastValue(implode(',', array_filter($values)));
     }
