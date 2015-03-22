@@ -76,7 +76,7 @@ class LdapObjectCollection implements \IteratorAggregate
     /**
      * Sets the collection array pointer to the first element and returns it.
      *
-     * @return LdapObject
+     * @return LdapObject|bool
      */
     public function first()
     {
@@ -86,7 +86,7 @@ class LdapObjectCollection implements \IteratorAggregate
     /**
      * Sets the collection array pointer to the last element and returns it.
      *
-     * @return LdapObject
+     * @return LdapObject|bool
      */
     public function last()
     {
@@ -106,7 +106,7 @@ class LdapObjectCollection implements \IteratorAggregate
     /**
      * Sets the collection array pointer to the next element and returns it.
      *
-     * @return LdapObject
+     * @return LdapObject|bool
      */
     public function next()
     {
@@ -116,7 +116,7 @@ class LdapObjectCollection implements \IteratorAggregate
     /**
      * Sets the collection array pointer to the previous element and returns it.
      *
-     * @return LdapObject
+     * @return LdapObject|bool
      */
     public function previous()
     {
