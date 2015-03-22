@@ -257,6 +257,25 @@ class LdapObject
     }
 
     /**
+     * Updates a set of attributes/values on the object without incurring a tracked modification.
+     *
+     * @param array $attributes
+     * @return $this
+     */
+    public function refresh(array $attributes)
+    {
+        foreach ($attributes as $attribute => $value) {
+            if ($this->has($attribute)) {
+                $this->attributes[$this->resolveAttributeName($attribute)] = $value;
+            } else {
+                $this->attributes[$attribute] = $value;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
      * Determines which function, if any, should be called.
      *
      * @param string $method

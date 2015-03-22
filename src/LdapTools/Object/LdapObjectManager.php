@@ -95,7 +95,9 @@ class LdapObjectManager
     public function move(LdapObject $ldapObject, $container)
     {
         $this->validateObject($ldapObject);
-        $this->connection->move($ldapObject->get('dn'), $this->getRdnFromLdapObject($ldapObject), $container);
+        $rdn = $this->getRdnFromLdapObject($ldapObject);
+        $this->connection->move($ldapObject->get('dn'), $rdn, $container);
+        $ldapObject->refresh(['dn' => $rdn.','.$container]);
     }
 
     /**
@@ -111,7 +113,7 @@ class LdapObjectManager
     }
 
     /**
-     * Gets the RDN for a LDAP object schema type. It should be mapped to the "name" attribute. // This does not handle
+     * Gets the RDN for a LDAP object schema type. It should be mapped to the "name" attribute. This does not handle
      * multi-valued RDNs. Though I'm not too sure how that should really be implemented either.
      *
      * @param LdapObject $ldapObject

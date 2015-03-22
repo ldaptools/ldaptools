@@ -276,4 +276,23 @@ class LdapObjectSpec extends ObjectBehavior
         $this->hasFoo()->shouldBeEqualTo(false);
         $this->hasFoo('bar')->shouldBeEqualTo(false);
     }
+
+    function it_should_refresh_attributes_without_triggering_a_batch_modification()
+    {
+        $this->refresh(['firstName' => 'Foo'])->getBatchCollection()->toArray()->shouldHaveCount(0);
+        $this->getFirstName()->shouldBeEqualTo('Foo');
+    }
+
+    function it_should_be_case_insensitive_when_refreshing()
+    {
+        $this->refresh(['FirstName' => 'foo', 'LastName' => 'bar']);
+        $this->getFirstName()->shouldBeEqualTo('foo');
+        $this->getLastName()->shouldBeEqualTo('bar');
+    }
+
+    function it_should_add_attributes_that_dont_exist_when_refreshing()
+    {
+        $this->refresh(['foo' => 'bar']);
+        $this->getFoo()->shouldBeEqualTo('bar');
+    }
 }
