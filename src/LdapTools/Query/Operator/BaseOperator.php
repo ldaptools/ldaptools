@@ -228,6 +228,11 @@ abstract class BaseOperator
         return $this->translatedAttribute ? $this->translatedAttribute : $this->attribute;
     }
 
+    /**
+     * Depending on whether a converter was used, get the value that should be used for the query.
+     *
+     * @return mixed
+     */
     protected function getValueForQuery()
     {
         return $this->converterUsed ? $this->convertedValue : $this->value;
