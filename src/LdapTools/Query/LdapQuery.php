@@ -110,10 +110,8 @@ class LdapQuery
         $hydrator = $this->hydratorFactory->get($hydratorType);
         $attributes = $this->getAttributesToLdap($this->attributes);
 
-        if (!empty($this->schemas)) {
-            $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->attributes));
-            $hydrator->setLdapObjectSchemas(...$this->schemas);
-        }
+        $hydrator->setLdapObjectSchemas(...$this->schemas);
+        $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->attributes));
         $hydrator->setLdapConnection($this->ldap);
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $hydrator->setOrderBy($this->orderBy);

@@ -103,6 +103,7 @@ class ArrayHydratorSpec extends ObjectBehavior
 
     function it_should_return_a_single_array_with_keys_when_calling_hydrateEntryFromLdap()
     {
+        $this->setSelectedAttributes(['sn']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKey('sn');
     }
 
@@ -265,11 +266,12 @@ class ArrayHydratorSpec extends ObjectBehavior
 
     function it_should_return_ordered_results_when_specified_and_hydrating_all_entries_from_ldap()
     {
+        $this->setSelectedAttributes(['givenName', 'sn', 'whenCreated']);
         $this->setOrderBy(['givenName' => 'ASC']);
         $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveCount(2);
-        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenname', 'Archie');
+        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenName', 'Archie');
         $this->setOrderBy(['givenName' => 'DESC']);
-        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenname', 'John');
+        $this->hydrateAllFromLdap($this->ldapEntries)->shouldHaveFirstValue('givenName', 'John');
     }
 
     public function getMatchers()
