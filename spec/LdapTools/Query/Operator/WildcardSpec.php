@@ -61,15 +61,6 @@ class WildcardSpec extends ObjectBehavior
         $this->shouldHaveConstant('EQ');
     }
 
-    public function getMatchers()
-    {
-        return [
-            'haveConstant' => function($subject, $constant) {
-                return defined('\LdapTools\Query\Operator\Wildcard::'.$constant);
-            }
-        ];
-    }
-
     public function it_should_return_a_string_with_the_wildcard_operators_on_each_side_when_using_contains()
     {
         $this->beConstructedWith('foo', Wildcard::CONTAINS, 'bar');
@@ -92,5 +83,21 @@ class WildcardSpec extends ObjectBehavior
     {
         $this->beConstructedWith('foo', Wildcard::LIKE, '*b*a*r*');
         $this->__tostring()->shouldBeEqualTo('(foo=*\62*\61*\72*)');
+    }
+
+    public function it_should_not_use_a_converter_if_the_type_is_present()
+    {
+        $this->beConstructedWith('foo', Wildcard::PRESENT);
+        $this->getUseConverter()->shouldBeEqualTo(false);
+    }
+
+
+    public function getMatchers()
+    {
+        return [
+            'haveConstant' => function($subject, $constant) {
+                return defined('\LdapTools\Query\Operator\Wildcard::'.$constant);
+            }
+        ];
     }
 }

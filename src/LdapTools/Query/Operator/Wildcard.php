@@ -62,6 +62,8 @@ class Wildcard extends Comparison
     {
         if (!defined('self::'.strtoupper($type))) {
             throw new LdapQueryException(sprintf('Invalid wildcard operator type "%s".', $type));
+        } elseif ($type == self::PRESENT) {
+            $this->setUseConverter(false);
         }
 
         $this->attribute = $attribute;
