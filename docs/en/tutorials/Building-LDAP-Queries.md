@@ -214,7 +214,7 @@ $rootDse = $lqb->where($lqb->filter->present('objectClass'))
 ```
 
 ------------------------ 
-#### addOrderBy($attribute, $direction = 'ASC')
+#### orderBy($attribute, $direction = 'ASC')
 
 This method sets the attribute to order the results by in either ascending (default) or descending order. Calling this 
 overwrites any already set orderBy statements. To stack multiple order statements call `addOrderBy($attribute)`.
