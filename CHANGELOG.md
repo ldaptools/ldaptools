@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.11.0 (2015-03-23)
+------------------
+
+  * Implement the ability to order search results by any specified attributes.
+  * Add the OU object type to both the default schemas for searching, creation, and modification.
+  * Implement a method for getting extended error messages from AD.
+  * Better LDAP authentication handling with optional detailed error messages and codes.
+  * Implement a gPLink converter to list/modify GPOs associated with an OU by their name.
+  * Additional array functions are available for a LdapObjectCollection: first, last, next, previous, current, key
+  * More code cleanup and a few bug fixes.
+
 0.10.0 (2015-03-08)
 ------------------
 
