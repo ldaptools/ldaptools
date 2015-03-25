@@ -366,7 +366,7 @@ class ArrayHydrator implements HydratorInterface
      * Retrieve the AttributeValueResolver instance with the connection and other information set if needed.
      *
      * @param BaseValueResolver $valueResolver
-     * @param $dn null|string
+     * @param null|string $dn
      */
     protected function configureValueResolver(BaseValueResolver $valueResolver, $dn = null)
     {

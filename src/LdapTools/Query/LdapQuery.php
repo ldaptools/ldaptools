@@ -247,7 +247,7 @@ class LdapQuery
     /**
      * Set the LDAP schema objects to be used for the results.
      *
-     * @param LdapObjectSchema|LdapObjectSchema[] $schemas
+     * @param LdapObjectSchema[] $schemas
      * @return $this
      */
     public function setLdapObjectSchemas(LdapObjectSchema ...$schemas)

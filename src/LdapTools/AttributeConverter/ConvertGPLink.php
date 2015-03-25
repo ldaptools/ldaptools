@@ -110,7 +110,7 @@ class ConvertGPLink implements AttributeConverterInterface
      * Given a gPLink value, pick out all the GPO DNs and return them as an array.
      *
      * @param string $gpLink
-     * @return array
+     * @return string[]
      */
     protected function explodeGPOLinkString($gpLink)
     {
