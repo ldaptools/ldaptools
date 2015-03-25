@@ -15,7 +15,6 @@ use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Query\LdapResultSorter;
 use LdapTools\Resolver\AttributeNameResolver;
-use LdapTools\Resolver\AttributeValueResolver;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
@@ -156,7 +155,7 @@ class ArrayHydrator implements HydratorInterface
     }
 
     /**
-     * @see HydratorInterface::hydrateToLdap()
+     * {@inheritdoc}
      */
     public function hydrateToLdap($attributes)
     {
@@ -256,7 +255,7 @@ class ArrayHydrator implements HydratorInterface
         if (empty($this->schemas)) {
             return $entry;
         }
-        $valueResolver = new AttributeValueResolver(
+        $valueResolver = BaseValueResolver::getInstance(
             $this->getSchema(),
             $entry,
             $this->type
