@@ -89,7 +89,7 @@ class BatchValueResolverSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->beConstructedWith($this->schema, (new LdapObject(...$this->ldapObjectOpts))->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
+        $this->beConstructedThrough('getInstance', [$this->schema, (new LdapObject(...$this->ldapObjectOpts))->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY]);
         $this->shouldHaveType('LdapTools\Resolver\BatchValueResolver');
     }
 

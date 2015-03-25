@@ -11,6 +11,7 @@
 namespace LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Schema\LdapObjectSchema;
@@ -94,6 +95,23 @@ abstract class BaseValueResolver
     public function setDn($dn)
     {
         $this->dn = $dn;
+    }
+
+    /**
+     * Factory method for instantiation.
+     *
+     * @param LdapObjectSchema $schema
+     * @param BatchCollection|array $values
+     * @param int $type
+     * @return AttributeValueResolver|BatchValueResolver
+     */
+    public static function getInstance(LdapObjectSchema $schema, $values, $type)
+    {
+        if ($values instanceof BatchCollection) {
+            return new BatchValueResolver($schema, $values, $type);
+        } else {
+            return new AttributeValueResolver($schema, $values, $type);
+        }
     }
 
     /**

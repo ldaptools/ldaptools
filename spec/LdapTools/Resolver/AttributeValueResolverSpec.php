@@ -94,7 +94,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
         ]);
         $this->schema = $schema;
         $this->connection = $connection;
-        $this->beConstructedWith($schema, $this->entryTo, AttributeConverterInterface::TYPE_CREATE);
+        $this->beConstructedThrough('getInstance', [$schema, $this->entryTo, AttributeConverterInterface::TYPE_CREATE]);
     }
 
     function it_is_initializable()

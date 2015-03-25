@@ -18,31 +18,22 @@ use LdapTools\Object\LdapObjectCollection;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class LdapObjectHydrator implements HydratorInterface
+class LdapObjectHydrator extends ArrayHydrator
 {
-    use HydratorTrait {
-        hydrateFromLdap as hydrateFromLdapToArray;
-        hydrateAllFromLdap as hydrateAllFromLdapToObjects;
-        hydrateToLdap as hydrateToLdapWithArray;
-    }
-
     /**
      * {@inheritdoc}
      */
     public function hydrateFromLdap(array $entry)
     {
-        $entry = $this->hydrateFromLdapToArray($entry);
+        $entry = parent::hydrateFromLdap($entry);
         $schema = empty($this->schemas) ? null : $this->getSchema();
-
-        $class = $schema ? $this->getSchema()->getObjectClass() : [];
-        $category = $schema ? $this->getSchema()->getObjectCategory() : '';
-        $type = $schema ? $this->getSchema()->getObjectType() : '';
+        $class = $schema ? $schema->getObjectClass() : [];
 
         return new LdapObject(
             $entry,
             is_array($class) ? $class : [$class],
-            $category,
-            $type
+            $schema ? $schema->getObjectCategory() : '',
+            $type = $schema ? $schema->getObjectType() : ''
         );
     }
 
@@ -54,7 +45,7 @@ class LdapObjectHydrator implements HydratorInterface
      */
     public function hydrateAllFromLdap(array $entries)
     {
-        return new LdapObjectCollection(...$this->hydrateAllFromLdapToObjects($entries));
+        return new LdapObjectCollection(...parent::hydrateAllFromLdap($entries));
     }
 
     /**
