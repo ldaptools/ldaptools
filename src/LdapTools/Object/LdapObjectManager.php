@@ -146,6 +146,7 @@ class LdapObjectManager
      */
     protected function getRdnValueIfNotSelected(LdapObject $ldapObject)
     {
+        /** @var LdapObjectCollection $results */
         $results = (new LdapQueryBuilder($this->connection, $this->schemaFactory))->select(['name'])
             ->from($ldapObject->getType())
             ->where(['dn' => $ldapObject->get('dn')])
