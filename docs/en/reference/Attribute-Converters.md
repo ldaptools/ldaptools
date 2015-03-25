@@ -84,4 +84,9 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Takes a bool and switches the group between domain local, universal, global, security, or distribution.
 
   * `fromLdap`: Depending on the attribute, does a bitwise conversion to set a specific type as true or false.
+
+#### *gpo_link*
+  * `toLdap`: Takes an array of GPO names, retrieves their DNs, and returns a valid string for the gPLink attribute.
+
+  * `fromLdap`: Takes a gPLink attribute string, splits it into the distinct GPOs, and returns an array of GPO names.
   
