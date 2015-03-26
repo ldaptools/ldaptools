@@ -29,7 +29,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | badPasswordCount | badPwdCount | int |
 | city | l | string |
 | company | company | string |
-| country | country | string |
+| country | c | string |
 | created | whenCreated | `\DateTime` | 
 | department | department | string |
 | description | description | string |
