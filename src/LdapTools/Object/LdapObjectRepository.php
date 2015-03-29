@@ -68,13 +68,9 @@ class LdapObjectRepository
      */
     public function findOneBy(array $attributes)
     {
-        $results = $this->findBy($attributes);
+        $query = $this->buildLdapQuery()->where($attributes)->getLdapQuery();
 
-        if ($results instanceof LdapObjectCollection) {
-            $results = $results->toArray();
-        }
-
-        return reset($results) ?: [];
+        return  $this->hydrationMode ? $query->getSingleResult($this->hydrationMode) : $query->getSingleResult();
     }
 
     /**

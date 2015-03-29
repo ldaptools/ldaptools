@@ -74,11 +74,15 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         ]
     ];
 
+    protected $ldap;
+
     public function let(LdapConnectionInterface $ldap)
     {
+        $attributes = ["cn", "givenName", "sn", "sAMAccountName", "mail", "distinguishedName", "objectGuid"];
         $config = new Configuration();
         $config->setCacheType('none');
-        $ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->willReturn($this->ldapEntries);
+        $this->ldap = $ldap;
+        $ldap->search(Argument::any(), $attributes, Argument::any(), Argument::any(), Argument::any())->willReturn($this->ldapEntries);
         $ldap->getLdapType()->willReturn(LdapConnection::TYPE_AD);
         $ldap->getEncoding()->willReturn('UTF-8');
 
@@ -96,6 +100,11 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
     function it_should_call_findOneByGuid_and_return_a_LdapObject()
     {
+        $results = $this->ldapEntries;
+        $results['count'] = 1;
+        unset($results[1]);
+        $this->setAttributes(['guid']);
+        $this->ldap->search(Argument::any(), ['objectGuid'], Argument::any(), Argument::any(), Argument::any())->willReturn($results);
         $this->findOneByGuid('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 
