@@ -125,10 +125,9 @@ class ArrayHydrator implements HydratorInterface
         $attributes = [];
 
         foreach ($entry as $key => $value) {
-            if (!is_string($key)) {
-                continue;
+            if (is_string($key)) {
+                $attributes = $this->setAttributeFromLdap($attributes, $key, $value);
             }
-            $attributes = $this->setAttributeFromLdap($attributes, $key, $value);
         }
         $attributes = $this->convertNamesFromLdap($attributes);
         $attributes = $this->convertValuesFromLdap($attributes);
