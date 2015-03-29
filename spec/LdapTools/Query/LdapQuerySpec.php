@@ -61,11 +61,14 @@ class LdapQuerySpec extends ObjectBehavior
         ],
     ];
 
+    protected $ldap;
+
     function let(LdapConnection $ldap)
     {
         $ldap->search(Argument::any(), ["cn", "givenName", "foo"], Argument::any(), Argument::any(), Argument::any())
             ->willReturn($this->ldapEntries);
         $this->beConstructedWith($ldap);
+        $this->ldap = $ldap;
     }
 
     function it_is_initializable()
@@ -77,6 +80,39 @@ class LdapQuerySpec extends ObjectBehavior
     {
         $this->setAttributes(["cn", "givenName", "foo"]);
         $this->execute()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
+    }
+
+    function it_should_return_a_single_result_when_calling_getSingleResult()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["objectGuid"]);
+        $this->getSingleResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
+        $this->getSingleResult(HydratorFactory::TO_ARRAY)->shouldBeArray();
+    }
+
+    function it_should_throw_MultiResultException_when_many_results_are_returned_when_only_one_is_expected()
+    {
+        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult();
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
+    }
+
+    function it_should_throw_EmptyResultException_when_no_results_are_returned_but_one_is_expected()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(array());
+
+        $this->setAttributes(["objectGuid"]);
+        $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult();
+        $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
     }
 
     function it_should_set_the_filter_when_calling_setLdapFilter()

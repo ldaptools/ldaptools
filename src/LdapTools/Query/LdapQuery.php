@@ -12,7 +12,10 @@ namespace LdapTools\Query;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\EmptyResultException;
+use LdapTools\Exception\MultiResultException;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -97,6 +100,29 @@ class LdapQuery
     {
         $this->ldap = $ldap;
         $this->hydratorFactory = new HydratorFactory();
+    }
+
+    /**
+     * Retrieve a single unique result from LDAP. If the result is empty or contains more than one entry, an exception
+     * is thrown.
+     *
+     * @param string $hydratorType A hyrdrator type constant from the factory.
+     * @return array|\LdapTools\Object\LdapObject
+     * @throws EmptyResultException
+     * @throws MultiResultException
+     */
+    public function getSingleResult($hydratorType = HydratorFactory::TO_OBJECT)
+    {
+        $result = $this->execute($hydratorType);
+        $count = ($result instanceof LdapObjectCollection) ? $result->count() : count($result);
+
+        if ($count === 0) {
+            throw new EmptyResultException('LDAP returned no results.');
+        } elseif ($count > 1) {
+            throw new MultiResultException(sprintf('Expected a single result but LDAP returned %s result(s).', $count));
+        }
+
+        return ($result instanceof LdapObjectCollection) ? $result->first() : reset($result);
     }
 
     /**

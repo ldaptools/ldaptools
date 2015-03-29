@@ -261,13 +261,17 @@ Gets the LDAP filter, as a string, that the query would produce.
 $filter = $lqb->getLdapFilter();
 ```
 
-------------------------
-#### getLdapQuery()
+## LdapQuery Methods to Retrieve LDAP Results
+-----------------------
 
-Retrieves an instance of the `LdapQuery` object that you can then call the `execute` method on to get your results. The
-`LdapQuery` object has the filter, page size, base DN, scope, etc that you set in the builder and takes care of
-converting the LDAP results array using a hydration process. It returns an easier to use set of objects. Or you can
-have it return a simple set of arrays with the attributes and values.
+There are a few ways to retrieve LDAP results after you have a query built. How you retrieve the results depends upon
+what type of data you're looking for. To start to retrieve results you need to first get a `LdapQuery` instance by using
+the `getLdapQuery()` method.
+
+The `getLdapQuery()` method retrieves an instance of the `LdapQuery` object that you can then call methods on to get 
+your results. The `LdapQuery` object has the filter, page size, base DN, scope, etc that you set in the builder and 
+takes care of converting the LDAP results array using a hydration process. It returns an easier to use set of objects. 
+Or you can have it return a simple set of arrays with the attributes and values.
  
 ```php
 use LdapTools\Factory\HydratorFactory;
@@ -290,9 +294,39 @@ foreach ($results as $result) {
 
 ```
 
+#### execute($hydrationType = HydratorFactory::TO_OBJECT)
 ------------------------
 
+This `LdapQuery` method executes the LDAP filter with the options you have set and returns the results as either a set
+objects (this is the default) or as an array (use the hydration type `HydratorFactory::TO_ARRAY`). See previous example 
+for full usage.
+
+#### getSingleResult($hydrationType = HydratorFactory::TO_OBJECT)
+------------------------
+
+This `LdapQuery` method will retrieve a single result from LDAP. So instead of a collection of objects or arrays you
+will be given a single result you can immediately begin to work with.
+
+```php
+$lqb = $ldapManager->buildLdapQuery();
+
+// Retrieve a single LdapObject from a query...a.
+$user = $lqb->select()
+    ->fromUsers()
+    ->Where(['username' => 'chad'])
+    ->getLdapQuery()
+    ->getSingleResult();
+
+echo "DN : ".$user->getDn();
+```
+
+If an empty result set is returned from LDAP then it will throw a `\LdapTools\Exception\EmptyResultException`. If more
+than one result is returned from LDAP then it will throw a `\LdapTools\Exception\MultiResultException`. Additionally, 
+you may pass an explicit hydration type to this method if you wish to get the result as a single array of attributes and
+values.
+
 ## Filter Method Shortcuts
+------------------------
 
 The `filter()` method of the `LdapQueryBuilder` returns a helper class that provides many shortcut methods for creating
 the LDAP operator classes within the `\LdapTools\Query\Operator` namespace. This way you do not have to manually
