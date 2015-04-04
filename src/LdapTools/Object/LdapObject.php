@@ -69,7 +69,7 @@ class LdapObject
         $this->class = $class;
         $this->category = $category;
         $this->type = $type;
-        $this->batches = new BatchCollection();
+        $this->batches = new BatchCollection(isset($attributes['dn']) ? $attributes['dn'] : null);
     }
 
     /**

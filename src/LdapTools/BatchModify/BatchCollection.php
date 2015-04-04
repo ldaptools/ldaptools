@@ -23,6 +23,19 @@ class BatchCollection implements \IteratorAggregate
     protected $batches = [];
 
     /**
+     * @var string|null The distinguished name of the LDAP object these batches will target.
+     */
+    protected $dn;
+
+    /**
+     * @param string|null $dn
+     */
+    public function __construct($dn = null)
+    {
+        $this->dn = $dn;
+    }
+
+    /**
      * Allows this object to be iterated over.
      *
      * @return \ArrayIterator
@@ -103,6 +116,26 @@ class BatchCollection implements \IteratorAggregate
     public function has($index)
     {
         return isset($this->batches[$index]);
+    }
+
+    /**
+     * Get the distinguished name of the LDAP object this batch will target.
+     *
+     * @return string
+     */
+    public function getDn()
+    {
+        return $this->dn;
+    }
+
+    /**
+     * Set the distinguished name of the LDAP object this batch will target.
+     *
+     * @param string $dn
+     */
+    public function setDn($dn)
+    {
+        $this->dn = $dn;
     }
 
     /**

@@ -72,7 +72,7 @@ class LdapObjectManager
         }
 
         $this->connection->modifyBatch($ldapObject->get('dn'), $batches);
-        $ldapObject->setBatchCollection(new BatchCollection());
+        $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
     }
 
     /**
@@ -97,7 +97,10 @@ class LdapObjectManager
         $this->validateObject($ldapObject);
         $rdn = $this->getRdnFromLdapObject($ldapObject);
         $this->connection->move($ldapObject->get('dn'), $rdn, $container);
-        $ldapObject->refresh(['dn' => $rdn.','.$container]);
+
+        $newDn = $rdn.','.$container;
+        $ldapObject->refresh(['dn' => $newDn]);
+        $ldapObject->getBatchCollection()->setDn($newDn);
     }
 
     /**

@@ -20,6 +20,7 @@ class LdapObjectSpec extends ObjectBehavior
         'firstName' => 'Chad',
         'lastName' => 'Sikorra',
         'emailAddress' => 'chad.sikorra@example.com',
+        'dn' => 'CN=chad,DC=example,DC=com'
     ];
 
     function let()
@@ -29,6 +30,11 @@ class LdapObjectSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Object\LdapObject');
+    }
+
+    function it_should_set_the_dn_for_the_batch_collection_on_construction()
+    {
+        $this->getBatchCollection()->getDn()->shouldBeEqualTo($this->attributes['dn']);
     }
 
     function it_should_return_an_array_with_the_exact_attributes_when_calling_to_array()

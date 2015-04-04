@@ -21,6 +21,13 @@ class BatchCollectionSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\BatchModify\BatchCollection');
     }
 
+    function it_is_initializable_with_a_dn()
+    {
+        $dn = 'cn=foo,dc=foo,dc=bar';
+        $this->beConstructedWith($dn);
+        $this->getDn()->shouldBeEqualTo($dn);
+    }
+
     function it_should_add_a_batch_to_the_collection()
     {
         $this->add(new Batch(LDAP_MODIFY_BATCH_REPLACE, 'foo', ['bar']));
@@ -74,5 +81,17 @@ class BatchCollectionSpec extends ObjectBehavior
         $exception = new \InvalidArgumentException('Batch index "0" does not exist.');
         $this->shouldThrow($exception)->duringGet(0);
         $this->shouldThrow($exception)->duringRemove(0);
+    }
+
+    function it_should_have_a_null_dn_by_default()
+    {
+        $this->getDn()->shouldBeNull();
+    }
+
+    function it_should_properly_set_the_dn()
+    {
+        $dn = 'cn=foo,dc=foo,dc=bar';
+        $this->setDn($dn);
+        $this->getDn()->shouldBeEqualTo($dn);
     }
 }
