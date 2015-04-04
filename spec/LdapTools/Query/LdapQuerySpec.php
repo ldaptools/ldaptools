@@ -112,24 +112,46 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getSingleResult(HydratorFactory::TO_ARRAY)->shouldBeArray();
     }
 
+    function it_should_return_a_single_result_when_calling_getOneOrNullResult()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["objectGuid"]);
+        $this->getOneOrNullResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
+        $this->getOneOrNullResult(HydratorFactory::TO_ARRAY)->shouldBeArray();
+    }
+
     function it_should_throw_MultiResultException_when_many_results_are_returned_when_only_one_is_expected()
     {
         $this->setAttributes(["cn", "givenName", "foo"]);
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult();
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetOneOrNullResult();
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetOneOrNullResult(HydratorFactory::TO_ARRAY);
     }
 
     function it_should_throw_EmptyResultException_when_no_results_are_returned_but_one_is_expected()
     {
-        $result = $this->ldapEntries;
-        $result['count'] = 1;
-        unset($result[1]);
         $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
             ->willReturn(array());
 
         $this->setAttributes(["objectGuid"]);
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult();
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
+    }
+
+    function it_should_return_null_when_calling_getOneOrNullResult_and_no_results_are_found()
+    {
+        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(array());
+
+        $this->setAttributes(["objectGuid"]);
+        $this->getOneOrNullResult()->shouldBeNull();
+        $this->getOneOrNullResult(HydratorFactory::TO_ARRAY)->shouldBeNull();
     }
 
     function it_should_set_the_filter_when_calling_setLdapFilter()

@@ -103,6 +103,23 @@ class LdapQuery
     }
 
     /**
+     * This behaves very similar to getSingleResult(), only if no results are found it will return null instead of
+     * throwing an exception.
+     *
+     * @param string $hydratorType
+     * @return array|\LdapTools\Object\LdapObject|null
+     * @throws MultiResultException
+     */
+    public function getOneOrNullResult($hydratorType = HydratorFactory::TO_OBJECT)
+    {
+        try {
+            return $this->getSingleResult($hydratorType);
+        } catch (EmptyResultException $e) {
+            return null;
+        }
+    }
+
+    /**
      * Retrieve a single unique result from LDAP. If the result is empty or contains more than one entry, an exception
      * is thrown.
      *

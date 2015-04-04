@@ -331,6 +331,13 @@ than one result is returned from LDAP then it will throw a `\LdapTools\Exception
 you may pass an explicit hydration type to this method if you wish to get the result as a single array of attributes and
 values.
 
+#### getOneOrNullResult($hydrationType = HydratorFactory::TO_OBJECT)
+------------------------
+
+The behavior of this method is very similar to `getSingleResult()`, but if no results are found for the query it will
+return `null` instead of throwing an exception. However, it will still throw an exception in the case that more than one
+result is returned from LDAP.
+
 ## Filter Method Shortcuts
 ------------------------
 
