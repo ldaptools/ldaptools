@@ -301,6 +301,12 @@ This `LdapQuery` method executes the LDAP filter with the options you have set a
 objects (this is the default) or as an array (use the hydration type `HydratorFactory::TO_ARRAY`). See previous example 
 for full usage.
 
+#### getResult($hydrationType = HydratorFactory::TO_OBJECT)
+------------------------
+
+This is an alias for the `execute()` method. It will return a `LdapObjectCollection` by default, or an array of LDAP
+entries if specified as `getResult(HydratorFactory::TO_ARRAY)`.
+
 #### getSingleResult($hydrationType = HydratorFactory::TO_OBJECT)
 ------------------------
 

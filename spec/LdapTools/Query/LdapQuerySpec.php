@@ -93,6 +93,12 @@ class LdapQuerySpec extends ObjectBehavior
         $this->execute()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
+    function it_should_return_a_result_when_calling_getResult()
+    {
+        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->getResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
+    }
+
     function it_should_return_a_single_result_when_calling_getSingleResult()
     {
         $result = $this->ldapEntries;

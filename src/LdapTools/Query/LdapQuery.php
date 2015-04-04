@@ -126,6 +126,17 @@ class LdapQuery
     }
 
     /**
+     * This is an alias for the execute() method. This executes the query against LDAP and returns the result.
+     *
+     * @param string $hydratorType A hyrdrator type constant from the factory.
+     * @return mixed
+     */
+    public function getResult($hydratorType = HydratorFactory::TO_OBJECT)
+    {
+        return $this->execute($hydratorType);
+    }
+
+    /**
      * Execute a query based on the set parameters. Optionally choose a mode to hydrate the results in.
      *
      * @param string $hydratorType A hyrdrator type constant from the factory.
