@@ -37,6 +37,12 @@ class LdapQuerySpec extends ObjectBehavior
                 0 => "Bourke",
             ],
             2 => "sn",
+            "otherhomephone" => [
+                "count" => 2,
+                0 => "555-5555",
+                1 => "444-4444",
+            ],
+            3 => "otherhomephone",
             "count" => 3,
             "dn" => "uid=jbourke,ou=People,dc=example,dc=local",
         ],
@@ -56,7 +62,12 @@ class LdapQuerySpec extends ObjectBehavior
                 0 => "Goldstein",
             ],
             2 => "sn",
-            "count" => 3,
+            "otherhomephone" => [
+                "count" => 1,
+                0 => "555-5555",
+            ],
+            3 => "otherhomephone",
+            "count" => 4,
             "dn" => "uid=jgoldste,ou=People,dc=example,dc=local",
         ],
     ];
@@ -172,5 +183,20 @@ class LdapQuerySpec extends ObjectBehavior
         $this->setAttributes(['cn', 'givenName']);
         $this->setBaseDn('dc=foo,dc=bar');
         $this->execute(HydratorFactory::TO_ARRAY);
+    }
+
+    function it_should_force_arrays_on_multivalued_attributes_when_returning_results()
+    {
+        $this->ldap->getEncoding()->willReturn('UTF-8');
+        $this->ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setMultivaluedAttributes(['otherHomePhone']);
+
+        $this->setAttributes(['otherHomePhone']);
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->setLdapObjectSchemas($schema);
+        $this->execute(HydratorFactory::TO_OBJECT)->first()->getOtherHomePhone()->shouldBeArray();
+        $this->execute(HydratorFactory::TO_OBJECT)->last()->getOtherHomePhone()->shouldBeArray();
     }
 }

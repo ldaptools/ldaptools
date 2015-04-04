@@ -80,6 +80,11 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $converterOptions = [];
 
     /**
+     * @var array Attributes that are defined as being multivalued.
+     */
+    protected $multivaluedAttributes = [];
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -415,5 +420,36 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getConverterOptions()
     {
         return $this->converterOptions;
+    }
+
+    /**
+     * Set the attributes that are expected to be multivalued.
+     *
+     * @param array $multivaluedAttributes
+     */
+    public function setMultivaluedAttributes(array $multivaluedAttributes)
+    {
+        $this->multivaluedAttributes = $multivaluedAttributes;
+    }
+
+    /**
+     * Get the attributes that are expected to be multivalued.
+     *
+     * @return array
+     */
+    public function getMultivaluedAttributes()
+    {
+        return $this->multivaluedAttributes;
+    }
+
+    /**
+     * Whether a specific attribute is defined as multivalued or not.
+     *
+     * @param string $attribute
+     * @return bool
+     */
+    public function isMultivaluedAttribute($attribute)
+    {
+        return in_array(strtolower($attribute), array_map('strtolower', $this->multivaluedAttributes));
     }
 }

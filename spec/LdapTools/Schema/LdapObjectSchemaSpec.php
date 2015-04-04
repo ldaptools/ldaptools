@@ -204,4 +204,20 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->setConverterOptions($options);
         $this->getConverterOptions()->shouldBeEqualTo($options);
     }
+
+    function it_should_properly_set_attributes_that_should_always_return_an_array()
+    {
+        $attributes = ['foo', 'bar'];
+        $this->setMultivaluedAttributes($attributes);
+        $this->getMultivaluedAttributes()->shouldBeEqualTo($attributes);
+    }
+
+    function it_should_be_able_to_tell_whether_a_specific_attribute_should_return_an_array()
+    {
+        $attributes = ['foo'];
+        $this->setMultivaluedAttributes($attributes);
+        $this->isMultivaluedAttribute('foo')->shouldBeEqualTo(true);
+        $this->isMultivaluedAttribute('FOO')->shouldBeEqualTo(true);
+        $this->isMultivaluedAttribute('bar')->shouldBeEqualTo(false);
+    }
 }

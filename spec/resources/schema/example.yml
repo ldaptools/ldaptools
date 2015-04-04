@@ -53,6 +53,8 @@ objects:
             guid: objectGuid
             name: cn
             username: sAMAccountName
+        multivalued_attributes:
+            - otherHomePhone
         default_values:
             name: %username%
             displayName: "%username%"

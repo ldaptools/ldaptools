@@ -142,6 +142,12 @@ objects:
             username: sAMAccountName
             upn: userPrincipalName
             zipCode: postalCode
+        # These attributes will be forced into an array regardless of the number of results they return.
+        multivalued_attributes:
+            - logonWorkstations
+            - exchangeSmtpAddresses
+            - exchangeSendOnBehalfOf
+            - servicePrincipalNames
         # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
         attributes_to_select:
             - 'name'
@@ -223,6 +229,9 @@ objects:
             scopeDomainLocal: groupType
             scopeGlobal: groupType
             scopeUniversal: groupType
+        multivalued_attributes:
+            - exchangeSmtpAddresses
+            - members
         attributes_to_select:
             - 'name'
             - 'dn'
@@ -309,6 +318,8 @@ objects:
             name: cn
             phoneNumber: telephoneNumber
             sid: objectSid
+        multivalued_attributes:
+            - exchangeSmtpAddresses
         attributes_to_select:
             - 'name'
             - 'emailAddress'
@@ -347,6 +358,8 @@ objects:
             state: st
             streetAddress: streetAddress
             zipCode: postalCode
+        multivalued_attributes:
+            - gpoLinks
         attributes_to_select:
             - 'description'
             - 'name'

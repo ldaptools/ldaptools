@@ -58,6 +58,8 @@ objects:
             name: cn
             modified: modifyTimestamp
             members: uniqueMember
+        multivalued_attributes:
+            - members
         attributes_to_select:
             - 'name'
             - 'description'

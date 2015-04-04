@@ -124,6 +124,18 @@ An array of attributes that will be selected by default on LDAP queries when usi
 ```
 
 --------------------
+#### multivalued_attributes
+
+An array of attributes that are expected to be multivalued. Setting this for an attribute will force it to always return
+an array value regardless of the number of values it has. This allows for more predictable results.
+
+```yaml
+    multivalued_attributes:
+        - 'otherHomePhone'
+        - 'otherIpPhone'
+```
+
+--------------------
 #### repository
 
 The full class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the default repository when calling

@@ -212,4 +212,13 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->getConverterOptions()
             ->shouldContain(['type' => 'windows']);
     }
+
+    function it_should_parse_a_schema_objects_multivalued_attriutes()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'user')
+            ->getMultivaluedAttributes()
+            ->shouldBeEqualTo(['otherHomePhone']);
+    }
 }

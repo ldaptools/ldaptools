@@ -50,7 +50,15 @@ class AttributeValueResolver extends BaseValueResolver
      */
     public function fromLdap()
     {
-        return $this->convert($this->entry, false);
+        $entry = $this->convert($this->entry, false);
+
+        foreach ($entry as $attribute => $value) {
+            if ($this->schema->isMultivaluedAttribute($attribute) && !is_array($value)) {
+                $entry[$attribute] = [$value];
+            }
+        }
+
+        return $entry;
     }
 
     /**
