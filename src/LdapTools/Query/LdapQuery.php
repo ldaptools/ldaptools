@@ -143,6 +143,17 @@ class LdapQuery
     }
 
     /**
+     * This is an alias for the execute() method with an implied array hydration type. This executes the query against
+     * LDAP and returns the results as an array instead of objects.
+     *
+     * @return array
+     */
+    public function getArrayResult()
+    {
+        return $this->execute(HydratorFactory::TO_ARRAY);
+    }
+
+    /**
      * This is an alias for the execute() method. This executes the query against LDAP and returns the result.
      *
      * @param string $hydratorType A hyrdrator type constant from the factory.

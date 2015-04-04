@@ -307,6 +307,12 @@ for full usage.
 This is an alias for the `execute()` method. It will return a `LdapObjectCollection` by default, or an array of LDAP
 entries if specified as `getResult(HydratorFactory::TO_ARRAY)`.
 
+#### getArrayResult()
+------------------------
+
+This functions the same as the `getResult()` method, but it will always return the LDAP entries as an array instead of a
+collection of objects. This is identical to calling `getResult(HydratorFactory::TO_ARRAY)`.
+
 #### getSingleResult($hydrationType = HydratorFactory::TO_OBJECT)
 ------------------------
 
