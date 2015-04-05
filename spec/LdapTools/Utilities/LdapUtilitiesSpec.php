@@ -48,6 +48,11 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldHaveCount(3);
     }
 
+    function it_should_throw_an_error_on_an_invalid_dn()
+    {
+        $this->shouldThrow('\InvalidArgumentException')->during('explodeDn', ['foo-bar']);
+    }
+
     function it_should_encode_values_to_the_desired_type()
     {
         // How to properly test this?

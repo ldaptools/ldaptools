@@ -56,7 +56,7 @@ class LdapUtilities
     {
         $pieces = ldap_explode_dn($dn, $withAttributes);
 
-        if (!isset($pieces['count']) || $pieces['count'] == 0) {
+        if ($pieces === false || !isset($pieces['count']) || $pieces['count'] == 0) {
             throw new \InvalidArgumentException(sprintf('Unable to parse DN "%s".', $dn));
         }
         for ($i = 0; $i < $pieces['count']; $i++) {
