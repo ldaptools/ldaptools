@@ -160,6 +160,108 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getOneOrNullResult(HydratorFactory::TO_ARRAY)->shouldBeNull();
     }
 
+    function it_should_return_a_single_attribute_value_when_calling_getSingleScalarResult()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["sn"]);
+        $this->getSingleScalarResult()->shouldBeEqualTo('Bourke');
+    }
+
+    function it_should_throw_an_error_when_calling_getSingleScalarResult_and_the_attribute_doesnt_exist()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["foo"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["foo"]);
+        $this->shouldThrow('\LdapTools\Exception\AttributeNotFoundException')->duringGetSingleScalarResult();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_no_LDAP_object_is_found()
+    {
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['count' => 0]);
+
+        $this->setAttributes(["sn"]);
+        $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleScalarResult();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_more_than_one_LDAP_object_is_found()
+    {
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+
+        $this->setAttributes(["sn"]);
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleScalarResult();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_more_than_one_attribute_is_selected()
+    {
+        $this->ldap->search(Argument::any(), ["sn","givenname"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+
+        $this->setAttributes(["sn","givenname"]);
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetSingleScalarResult();
+    }
+
+    function it_should_return_a_single_attribute_value_when_calling_getSingleScalarOrNullResult()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["sn"]);
+        $this->getSingleScalarOrNullResult()->shouldBeEqualTo('Bourke');
+    }
+
+    function it_should_return_a_null_value_when_calling_getSingleScalarOrNullResult_and_no_attribute_is_found()
+    {
+        $result = $this->ldapEntries;
+        $result['count'] = 1;
+        unset($result[1]);
+        $this->ldap->search(Argument::any(), ["foo"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($result);
+
+        $this->setAttributes(["foo"]);
+        $this->getSingleScalarOrNullResult()->shouldBeNull();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_no_LDAP_object_is_found()
+    {
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['count' => 0]);
+
+        $this->setAttributes(["sn"]);
+        $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleScalarOrNullResult();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_more_than_one_LDAP_object_is_found()
+    {
+        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+
+        $this->setAttributes(["sn"]);
+        $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleScalarOrNullResult();
+    }
+
+    function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_more_than_one_attribute_is_selected()
+    {
+        $this->ldap->search(Argument::any(), ["sn","givenname"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+
+        $this->setAttributes(["sn","givenname"]);
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetSingleScalarOrNullResult();
+    }
+
     function it_should_set_the_filter_when_calling_setLdapFilter()
     {
         $filter = '(objectClass=*)';

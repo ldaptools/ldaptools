@@ -12,7 +12,9 @@ namespace LdapTools\Query;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\AttributeNotFoundException;
 use LdapTools\Exception\EmptyResultException;
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Exception\MultiResultException;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Object\LdapObjectCollection;
@@ -140,6 +142,51 @@ class LdapQuery
         }
 
         return ($result instanceof LdapObjectCollection) ? $result->first() : reset($result);
+    }
+
+    /**
+     * Retrieve a single selected attribute value from LDAP.
+     *
+     * @return mixed
+     * @throws LdapQueryException
+     * @throws AttributeNotFoundException
+     * @throws EmptyResultException
+     * @throws MultiResultException
+     */
+    public function getSingleScalarResult()
+    {
+        if (count($this->getAttributes()) !== 1) {
+            throw new LdapQueryException(sprintf(
+                'When retrieving a single value you should only select a single attribute. %s are selected.',
+                count($this->getAttributes())
+            ));
+        }
+        $attribute = reset($this->getAttributes());
+        $result = $this->getSingleResult();
+
+        if (!$result->has($attribute)) {
+            throw new AttributeNotFoundException(sprintf('Attribute "%s" not found for this LDAP object.', $attribute));
+        }
+
+        return $result->get($attribute);
+    }
+
+    /**
+     * This behaves very similar to getSingleScalarResult(), only if the attribute is not found it will return null
+     * instead of throwing an exception.
+     *
+     * @return mixed
+     * @throws LdapQueryException
+     * @throws EmptyResultException
+     * @throws MultiResultException
+     */
+    public function getSingleScalarOrNullResult()
+    {
+        try {
+            return $this->getSingleScalarResult();
+        } catch (AttributeNotFoundException $e) {
+            return null;
+        }
     }
 
     /**

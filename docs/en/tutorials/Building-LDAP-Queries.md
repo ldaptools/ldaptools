@@ -344,6 +344,32 @@ The behavior of this method is very similar to `getSingleResult()`, but if no re
 return `null` instead of throwing an exception. However, it will still throw an exception in the case that more than one
 result is returned from LDAP.
 
+#### getSingleScalarResult()
+------------------------
+
+Using this method you can get the value of a single attribute from the query. If the LDAP object or attribute does not
+exist then it will throw an exception.
+
+```php
+$lqb = $ldapManager->buildLdapQuery();
+
+// Retrieve the GUID string of a specific AD user...
+$guid = $lqb->select('guid')
+    ->fromUsers()
+    ->Where(['username' => 'chad'])
+    ->getLdapQuery()
+    ->getSingleScalarResult();
+
+echo "GUID : ".$guid;
+```
+
+#### getSingleScalarOrNullResult()
+------------------------
+
+The behavior of this method is very similar to `getSingleScalarResult()`, but if the attribute is not found/set for the
+LDAP object it will return `null` instead of throwing an exception. However, it will still throw an exception in the
+case that more than one result is returned from LDAP or if the LDAP object does not exist.
+
 ## Filter Method Shortcuts
 ------------------------
 
