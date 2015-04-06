@@ -16,7 +16,6 @@ use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\bNot;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\MatchingRule;
-use LdapTools\Query\Operator\MemberOf;
 use LdapTools\Query\Operator\Wildcard;
 use LdapTools\Query\MatchingRuleOid;
 
