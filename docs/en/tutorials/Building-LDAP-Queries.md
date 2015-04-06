@@ -366,9 +366,9 @@ echo "GUID : ".$guid;
 #### getSingleScalarOrNullResult()
 ------------------------
 
-The behavior of this method is very similar to `getSingleScalarResult()`, but if the attribute is not found/set for the
-LDAP object it will return `null` instead of throwing an exception. However, it will still throw an exception in the
-case that more than one result is returned from LDAP or if the LDAP object does not exist.
+The behavior of this method is very similar to `getSingleScalarResult()`, but if the attribute is not found/set
+for the LDAP object it will return `null` instead of throwing an exception. However, it will still throw an exception
+in the case that more than one result is returned from LDAP or if the LDAP object does not exist.
 
 ## Filter Method Shortcuts
 ------------------------
@@ -516,28 +516,40 @@ Checks for accounts that have passwords that are set to never expire. Creates a 
 #### hasMemberRecursively($userDn)
 ---
 
-Recursively checks groups for a member specified by their full distinguished name. Creates a matching rule comparison 
+Recursively checks groups for a member specified by their full distinguished name. Creates a matching rule comparison
 using the OID `IN_CHAIN` against the groups `member` attribute.
 
 ------------------------
-#### isRecursivelyMemberOf($groupDn)
+#### isRecursivelyMemberOf($group)
 
-Recursively checks a user's group membership for a group specified by its full distinguished name. Creates a matching 
-rule comparison using the OID `IN_CHAIN` against the users `memberOf` attribute. To make this a bit easier to use, you
-could do something like the following:
+Recursively checks an object's group membership for a group. The `$group` parameter can be any of the following:
+
+* The name of a group.
+* The GUID of a group (ie. a value like `bee66f2f-bcf7-4905-b65b-2f36d5008f1e`)
+* The SID of a group (ie. a value like `S-1-5-21-1004336348-1177238915-682003330-512`)
+* The full distinguished name of a group.
+
+This creates a matching rule comparison using the OID `IN_CHAIN` against the users `memberOf` attribute.
 
 ```php
 use LdapTools\Object\LdapObjectType;
 
 // ...
 
-$groupRepo = $ldapManager->getRepository(LdapObjectType::GROUP);
-$group = $groupRepo->findOneByName('Domain Administrators');
-
+// Query by a group name...
 $query = $ldapManager->buildLdapQuery();
 $users = $query->select()
     ->fromUsers()
-    ->where($query->filter()->isRecursivelyMemberOf($group->getDn()))
+    ->where($query->filter()->isRecursivelyMemberOf('Employees'))
+    ->getLdapQuery()
+    ->execute();
+
+// If you are not targeting a specific set of objects from the schema, then you must
+// pass 'false' as the second argument and specify a full DN. Otherwise this method
+// will attempt to use the 'groups' attribute from the schema by default.
+$ldapObjects = $query->select('description')
+    ->where(['cn' => 'foo'])
+    ->andWhere($query->filter()->isRecursivelyMemberOf('CN=Foo,DC=foo,DC=bar', false))
     ->getLdapQuery()
     ->execute();
 ```

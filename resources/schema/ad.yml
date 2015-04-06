@@ -16,7 +16,7 @@ objects:
                     smartCardRequired: '262144'
                     trustedForAllDelegation: '524288'
                     trustedForAnyAuthDelegation: '16777216'
-            name_to_dn:
+            value_to_dn:
                 exchangeMailboxDatabase:
                     attribute: cn
                     filter:
@@ -33,6 +33,10 @@ objects:
                     attribute: cn
                     filter:
                         objectClass: msExchRecipientPolicy
+                groups:
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
             exchange_proxy_address:
                 addressType:
                     exchangeSmtpAddresses: 'smtp'
@@ -66,11 +70,12 @@ objects:
                  - 'trustedForAllDelegation'
                  - 'trustedForAnyAuthDelegation'
              password_must_change: [ passwordMustChange ]
-             name_to_dn:
+             value_to_dn:
                 - 'exchangeMailboxDatabase'
                 - 'exchangePolicyRBAC'
                 - 'exchangePolicyActiveSync'
                 - 'exchangePolicyRetention'
+                - 'groups'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
@@ -105,6 +110,7 @@ objects:
             exchangeDefaultSmtpAddress: proxyAddresses
             fax: facsimileTelephoneNumber
             firstName: givenName
+            groups: memberOf
             guid: objectGuid
             homeDirectory: homeDirectory
             homeDrive: homeDrive
@@ -148,6 +154,7 @@ objects:
             - exchangeSmtpAddresses
             - exchangeSendOnBehalfOf
             - servicePrincipalNames
+            - groups
         # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
         attributes_to_select:
             - 'name'
@@ -179,6 +186,8 @@ objects:
                 - 'exchangeDefaultSmtpAddress'
              int:
                 - 'exchangeAddressBookFlags'
+             value_to_dn:
+                 - 'groups'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -206,6 +215,11 @@ objects:
                     exchangeDefaultSmtpAddress: 'smtp'
                 default:
                     - 'exchangeDefaultSmtpAddress'
+            value_to_dn:
+                groups:
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
         attributes:
             accountName: sAMAccountName
             created: whenCreated
@@ -219,6 +233,7 @@ objects:
             exchangeInternalOnly: msExchRequireAuthToSendTo
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
+            groups: memberOf
             guid: objectGuid
             members: member
             modified: whenChanged
@@ -231,6 +246,7 @@ objects:
             scopeUniversal: groupType
         multivalued_attributes:
             - exchangeSmtpAddresses
+            - groups
             - members
         attributes_to_select:
             - 'name'
@@ -245,6 +261,8 @@ objects:
         type: computer
         category: computer
         converters:
+             value_to_dn:
+                 - 'groups'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -252,12 +270,19 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+        converter_options:
+            value_to_dn:
+                groups:
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
         attributes:
             accountName: sAMAccountName
             created: whenCreated
             description: description
             dn: distinguishedName
             dnsHostName: dNSHostName
+            groups: memberOf
             guid: objectGuid
             location: location
             modified: whenChanged
@@ -266,6 +291,8 @@ objects:
             osServicePack: operatingSystemServicePack
             osVersion: operatingSystemVersion
             sid: objectSid
+        multivalued_attributes:
+            - groups
         attributes_to_select:
             - 'name'
             - 'os'
@@ -287,6 +314,8 @@ objects:
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
+             value_to_dn:
+                 - 'groups'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -301,6 +330,11 @@ objects:
                     exchangeDefaultSmtpAddress: 'smtp'
                 default:
                     - 'exchangeDefaultSmtpAddress'
+            value_to_dn:
+                groups:
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
         attributes:
             created: whenCreated
             description: description
@@ -312,6 +346,7 @@ objects:
             exchangeSmtpAddresses: proxyAddresses
             exchangeDefaultSmtpAddress: proxyAddresses
             firstName: givenName
+            groups: memberOf
             guid: objectGuid
             lastName: sn
             modified: whenChanged
@@ -320,6 +355,7 @@ objects:
             sid: objectSid
         multivalued_attributes:
             - exchangeSmtpAddresses
+            - groups
         attributes_to_select:
             - 'name'
             - 'emailAddress'

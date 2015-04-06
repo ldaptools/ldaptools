@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Query\Operator\bOr;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -19,21 +20,21 @@ use LdapTools\Utilities\LdapUtilities;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class ConvertNameToDn implements  AttributeConverterInterface
+class ConvertValueToDn implements  AttributeConverterInterface
 {
     use AttributeConverterTrait, ConverterUtilitiesTrait;
 
     /**
      * {@inheritdoc}
      */
-    public function toLdap($name)
+    public function toLdap($value)
     {
         if (is_null($this->getLdapConnection())) {
-            return $name;
+            return $value;
         }
         $this->validateCurrentAttribute($this->options);
 
-        return $this->getDnFromName($name);
+        return $this->getDnFromValue($value);
     }
 
     /**
@@ -45,22 +46,29 @@ class ConvertNameToDn implements  AttributeConverterInterface
     }
 
     /**
-     * Given a common string name, do the LDAP query needed to retrieve the full distinguished name.
+     * Given a value try to determine its full distinguished name.
      *
-     * @param string $name
+     * @param string $value
      * @return string $dn
      */
-    protected function getDnFromName($name)
+    protected function getDnFromValue($value)
     {
         $options = $this->getOptionsArray();
-        $query = $this->buildLdapQuery($options['filter'])->where([$options['attribute'] => $name]);
+        $query = $this->buildLdapQuery($options['filter']);
 
-        $results = $query->getLdapQuery()->execute();
-        if ($results->count() != 1) {
-            throw new \InvalidArgumentException(sprintf('Unable to resolve "%s" to a valid LDAP object.', $name));
+        $bOr = $this->getQueryOrStatement($query, $value);
+        $eq = $query->filter()->eq($options['attribute'], $value);
+
+        // If the value is in DN form this will still do a query. Is this really what we want? However, this will verify
+        // whether the DN is actually valid or not and still look something that matched a DN but really is not.
+        if (!empty($bOr->getChildren())) {
+            $bOr->add($eq);
+            $query->where($bOr);
+        } else {
+            $query->where($eq);
         }
 
-        return $results->toArray()[0]->getDn();
+        return $query->getLdapQuery()->getSingleScalarResult();
     }
 
     /**
@@ -72,13 +80,33 @@ class ConvertNameToDn implements  AttributeConverterInterface
     protected function buildLdapQuery(array $filter)
     {
         $query = new LdapQueryBuilder($this->connection);
-        $query->select(['distinguishedName']);
+        $query->select('distinguishedName');
 
         foreach ($filter as $attribute => $value) {
             $query->where([$attribute => $value]);
         }
 
         return $query;
+    }
+
+    /**
+     * @param LdapQueryBuilder $query
+     * @param string $value
+     * @return bOr
+     */
+    protected function getQueryOrStatement(LdapQueryBuilder $query, $value)
+    {
+        $bOr = $query->filter()->bOr();
+
+        if (preg_match(LdapUtilities::MATCH_GUID, $value)) {
+            $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->toLdap($value)));
+        } elseif (preg_match(LdapUtilities::MATCH_SID, $value)) {
+            $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->toLdap($value)));
+        } elseif (($pieces = ldap_explode_dn($value, 1)) && isset($pieces['count']) && $pieces['count'] > 0) {
+            $bOr->add($query->filter()->eq('distinguishedName', $value));
+        }
+
+        return $bOr;
     }
 
     /**

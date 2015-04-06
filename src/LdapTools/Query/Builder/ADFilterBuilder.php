@@ -175,14 +175,18 @@ class ADFilterBuilder extends FilterBuilder
     }
 
     /**
-     * Performs a recursive search of group membership to determine if the account belongs to it.
+     * Performs a recursive search of group membership to determine if the account belongs to it. If you are not using a
+     * schema and want to use this function you should pass false as the second argument.
      *
-     * @param string $groupDn The full distinguished name of the group.
+     * @param string $group The name, GUID, SID, or DN of a group
+     * @param bool $schema If false the 'memberOf' attribute will be used instead of the 'groups' attribute from the schema.
      * @return MatchingRule
      */
-    public function isRecursivelyMemberOf($groupDn)
+    public function isRecursivelyMemberOf($group, $schema = true)
     {
-        return new MatchingRule(self::ATTR['MEMBER_OF'], MatchingRuleOid::IN_CHAIN, $groupDn);
+        $attribute = $schema ? 'groups' : self::ATTR['MEMBER_OF'];
+
+        return new MatchingRule($attribute, MatchingRuleOid::IN_CHAIN, $group);
     }
 
     /**

@@ -52,6 +52,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
 | fax | facsimileTelephoneNumber | string |
 | firstName | givenName | string |
+| groups | memberOf | array |
 | guid | objectGuid | string |
 | homeDirectory | homeDirectory | string |
 | homeDrive | homeDrive | string |
@@ -106,6 +107,7 @@ These are typical LDAP group objects (`objectClass=group`).
 | exchangeInternalOnly | msExchRequireAuthToSendTo | bool |
 | exchangeSmtpAddresses | proxyAddresses | array |
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
+| groups | memberOf | array |
 | guid | objectGuid | string |
 | members | member | array|
 | modified |whenModified | `\DateTime` |
@@ -129,6 +131,7 @@ These are typical LDAP computer objects (`objectCategory=computer`).
 | displayName | displayName | string |
 | dn | dn | string |
 | dnsHostName | dNSHostName | string |
+| groups | memberOf | array |
 | guid | objectGuid | string |
 | location | location | string |
 | modified |whenModified | `\DateTime` |
@@ -154,6 +157,7 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 | exchangeSmtpAddresses | proxyAddresses | array |
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
 | firstName | givenName | string |
+| groups | memberOf | array |
 | guid | objectGuid | string |
 | lastName | sn | string |
 | modified | whenModified | `\DateTime` |

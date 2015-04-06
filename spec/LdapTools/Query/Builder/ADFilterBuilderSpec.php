@@ -110,4 +110,14 @@ class ADFilterBuilderSpec extends ObjectBehavior
     {
         $this->mailEnabled()->shouldReturnAnInstanceOf('LdapTools\Query\Operator\Wildcard');
     }
+
+    function it_should_use_the_groups_attribute_by_default_for_isRecursivelyMemberOf()
+    {
+        $this->isRecursivelyMemberOf('foo')->getAttribute()->shouldBeEqualTo('groups');
+    }
+
+    function it_should_use_the_memberOf_attribute_if_false_is_passed_to_isRecursivelyMemberOf()
+    {
+        $this->isRecursivelyMemberOf('foo', false)->getAttribute()->shouldBeEqualTo('memberOf');
+    }
 }

@@ -18,6 +18,16 @@ namespace LdapTools\Utilities;
 class LdapUtilities
 {
     /**
+     * Regex to match a GUID.
+     */
+    const MATCH_GUID = '/^([0-9a-fA-F]){8}(-([0-9a-fA-F]){4}){3}-([0-9a-fA-F]){12}$/';
+
+    /**
+     * Regex to match a Windows SID.
+     */
+    const MATCH_SID = '/^S-\d-(\d+-){1,14}\d+$/i';
+
+    /**
      * Escape any special characters for LDAP to their hexadecimal representation.
      *
      * @param mixed $value The value to escape.
