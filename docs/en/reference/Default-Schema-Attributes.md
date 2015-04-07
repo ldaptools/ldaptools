@@ -75,6 +75,7 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | pager | pager | string |
 | phoneNumber | telephoneNumber | string |
 | poBox | postOfficeBox | string |
+| primaryGroup | primaryGroupID | string |
 | profilePath | profilePath | string |
 | scriptPath | scriptPath | string |
 | servicePrincipalNames | servicePrincipalName | array |

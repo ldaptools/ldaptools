@@ -39,6 +39,7 @@ class AttributeConverterFactory
         'account_expires' => '\LdapTools\AttributeConverter\ConvertAccountExpiration',
         'group_type' => '\LdapTools\AttributeConverter\ConvertGroupType',
         'gpo_link' => '\LdapTools\AttributeConverter\ConvertGPLink',
+        'primary_group' => '\LdapTools\AttributeConverter\ConvertPrimaryGroup',
     ];
 
     /**

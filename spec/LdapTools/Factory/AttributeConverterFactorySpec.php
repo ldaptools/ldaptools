@@ -103,6 +103,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('gpo_link')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGPLink');
     }
 
+    function it_should_return_ConvertPrimaryGroup_when_calling_get_with_primary_group()
+    {
+        $this::get('primary_group')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertPrimaryGroup');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');

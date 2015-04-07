@@ -95,4 +95,9 @@ process and the converter may use the connection to make LDAP calls to resolve d
 
   * `fromLdap`: Returns a common name for the object instead of the full distinguished name.
 
+#### *primary_group*
+  * `toLdap`: Takes a group name and converts it to its RID decimal value for the primaryGroupID attribute.
+
+  * `fromLdap`: Takes the RID of a group and returns the group's name.
+
   

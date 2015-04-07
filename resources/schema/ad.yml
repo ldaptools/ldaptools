@@ -81,6 +81,7 @@ objects:
                 - 'exchangeDefaultSmtpAddress'
              logon_workstations: [ logonWorkstations ]
              account_expires: [ accountExpirationDate ]
+             primary_group: [ primaryGroup ]
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             accountExpirationDate: accountExpires
@@ -135,6 +136,7 @@ objects:
             passwordMustChange: pwdLastSet
             phoneNumber: telephoneNumber
             poBox: postOfficeBox
+            primaryGroup: primaryGroupID
             profilePath: profilePath
             scriptPath: scriptPath
             servicePrincipalNames: servicePrincipalName
