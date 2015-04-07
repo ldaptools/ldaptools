@@ -23,6 +23,11 @@ class ADResponseCodes
     const ACCOUNT_INVALID = 1317;
 
     /**
+     * The account is not in the group.
+     */
+    const MEMBER_NOT_IN_GROUP = 1321;
+
+    /**
      * Unable to update password because the current password supplied is incorrect.
      */
     const CURRENT_PASSWORD_INCORRECT = 1323;
@@ -105,6 +110,7 @@ class ADResponseCodes
         self::ACCOUNT_LOCKED => 'The account is currently locked out.',
         self::CURRENT_PASSWORD_INCORRECT => 'Unable to update the password. The value for the current password is incorrect.',
         self::PASSWORD_MALFORMED => 'Unable to update the password. The value contains characters not allowed in passwords.',
-        self::PASSWORD_RESTRICTIONS => 'Unable to update the password. It does not meet the length, complexity, or history requirements for the domain.'
+        self::PASSWORD_RESTRICTIONS => 'Unable to update the password. It does not meet the length, complexity, or history requirements for the domain.',
+        self::MEMBER_NOT_IN_GROUP => 'The specified user account is not a member of the specified group account.',
     ];
 }

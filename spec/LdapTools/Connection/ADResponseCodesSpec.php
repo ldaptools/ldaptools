@@ -90,6 +90,11 @@ class ADResponseCodesSpec extends ObjectBehavior
         $this->shouldHaveConstant('ACCOUNT_LOCKED');
     }
 
+    function it_should_have_a_constant_for_member_not_in_group()
+    {
+        $this->shouldHaveConstant('MEMBER_NOT_IN_GROUP');
+    }
+
     public function getMatchers()
     {
         return [
