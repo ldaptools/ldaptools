@@ -212,7 +212,7 @@ abstract class BaseValueResolver
      */
     protected function encodeValues($values)
     {
-        if (is_null($this->connection)) {
+        if (is_null($this->connection) || $this->type == AttributeConverterInterface::TYPE_SEARCH_FROM) {
             return $values;
         }
         $encoded = is_array($values) ? $values : [$values];
