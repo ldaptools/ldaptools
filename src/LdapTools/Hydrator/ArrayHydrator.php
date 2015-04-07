@@ -259,7 +259,7 @@ class ArrayHydrator implements HydratorInterface
             $entry,
             $this->type
         );
-        $this->configureValueResolver($valueResolver);
+        $this->configureValueResolver($valueResolver, isset($entry['dn']) ? $entry['dn'] : null);
 
         return $valueResolver->fromLdap();
     }
@@ -368,7 +368,6 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function configureValueResolver(BaseValueResolver $valueResolver, $dn = null)
     {
-        $dn = isset($entry['dn']) ? $entry['dn'] : $dn;
         if ($this->connection) {
             $valueResolver->setLdapConnection($this->connection);
         }
