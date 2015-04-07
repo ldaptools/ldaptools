@@ -94,9 +94,9 @@ class LdapObjectCollection implements \IteratorAggregate
     }
 
     /**
-     * Gets the currently element in the collection array.
+     * Gets the current element in the collection array.
      *
-     * @return LdapObject
+     * @return LdapObject|false
      */
     public function current()
     {
