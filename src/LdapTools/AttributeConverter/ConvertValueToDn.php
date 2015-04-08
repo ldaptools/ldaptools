@@ -102,7 +102,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
             $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->toLdap($value)));
         } elseif (preg_match(LdapUtilities::MATCH_SID, $value)) {
             $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->toLdap($value)));
-        } elseif (($pieces = ldap_explode_dn($value, 1)) && isset($pieces['count']) && $pieces['count'] > 0) {
+        } elseif (($pieces = ldap_explode_dn($value, 1)) && isset($pieces['count']) && $pieces['count'] > 2) {
             $bOr->add($query->filter()->eq('distinguishedName', $value));
         }
 
