@@ -138,7 +138,16 @@ The base DN for searches (ie. `dc=example,dc=com`).
 -------------------------------
 #### username **(REQUIRED)**
 
-The username to use when binding to LDAP.
+The username to use when binding to LDAP. When using Active Directory, the username can be in any of these formats:
+
+  * A typical username in UPN form (ie. `user@domain.com`).
+  * A string GUID of an account (ie. `8227ab9b-b307-45eb-a50c-6f6cb3946318`)
+  * A string SID of an account (ie. `S-1-5-21-1004336348-1177238915-682003330-512`)
+  * The full distinguished name of an account.
+
+If none of those forms are detected, then by default it will force the username into UPN form based off of the domain
+name. However, if the LDAP type is `openldap`, then it will just pass the unmodified username along. This behavior can 
+be modified using the `bind_format` option.
 
 -------------------------------
 #### password **(REQUIRED)**
@@ -150,6 +159,13 @@ The password to use when binding to LDAP.
 
 An array of LDAP servers (ie. `[ 'dc01' ]`). When more than one server name is used it will attempt each one until it
 successfully connects.
+
+-------------------------------
+#### bind_format
+
+Defines how the username will be passed to LDAP on a bind/authentication attempt. This is a string that accepts 2
+parameters: `%username%` and `%domainname%`. By default, the AD bind format is `%username%@%domainname%`. With OpenLDAP
+it is simply `%username%`. However, you could set it to an DN path, such as: `CN=%username%,OU=Users,DC=example,DC=com`
 
 -------------------------------
 #### server_selection

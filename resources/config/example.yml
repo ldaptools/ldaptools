@@ -48,6 +48,11 @@ domains:
         server_selection: order
         # Optional: The encoding type to use. Default: UTF-8
         encoding: UTF-8
+        # Optional: The format that the username should be in when binding. This allows for two possible
+        #   placeholders: %username% and %domainname%. The domain name parameter is the FQDN. Default: For AD
+        #   the default is "%username%@%domainname%", for OpenLDAP it is simply "%username%". But you could easily
+        #   make it something like "CN=%username%,OU=Users,DC=example,DC=local".
+        bind_format: "%username%"
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

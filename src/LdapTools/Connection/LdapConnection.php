@@ -85,10 +85,16 @@ class LdapConnection implements LdapConnectionInterface
     protected $pagedResults = true;
 
     /**
+     * @var ADBindUserStrategy|BindStrategy
+     */
+    protected $usernameFormatter;
+
+    /**
      * @param DomainConfiguration $config
      */
     public function __construct(DomainConfiguration $config)
     {
+        $this->usernameFormatter = BindUserStrategy::getInstance($config);
         $this->serverPool = new LdapServerPool($config->getServers(), $config->getPort());
         $this->config = $config;
 
@@ -154,13 +160,8 @@ class LdapConnection implements LdapConnectionInterface
     {
         $this->initiateLdapConnection();
 
-        $username = $username ?: $this->config->getUsername();
+        $username = $this->usernameFormatter->getUsername($username ?: $this->config->getUsername());
         $password = $password ?: $this->config->getPassword();
-
-        // If this is AD and the username is not in UPN form, then assume the default domain context.
-        if ($this->config->getLdapType() == self::TYPE_AD && !strpos($username, '@')) {
-            $username .= '@'.$this->config->getDomainName();
-        }
 
         $this->bind($username, $password, $anonymous);
 

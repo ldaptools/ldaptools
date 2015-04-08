@@ -50,7 +50,8 @@ class DomainConfiguration
         'lazy_bind' => 'lazyBind',
         'schema_name' => 'schemaName',
         'server_selection' => 'serverSelection',
-        'encoding' => 'encoding'
+        'encoding' => 'encoding',
+        'bind_format' => 'bindFormat',
     ];
 
     /**
@@ -82,6 +83,7 @@ class DomainConfiguration
         'schemaName' => '',
         'serverSelection' => LdapServerPool::SELECT_ORDER,
         'encoding' => 'UTF-8',
+        'bindFormat' => '',
     ];
 
     /**
@@ -421,6 +423,29 @@ class DomainConfiguration
     public function getEncoding()
     {
         return $this->config['encoding'];
+    }
+
+    /**
+     * Set the format a username should be bound as.
+     *
+     * @param string $bindFormat
+     * @return $this
+     */
+    public function setBindFormat($bindFormat)
+    {
+        $this->config['bindFormat'] = $bindFormat;
+
+        return $this;
+    }
+
+    /**
+     * Get the format a username should be bound as.
+     *
+     * @return string
+     */
+    public function getBindFormat()
+    {
+        return $this->config['bindFormat'];
     }
 
     /**

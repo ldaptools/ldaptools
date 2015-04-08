@@ -232,6 +232,19 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getEncoding()->shouldBeEqualTo('Foo');
     }
 
+
+    function it_should_return_self_when_setting_the_bind_format()
+    {
+        $this->setBindFormat('%username%')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+    }
+
+    function it_should_have_the_correct_encoding_after_calling_setBindFormat()
+    {
+        $this->getBindFormat()->shouldBeEqualTo('');
+        $this->setBindFormat('%username%');
+        $this->getBindFormat()->shouldBeEqualTo('%username%');
+    }
+
     function it_should_load_an_array_for_the_configuration()
     {
         $config = [
