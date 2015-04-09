@@ -142,7 +142,7 @@ The full class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the
  `getRepository('object_type')` on the `LdapManager` class. The class must extend `\LdapTools\Object\LdapObjectRepository`.
 
 --------------------
-#### default_values
+#### attributes_to_select
 
 An array of attributes with what their default value should be set to whe creating this object using the 
 `LdapObjectCreator`. These values also accept parameter values encased within `%` symbols that can resolve to other 
@@ -157,7 +157,7 @@ attribute values.
 ```
         
 --------------------
-#### attributes_required
+#### required_attributes
 
 An array of attributes that are required when creating this object type. If these are not present, an exception will be
 thrown. This will only happen if they are not specified on creation and not contained within the `default_values` list.
