@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.12.0 (2015-04-08)
+------------------
+
+  * Added several new query search result methods: getSingleResult, getOneOrNullResult, getSingleScalarResult, etc.
+  * Added a converter for the AD primary group of a user. It can now be searched/modified/displayed by the group name.
+  * Added the groups attribute to the schema for AD users, groups, contacts, and computers. Returns groups by name.
+  * Implemented an updated 'value_to_dn' converter to easily search/update values by name, GUID, SID, or full DN.
+  * The groups attribute can be used to query a user for membership by a group name, GUID, SID, or full DN.
+  * Add the ability to format the bind username. You can now bind/auth to AD with a GUID, SID, UPN, DN, or username.
+  * More code cleanup and bug fixes.
+
 0.11.0 (2015-03-23)
 ------------------
 
