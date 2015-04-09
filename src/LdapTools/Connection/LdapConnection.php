@@ -85,7 +85,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $pagedResults = true;
 
     /**
-     * @var ADBindUserStrategy|BindStrategy
+     * @var ADBindUserStrategy|BindUserStrategy
      */
     protected $usernameFormatter;
 
