@@ -77,7 +77,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
             $query->andWhere(['member' => $this->getDn()]);
         }
         try {
-             return $query->andWhere($query->filter()->bitwiseAnd('groupType', GroupTypeFlags::SECURITY_ENABLED))
+            return $query->andWhere($query->filter()->bitwiseAnd('groupType', GroupTypeFlags::SECURITY_ENABLED))
                  ->getLdapQuery()
                  ->getSingleScalarResult();
         } catch (EmptyResultException $e) {
