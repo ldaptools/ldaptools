@@ -203,6 +203,7 @@ objects:
                 - 'exchangeAddressBookFlags'
              value_to_dn:
                  - 'groups'
+                 - 'managedBy'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -235,6 +236,13 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+                managedBy:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    or_filter: true
+                    filter:
+                        objectClass: group
+                        objectCategory: person
         attributes:
             accountName: sAMAccountName
             created: whenCreated
@@ -250,6 +258,7 @@ objects:
             exchangeDefaultSmtpAddress: proxyAddresses
             groups: memberOf
             guid: objectGuid
+            managedBy: managedBy
             members: member
             modified: whenChanged
             name: cn
