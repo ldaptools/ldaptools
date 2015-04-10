@@ -41,6 +41,8 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_convert_a_dn_to_a_normal_name()
     {
+        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']]);
+        $this->setAttribute('foo');
         $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('Foo');
     }
 
@@ -117,6 +119,14 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_convert_a_dn_into_its_common_name()
     {
+        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']]);
+        $this->setAttribute('foo');
         $this->fromLdap('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldBeEqualTo('Foo,=bar');
+    }
+
+    function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute(LdapConnectionInterface $ldap)
+    {
+        $this->setLdapConnection($ldap);
+        $this->shouldThrow('\RuntimeException')->duringToLdap('foo');
     }
 }

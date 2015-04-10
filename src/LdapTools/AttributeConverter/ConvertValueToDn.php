@@ -116,6 +116,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
      */
     protected function getOptionsArray()
     {
+        $this->validateCurrentAttribute();
         $options = $this->getArrayValue($this->options, $this->getAttribute());
 
         if (!isset($options['filter']) || !is_array($options['filter'])) {
@@ -126,5 +127,17 @@ class ConvertValueToDn implements  AttributeConverterInterface
         }
 
         return $options;
+    }
+
+    /**
+     * Make sure that the current attribute has actually been defined.
+     */
+    protected function validateCurrentAttribute()
+    {
+        if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($this->getOptions()))) {
+            throw new \RuntimeException(
+                sprintf('Attribute "%s" must be defined in the converter options.', $this->getAttribute())
+            );
+        }
     }
 }
