@@ -331,6 +331,7 @@ objects:
                 - 'exchangeDefaultSmtpAddress'
              value_to_dn:
                  - 'groups'
+                 - 'manager'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -350,6 +351,13 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+                manager:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    or_filter: true
+                    filter:
+                        objectClass: contact
+                        objectCategory: person
         attributes:
             created: whenCreated
             description: description
@@ -364,6 +372,7 @@ objects:
             groups: memberOf
             guid: objectGuid
             lastName: sn
+            manager: manager
             modified: whenChanged
             name: cn
             phoneNumber: telephoneNumber
