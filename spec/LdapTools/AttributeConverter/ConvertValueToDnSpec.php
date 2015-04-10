@@ -129,4 +129,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->setLdapConnection($ldap);
         $this->shouldThrow('\RuntimeException')->duringToLdap('foo');
     }
+
+    function it_should_display_the_dn_from_ldap_if_specified()
+    {
+        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo', 'display_dn' => true]]);
+        $this->setAttribute('foo');
+        $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('cn=Foo,dc=bar,dc=foo');
+    }
 }
