@@ -110,6 +110,7 @@ These are typical LDAP group objects (`objectClass=group`).
 | exchangeDefaultSmtpAddress | proxyAddresses | string |
 | groups | memberOf | array |
 | guid | objectGuid | string |
+| managedBy | managedBy | string |
 | members | member | array|
 | modified |whenModified | `\DateTime` |
 | name | cn | string |
@@ -161,6 +162,7 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 | groups | memberOf | array |
 | guid | objectGuid | string |
 | lastName | sn | string |
+| manager | manager | string |
 | modified | whenModified | `\DateTime` |
 | phoneNumber | telephoneNumber | string |
 | sid | objectSid | string |
