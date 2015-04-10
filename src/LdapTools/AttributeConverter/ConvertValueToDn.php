@@ -56,7 +56,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
     protected function getDnFromValue($value)
     {
         $options = $this->getOptionsArray();
-        $query = $this->buildLdapQuery($options['filter']);
+        $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']));
 
         $bOr = $this->getQueryOrStatement($query, $value);
         $eq = $query->filter()->eq($options['attribute'], $value);
@@ -77,18 +77,23 @@ class ConvertValueToDn implements  AttributeConverterInterface
      * Builds the part the of the query with the specific object class/value to search on.
      *
      * @param array $filter
+     * @param bool $isOrFilter
      * @return LdapQueryBuilder
      */
-    protected function buildLdapQuery(array $filter)
+    protected function buildLdapQuery(array $filter, $isOrFilter)
     {
         $query = new LdapQueryBuilder($this->connection);
         $query->select('distinguishedName');
 
-        foreach ($filter as $attribute => $value) {
-            $query->where([$attribute => $value]);
+        $statement = $isOrFilter ? $query->filter()->bOr() : $query->filter()->bAnd();
+        foreach ($filter as $attribute => $values) {
+            $values = is_array($values) ? $values : [ $values ];
+            foreach ($values as $value) {
+                $statement->add($query->filter()->eq($attribute, $value));
+            }
         }
 
-        return $query;
+        return $query->andWhere($statement);
     }
 
     /**

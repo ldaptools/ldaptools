@@ -37,6 +37,13 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+                manager:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    or_filter: true
+                    filter:
+                        objectClass: contact
+                        objectCategory: person
             exchange_proxy_address:
                 addressType:
                     exchangeSmtpAddresses: 'smtp'
@@ -76,6 +83,7 @@ objects:
                 - 'exchangePolicyActiveSync'
                 - 'exchangePolicyRetention'
                 - 'groups'
+                - 'manager'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
