@@ -20,20 +20,33 @@ trait ContainsOperatorsTrait
     /**
      * The operators within this operator.
      *
-     * @var array
+     * @var BaseOperator[]
      */
     protected $children = [];
 
+    /**
+     * Get all the children operators within an operator.
+     *
+     * @return BaseOperator[]
+     */
     public function getChildren()
     {
         return $this->children;
     }
 
+    /**
+     * Add operator(s) to an operator.
+     *
+     * @param BaseOperator[]|BaseOperator ...$operators
+     */
     public function add(BaseOperator ...$operators)
     {
         $this->children = array_merge($this->children, $operators);
     }
 
+    /**
+     * @return string
+     */
     public function __toString()
     {
         return self::SEPARATOR_START.self::SYMBOL.implode($this->children).self::SEPARATOR_END;
