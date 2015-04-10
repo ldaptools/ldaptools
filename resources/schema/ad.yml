@@ -33,6 +33,11 @@ objects:
                     attribute: cn
                     filter:
                         objectClass: msExchRecipientPolicy
+                exchangeSendOnBehalfOf:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: person
                 groups:
                     attribute: sAMAccountName
                     filter:
