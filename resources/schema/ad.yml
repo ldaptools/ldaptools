@@ -170,6 +170,7 @@ objects:
             - exchangeSendOnBehalfOf
             - servicePrincipalNames
             - groups
+            - objectClass
         # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
         attributes_to_select:
             - 'name'
@@ -272,6 +273,7 @@ objects:
             - exchangeSmtpAddresses
             - groups
             - members
+            - objectClass
         attributes_to_select:
             - 'name'
             - 'dn'
@@ -317,6 +319,7 @@ objects:
             sid: objectSid
         multivalued_attributes:
             - groups
+            - objectClass
         attributes_to_select:
             - 'name'
             - 'os'
@@ -389,6 +392,7 @@ objects:
         multivalued_attributes:
             - exchangeSmtpAddresses
             - groups
+            - objectClass
         attributes_to_select:
             - 'name'
             - 'emailAddress'
@@ -429,6 +433,7 @@ objects:
             zipCode: postalCode
         multivalued_attributes:
             - gpoLinks
+            - objectClass
         attributes_to_select:
             - 'description'
             - 'name'
