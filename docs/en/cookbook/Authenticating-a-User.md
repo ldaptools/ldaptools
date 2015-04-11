@@ -15,6 +15,13 @@ if ($ldapManager->authenticate($username, $password)) {
 This method actually uses the already existing `authenticate()` method of the `LdapConnection` class in the current
 context and is included as a quick shortcut for not having to do `$ldapManager->getConnection()->authenticate($username, $password)`.
 
+## Valid Username Formats
+
+The `authenticate()` method username argument can be the same value types as the username you defined in your config. For
+Active Directory, this means you can authenticate a user using either a UPN, a text SID, a text GUID, a
+distinguished name, or just a normal username. With OpenLDAP the username must be a full DN. However, you can adjust the
+`bind_format` option for the domain configuration to modify this behavior.
+
 ## Authentication Error Messages
 
 There are many times where you may want to provide a more meaningful response as to why authentication for a user has
