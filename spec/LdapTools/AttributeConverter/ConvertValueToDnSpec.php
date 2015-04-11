@@ -11,6 +11,7 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -97,6 +98,36 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap($sid)->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
+    }
+
+    function it_should_convert_a_LdapObject_back_to_a_dn(LdapConnectionInterface $connection)
+    {
+        $dn = 'CN=Chad,OU=Employees,DC=example,DC=com';
+        $ldapObject = new LdapObject(['dn' => $dn], ['user'], 'user', 'user');
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+        ]]);
+        $this->setAttribute('foo');
+        $this->setLdapConnection($connection);
+        $this->toLdap($ldapObject)->shouldBeEqualTo($dn);
+    }
+
+    function it_should_error_if_a_LdapObject_is_missing_a_DN(LdapConnectionInterface $connection)
+    {
+        $dn = 'CN=Chad,OU=Employees,DC=example,DC=com';
+        $ldapObject = new LdapObject(['cn' => 'foo'], ['user'], 'user', 'user');
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+        ]]);
+        $this->setAttribute('foo');
+        $this->setLdapConnection($connection);
+        $this->shouldThrow('\RuntimeException')->duringToLdap($ldapObject);
     }
 
     function it_should_convert_a_dn_back_to_a_dn(LdapConnectionInterface $connection)

@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Object\LdapObject;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
@@ -29,9 +30,6 @@ class ConvertValueToDn implements  AttributeConverterInterface
      */
     public function toLdap($value)
     {
-        if (is_null($this->getLdapConnection())) {
-            return $value;
-        }
         $this->validateCurrentAttribute($this->options);
 
         return $this->getDnFromValue($value);
@@ -48,12 +46,31 @@ class ConvertValueToDn implements  AttributeConverterInterface
     }
 
     /**
-     * Given a value try to determine its full distinguished name.
+     * Given a value try to determine how to get its full distinguished name.
      *
      * @param string $value
      * @return string $dn
      */
     protected function getDnFromValue($value)
+    {
+        if ($value instanceof LdapObject && !$value->has('dn')) {
+            throw new \RuntimeException('The LdapObject must have a DN defined.');
+        } elseif ($value instanceof LdapObject) {
+            $value = $value->get('dn');
+        } elseif (!is_null($this->getLdapConnection())) {
+            $value = $this->getDnFromLdapQuery($value);
+        }
+
+        return $value;
+    }
+
+    /**
+     * Attempt to look-up the DN from a LDAP query based on the value.
+     *
+     * @param string $value
+     * @return string The distinguished name.
+     */
+    protected function getDnFromLdapQuery($value)
     {
         $options = $this->getOptionsArray();
         $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']));
