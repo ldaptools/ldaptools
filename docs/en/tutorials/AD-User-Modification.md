@@ -73,3 +73,43 @@ $user->setAccountExpirationDate(false);
 // Instead, set the account to expire sometime in the future.
 $user->setAccountExpirationDate(new \DateTime('2228-3-22'));
 ```
+
+## Manager Modification
+
+You can set the `manager` attribute by using several values: A string GUID, string SID, a distinguished name, username,
+or a `LdapObject`:
+
+```php
+// First get the user object via a query.
+$user = $ldapManager->buildLdapQuery()
+    ->select('manager')
+    ->fromUsers()
+    ->where(['username' => 'Chad'])
+    ->getLdapQuery()
+    ->getSingleResult();
+
+// Set the manager via username
+$user->setManager('Tim');
+// Set the manager via a SID
+$user->setManager('S-1-5-21-1004336348-1177238915-682003330-512');
+// Set the manager via a GUID
+$user->setManager('270db4d0-249d-46a7-9cc5-eb695d9af9ac');
+// Set the manager via a DN
+$user->setManager('CN=Tim,OU=Employees,DC=example,DC=local');
+
+// Set the manager as a result of an LDAP object for a different query
+$manager = $ldapManager->buildLdapQuery()
+    ->select()
+    ->fromUsers()
+    ->where(['lastName' => 'Smith', 'office' => 'Head Office'])
+    ->getLdapQuery()
+    ->getSingleResult();
+$user->setManager($manager);
+
+// All of the above will ultimately produce the same result.
+try {
+    $ldapManager->persist($user);
+} catch (\Exception $e) {
+    echo "Error changing the manager: ".$e->getMessage();
+}
+```
