@@ -41,23 +41,42 @@ syntax for LDAP filters. All values are also automatically escaped.
 
 ```php
 // Get an instance of the query...
-$query = $ldap->buildLdapQuery()
-    ->select()
+$query = $ldap->buildLdapQuery();
+
+
+// Returns a `LdapObjectCollection` of all users whose first name 
+// starts with 'Foo' and last name is 'Bar' or 'Smith'.
+// The result set will also be ordered by state name (ascending).
+$users = $query->select()
     ->fromUsers()
-    ->where(['firstName' => 'Foo'])
+    ->where($query->filter()->startsWith('firstName', 'Foo'))
     ->orWhere(['lastName' => 'Bar'])
     ->orWhere(['lastName' => 'Smith'])
-    ->orderBy('state');
-    
-// Returns a `LdapObjectCollection` of all users whose first name is 'Foo' and last name is 'Bar' or 'Smith'
-// The result set will also be ordered by state name (ascending).
-$users = $query->getLdapQuery()->execute();
+    ->orderBy('state')
+    ->getLdapQuery()
+    ->getResult();
 
-echo "Found ".$users->count()." user(s).".PHP_EOL;
+echo "Found ".$users->count()." user(s).";
 foreach ($users as $user) {
-    echo "User: ".$user->getUsername().PHP_EOL;
+    echo "User: ".$user->getUsername();
 }
 
+// Get a single LDAP object...
+$user = $ldap->buildLdapQuery()
+    ->select()
+    ->fromUsers()
+    ->where(['username' => 'chad'])
+    ->getLdapQuery()
+    ->getSingleResult();
+
+// Get a single attribute value from a LDAP object...
+$guid = $ldap->buildLdapQuery()
+    ->select('guid')
+    ->fromUsers()
+    ->where(['username' => 'chad'])
+    ->getLdapQuery()
+    ->getSingleScalarResult();
+    
 // It also supports the concepts of repositories...
 $userRepository = $ldap->getRepository('user');
 
@@ -66,7 +85,7 @@ $users = $userRepository->findByLastName('Smith');
 
 // Get the first user whose username equals 'jsmith'. Returns a `LdapObject`.
 $user = $userRepository->findOneByUsername('jsmith');
-echo "First name ".$user->getFirstName()." and last name ".$user->getLastName().PHP_EOL;
+echo "First name ".$user->getFirstName()." and last name ".$user->getLastName();
 ```
 
 The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
@@ -77,14 +96,25 @@ Modifying LDAP is as easy as searching for the LDAP object as described above, t
 and saving it back to LDAP using the `LdapManager`.
 
 ```php
-$user = $userRepository->findOneByUsername('jsmith');
+$user = $ldap->buildLdapQuery()
+    ->select(['title', 'mobilePhone', 'disabled'])
+    ->fromUsers()
+    ->where(['username' => 'jsmith'])
+    ->getLdapQuery()
+    ->getSingleResult();
 
-// Make some modifications to the user account. All these changes are tracked so it knows how to modify the object.
+// Make some modifications to the user account.
+All these changes are tracked so it knows how to modify the object.
 $user->setTitle('CEO');
-$user->resetMobilePhone();
+
+if ($user->hasMobilePhone()) {
+    $user->resetMobilePhone();
+}
 
 // Set a field by a property instead...
-$user->disabled = false;
+if ($user->disabled) {
+    $user->disabled = false;
+}
 
 // Now actually save the changes back to LDAP...
 try {
