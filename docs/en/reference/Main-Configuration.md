@@ -201,7 +201,11 @@ the case of Active Directory). Setting this to `true` also changes the port to `
 #### use_tls
 
 Whether or not to initiate TLS when connecting to LDAP. This is required for certain LDAP operations (such as password 
-changes in Active Directory).
+changes in Active Directory). When using this directive you will often have to configure your `ldap.conf` file and add
+the `TLS_REQCERT never` line. The `ldap.conf` file is in the following default locations:
+
+  * Windows: `C:\OpenLDAP\sysconf\ldap.conf` (If this directory structure does not exist, then create it...and the file)
+  * Linux: `/etc/ldap/ldap.conf`
 
 **Default**: `false`
 
