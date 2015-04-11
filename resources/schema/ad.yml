@@ -141,6 +141,11 @@ objects:
             name: cn
             office: physicalDeliveryOfficeName
             organization: o
+            otherFaxes: otherFacsimileTelephoneNumber
+            otherHomePhones: otherHomePhone
+            otherIpPhones: otherIpPhone
+            otherPagers: otherPager
+            otherPhoneNumbers: otherTelephoneNumber
             pager: pager
             password: unicodePwd
             passwordIsReversible: userAccountControl
@@ -171,6 +176,11 @@ objects:
             - servicePrincipalNames
             - groups
             - objectClass
+            - otherFaxes
+            - otherHomePhones
+            - otherIpPhones
+            - otherPagers
+            - otherPhoneNumbers
         # When querying LDAP via the LdapQueryBuilder or a Repository, retrieve these attributes by default.
         attributes_to_select:
             - 'name'

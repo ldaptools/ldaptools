@@ -67,6 +67,11 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 | mobilePhone | mobile | string |
 | office | physicalDeliveryOfficeName  | string |
 | organization | o | string |
+| otherFaxes | otherFacsimileTelephoneNumber | array |
+| otherHomePhones | otherHomePhone | array |
+| otherIpPhones | otherIpPhone | array |
+| otherPagers | otherPager | array |
+| otherPhoneNumbers | otherTelephoneNumber | array |
 | password | unicodePwd | string |
 | passwordIsReversible | userAccountControl | bool |
 | passwordLastSet | pwdLastSet | `\DateTime` |
