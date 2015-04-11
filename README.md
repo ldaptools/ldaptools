@@ -43,7 +43,6 @@ syntax for LDAP filters. All values are also automatically escaped.
 // Get an instance of the query...
 $query = $ldap->buildLdapQuery();
 
-
 // Returns a `LdapObjectCollection` of all users whose first name 
 // starts with 'Foo' and last name is 'Bar' or 'Smith'.
 // The result set will also be ordered by state name (ascending).
