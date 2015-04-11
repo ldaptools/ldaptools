@@ -72,7 +72,7 @@ class Configuration
      * specified.
      *
      * @param null|string $domain
-     * @return array|DomainConfiguration
+     * @return DomainConfiguration[]|DomainConfiguration
      */
     public function getDomainConfiguration($domain = null)
     {
