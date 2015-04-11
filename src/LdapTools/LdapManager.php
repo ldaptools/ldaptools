@@ -34,7 +34,7 @@ class LdapManager
     protected $config;
 
     /**
-     * @var array An array of "domain name" => "LdapConnection" pairs.
+     * @var LdapConnection[] An array of "domain name" => "LdapConnection" pairs.
      */
     protected $connections;
 
@@ -44,7 +44,7 @@ class LdapManager
     protected $context;
 
     /**
-     * @var array An array of "domain name" => "DomainConfiguration" pairs.
+     * @var DomainConfiguration[] An array of "domain name" => "DomainConfiguration" pairs.
      */
     protected $domains;
 
@@ -64,7 +64,7 @@ class LdapManager
     protected $schemaFactory;
 
     /**
-     * @var array
+     * @var LdapObjectManager[]
      */
     protected $ldapObjectManager = [];
 
@@ -101,7 +101,7 @@ class LdapManager
     /**
      * Get all of the domain names that are loaded.
      *
-     * @return array
+     * @return string[]
      */
     public function getDomains()
     {
