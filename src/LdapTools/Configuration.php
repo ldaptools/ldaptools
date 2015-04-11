@@ -306,7 +306,7 @@ class Configuration
                 $this->addDomain($domain);
             }
         } catch (ConfigurationException $e) {
-            throw new ConfigurationException(sprintf("Error in domain config section: ", $e->getMessage()));
+            throw new ConfigurationException(sprintf("Error in domain config section: %s", $e->getMessage()));
         }
     }
 }

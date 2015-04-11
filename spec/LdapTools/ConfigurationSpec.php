@@ -10,7 +10,7 @@
 
 namespace spec\LdapTools;
 
-use LdapTools\Configuration;
+use LdapTools\Exception\ConfigurationException;
 use LdapTools\Factory\CacheFactory;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -106,6 +106,12 @@ class ConfigurationSpec extends ObjectBehavior
     function it_should_throw_ConfigurationException_when_setting_invalid_cache_type()
     {
         $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringSetCacheType('foo.bar');
+    }
+
+    function it_should_throw_ConfigurationException_when_loading_a_domain_config_with_an_unknown_option()
+    {
+        $e = new ConfigurationException('Error in domain config section: Option "user" not recognized.');
+        $this->shouldThrow($e)->duringLoad(__DIR__.'/../resources/config/unknown_directive.yml');
     }
 
     function it_should_have_an_array_as_the_attribute_converters()

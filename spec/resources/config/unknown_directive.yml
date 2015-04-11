@@ -1,0 +1,6 @@
+domains:
+    example:
+        user: foo
+        password: bar
+        domain_name: example.local
+        base_dn: dc=example,dc=local
