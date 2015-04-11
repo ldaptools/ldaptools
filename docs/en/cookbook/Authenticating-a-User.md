@@ -40,7 +40,7 @@ disabled account, a locked account, or an account whose password needs to change
 common error codes you may see in AD:
 
 | Error Number | Constant | Description |
-| ------------ | ----------- |
+| ------------ | ----------- | ----------- |
 | 1317 | `ACCOUNT_INVALID` | Account does not exist. |
 | 1326 | `ACCOUNT_CREDENTIALS_INVALID` | Account password is invalid. |
 | 1327 | `ACCOUNT_RESTRICTIONS` | Account Restrictions prevent this user from signing in. |
