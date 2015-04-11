@@ -42,9 +42,15 @@ class ADLastErrorStrategy extends LastErrorStrategy
 
         $errorNumber = 0;
         if (!empty($extendedError)) {
-            $errorNumber = explode(',', $extendedError)[2];
-            $errorNumber = explode(' ', $errorNumber)[2];
-            $errorNumber = hexdec(intval($errorNumber));
+            $errorNumber = explode(',', $extendedError);
+            if (!isset($errorNumber[2])) {
+                return 0;
+            };
+            $errorNumber = explode(' ', $errorNumber[2]);
+            if (!isset($errorNumber[2])) {
+                return 0;
+            };
+            $errorNumber = hexdec(intval($errorNumber[2]));
         }
 
         return $errorNumber;
