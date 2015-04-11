@@ -104,7 +104,7 @@ $user = $ldap->buildLdapQuery()
     ->getSingleResult();
 
 // Make some modifications to the user account.
-All these changes are tracked so it knows how to modify the object.
+// All these changes are tracked so it knows how to modify the object.
 $user->setTitle('CEO');
 
 if ($user->hasMobilePhone()) {
