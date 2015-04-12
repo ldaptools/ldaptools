@@ -215,6 +215,7 @@ objects:
              value_to_dn:
                  - 'groups'
                  - 'managedBy'
+                 - 'members'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -247,6 +248,13 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+                members:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    or_filter: true
+                    filter:
+                        objectClass: [ group, contact ]
+                        objectCategory: [ person, computer ]
                 managedBy:
                     display_dn: true
                     attribute: sAMAccountName
