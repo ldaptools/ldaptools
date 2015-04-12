@@ -13,6 +13,7 @@ namespace LdapTools\Connection;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
+use LdapTools\Query\LdapQuery;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -287,12 +288,12 @@ class LdapConnection implements LdapConnectionInterface
         // If this is not a paged search then set this to null so it ends the loop on the first pass.
         $cookie = $this->pagedResults ? '' : null;
         do {
-            $this->setPagedResultsControl($pageSize, $cookie);
+            $this->setPagedResultsControl($pageSize, $cookie, $scope);
 
             $result = @$searchMethod($this->connection, $baseDn, $ldapFilter, $attributes);
             $allEntries = $this->processSearchResult($result, $allEntries);
 
-            $this->setPagedResultsResponse($result, $cookie);
+            $this->setPagedResultsResponse($result, $cookie, $scope);
         } while ($cookie !== null && $cookie != '');
 
         return $allEntries;
@@ -434,12 +435,18 @@ class LdapConnection implements LdapConnectionInterface
      *
      * @param int $pageSize
      * @param string $cookie
+     * @param string $scope
      * @throws LdapConnectionException
      */
-    protected function setPagedResultsControl($pageSize, &$cookie)
+    protected function setPagedResultsControl($pageSize, &$cookie, $scope)
     {
-        if ($this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
+        if ($scope !== LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
+        } elseif ($scope == LdapQuery::SCOPE_BASE && !@ldap_control_paged_result($this->connection, 0)) {
+            throw new LdapConnectionException(sprintf(
+                'Unable to reset paged results for read operation: %s',
+                $this->getLastError()
+            ));
         }
     }
 
@@ -448,11 +455,12 @@ class LdapConnection implements LdapConnectionInterface
      *
      * @param resource $result
      * @param string $cookie
+     * @param string $scope
      * @throws LdapConnectionException
      */
-    protected function setPagedResultsResponse($result, &$cookie)
+    protected function setPagedResultsResponse($result, &$cookie, $scope)
     {
-        if ($this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
+        if ($scope !== LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->getLastError())
             );
