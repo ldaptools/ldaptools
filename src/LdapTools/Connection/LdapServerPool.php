@@ -162,7 +162,7 @@ class LdapServerPool
     {
         $servers = $this->utilities->getLdapServersForDomain($this->config->getDomainName());
 
-        if (!is_array($servers)) {
+        if (empty($servers)) {
             throw new LdapConnectionException(sprintf(
                 'No LDAP servers found via DNS for "%s".',
                 $this->config->getDomainName()

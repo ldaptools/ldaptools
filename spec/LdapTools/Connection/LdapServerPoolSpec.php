@@ -101,11 +101,12 @@ class LdapServerPoolSpec extends ObjectBehavior
 
     function it_should_throw_an_error_when_no_servers_are_returned_from_dns(TcpSocket $tcp, LdapUtilities $utils)
     {
+        $e = new LdapConnectionException('No LDAP servers found via DNS for "example.com".');
         $utils->getLdapServersForDomain('example.com')->willReturn([]);
         $config = new DomainConfiguration('example.com');
         $this->beConstructedWith($config, $tcp, $utils);
 
-        $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringGetServer();
+        $this->shouldThrow($e)->duringGetServer();
     }
 
     public function getMatchers()
