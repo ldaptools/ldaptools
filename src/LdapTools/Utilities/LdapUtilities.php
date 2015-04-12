@@ -102,6 +102,19 @@ class LdapUtilities
     }
 
     /**
+     * Given a string, try to determine if it is a valid distinguished name for a LDAP object. This is a somewhat
+     * unsophisticated approach. A regex might be a better solution, but would probably be rather difficult to get
+     * right.
+     *
+     * @param string $dn
+     * @return bool
+     */
+    public static function isValidLdapObjectDn($dn)
+    {
+        return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] > 2);
+    }
+
+    /**
      * Get an array of all the LDAP servers for a domain by querying DNS.
      *
      * @param string $domain The domain name to query.

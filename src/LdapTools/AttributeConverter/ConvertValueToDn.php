@@ -57,7 +57,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
             throw new \RuntimeException('The LdapObject must have a DN defined.');
         } elseif ($value instanceof LdapObject) {
             $value = $value->get('dn');
-        } elseif (!is_null($this->getLdapConnection())) {
+        } elseif (!LdapUtilities::isValidLdapObjectDn($value) && !is_null($this->getLdapConnection())) {
             $value = $this->getDnFromLdapQuery($value);
         }
 
@@ -78,8 +78,6 @@ class ConvertValueToDn implements  AttributeConverterInterface
         $bOr = $this->getQueryOrStatement($query, $value);
         $eq = $query->filter()->eq($options['attribute'], $value);
 
-        // If the value is in DN form this will still do a query. Is this really what we want? However, this will verify
-        // whether the DN is actually valid or not and still look something that matched a DN but really is not.
         if (!empty($bOr->getChildren())) {
             $bOr->add($eq);
             $query->where($bOr);
@@ -126,8 +124,6 @@ class ConvertValueToDn implements  AttributeConverterInterface
             $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->toLdap($value)));
         } elseif (preg_match(LdapUtilities::MATCH_SID, $value)) {
             $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->toLdap($value)));
-        } elseif (($pieces = ldap_explode_dn($value, 1)) && isset($pieces['count']) && $pieces['count'] > 2) {
-            $bOr->add($query->filter()->eq('distinguishedName', $value));
         }
 
         return $bOr;

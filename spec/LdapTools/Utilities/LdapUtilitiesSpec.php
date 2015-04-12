@@ -58,4 +58,10 @@ class LdapUtilitiesSpec extends ObjectBehavior
         // How to properly test this?
         $this::encode('foo', 'UTF-8')->shouldBeEqualTo('foo');
     }
+
+    function it_should_check_whether_a_dn_is_a_valid_ldap_object()
+    {
+        $this::isValidLdapObjectDn('cn=foo,dc=example,dc=com')->shouldBeEqualTo(true);
+        $this::isValidLdapObjectDn('foo,=bar')->shouldBeEqualTo(false);
+    }
 }

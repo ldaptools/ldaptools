@@ -133,10 +133,8 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_convert_a_dn_back_to_a_dn(LdapConnectionInterface $connection)
     {
         $dn = $this->entry[0]['distinguishedname'][0];
-        $dnHex = '\43\4e\3d\46\6f\6f\2c\44\43\3d\62\61\72\2c\44\43\3d\66\6f\6f';
-
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=\62\61\72))(|(distinguishedName='.$dnHex.')(cn='.$dnHex.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -145,7 +143,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         ]]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
-        $this->toLdap($this->entry[0]['distinguishedname'][0])->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
+        $this->toLdap($dn)->shouldBeEqualTo($dn);
     }
 
     function it_should_convert_a_dn_into_its_common_name()
