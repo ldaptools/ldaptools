@@ -133,7 +133,7 @@ The FQDN of the domain (ie. `example.com`).
 ------------------------------
 #### base_dn **(REQUIRED)**
 
-The base DN for searches (ie. `dc=example,dc=com`).
+The base DN for searches (ie. The default naming context: `dc=example,dc=com`).
 
 -------------------------------
 #### username **(REQUIRED)**
@@ -155,10 +155,11 @@ be modified using the `bind_format` option.
 The password to use when binding to LDAP.
 
 -------------------------------
-#### servers **(REQUIRED)**
+#### servers
 
 An array of LDAP servers (ie. `[ 'dc01' ]`). When more than one server name is used it will attempt each one until it
-successfully connects.
+successfully connects. If no servers are given then it will attempt to lookup the LDAP servers for the domain by
+querying DNS. It is recommended that you define this manually for faster and more predictable results.
 
 -------------------------------
 #### bind_format

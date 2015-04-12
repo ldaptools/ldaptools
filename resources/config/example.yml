@@ -20,9 +20,14 @@ domains:
     example:
         # Required: The full domain name.
         domain_name: "example.com"
-        # Optional: If not specified, it will be looked-up in the RootDSE.
+        # Required: The user to use for binding to LDAP and subsequent operations for the connection.
+        username: user
+        # Required: The password for the user binding to LDAP.
+        password: 12345
+        # Required: The base DN (default naming context) for the domain.
         base_dn: "dc=example,dc=com"
-        # Required: One or more LDAP servers to connect to.
+        # Recommended: One or more LDAP servers to connect to. If this is empty then it will query DNS for a
+        #   list of LDAP servers for the domain.
         servers: [ 'example1','example2' ]
         # Optional: The page size to use for paging operations, such as searches. Default: 1000
         page_size: 1000
@@ -34,10 +39,6 @@ domains:
         # Optional: Whether or not to talk to LDAP over TLS. Default: false
         # If this is set to false, certain operations will not work. Such as password changes.
         use_tls: false
-        # Required: The user to use for binding to LDAP and subsequent operations for the connection.
-        username: user
-        # Required: The password for the user binding to LDAP.
-        password: 12345
         # Optional: The LDAP type for this domain: ad, openldap. Default: ad
         ldap_type: openldap
         # Optional: Whether the connection should wait to bind until necessary (true) or bind immediately

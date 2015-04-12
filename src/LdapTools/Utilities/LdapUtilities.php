@@ -100,4 +100,17 @@ class LdapUtilities
 
         return $value;
     }
+
+    /**
+     * Get an array of all the LDAP servers for a domain by querying DNS.
+     *
+     * @param string $domain The domain name to query.
+     * @return string[]
+     */
+    public function getLdapServersForDomain($domain)
+    {
+        $hosts = dns_get_record('_ldap._tcp.'.$domain, DNS_SRV);
+
+        return is_array($hosts) ? array_column($hosts, 'target') : [];
+    }
 }

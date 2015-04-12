@@ -95,7 +95,7 @@ class LdapConnection implements LdapConnectionInterface
     public function __construct(DomainConfiguration $config)
     {
         $this->usernameFormatter = BindUserStrategy::getInstance($config);
-        $this->serverPool = new LdapServerPool($config->getServers(), $config->getPort());
+        $this->serverPool = new LdapServerPool($config);
         $this->config = $config;
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());

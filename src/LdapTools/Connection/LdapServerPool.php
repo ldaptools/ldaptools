@@ -11,6 +11,9 @@
 namespace LdapTools\Connection;
 
 use LdapTools\Exception\LdapConnectionException;
+use LdapTools\DomainConfiguration;
+use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\TcpSocket;
 
 /**
  * Retrieves an available LDAP server from an array using the provided method.
@@ -30,28 +33,35 @@ class LdapServerPool
     const SELECT_ORDER = 'order';
 
     /**
-     * @var array The LDAP servers.
-     */
-    protected $servers = [];
-
-    /**
      * @var string The method to use when ordering the servers array.
      */
     protected $selectionMethod = self::SELECT_ORDER;
 
     /**
-     * @var int The LDAP port number.
+     * @var DomainConfiguration
      */
-    protected $port = 389;
+    protected $config;
 
     /**
-     * @param array $servers
-     * @param int $port
+     * @var TcpSocket
      */
-    public function __construct(array $servers, $port)
+    protected $tcp;
+
+    /**
+     * @var LdapUtilities
+     */
+    protected $utilities;
+
+    /**
+     * @param DomainConfiguration $config
+     * @param TcpSocket $tcp|null
+     * @param LdapUtilities $utilities|null
+     */
+    public function __construct(DomainConfiguration $config, TcpSocket $tcp = null, LdapUtilities $utilities = null)
     {
-        $this->servers = $servers;
-        $this->port = $port;
+        $this->config = $config;
+        $this->tcp = $tcp ?: new TcpSocket($config->getPort());
+        $this->utilities = $utilities ?: new LdapUtilities();
     }
 
     /**
@@ -104,10 +114,10 @@ class LdapServerPool
      */
     public function getSortedServersArray()
     {
-        if (self::SELECT_ORDER == $this->selectionMethod) {
-            $servers = $this->servers;
-        } else {
-            $servers = $this->shuffleServers($this->servers);
+        $servers = empty($this->config->getServers()) ? $this->getServersFromDns() : $this->config->getServers();
+
+        if (self::SELECT_RANDOM == $this->selectionMethod) {
+            $servers = $this->shuffleServers($servers);
         }
 
         return $servers;
@@ -121,11 +131,9 @@ class LdapServerPool
      */
     protected function isServerAvailable($server)
     {
-        $fp = @fsockopen($server, $this->port, $errorNumber, $errorMessage, 1);
-        $result = (bool) $fp;
-
-        if ($fp) {
-            fclose($fp);
+        $result = $this->tcp->connect($server);
+        if ($result) {
+            $this->tcp->close();
         }
 
         return $result;
@@ -140,6 +148,26 @@ class LdapServerPool
     protected function shuffleServers(array $servers)
     {
         shuffle($servers);
+
+        return $servers;
+    }
+
+    /**
+     * Attempt to lookup the LDAP servers from the DNS name.
+     *
+     * @return array The LDAP servers.
+     * @throws LdapConnectionException
+     */
+    protected function getServersFromDns()
+    {
+        $servers = $this->utilities->getLdapServersForDomain($this->config->getDomainName());
+
+        if (!is_array($servers)) {
+            throw new LdapConnectionException(sprintf(
+                'No LDAP servers found via DNS for "%s".',
+                $this->config->getDomainName()
+            ));
+        }
 
         return $servers;
     }
