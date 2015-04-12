@@ -54,8 +54,8 @@ class LdapServerPool
 
     /**
      * @param DomainConfiguration $config
-     * @param TcpSocket $tcp|null
-     * @param LdapUtilities $utilities|null
+     * @param TcpSocket|null $tcp
+     * @param LdapUtilities|null $utilities
      */
     public function __construct(DomainConfiguration $config, TcpSocket $tcp = null, LdapUtilities $utilities = null)
     {
