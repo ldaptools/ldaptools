@@ -90,6 +90,11 @@ class LdapConnection implements LdapConnectionInterface
     protected $usernameFormatter;
 
     /**
+     * @var RootDSE|null
+     */
+    protected $rootDse;
+
+    /**
      * @param DomainConfiguration $config
      */
     public function __construct(DomainConfiguration $config)
@@ -111,7 +116,11 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getRootDse()
     {
-        return new RootDse($this);
+        if (!$this->rootDse) {
+            $this->rootDse = new RootDse($this);
+        }
+
+        return $this->rootDse;
     }
 
     /**
