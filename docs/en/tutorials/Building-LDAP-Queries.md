@@ -216,7 +216,7 @@ Example usage to return the RootDSE for a domain:
 
 ```php
 // NOTE: You can also call the getRootDse() method on the connection object to get the RootDSE...
-$rootDse = $lqb->where($lqb->filter->present('objectClass'))
+$rootDse = $lqb->where($lqb->filter()->present('objectClass'))
                 ->setBaseDn('')
                 ->setScopeBase()
                 ->getLdapQuery()
