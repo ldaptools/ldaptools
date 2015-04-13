@@ -63,6 +63,10 @@ The `select` method allows you to choose specifically which attributes you would
 pass an array of attribute names to it that you would like, or a single attribute as a string. In the absence of 
 anything passed to it, it will select the default set of attributes for the query as defined for the type in the schema.
 
+To retrieve all attributes defined in the schema you can pass a single wildcard `*` as a selected attribute. In the
+absence of a schema doing that will also select all LDAP attributes. To select all LDAP attributes and all schema
+attributes for a LDAP object you can pass a double wildcard `**` as a selected attribute.
+
 Attribute names are looked for in the schema to see if they map to specific LDAP attributes.
 ```php
 $lqb->select(['firstName', 'city', 'state', 'sid']);
@@ -72,10 +76,16 @@ $lqb->select('guid');
 
 // Attribute names will always be returned in the case you enter it in, irrespective of how LDAP returns the data.
 $lqb->select(['FirstName', 'City', 'State', 'SID']);
+
+// Select all attributes defined in the schema for a LDAP object
+$lqb->select('*');
+
+// Select all attributes both in the schema and from LDAP for an object
+$lqb->select('**');
 ```
  
 If you want the raw data to be returned from LDAP you can select LDAP attribute names explicitly. You can also include 
-schema names at the same time. **NOTE:** Attributes selected by their LDAP attribute name will **NOT** have attribute 
+schema names at the same time. **NOTE:** Attributes selected by their LDAP attribute name will **NOTE** have attribute 
 conversion done.
 
 ```php

@@ -196,7 +196,7 @@ class ArrayHydrator implements HydratorInterface
     protected function sortResults(array $results)
     {
         $orderBy = [];
-        if (!empty($this->schemas)) {
+        if (!empty($this->schemas) && $this->selectedAttributes !== ['*']) {
             // Ignore case differences to ease later comparisons.
             foreach ($this->orderBy as $attribute => $direction) {
                 $orderBy[AttributeNameResolver::getKeyNameCaseInsensitive($attribute, $this->selectedAttributes)] = $direction;

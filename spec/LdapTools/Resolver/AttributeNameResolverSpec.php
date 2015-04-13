@@ -70,4 +70,36 @@ class AttributeNameResolverSpec extends ObjectBehavior
     {
         $this::getKeyNameCaseInsensitive('firstName',['FirstName'])->shouldBeEqualTo('FirstName');
     }
+
+    function it_should_return_all_LDAP_attributes_merged_with_the_schema_if_a_wildcard_was_used()
+    {
+        $map = [
+            'firstName' => 'givenName',
+            'lastName' => 'sn',
+            'emailAddress' => 'mail',
+            'name' => 'cn'
+        ];
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap($map);
+        $fromLdap = [
+            'givenName' => 'Egon',
+            'sn' => 'Spengler',
+            'mail' => 'espengler@whhhhhy.local',
+            'cn' => 'Egon',
+            'dn' => 'CN=Egon,dc=whhhhhy,dc=local',
+        ];
+        $keys = array_unique(array_merge(array_keys($fromLdap), array_keys($map)));
+
+        $this->beConstructedWith($schema);
+        $this->fromLdap($fromLdap, ['*'])->shouldHaveKeys($keys);
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'haveKeys' => function($subject, $keys) {
+                return (count(array_intersect_key(array_flip($keys), $subject)) === count($keys));
+            },
+        ];
+    }
 }

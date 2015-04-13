@@ -155,10 +155,11 @@ class LdapQuery
      */
     public function getSingleScalarResult()
     {
-        if (count($this->getAttributes()) !== 1) {
+        if (count($this->getAttributes()) !== 1 || $this->isWildCardSelection()) {
+            $selected = $this->isWildCardSelection() ? 'All' : count($this->getAttributes());
             throw new LdapQueryException(sprintf(
                 'When retrieving a single value you should only select a single attribute. %s are selected.',
-                count($this->getAttributes())
+                $selected
             ));
         }
         $attribute = reset($this->getAttributes());
@@ -220,10 +221,10 @@ class LdapQuery
     public function execute($hydratorType = HydratorFactory::TO_OBJECT)
     {
         $hydrator = $this->hydratorFactory->get($hydratorType);
-        $attributes = $this->getAttributesToLdap($this->attributes);
+        $attributes = $this->getAttributesToLdap($this->getSelectedAttributes());
 
         $hydrator->setLdapObjectSchemas(...$this->schemas);
-        $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->attributes));
+        $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->getSelectedAttributes()));
         $hydrator->setLdapConnection($this->ldap);
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $hydrator->setOrderBy($this->orderBy);
@@ -444,12 +445,44 @@ class LdapQuery
      */
     protected function mergeOrderByAttributes(array $attributes)
     {
-        foreach (array_keys($this->orderBy) as $attribute) {
-            if (!in_array(strtolower($attribute), array_map('strtolower', $attributes))) {
-                $attributes[] = $attribute;
+        if (!$this->isWildCardSelection()) {
+            foreach (array_keys($this->orderBy) as $attribute) {
+                if (!in_array(strtolower($attribute), array_map('strtolower', $attributes))) {
+                    $attributes[] = $attribute;
+                }
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * Determine what attributes should be selected. This helps account for all attributes being selected both within
+     * and out of the context of a schema.
+     *
+     * @return array
+     */
+    protected function getSelectedAttributes()
+    {
+        $attributes = $this->attributes;
+
+        // Interpret a single wildcard as only schema attributes.
+        if (!empty($this->schemas) && !empty($attributes) && $attributes[0] == '*') {
+            $attributes = array_keys($this->schemas[0]->getAttributeMap());
+        // Interpret a double wildcard as all LDAP attributes even if they aren't in the schema file.
+        } elseif (!empty($this->schemas) && !empty($attributes) && $attributes[0] == '**') {
+            $attributes = ['*'];
+        }
+
+        return $attributes;
+    }
+
+    /**
+     *
+     * @return bool
+     */
+    protected function isWildCardSelection()
+    {
+        return (count($this->attributes) === 1 && ($this->attributes[0] == '*' || $this->attributes[0] == '**' ));
     }
 }

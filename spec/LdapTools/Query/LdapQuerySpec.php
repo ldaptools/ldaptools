@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Query;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Query\LdapQuery;
 use LdapTools\Schema\LdapObjectSchema;
@@ -209,6 +210,11 @@ class LdapQuerySpec extends ObjectBehavior
 
         $this->setAttributes(["sn","givenname"]);
         $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetSingleScalarResult();
+        $this->setAttributes(["*"]);
+        $e = new LdapQueryException('When retrieving a single value you should only select a single attribute. All are selected.');
+        $this->shouldThrow($e)->duringGetSingleScalarResult();
+        $this->setAttributes(["**"]);
+        $this->shouldThrow($e)->duringGetSingleScalarResult();
     }
 
     function it_should_return_a_single_attribute_value_when_calling_getSingleScalarOrNullResult()
@@ -334,5 +340,83 @@ class LdapQuerySpec extends ObjectBehavior
         $this->setLdapObjectSchemas($schema);
         $this->execute(HydratorFactory::TO_OBJECT)->first()->getOtherHomePhone()->shouldBeArray();
         $this->execute(HydratorFactory::TO_OBJECT)->last()->getOtherHomePhone()->shouldBeArray();
+    }
+
+    function it_should_select_all_schema_attributes_with_a_wildcard()
+    {
+        $map = [
+            'firstName' => 'givenName',
+            'lastName' => 'sn',
+        ];
+        $this->ldap->getEncoding()->willReturn('UTF-8');
+        $this->ldap->search(Argument::any(), ["givenName","sn"], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap($map);
+
+        $this->setAttributes(['*']);
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->setLdapObjectSchemas($schema);
+        $this->getResult()->first()->toArray()->shouldHaveKeys(array_keys($map));
+    }
+
+    function it_should_select_all_LDAP_attributes_with_a_double_wildcard()
+    {
+        $attributes = [
+            "givenname",
+            "cn",
+            "sn",
+            "otherhomephone",
+            "dn",
+        ];
+        $map = [
+            'firstName' => 'givenName',
+            'lastName' => 'sn',
+        ];
+        $this->ldap->getEncoding()->willReturn('UTF-8');
+        $this->ldap->search(Argument::any(), ['*'], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap($map);
+
+        $this->setAttributes(['**']);
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->setLdapObjectSchemas($schema);
+        $this->getResult()->first()->toArray()->shouldHaveKeys($attributes);
+    }
+
+    function it_should_not_add_an_order_by_attribute_to_the_selection_when_a_wildcard_is_used()
+    {
+        $attributes = [
+            "givenname",
+            "cn",
+            "sn",
+            "otherhomephone",
+            "dn",
+        ];
+        $map = [
+            'firstName' => 'givenName',
+            'lastName' => 'sn',
+        ];
+        $this->ldap->getEncoding()->willReturn('UTF-8');
+        $this->ldap->search(Argument::any(), ['*'], Argument::any(), Argument::any(), Argument::any())
+            ->willReturn($this->ldapEntries);
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setAttributeMap($map);
+
+        $this->setOrderBy(['firstName' => 'ASC']);
+        $this->setAttributes(['**']);
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->setLdapObjectSchemas($schema);
+        $this->getResult()->first()->toArray()->shouldHaveKeys($attributes);
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'haveKeys' => function($subject, $keys) {
+                return (count(array_intersect_key(array_flip($keys), $subject)) === count($keys));
+            },
+        ];
     }
 }

@@ -46,7 +46,7 @@ class AttributeNameResolver
      */
     public function fromLdap(array $entry, array $selectedAttributes)
     {
-        $this->selectedAttributes = $selectedAttributes;
+        $this->selectedAttributes = $this->getSelectedAttributes($selectedAttributes, $entry);
 
         $newEntry = [];
         foreach ($entry as $attribute => $value) {
@@ -155,5 +155,23 @@ class AttributeNameResolver
         }
 
         return $newEntry;
+    }
+
+    /**
+     * Determine what attributes should be selected. This accounts for a query wanting all attributes.
+     *
+     * @param array $selected
+     * @param array $entry
+     * @return array
+     */
+    protected function getSelectedAttributes(array $selected, array $entry)
+    {
+        if (count($selected) === 1 && $selected[0] == '*' && !$this->schema) {
+            $selected = array_keys($entry);
+        } elseif (count($selected) === 1 && $selected[0] == '*' && $this->schema) {
+            $selected = array_unique(array_merge(array_keys($this->schema->getAttributeMap()), array_keys($entry)));
+        }
+
+        return $selected;
     }
 }
