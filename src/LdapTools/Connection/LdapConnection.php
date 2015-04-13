@@ -13,6 +13,7 @@ namespace LdapTools\Connection;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
+use LdapTools\Factory\RootDseFactory;
 use LdapTools\Query\LdapQuery;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -91,7 +92,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $usernameFormatter;
 
     /**
-     * @var RootDSE|null
+     * @var \LdapTools\Object\LdapObject|null
      */
     protected $rootDse;
 
@@ -111,17 +112,13 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Get an object that represents the RootDSE information for the domain.
+     * Get a LdapObject that represents the RootDSE information for the domain.
      *
-     * @return RootDse
+     * @return \LdapTools\Object\LdapObject
      */
     public function getRootDse()
     {
-        if (!$this->rootDse) {
-            $this->rootDse = new RootDse($this);
-        }
-
-        return $this->rootDse;
+        return RootDseFactory::get($this);
     }
 
     /**
@@ -442,7 +439,7 @@ class LdapConnection implements LdapConnectionInterface
     {
         if ($scope !== LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
-        } elseif ($scope == LdapQuery::SCOPE_BASE && !@ldap_control_paged_result($this->connection, 0)) {
+        } elseif ($scope == LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result($this->connection, 0)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results for read operation: %s',
                 $this->getLastError()
