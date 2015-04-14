@@ -149,17 +149,17 @@ class LdapObjectManager
      */
     protected function getRdnValueIfNotSelected(LdapObject $ldapObject)
     {
-        /** @var LdapObjectCollection $results */
-        $results = (new LdapQueryBuilder($this->connection, $this->schemaFactory))->select(['name'])
+        /** @var LdapObject $result */
+        $result = (new LdapQueryBuilder($this->connection, $this->schemaFactory))->select('name')
             ->from($ldapObject->getType())
             ->where(['dn' => $ldapObject->get('dn')])
             ->getLdapQuery()
-            ->execute();
+            ->getOneOrNullResult();
 
-        if (1 != $results->count()) {
+        if (is_null($result) || !$result->has('name')) {
             throw new \RuntimeException('Unable to retrieve the RDN value for the LdapObject');
         }
 
-        return reset($results->toArray())->get('name');
+        return $result->get('name');
     }
 }

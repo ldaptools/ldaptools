@@ -42,7 +42,12 @@ class ConvertValueToDn implements  AttributeConverterInterface
     {
         $options = $this->getOptionsArray();
 
-        return (isset($options['display_dn']) && $options['display_dn']) ? $dn : reset(LdapUtilities::explodeDn($dn));
+        if (!(isset($options['display_dn']) && $options['display_dn'])) {
+            $dn = LdapUtilities::explodeDn($dn);
+            $dn = reset($dn);
+        }
+
+        return $dn;
     }
 
     /**

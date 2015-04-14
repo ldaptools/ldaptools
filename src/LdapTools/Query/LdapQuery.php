@@ -162,7 +162,8 @@ class LdapQuery
                 $selected
             ));
         }
-        $attribute = reset($this->getAttributes());
+        $attribute = $this->getAttributes();
+        $attribute = reset($attribute);
         $result = $this->getSingleResult();
 
         if (!$result->has($attribute)) {

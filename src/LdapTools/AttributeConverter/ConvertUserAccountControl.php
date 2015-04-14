@@ -70,7 +70,12 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     protected function modifyUacValue($value)
     {
-        $lastValue = is_array($this->getLastValue()) ? reset($this->getLastValue()) : $this->getLastValue();
+        if (is_array($this->getLastValue())) {
+            $lastValue = $this->getLastValue();
+            $lastValue = reset($lastValue);
+        } else {
+            $lastValue = $this->getLastValue();
+        }
 
         // If the bit we are expecting is already set how we want it, then do not attempt to modify it.
         if ($this->fromLdap($lastValue) === $value) {

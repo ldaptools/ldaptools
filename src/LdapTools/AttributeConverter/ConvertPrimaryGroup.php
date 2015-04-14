@@ -56,8 +56,9 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
             return $value;
         }
         $groupSid = $this->validateAndGetGroupSID($value);
+        $groupSid = explode('-', (new ConvertWindowsSid())->fromLdap($groupSid));
 
-        return end(explode('-', (new ConvertWindowsSid())->fromLdap($groupSid)));
+        return end($groupSid);
     }
 
     /**
