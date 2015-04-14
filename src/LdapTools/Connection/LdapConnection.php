@@ -245,7 +245,11 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getBaseDn()
     {
-        return $this->config->getBaseDn();
+        if (empty($this->config->getBaseDn())) {
+            return $this->getRootDse()->get('defaultNamingContext');
+        } else {
+            return $this->config->getBaseDn();
+        }
     }
 
     /**

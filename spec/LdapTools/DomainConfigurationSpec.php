@@ -266,7 +266,6 @@ class DomainConfigurationSpec extends ObjectBehavior
         $config = [
             'domain_name' => 'example.local',
             'username' => 'admin',
-            'password' => '12345',
             'lazy_bind' => true,
         ];
         $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringLoad($config);

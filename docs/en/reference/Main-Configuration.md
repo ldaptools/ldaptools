@@ -130,11 +130,6 @@ general:
 
 The FQDN of the domain (ie. `example.com`).
 
-------------------------------
-#### base_dn **(REQUIRED)**
-
-The base DN for searches (ie. The default naming context: `dc=example,dc=com`).
-
 -------------------------------
 #### username **(REQUIRED)**
 
@@ -153,6 +148,12 @@ be modified using the `bind_format` option.
 #### password **(REQUIRED)**
 
 The password to use when binding to LDAP.
+
+------------------------------
+#### base_dn
+
+The base DN for searches (ie. The default naming context: `dc=example,dc=com`). If this is empty then the RootDSE will
+be queried for the `defaultNamingContext` value. It is recommended that you define this manually for better performance.
 
 -------------------------------
 #### servers
