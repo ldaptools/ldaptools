@@ -20,7 +20,7 @@ use LdapTools\Query\LdapQueryBuilder;
 $lqb = new LdapQueryBuilder();
 
 $filter = $lqb->select('givenName', 'sn', 'l')
-    ->where('objectClass','user')
+    ->where(['objectClass' => 'user'])
     ->andWhere($lqb->filter->like('sAMAccountName','*smith'))
     ->getLdapFilter();
     
