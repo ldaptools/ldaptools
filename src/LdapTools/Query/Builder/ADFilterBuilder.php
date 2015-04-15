@@ -195,8 +195,8 @@ class ADFilterBuilder extends FilterBuilder
      * @param string $objectDn The full distinguished name of the account.
      * @return MatchingRule
      */
-    public function hasMemberRecursively($objectDn)
+    public function hasMemberRecursively($value, $attribute = 'members')
     {
-        return new MatchingRule(self::ATTR['MEMBER'], MatchingRuleOid::IN_CHAIN, $objectDn);
+        return new MatchingRule($attribute, MatchingRuleOid::IN_CHAIN, $value);
     }
 }

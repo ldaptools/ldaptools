@@ -56,6 +56,16 @@ class ADFilterBuilderSpec extends ObjectBehavior
         $this->hasMemberRecursively('cn=foo,dc=bar,dc=foo')->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
     }
 
+    function it_should_use_the_members_attribute_by_default_for_hasMemberRecursively()
+    {
+        $this->hasMemberRecursively('foo')->getAttribute()->shouldBeEqualTo('members');
+    }
+
+    function it_should_use_the_specified_attribute_when_requested_for_hasMemberRecursively()
+    {
+        $this->hasMemberRecursively('foo','users')->getAttribute()->shouldBeEqualTo('users');
+    }
+
     function it_should_return_MatchingRule_when_calling_groupIsType()
     {
         $this->groupIsType(GroupTypeFlags::GLOBAL_GROUP)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
