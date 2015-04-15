@@ -549,7 +549,7 @@ Recursively checks an object's group membership for a group. The `$group` parame
 * The full distinguished name of a group.
 * A `LdapObject` as the result of another query.
 
-This creates a matching rule comparison using the OID `IN_CHAIN` against the users `memberOf` attribute.
+This creates a matching rule comparison using the OID `IN_CHAIN` against the users `groups` attribute.
 
 ```php
 use LdapTools\Object\LdapObjectType;
