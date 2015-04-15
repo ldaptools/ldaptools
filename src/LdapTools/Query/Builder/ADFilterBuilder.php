@@ -178,7 +178,7 @@ class ADFilterBuilder extends FilterBuilder
      * Performs a recursive search of group membership to determine if the account belongs to it. If you are not using a
      * schema and want to use this function you should pass false as the second argument.
      *
-     * @param string $group The name, GUID, SID, or DN of a group
+     * @param string $group The name, GUID, SID, LdapObject or DN of a group
      * @param bool $schema If false the 'memberOf' attribute will be used instead of the 'groups' attribute from the schema.
      * @return MatchingRule
      */
@@ -192,7 +192,8 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Performs a recursive search of members in a group to see if the account is one of them.
      *
-     * @param string $objectDn The full distinguished name of the account.
+     * @param string $value A username, SID, GUID, DN or LdapObject.
+     * @param string $attribute The attribute to query against. Defaults to 'members'.
      * @return MatchingRule
      */
     public function hasMemberRecursively($value, $attribute = 'members')
