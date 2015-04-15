@@ -523,11 +523,20 @@ Checks for accounts that have passwords that are set to never expire. Creates a 
 `userAccountControl` attribute.
 
 ------------------------
-#### hasMemberRecursively($userDn)
+#### hasMemberRecursively($member, $attribute = 'members')
 ---
 
-Recursively checks groups for a member specified by their full distinguished name. Creates a matching rule comparison
-using the OID `IN_CHAIN` against the groups `member` attribute.
+Recursively checks groups for a specific member. The `$member` parameter can be any of the following:
+ 
+ * A username. This must be unique! If a computer and user share the same name then an exception will be thrown.
+ * The GUID of an object (ie. a value like `bee66f2f-bcf7-4905-b65b-2f36d5008f1e`)
+ * The SID of an object (ie. a value like `S-1-5-21-1004336348-1177238915-682003330-512`)
+ * The full distinguished name of an object.
+ * A `LdapObject` as the result of another query.
+ 
+This creates a matching rule comparison using the OID `IN_CHAIN` against the groups `members` attribute by default. If
+you have a custom attribute, or some other attribute you would like to run it against, you must pass it as the second
+argument.
 
 ------------------------
 #### isRecursivelyMemberOf($group)
@@ -538,6 +547,7 @@ Recursively checks an object's group membership for a group. The `$group` parame
 * The GUID of a group (ie. a value like `bee66f2f-bcf7-4905-b65b-2f36d5008f1e`)
 * The SID of a group (ie. a value like `S-1-5-21-1004336348-1177238915-682003330-512`)
 * The full distinguished name of a group.
+* A `LdapObject` as the result of another query.
 
 This creates a matching rule comparison using the OID `IN_CHAIN` against the users `memberOf` attribute.
 
