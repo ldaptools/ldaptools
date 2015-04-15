@@ -7,7 +7,7 @@ Any pull requests (bug fixes, new features, typos, etc.) are greatly appreciated
 * Please limit each pull request to a single issue or feature. Breaking them into separate items make it easier to spot 
   what's changing.  
 
-* Please write specs for your code. If you're unfamiliar with phpspec, please read through [their introduction](http://www.phpspec.net/docs/introduction.html).
+* Please write specs for your code. If you're unfamiliar with phpspec, please read through [their introduction](http://www.phpspec.net/).
 
 * Please add any additional documentation and docblocks for your code as necessary.
 
