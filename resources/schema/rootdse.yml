@@ -27,12 +27,19 @@ objects:
              bool:
                 - isSynchronized
                 - isGlobalCatalogReady
+             functional_level:
+                - domainFunctionalLevel
+                - forestFunctionalLevel
+                - dcFunctionalLevel
         attributes:
             isSynchronized: isSynchronized
             isGlobalCatalogReady: isGlobalCatalogReady
             domainFunctionality: domainFunctionality
             forestFunctionality: forestFunctionality
             domainControllerFunctionality: domainControllerFunctionality
+            domainFunctionalLevel: domainFunctionality
+            forestFunctionalLevel: forestFunctionality
+            dcFunctionalLevel: domainControllerFunctionality
             dsServiceName: dsServiceName
             currentTime: currentTime
     openldap:

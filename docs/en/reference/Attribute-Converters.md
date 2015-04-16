@@ -100,4 +100,8 @@ process and the converter may use the connection to make LDAP calls to resolve d
 
   * `fromLdap`: Takes the RID of a group and returns the group's name.
 
+#### *functional_level*
+  * `fromLdap`: Takes an Active Directory functional level as an int and converts it to a human readable form.
   
+  * `toLdap`: This should not be used. You should only read the value from LDAP.
+ 

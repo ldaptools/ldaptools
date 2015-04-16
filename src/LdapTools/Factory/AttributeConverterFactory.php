@@ -40,6 +40,7 @@ class AttributeConverterFactory
         'group_type' => '\LdapTools\AttributeConverter\ConvertGroupType',
         'gpo_link' => '\LdapTools\AttributeConverter\ConvertGPLink',
         'primary_group' => '\LdapTools\AttributeConverter\ConvertPrimaryGroup',
+        'functional_level' => '\LdapTools\AttributeConverter\ConvertFunctionalLevel',
     ];
 
     /**
