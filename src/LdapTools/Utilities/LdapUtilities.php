@@ -78,6 +78,26 @@ class LdapUtilities
     }
 
     /**
+     * Given a DN as an array in ['cn=Name', 'ou=Employees', 'dc=example', 'dc=com'] form, return it as its string
+     * representation that is safe to pass back to a query or to save back to LDAP for a DN.
+     *
+     * @param array $dn
+     * @return string
+     */
+    public static function implodeDn(array $dn)
+    {
+        foreach ($dn as $index => $piece) {
+            $values = explode('=', $piece, 2);
+            if (count($values) === 1) {
+                throw new \InvalidArgumentException(sprintf('Unable to parse DN piece "%s".', $values[0]));
+            }
+            $dn[$index] = $values[0].'='.ldap_escape($values[1], null, LDAP_ESCAPE_DN);
+        }
+
+        return implode(',', $dn);
+    }
+
+    /**
      * Encode a string for LDAP with a specific encoding type.
      *
      * @param string $value The value to encode.

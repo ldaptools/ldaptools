@@ -46,11 +46,27 @@ class LdapUtilitiesSpec extends ObjectBehavior
     {
         $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldContain('Foo=bar');
         $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldHaveCount(3);
+        $this::explodeDn('cn=Foo\,\=bar,dc=foo,dc=bar', 0)->shouldContain('cn=Foo=bar');
     }
 
     function it_should_throw_an_error_on_an_invalid_dn()
     {
         $this->shouldThrow('\InvalidArgumentException')->during('explodeDn', ['foo-bar']);
+    }
+
+    function it_should_implode_a_dn_array_to_a_string_dn()
+    {
+        $this::implodeDn(['CN=Foo','DC=example','DC=local'])->shouldBeEqualTo('CN=Foo,DC=example,DC=local');
+    }
+
+    function it_should_escape_special_characters_when_imploding_a_DN_array()
+    {
+        $this::implodeDn(['CN=Foo,=Bar','DC=example','DC=local'])->shouldBeEqualTo('CN=Foo\2c\3dBar,DC=example,DC=local');
+    }
+
+    function it_should_throw_an_error_when_imploding_a_DN_in_invalid_array_form()
+    {
+        $this->shouldThrow('\InvalidArgumentException')->during('implodeDn', [['foo', 'bar']]);
     }
 
     function it_should_encode_values_to_the_desired_type()
