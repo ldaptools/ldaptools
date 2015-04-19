@@ -51,7 +51,7 @@ want. For instance:
 
 ```php
 $object->createContact()
-    ->in('dc=awesome,dc=local')
+    ->in('%OUPath%,%_defaultnamingcontext_%')
     ->with([
         'name' => '%firstname% %lastname%',
         'firstName' => 'Some',
@@ -59,15 +59,19 @@ $object->createContact()
         'emailAddress' => '%firstname%.%lastname%@%somedomain%'
     ])
     ->setParameter('somedomain','foo.bar')
+    ->setParameter('OUPath','OU=Sales,OU=Departments')
     ->execute();
 ```
 
-This contains 3 parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
- parameters will populate their value with their corresponding attribute name. However, `%somedomain%` does not 
-correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` as defined.
+This contains several parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
+ parameters will populate their value with their corresponding attribute name. However, `%somedomain%` and `%OUPath%` do
+ not correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` and
+`OU=Sales,OU=Departments`, respectively.
 
-There is also a special parameter called `%_domainname_%` when creating LDAP objects that will resolve to the fully
-qualified domain name of the connection in the current context (ie. `example.com`).
+There is also a special parameter for `%_domainname_%` and `%_defaultnamingcontext_%` when creating LDAP objects. The 
+`%_domainname_%` will resolve to the fully qualified domain name of the connection in the current context (ie. 
+`example.com`). The `%_defaultnamingcontext_%` will resolve the the base distinguished name of the domain (ie. 
+`dc=example,dc=com`).
 
 ## LdapObjectCreator Methods
 
@@ -81,6 +85,7 @@ distinguished name form (ie. `ou=users,dc=mydomain,dc=com`).
 
 You can also specify a default location all objects of a certain type by defining the `default_container` directive in 
 your schema (see [the schema configuration reference](../reference/Schema-Configuration.md)). If you define that can omit this method.
+You can also place parameters in this value that will be resolved upon creation (ie. `%EmployeeOU%,DC=example,DC=com`).
 
 ------------------------
 #### with($attributes)
