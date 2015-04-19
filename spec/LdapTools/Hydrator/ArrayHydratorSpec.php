@@ -207,13 +207,15 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setDefaultValues([
             'phoneNumber' => '555-2368',
-            'emailAddress' => '%firstname%.lastname%@%whoyougonnacall%'
+            'emailAddress' => '%firstname%.lastname%@%whoyougonnacall%',
+            'enabled' => false,
         ]);
 
         $this->setLdapObjectSchemas($schema);
         $this->setParameter('whoyougonnacall', 'ghostbusters.local');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKeyWithValue('phoneNumber', '555-2368');
         $this->hydrateToLdap($this->objectToLdap)->shouldNotContain('Egon.Spengler@ghostbusters.local');
+        $this->hydrateToLdap($this->objectToLdap)->shouldHaveKeyWithValue('enabled', false);
     }
 
     function it_should_rename_schema_names_to_ldap_attributeNames_when_hyrdating_to_ldap()

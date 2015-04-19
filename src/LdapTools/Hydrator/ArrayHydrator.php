@@ -272,10 +272,11 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function mergeDefaultAttributes(array $attributes)
     {
-        return array_filter(array_merge(
-            empty($this->schemas) ? [] : $this->getSchema()->getDefaultValues(),
-            $attributes
-        ));
+        if (!empty($this->schemas) && !empty($this->getSchema()->getDefaultValues())) {
+            $attributes = array_merge($this->getSchema()->getDefaultValues(), $attributes);
+        }
+
+        return $attributes;
     }
 
     /**
