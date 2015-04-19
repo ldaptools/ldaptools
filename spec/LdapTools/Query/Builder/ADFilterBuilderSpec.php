@@ -126,8 +126,8 @@ class ADFilterBuilderSpec extends ObjectBehavior
         $this->isRecursivelyMemberOf('foo')->getAttribute()->shouldBeEqualTo('groups');
     }
 
-    function it_should_use_the_memberOf_attribute_if_false_is_passed_to_isRecursivelyMemberOf()
+    function it_should_use_the_memberOf_attribute_if_specified_for_isRecursivelyMemberOf()
     {
-        $this->isRecursivelyMemberOf('foo', false)->getAttribute()->shouldBeEqualTo('memberOf');
+        $this->isRecursivelyMemberOf('foo', 'memberOf')->getAttribute()->shouldBeEqualTo('memberOf');
     }
 }
