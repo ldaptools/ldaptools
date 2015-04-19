@@ -41,6 +41,7 @@ class AttributeConverterFactory
         'gpo_link' => '\LdapTools\AttributeConverter\ConvertGPLink',
         'primary_group' => '\LdapTools\AttributeConverter\ConvertPrimaryGroup',
         'functional_level' => '\LdapTools\AttributeConverter\ConvertFunctionalLevel',
+        'ad_time_span' => '\LdapTools\AttributeConverter\ConvertADTimeSpan',
     ];
 
     /**

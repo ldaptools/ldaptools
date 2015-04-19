@@ -461,3 +461,81 @@ objects:
             objectclass: [ 'top', 'organizationalUnit' ]
         required_attributes:
             - 'name'
+    password_settings:
+        type: PSO
+        class: msDS-PasswordSettings
+        converters:
+             ad_time_span:
+                 - 'maximumPasswordAge'
+                 - 'minimumPasswordAge'
+                 - 'lockoutObservationWindow'
+                 - 'lockoutDuration'
+             bool:
+                 - 'passwordComplexity'
+                 - 'passwordReversibleEncryption'
+             int:
+                 - 'lockoutThreshold'
+                 - 'minimumPasswordLength'
+                 - 'passwordHistoryLength'
+                 - 'precedence'
+             value_to_dn:
+                 - 'appliesTo'
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        converter_options:
+            value_to_dn:
+                 appliesTo:
+                     display_dn: true
+                     attribute: sAMAccountName
+                     or_filter: true
+                     filter:
+                         objectClass: group
+                         objectCategory: person
+        attributes:
+            appliesTo: msDS-PSOAppliesTo
+            created: whenCreated
+            description: description
+            dn: distinguishedName
+            guid: objectGuid
+            lockoutDuration: msDS-LockoutDuration
+            lockoutObservationWindow: msDS-LockoutObservationWindow
+            lockoutThreshold: msDS-LockoutThreshold
+            maximumPasswordAge: msDS-MaximumPasswordAge
+            minimumPasswordAge: msDS-MinimumPasswordAge
+            minimumPasswordLength: msDS-MinimumPasswordLength
+            modified: whenChanged
+            name: cn
+            passwordComplexity: msDS-PasswordComplexityEnabled
+            passwordHistoryLength: msDS-PasswordHistoryLength
+            passwordReversibleEncryption: msDS-PasswordReversibleEncryptionEnabled
+            precedence: msDS-PasswordSettingsPrecedence
+            sid: objectSid
+        multivalued_attributes:
+            - objectClass
+            - appliesTo
+        attributes_to_select:
+            - 'description'
+            - 'name'
+            - 'guid'
+            - 'sid'
+        default_values:
+            objectclass: [ 'top', 'msDS-PasswordSettings' ]
+            passwordReversibleEncryption: false
+        default_container: 'CN=Password Settings Container,CN=System,%_defaultnamingcontext_%'
+        required_attributes:
+            - 'name'
+            - 'lockoutDuration'
+            - 'lockoutObservationWindow'
+            - 'lockoutThreshold'
+            - 'maximumPasswordAge'
+            - 'minimumPasswordAge'
+            - 'minimumPasswordLength'
+            - 'passwordComplexity'
+            - 'passwordHistoryLength'
+            - 'passwordReversibleEncryption'
+            - 'precedence'

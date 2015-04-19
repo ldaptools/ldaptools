@@ -10,6 +10,7 @@ used when generating queries and returning data from LDAP.
   * [Computers](#ad-computer-types)
   * [Contacts](#ad-contact-types)
   * [OUs](#ad-ou-types)
+  * [Password Settings Objects](#ad-password-settings-objects-types)
 
 #### OpenLDAP Schema
   * [Users](#openldap-user-types)
@@ -191,6 +192,32 @@ These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
 | state | st | string |
 | streetAddress | streetAddress | string |
 | zipCode | postalCode | string |
+
+#### AD Password Settings Objects Types
+
+These are Password Settings Objects, also known as PSOs, (`objectClass=msDS-PasswordSettings`). They can be used with 
+the type name `PSO`.
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| appliesTo | msDS-PSOAppliesTo | array |
+| created | whenCreated | `\DateTime` |
+| description | description | string |
+| dn | distinguishedName | string |
+| guid | objectGuid | string |
+| lockoutDuration | msDS-LockoutDuration | `\LdapTools\Utilities\ADTimeSpan` |
+| lockoutObservationWindow | msDS-LockoutObservationWindow | `\LdapTools\Utilities\ADTimeSpan` |
+| lockoutThreshold | msDS-LockoutThreshold | int |
+| maximumPasswordAge | msDS-MaximumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` |
+| minimumPasswordAge | msDS-MinimumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` |
+| minimumPasswordLength | msDS-MinimumPasswordLength | int |
+| modified | whenChanged | `\DateTime` |
+| name | cn | string |
+| passwordComplexity | msDS-PasswordComplexityEnabled | bool |
+| passwordHistoryLength | msDS-PasswordHistoryLength | int |
+| passwordReversibleEncryption | msDS-PasswordReversibleEncryptionEnabled | bool |
+| precedence | msDS-PasswordSettingsPrecedence | int |
+| sid | objectSid | string |
 
 ### The OpenLDAP Schema
 ---

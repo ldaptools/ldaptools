@@ -113,6 +113,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('functional_level')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertFunctionalLevel');
     }
 
+    function it_should_return_ConvertADTimeSpan_when_calling_get_with_ad_time_span()
+    {
+        $this::get('ad_time_span')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertADTimeSpan');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');
