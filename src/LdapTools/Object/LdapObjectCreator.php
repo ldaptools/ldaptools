@@ -14,6 +14,7 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -207,9 +208,7 @@ class LdapObjectCreator
     public function execute()
     {
         $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_ARRAY);
-
-        $hydrator->setParameter('_domainname_', (string) $this->connection);
-        foreach ($this->parameters as $parameter => $value) {
+        foreach ($this->getAllParameters() as $parameter => $value) {
             $hydrator->setParameter($parameter, $value);
         }
 
@@ -247,6 +246,37 @@ class LdapObjectCreator
         }
         $attribute = $this->schema->getAttributeToLdap('name');
 
-        return $attribute.'='.ldap_escape($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->container;
+        return $attribute.'='.ldap_escape($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->getContainerValue();
+    }
+
+    /**
+     * Merges the explicitly set parameters with the default ones.
+     *
+     * @return array
+     */
+    protected function getAllParameters()
+    {
+        $parameters = $this->parameters;
+        $parameters['_domainname_'] = (string) $this->connection;
+
+        $rootDse = $this->connection->getRootDse();
+        // Would this ever not be true? I'm unable to find any RFCs specifically regarding Root DSE structure.
+        if ($rootDse->has('defaultNamingContext')) {
+            $parameters['_defaultnamingcontext_'] = $rootDse->get('defaultNamingContext');
+        }
+
+        return $parameters;
+    }
+
+    /**
+     * Get the container to use while resolving any parameters it might have.
+     *
+     * @return string
+     */
+    protected function getContainerValue()
+    {
+        $resolver = new ParameterResolver(['container' => $this->container], $this->getAllParameters());
+
+        return $resolver->resolve()['container'];
     }
 }

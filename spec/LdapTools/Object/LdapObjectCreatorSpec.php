@@ -9,6 +9,7 @@ use LdapTools\DomainConfiguration;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -16,9 +17,11 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 {
     public function let(LdapConnectionInterface $connection)
     {
+        $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
+        $connection->getRootDse()->willReturn($ldapObject);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -200,5 +203,32 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->with(['username' => 'foobar', 'password' => '12345'])
             ->in('ou=employees,dc=example,dc=local')
             ->execute();
+    }
+
+    function it_should_set_parameters_for_the_container_of_the_ldap_object(LdapConnectionInterface $connection)
+    {
+        $arg = Argument::allOf(
+            Argument::withEntry('cn', 'somedude'),
+            Argument::withEntry('sAMAccountName', 'somedude'),
+            Argument::withEntry('unicodePwd', (new EncodeWindowsPassword())->toLdap('12345'))
+        );
+        $connection->getSchemaName()->willReturn('ad');
+        $connection->add("cn=somedude,ou=Sales,dc=example,dc=com", $arg)->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
+        $cache = CacheFactory::get('none', []);
+        $factory = new LdapObjectSchemaFactory($cache, $parser);
+
+        $this->beConstructedWith($connection, $factory);
+
+        $this->createUser()
+            ->with(['username' => '%foo%', 'password' => '%bar%'])
+            ->in('%SalesOU%,%_defaultnamingcontext_%')
+            ->setParameter('foo', 'somedude')
+            ->setParameter('SalesOU', 'ou=Sales')
+            ->setParameter('bar', '12345');
+
+        $this->execute();
     }
 }
