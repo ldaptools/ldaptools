@@ -54,7 +54,7 @@ class RootDseFactory
     protected static function setup()
     {
         if (!self::$schemaFactory) {
-            $cache = CacheFactory::get(CacheFactory::TYPE_NONE,[]);
+            $cache = CacheFactory::get(CacheFactory::TYPE_NONE, []);
             $parser = SchemaParserFactory::get(SchemaParserFactory::TYPE_YML,  __DIR__.'/../../../resources/schema');
             self::$schemaFactory = new LdapObjectSchemaFactory($cache, $parser);
         }

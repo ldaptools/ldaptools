@@ -484,6 +484,6 @@ class LdapQuery
      */
     protected function isWildCardSelection()
     {
-        return (count($this->attributes) === 1 && ($this->attributes[0] == '*' || $this->attributes[0] == '**' ));
+        return (count($this->attributes) === 1 && ($this->attributes[0] == '*' || $this->attributes[0] == '**'));
     }
 }
