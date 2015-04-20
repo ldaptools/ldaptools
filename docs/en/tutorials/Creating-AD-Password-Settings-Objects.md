@@ -10,7 +10,7 @@ The PSOs can be easily created using a schema definition called `PSO`:
 
 ```php
 use LdapTools\Configuration;
-use LdapTools\ADTimeSpan;
+use LdapTools\Utilities\ADTimeSpan;
 use LdapTools\LdapManager;
 
 $config = (new Configuration())->load('/path/to/my/ldap.yml');

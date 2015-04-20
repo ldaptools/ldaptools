@@ -82,12 +82,13 @@ This class provides a few methods to make it easier to create LDAP objects.
 #### in($container)
 
 The `in` method specifies the container/OU you want to place the LDAP object. It should be a string with the common LDAP
-distinguished name form (ie. `ou=users,dc=mydomain,dc=com`). If you use a parameter in this value it must be explicitly 
-specified. The parameter cannot currently be the value of one of the object's attributes.
+distinguished name form (ie. `ou=users,dc=mydomain,dc=com`).
 
 You can also specify a default location all objects of a certain type by defining the `default_container` directive in 
 your schema (see [the schema configuration reference](../reference/Schema-Configuration.md)). If you define that can omit this method.
 You can also place parameters in this value that will be resolved upon creation (ie. `%EmployeeOU%,DC=example,DC=com`).
+If you use a parameter in this value it must be explicitly specified. The parameter cannot currently be the value of one
+of the object's attributes.
 
 ------------------------
 #### with($attributes)
