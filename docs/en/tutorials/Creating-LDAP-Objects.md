@@ -66,7 +66,8 @@ $object->createContact()
 This contains several parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
  parameters will populate their value with their corresponding attribute name. However, `%somedomain%` and `%OUPath%` do
  not correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` and
-`OU=Sales,OU=Departments`, respectively.
+`OU=Sales,OU=Departments`, respectively. With the OU/container value, the parameter must be explicitly specified it cannot
+currently be the value of one of the object's attributes.
 
 There is also a special parameter for `%_domainname_%` and `%_defaultnamingcontext_%` when creating LDAP objects. The 
 `%_domainname_%` will resolve to the fully qualified domain name of the connection in the current context (ie. 
@@ -81,7 +82,8 @@ This class provides a few methods to make it easier to create LDAP objects.
 #### in($container)
 
 The `in` method specifies the container/OU you want to place the LDAP object. It should be a string with the common LDAP
-distinguished name form (ie. `ou=users,dc=mydomain,dc=com`).
+distinguished name form (ie. `ou=users,dc=mydomain,dc=com`). If you use a parameter in this value it must be explicitly 
+specified. The parameter cannot currently be the value of one of the object's attributes.
 
 You can also specify a default location all objects of a certain type by defining the `default_container` directive in 
 your schema (see [the schema configuration reference](../reference/Schema-Configuration.md)). If you define that can omit this method.
