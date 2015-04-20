@@ -1,6 +1,24 @@
 CHANGELOG
 =========
 
+0.13.0 (2015-04-19)
+------------------
+
+  * A `LdapObject` returned from queries can be passed as a value to many attributes: groups, members, manager, 
+    exchangeSendOnBehalfOf, managedBy, etc. This allows for more fluent code.
+  * Added Password Settings Objects (PSO) to the AD schema definition. 
+  * The `servers` domain config option is no longer mandatory. It will be queried from DNS if not provided.
+  * The `base_dn` domain config option is no longer mandatory. It will be queried from the RootDSE if not provided.
+  * All attributes can now be selected when running a query. `*` selects all schema attributes. `**` Selects all
+    attributes (both schema and LDAP).
+  * Better RootDSE support. It is now returned as a normal LdapObject and is based off a schema.
+  * The `hasMemberRecursively` filter now accepts a username, GUID, SID, LdapObject or DN.
+  * Parameters for the container/OU path are now resolved on LDAP object creation.
+  * Added all of the `other*` AD telephone attributes to the schema.
+  * Defined the objectClass as a multivalued attribute for all schema objects.
+  * The value-to-dn converter will no longer query LDAP when the passed value is a DN.
+  * A few bug fixes.
+  
 0.12.0 (2015-04-08)
 ------------------
 
