@@ -42,7 +42,7 @@ $users = $lqb->select()
     ->fromUsers()
     ->Where(['state' => 'Wisconsin'])
     ->getLdapQuery()
-    ->execute();
+    ->getResult();
     
 foreach ($users as $user) {
     foreach ($user->toArray() as $attribute => $value) {
@@ -220,7 +220,7 @@ $rootDse = $lqb->where($lqb->filter()->present('objectClass'))
                 ->setBaseDn('')
                 ->setScopeBase()
                 ->getLdapQuery()
-                ->execute();
+                ->getSingleResult();
 ```
 
 ------------------------ 
@@ -235,7 +235,7 @@ $users = $lqb->select()
     ->fromUsers()
     ->where(['firstName' => 'John'])
     ->orderBy('lastName') 
-    ->execute();
+    ->getResult();
     
 // Order results by last name (descending) and first name (ascending).
 $users = $lqb->select()
@@ -243,7 +243,7 @@ $users = $lqb->select()
     ->where(['state' => 'Wisconsin'])
     ->orderBy('lastName', 'DESC')
     ->addOrderBy('firstName', 'ASC')
-    ->execute();
+    ->getResult();
 ```
 
 ------------------------ 
@@ -284,17 +284,16 @@ takes care of converting the LDAP results array using a hydration process. It re
 Or you can have it return a simple set of arrays with the attributes and values.
  
 ```php
-use LdapTools\Factory\HydratorFactory;
 
 // By default the results will be a collection of LdapUser objects you can iterate over...
-$results = $lqb->getLdapQuery()->execute();
+$results = $lqb->getLdapQuery()->getResult();
 
 foreach ($results as $result) {
     echo $result->getEmailAddress();
 }
 
 // If you just want simple arrays returned you can specify that
-$results = $lqb->getLdapQuery()->execute(HydratorFactory::TO_ARRAY);
+$results = $lqb->getLdapQuery()->getArrayResult();
 
 foreach ($results as $result) {
     foreach ($result as $attribute => $value) {
@@ -562,7 +561,7 @@ $users = $query->select()
     ->fromUsers()
     ->where($query->filter()->isRecursivelyMemberOf('Employees'))
     ->getLdapQuery()
-    ->execute();
+    ->getResult();
 
 // If you are not targeting a specific set of objects from the schema, then you must
 // pass 'false' as the second argument and specify a full DN. Otherwise this method
@@ -571,7 +570,7 @@ $ldapObjects = $query->select('description')
     ->where(['cn' => 'foo'])
     ->andWhere($query->filter()->isRecursivelyMemberOf('CN=Foo,DC=foo,DC=bar', false))
     ->getLdapQuery()
-    ->execute();
+    ->getResult();
 ```
 
 ------------------------
