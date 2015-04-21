@@ -85,7 +85,7 @@ $lqb->select('**');
 ```
  
 If you want the raw data to be returned from LDAP you can select LDAP attribute names explicitly. You can also include 
-schema names at the same time. **NOTE:** Attributes selected by their LDAP attribute name will **NOTE** have attribute 
+schema names at the same time. Attributes selected by their LDAP attribute name will **NOT** have attribute 
 conversion done.
 
 ```php
