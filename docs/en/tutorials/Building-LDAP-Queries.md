@@ -6,7 +6,7 @@ familiar with Doctrine's QueryBuilder will find this syntax easy to adapt to, as
 takes care of escaping all values passed to it when generating the filter.
 
 * [LdapQueryBuilder Methods](#ldapquerybuilder-methods)
-* [Filter Method Shorcuts](#filter-method-shortcuts)
+* [Filter Method Shortcuts](#filter-method-shortcuts)
 
 ## Generating LDAP Filters Without LdapManager
 -----------------------
