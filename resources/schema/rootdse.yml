@@ -12,6 +12,7 @@ objects:
             supportedSaslMechanisms: supportedSaslMechanisms
             supportedLdapPolicies: supportedLdapPolicies
             supportedLdapVersion: supportedLdapVersion
+            vendorName: vendorName
         multivalued_attributes:
             - namingContexts
             - supportedControl
