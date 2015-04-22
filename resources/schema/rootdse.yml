@@ -13,6 +13,7 @@ objects:
             supportedLdapPolicies: supportedLdapPolicies
             supportedLdapVersion: supportedLdapVersion
             vendorName: vendorName
+            vendorVersion: vendorVersion
         multivalued_attributes:
             - namingContexts
             - supportedControl

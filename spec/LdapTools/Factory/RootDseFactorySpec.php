@@ -38,7 +38,7 @@ class RootDseFactorySpec extends ObjectBehavior
 
     function let(LdapConnectionInterface $connection)
     {
-        $connection->search("(&(objectClass=*))", ["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"], "", "base", null)
+        $connection->search("(&(objectClass=*))", ["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"], "", "base", null)
             ->willReturn($this->entry);
         $connection->__toString()->willReturn('example.local');
         $connection->getPagedResults()->willReturn(true);
