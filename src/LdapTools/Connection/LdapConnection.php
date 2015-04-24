@@ -245,11 +245,17 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getBaseDn()
     {
-        if (empty($this->config->getBaseDn())) {
-            return $this->getRootDse()->get('defaultNamingContext');
+        if (!empty($this->config->getBaseDn())) {
+            $baseDn = $this->config->getBaseDn();
+        } elseif ($this->getRootDse()->has('defaultNamingContext')) {
+            $baseDn = $this->getRootDse()->get('defaultNamingContext');
+        } elseif ($this->getRootDse()->has('namingContexts')) {
+            $baseDn =  $this->getRootDse()->get('namingContexts')[0];
         } else {
-            return $this->config->getBaseDn();
+            throw new LdapConnectionException('The base DN is not defined and could not be found in the RootDSE.');
         }
+
+        return $baseDn;
     }
 
     /**
