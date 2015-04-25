@@ -12,6 +12,7 @@ namespace LdapTools\Connection;
 
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
+use LdapTools\Utilities\Dns;
 use LdapTools\Utilities\LdapUtilities;
 use LdapTools\Utilities\TcpSocket;
 
@@ -48,20 +49,20 @@ class LdapServerPool
     protected $tcp;
 
     /**
-     * @var LdapUtilities
+     * @var Dns
      */
-    protected $utilities;
+    protected $dns;
 
     /**
      * @param DomainConfiguration $config
      * @param TcpSocket|null $tcp
-     * @param LdapUtilities|null $utilities
+     * @param Dns|null $dns
      */
-    public function __construct(DomainConfiguration $config, TcpSocket $tcp = null, LdapUtilities $utilities = null)
+    public function __construct(DomainConfiguration $config, TcpSocket $tcp = null, Dns $dns = null)
     {
         $this->config = $config;
         $this->tcp = $tcp ?: new TcpSocket($config->getPort());
-        $this->utilities = $utilities ?: new LdapUtilities();
+        $this->dns = $dns ?: new Dns();
     }
 
     /**
@@ -160,15 +161,20 @@ class LdapServerPool
      */
     protected function getServersFromDns()
     {
-        $servers = $this->utilities->getLdapServersForDomain($this->config->getDomainName());
+        $servers = $this->dns->getRecord(LdapUtilities::SRV_PREFIX.$this->config->getDomainName(), DNS_SRV);
 
-        if (empty($servers)) {
+        if ($servers === false || empty($servers)) {
             throw new LdapConnectionException(sprintf(
                 'No LDAP servers found via DNS for "%s".',
                 $this->config->getDomainName()
             ));
         }
+        array_multisort(
+            array_column($servers, 'pri'), SORT_ASC|SORT_NUMERIC,
+            array_column($servers, 'weight'), SORT_DESC|SORT_NUMERIC,
+            $servers
+        );
 
-        return $servers;
+        return array_column($servers, 'target');
     }
 }

@@ -28,6 +28,11 @@ class LdapUtilities
     const MATCH_SID = '/^S-\d-(\d+-){1,14}\d+$/i';
 
     /**
+     * The prefix for a LDAP DNS SRV record.
+     */
+    const SRV_PREFIX = '_ldap._tcp.';
+
+    /**
      * Escape any special characters for LDAP to their hexadecimal representation.
      *
      * @param mixed $value The value to escape.
@@ -140,9 +145,9 @@ class LdapUtilities
      * @param string $domain The domain name to query.
      * @return string[]
      */
-    public function getLdapServersForDomain($domain)
+    public static function getLdapServersForDomain($domain)
     {
-        $hosts = dns_get_record('_ldap._tcp.'.$domain, DNS_SRV);
+        $hosts = (new Dns())->getRecord(self::SRV_PREFIX.$domain, DNS_SRV);
 
         return is_array($hosts) ? array_column($hosts, 'target') : [];
     }

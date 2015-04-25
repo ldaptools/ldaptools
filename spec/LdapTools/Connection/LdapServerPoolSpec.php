@@ -13,7 +13,7 @@ namespace spec\LdapTools\Connection;
 use LdapTools\Connection\LdapServerPool;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\LdapConnectionException;
-use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\Dns;
 use LdapTools\Utilities\TcpSocket;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -87,24 +87,57 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->shouldThrow(new LdapConnectionException('No LDAP server is available.'))->duringGetServer();
     }
 
-    function it_should_lookup_servers_via_dns_if_no_servers_are_defined(TcpSocket $tcp, LdapUtilities $utils)
+    function it_should_lookup_servers_via_dns_if_no_servers_are_defined(TcpSocket $tcp, Dns $dns)
     {
         $tcp->connect('foo.example.com')->willReturn(false);
         $tcp->connect('bar.example.com')->willReturn(true);
         $tcp->close()->willReturn(null);
-        $utils->getLdapServersForDomain('example.com')->willReturn(['foo.example.com', 'bar.example.com']);
+        $srvRecords = [
+            [
+                'host' => '_ldap._tcp.example.com',
+                'class' => 'IN',
+                'ttl' => 600,
+                'type' => 'SRV',
+                'pri' => 1,
+                'weight' => 101,
+                'port' => 389,
+                'target' => 'foo.example.com',
+            ],
+            [
+                'host' => '_ldap._tcp.example.com',
+                'class' => 'IN',
+                'ttl' => 600,
+                'type' => 'SRV',
+                'pri' => 0,
+                'weight' => 100,
+                'port' => 389,
+                'target' => 'test.example.com',
+            ],
+            [
+                'host' => '_ldap._tcp.example.com',
+                'class' => 'IN',
+                'ttl' => 600,
+                'type' => 'SRV',
+                'pri' => 0,
+                'weight' => 101,
+                'port' => 389,
+                'target' => 'bar.example.com',
+            ],
+        ];
+
+        $dns->getRecord("_ldap._tcp.example.com", DNS_SRV)->willReturn($srvRecords);
         $config = new DomainConfiguration('example.com');
-        $this->beConstructedWith($config, $tcp, $utils);
+        $this->beConstructedWith($config, $tcp, $dns);
 
         $this->getServer()->shouldBeEqualTo('bar.example.com');
     }
 
-    function it_should_throw_an_error_when_no_servers_are_returned_from_dns(TcpSocket $tcp, LdapUtilities $utils)
+    function it_should_throw_an_error_when_no_servers_are_returned_from_dns(TcpSocket $tcp, Dns $dns)
     {
         $e = new LdapConnectionException('No LDAP servers found via DNS for "example.com".');
-        $utils->getLdapServersForDomain('example.com')->willReturn([]);
+        $dns->getRecord("_ldap._tcp.example.com", DNS_SRV)->willReturn(false);
         $config = new DomainConfiguration('example.com');
-        $this->beConstructedWith($config, $tcp, $utils);
+        $this->beConstructedWith($config, $tcp, $dns);
 
         $this->shouldThrow($e)->duringGetServer();
     }
