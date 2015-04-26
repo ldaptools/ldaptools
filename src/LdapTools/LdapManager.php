@@ -240,6 +240,51 @@ class LdapManager
     }
 
     /**
+     * Retrieve the schema factory instance.
+     *
+     * @return LdapObjectSchemaFactory
+     */
+    public function getSchemaFactory()
+    {
+        if (!$this->schemaFactory) {
+            $this->schemaFactory = new LdapObjectSchemaFactory($this->getCache(), $this->getSchemaParser());
+        }
+
+        return $this->schemaFactory;
+    }
+
+    /**
+     * Retrieve the cache instance.
+     *
+     * @return Cache\CacheInterface
+     */
+    public function getCache()
+    {
+        if (!$this->cache) {
+            $this->cache = CacheFactory::get($this->config->getCacheType(), $this->config->getCacheOptions());
+        }
+
+        return $this->cache;
+    }
+
+    /**
+     * Retrieve the schema parser instance.
+     *
+     * @return Schema\Parser\SchemaParserInterface
+     */
+    public function getSchemaParser()
+    {
+        if (!$this->schemaParser) {
+            $this->schemaParser = SchemaParserFactory::get(
+                $this->config->getSchemaFormat(),
+                $this->config->getSchemaFolder()
+            );
+        }
+
+        return $this->schemaParser;
+    }
+
+    /**
      * Retrieve the LdapObjectManager for the current domain context.
      *
      * @return LdapObjectManager
@@ -265,51 +310,6 @@ class LdapManager
     protected function getLdapObjectSchema($type)
     {
         return $this->getSchemaFactory()->get($this->getConnection()->getSchemaName(), $type);
-    }
-
-    /**
-     * Retrieve the schema factory instance.
-     *
-     * @return LdapObjectSchemaFactory
-     */
-    protected function getSchemaFactory()
-    {
-        if (!$this->schemaFactory) {
-            $this->schemaFactory = new LdapObjectSchemaFactory($this->getCache(), $this->getSchemaParser());
-        }
-
-        return $this->schemaFactory;
-    }
-
-    /**
-     * Retrieve the cache instance.
-     *
-     * @return Cache\CacheInterface
-     */
-    protected function getCache()
-    {
-        if (!$this->cache) {
-            $this->cache = CacheFactory::get($this->config->getCacheType(), $this->config->getCacheOptions());
-        }
-
-        return $this->cache;
-    }
-
-    /**
-     * Retrieve the schema parser instance.
-     *
-     * @return Schema\Parser\SchemaParserInterface
-     */
-    protected function getSchemaParser()
-    {
-        if (!$this->schemaParser) {
-            $this->schemaParser = SchemaParserFactory::get(
-                $this->config->getSchemaFormat(),
-                $this->config->getSchemaFolder()
-            );
-        }
-
-        return $this->schemaParser;
     }
 
     /**

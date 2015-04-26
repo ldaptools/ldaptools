@@ -148,4 +148,19 @@ class LdapManagerSpec extends ObjectBehavior
             ->where(['foo' => true])
             ->getLdapFilter()->shouldBeEqualTo('(&(objectClass=\66\6f\6f)(&(bar=\54\52\55\45)))');
     }
+
+    function it_should_return_the_cache_class_in_use()
+    {
+        $this->getCache()->shouldReturnAnInstanceOf('\LdapTools\Cache\CacheInterface');
+    }
+
+    function it_should_return_the_schema_parser_in_use()
+    {
+        $this->getSchemaParser()->shouldReturnAnInstanceOf('\LdapTools\Schema\Parser\SchemaParserInterface');
+    }
+
+    function it_should_return_the_ldap_object_schema_factory_in_use()
+    {
+        $this->getSchemaFactory()->shouldReturnAnInstanceOf('\LdapTools\Factory\LdapObjectSchemaFactory');
+    }
 }
