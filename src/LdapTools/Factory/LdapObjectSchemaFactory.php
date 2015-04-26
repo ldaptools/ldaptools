@@ -51,10 +51,8 @@ class LdapObjectSchemaFactory
     public function get($schemaName, $objectType)
     {
         $cacheItem = $schemaName.'.'.$objectType;
-        $lastModTime = $this->parser->getSchemaModificationTime($schemaName);
-        $cacheCreationTime = $this->cache->getCacheCreationTime(LdapObjectSchema::getCacheType(), $cacheItem);
 
-        if (!$lastModTime || ($lastModTime > $cacheCreationTime)) {
+        if ($this->shouldBuildCacheItem($schemaName, $cacheItem)) {
             $ldapObjectSchema = $this->parser->parse($schemaName, $objectType);
             $this->cache->set($ldapObjectSchema);
         } else {
@@ -62,5 +60,24 @@ class LdapObjectSchemaFactory
         }
 
         return $ldapObjectSchema;
+    }
+
+    /**
+     * Whether or not the item needs to be parsed and cached.
+     *
+     * @param string $schemaName
+     * @param string $cacheItem
+     * @return bool
+     */
+    protected function shouldBuildCacheItem($schemaName, $cacheItem)
+    {
+        $cacheOutOfDate = false;
+        if ($this->cache->getUseAutoCache()) {
+            $lastModTime = $this->parser->getSchemaModificationTime($schemaName);
+            $cacheCreationTime = $this->cache->getCacheCreationTime(LdapObjectSchema::getCacheType(), $cacheItem);
+            $cacheOutOfDate = (!$lastModTime || ($lastModTime > $cacheCreationTime));
+        }
+
+        return ($cacheOutOfDate || !$this->cache->contains(LdapObjectSchema::getCacheType(), $cacheItem));
     }
 }
