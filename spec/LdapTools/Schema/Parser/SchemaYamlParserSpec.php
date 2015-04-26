@@ -13,6 +13,7 @@ namespace spec\LdapTools\Schema\Parser;
 use LdapTools\Configuration;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\SchemaParserException;
+use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -220,5 +221,29 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('example', 'user')
             ->getMultivaluedAttributes()
             ->shouldBeEqualTo(['otherHomePhone']);
+    }
+
+    function it_should_be_able_to_parse_all_types_in_a_schema_and_return_an_array_of_LdapObjectSchema()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parseAll('example')->shouldBeArray();
+        $this->parseAll('example')->shouldHaveCount(10);
+        $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
+    }
+
+    function getMatchers()
+    {
+        return [
+            'returnAnArrayOfLdapObjectSchemas' => function($ldapObjectSchemas) {
+                foreach ($ldapObjectSchemas as $schema) {
+                    if (!($schema instanceof LdapObjectSchema)) {
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+        ];
     }
 }

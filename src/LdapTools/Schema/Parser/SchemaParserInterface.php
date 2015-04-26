@@ -29,6 +29,14 @@ interface SchemaParserInterface
     public function parse($schemaName, $objectType);
 
     /**
+     * Given the schema name, parse through and return every LdapObjectSchema.
+     *
+     * @param string $schemaName
+     * @return LdapObjectSchema[]
+     */
+    public function parseAll($schemaName);
+
+    /**
      * Given the schema name, return the last time the schema was modified in DateTime format.
      *
      * @param string $schemaName

@@ -87,6 +87,30 @@ class SchemaYamlParser implements SchemaParserInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function parseAll($schemaName)
+    {
+        $this->parseSchemaNameToArray($schemaName);
+        $types = [];
+        $ldapObjectSchemas = [];
+
+        if (isset($this->schemas[$this->schemaFolder][$schemaName]['objects'])) {
+            $types = array_column($this->schemas[$this->schemaFolder][$schemaName]['objects'], 'type');
+        }
+
+        foreach ($types as $type) {
+            $ldapObjectSchemas[] = $this->parseYamlForObject(
+                $this->schemas[$this->schemaFolder][$schemaName],
+                $schemaName,
+                $type
+            );
+        }
+
+        return $ldapObjectSchemas;
+    }
+
+    /**
      * Make sure a file is readable.
      *
      * @param string $file
