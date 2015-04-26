@@ -7,7 +7,7 @@ general:
     # Optional: The location to use when loading schema files. Default: "resources/schema" in the library
     #   root.
     schema_folder: "/var/www/project/resources/schema"
-    # The cache type to use. Either 'stash' or 'none'. Default: none
+    # The cache type to use. Either 'stash', 'doctrine', or 'none'. Default: none
     cache_type: none
     # Optional: These are variable settings for the cache type in use.
     cache_options:
