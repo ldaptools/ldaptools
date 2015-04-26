@@ -90,4 +90,22 @@ class StashCacheSpec extends ObjectBehavior
         $this->getCacheCreationTime(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldReturnAnInstanceOf('\DateTime');
         $this->clear();
     }
+
+    function it_should_return_true_when_calling_contains_and_the_item_is_in_the_cache()
+    {
+        $this->setCacheFolder(sys_get_temp_dir());
+        $this->setCachePrefix($this->testCacheDir);
+        $item = new LdapObjectSchema('foo', 'bar');
+        $this->set($item);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
+        $this->clear();
+    }
+
+    function it_should_return_false_when_calling_contains_and_the_item_is_not_in_the_cache()
+    {
+        $this->setCacheFolder(sys_get_temp_dir());
+        $this->setCachePrefix($this->testCacheDir);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
+        $this->clear();
+    }
 }

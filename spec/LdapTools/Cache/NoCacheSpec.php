@@ -49,4 +49,14 @@ class NoCacheSpec extends ObjectBehavior
     {
         $this->getCacheCreationTime('foo', 'bar')->shouldBeEqualTo(false);
     }
+
+    public function it_should_return_false_when_calling_getUseAutoCache()
+    {
+        $this->getUseAutoCache()->shouldBeEqualTo(false);
+    }
+
+    public function it_should_return_false_when_calling_contains()
+    {
+        $this->contains('foo','bar')->shouldBeEqualTo(false);
+    }
 }

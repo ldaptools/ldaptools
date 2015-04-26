@@ -25,7 +25,8 @@ interface CacheInterface
     public function setOptions(array $options);
 
     /**
-     * Retrieve an item from the cache.
+     * Retrieve an item from the cache. If it is not in the cache it should return null. However, you should call the
+     * contains method first rather than relying on that value.
      *
      * @param $itemType
      * @param $itemName
@@ -42,12 +43,29 @@ interface CacheInterface
      */
     public function getCacheCreationTime($itemType, $itemName);
 
+
+    /**
+     * Whether to auto refresh cache based on creation/modification times instead of a manual process.
+     *
+     * @return bool
+     */
+    public function getUseAutoCache();
+
     /**
      * Cache an item.
      *
      * @param CacheableItemInterface $item
      */
     public function set(CacheableItemInterface $item);
+
+    /**
+     * Whether the item is in the cache.
+     *
+     * @param string $itemType
+     * @param string $itemName
+     * @return bool
+     */
+    public function contains($itemType, $itemName);
 
     /**
      * Clear the cache.

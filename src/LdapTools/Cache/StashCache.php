@@ -40,6 +40,11 @@ class StashCache implements CacheInterface
      */
     protected $cachePrefix = '/ldaptools';
 
+    /**
+     * @var bool Whether the cache should auto refresh based on creation/modification times.
+     */
+    protected $useAutoCache = true;
+
     public function __construct()
     {
         $this->driver = new FileSystem();
@@ -98,11 +103,21 @@ class StashCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
+    public function contains($itemType, $itemName)
+    {
+        return !$this->getCacheItem($itemType, $itemName)->isMiss();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function get($itemType, $itemName)
     {
-        $item = $this->pool->getItem($this->getCachePath($itemType, $itemName));
+        if (!$this->contains($itemType, $itemName)) {
+            return null;
+        }
 
-        return $item->get();
+        return $this->getCacheItem($itemType, $itemName)->get();
     }
 
     /**
@@ -110,7 +125,15 @@ class StashCache implements CacheInterface
      */
     public function getCacheCreationTime($itemType, $itemName)
     {
-        return $this->pool->getItem($this->getCachePath($itemType, $itemName))->getCreation();
+        return $this->getCacheItem($itemType, $itemName)->getCreation();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUseAutoCache()
+    {
+        return $this->useAutoCache;
     }
 
     /**
@@ -118,9 +141,7 @@ class StashCache implements CacheInterface
      */
     public function set(CacheableItemInterface $cacheableItem)
     {
-        $item = $this->pool->getItem($this->getCachePath(
-            $cacheableItem->getCacheType(), $cacheableItem->getCacheName()
-        ));
+        $item = $this->getCacheItem($cacheableItem->getCacheType(), $cacheableItem->getCacheName());
         $data = $item->get();
 
         if ($item->isMiss()) {
@@ -156,6 +177,9 @@ class StashCache implements CacheInterface
         if (isset($options['cache_prefix'])) {
             $this->cachePrefix = $options['cache_prefix'];
         }
+        if (isset($options['cache_auto_refresh'])) {
+            $this->useAutoCache = $options['cache_auto_refresh'];
+        }
     }
 
     /**
@@ -168,5 +192,14 @@ class StashCache implements CacheInterface
     protected function getCachePath($itemType, $itemName)
     {
         return $this->cachePrefix.'/'.$itemType.'/'.$itemName;
+    }
+
+    /**
+     * @param string $itemType
+     * @param string $itemName
+     * @return \Stash\Interfaces\ItemInterface
+     */
+    protected function getCacheItem($itemType, $itemName) {
+        return $this->pool->getItem($this->getCachePath($itemType, $itemName));
     }
 }

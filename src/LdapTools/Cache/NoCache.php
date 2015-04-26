@@ -55,4 +55,20 @@ class NoCache implements CacheInterface
     {
         return false;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUseAutoCache()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function contains($itemType, $itemName)
+    {
+        return false;
+    }
 }
