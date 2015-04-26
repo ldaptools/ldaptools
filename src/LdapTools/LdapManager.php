@@ -213,6 +213,7 @@ class LdapManager
      * Move an object in LDAP from one container/OU to another.
      *
      * @param LdapObject $ldapObject
+     * @param string $container The container/OU in DN format.
      * @return $this
      */
     public function move(LdapObject $ldapObject, $container)
