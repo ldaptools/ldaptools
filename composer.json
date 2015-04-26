@@ -18,12 +18,14 @@
     "symfony/yaml": ">=2.0"
   },
   "suggest": {
-    "tedivm/stash": "Provides the cache_type 'stash' to help increase performance."
+    "tedivm/stash": "Provides the cache_type 'stash' to help increase performance.",
+    "doctrine/cache": "Provides the cache_type 'doctrine' to help increase performance."
   },
   "require-dev": {
     "phpspec/phpspec": "~2.0",
     "fabpot/php-cs-fixer": "~1.0",
-    "tedivm/stash": "*"
+    "tedivm/stash": "*",
+    "doctrine/cache": "~1.0"
   },
   "config": {
     "bin-dir": "bin"

@@ -10,6 +10,7 @@
 
 namespace LdapTools\Factory;
 
+use LdapTools\Cache\DoctrineCache;
 use LdapTools\Cache\NoCache;
 use LdapTools\Cache\StashCache;
 use LdapTools\Cache\CacheInterface;
@@ -27,6 +28,11 @@ class CacheFactory
     const TYPE_STASH = 'stash';
 
     /**
+     * The Doctrine Common caching library.
+     */
+    const TYPE_DOCTRINE = 'doctrine';
+
+    /**
      * The NoCache class.
      */
     const TYPE_NONE = 'none';
@@ -42,6 +48,8 @@ class CacheFactory
     {
         if (self::TYPE_STASH == $type) {
             $cache = new StashCache();
+        } elseif (self::TYPE_DOCTRINE == $type) {
+            $cache = new DoctrineCache();
         } elseif (self::TYPE_NONE == $type) {
             $cache = new NoCache();
         } else {

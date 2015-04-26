@@ -92,11 +92,23 @@ This is where the LDAP object schema definition files are stored.
 ----------------
 #### cache_type
 
-The default caching mechanism to use when parsing schema files. Options are `stash` or `none`. When `stash` is used it
-will take the parsed LDAP schema objects and cache them to disk. It will then use the cache instead of re-parsing the
-schema each time. If it detects that the schema file has been modified, it will re-parse it and cache it again.
+The default caching mechanism to use when parsing schema files. Options are `stash`, `doctrine`, or `none`. When `stash`
+ or `doctrine` is used it will take the parsed LDAP schema objects and cache them to disk. It will then use the cache 
+instead of re-parsing the schema each time. 
+
+The `stash` type will auto-refresh the cache if it detects that the schema file has been modified since it was last
+cached. it will re-parse it and cache it again. This behavior can be changed by using the `cache_options`
+described below and setting `cache_auto_refresh: false`.
+
+To manually clear the cache so it rebuilds you can call the `clear()` method on the cache from the `LdapManager` class.
+
+```php
+// Clears all contents of the cache.
+$ldapManager->getCache()->clear();
+```
 
 To use the `stash` type you must install [Stash](https://github.com/tedious/Stash).
+To use the `doctrine` type you must install [Doctrine Cache](https://github.com/doctrine/cache).
 
 **Default:** `none`
 
@@ -104,6 +116,20 @@ To use the `stash` type you must install [Stash](https://github.com/tedious/Stas
 #### cache_options
 
 An array of options that will be passed to the cache type when it is instantiated.
+
+For the `doctrine` and `stash` types you can pass a few options that control how they work:
+
+```yml
+cache_options:
+    # Make it so the cache must be manually cleared for it to update. Stash auto-refreshes by default.
+    # The doctrine type does not support auto-refresh so this option will not affect it.
+    cache_auto_refresh: false
+    # The full path to the location where the cache contents should be kept. If not set it defaults to the systems temp
+    # directory.
+    cache_folder: /tmp/www
+    # The subdirectory/location name in the cache directory to store the cache. Defaults to 'ldaptools'. 
+    cache_prefix: ldaptools
+```
 
 **Defaults**: No options are passed by default.
 

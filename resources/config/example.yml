@@ -11,10 +11,13 @@ general:
     cache_type: none
     # Optional: These are variable settings for the cache type in use.
     cache_options:
-        # Type: stash
+        # Type: stash, doctrine
         # Optional: The location to cache generated schema data. Default: The systems temporary directory.
         cache_folder: "/tmp/projectCache"
-
+        # Type: stash
+        # Optional: Whether the cache should auto-refresh based on mod times. This is enabled by default with stash.
+        #  However, the doctrine type does not support it.
+        cache_auto_refresh: false
 domains:
     # At least one domain is required.
     example:

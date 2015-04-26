@@ -25,6 +25,11 @@ class CacheFactorySpec extends ObjectBehavior
         $this->shouldHaveConstant('TYPE_STASH');
     }
 
+    function it_should_have_a_constant_for_the_doctrine_cache_type()
+    {
+        $this->shouldHaveConstant('TYPE_DOCTRINE');
+    }
+
     function it_should_return_the_stash_type_when_calling_get_with_stash()
     {
         $this->get('stash', [])->shouldBeAnInstanceOf('\LdapTools\Cache\StashCache');
@@ -33,6 +38,11 @@ class CacheFactorySpec extends ObjectBehavior
     function it_should_return_the_NoCache_type_when_calling_get_with_none()
     {
         $this->get('none', [])->shouldBeAnInstanceOf('\LdapTools\Cache\NoCache');
+    }
+
+    function it_should_return_the_DoctrineCache_type_when_calling_get_with_doctrine()
+    {
+        $this->get('doctrine', [])->shouldBeAnInstanceOf('\LdapTools\Cache\DoctrineCache');
     }
 
     function it_should_thrown_InvalidArgumentException_when_passing_unknown_cache_types()
