@@ -58,7 +58,7 @@ class LdapObjectSchemaFactory
             $ldapObjectSchema = $this->parser->parse($schemaName, $objectType);
             $this->cache->set($ldapObjectSchema);
         } else {
-            $ldapObjectSchema = $this->cache->get(LdapObjectSchema::getCacheType(), $schemaName.'.'.$objectType);
+            $ldapObjectSchema = $this->cache->get(LdapObjectSchema::getCacheType(), $cacheItem);
         }
 
         return $ldapObjectSchema;
