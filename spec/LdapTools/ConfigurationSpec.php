@@ -50,6 +50,26 @@ class ConfigurationSpec extends ObjectBehavior
         $this->shouldthrow('\LdapTools\Exception\ConfigurationException')->duringLoad(__DIR__.'/thisisasuperlongfilenamethatshouldneverexist.yml');
     }
 
+    function it_should_load_from_an_array_of_config_values()
+    {
+        $config = [
+            'general' => [
+                'schema_folder' => '/foo/bar',
+            ],
+            'domains' => [
+                'foobar' => [
+                    'domain_name' => 'foo.bar',
+                    'username' => 'foo',
+                    'password' => 'bar',
+                ]
+            ]
+        ];
+
+        $this->loadFromArray($config)->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+        $this->loadFromArray($config)->getSchemaFolder()->shouldBeEqualTo('/foo/bar');
+        $this->loadFromArray($config)->getDomainConfiguration('foo.bar')->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
+    }
+
     function it_should_return_self_when_calling_setDefaultDomain()
     {
         $this->setDefaultDomain('foo.bar')->shouldReturnAnInstanceOf('\LdapTools\Configuration');

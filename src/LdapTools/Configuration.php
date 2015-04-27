@@ -272,6 +272,19 @@ class Configuration
             throw new ConfigurationException('Error in configuration file: %s', $e->getMessage());
         }
 
+        return $this->loadFromArray($config);
+    }
+
+    /**
+     * Load the configuration from an array of values. They should be in the same format/name as the YAML format.
+     * ie. [ 'general' => [ ... ], 'domains' => [ ... ] ]
+     *
+     * @param array $config
+     * @return $this
+     * @throws ConfigurationException
+     */
+    public function loadFromArray(array $config)
+    {
         $this->loadDomainConfiguration($config);
 
         if (isset($config['general'])) {
