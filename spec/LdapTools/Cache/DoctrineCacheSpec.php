@@ -18,6 +18,11 @@ class DoctrineCacheSpec extends ObjectBehavior
 {
     protected $testCacheDir = '/ldaptoolstesting';
 
+    function let()
+    {
+        $this->testCacheDir = sys_get_temp_dir().'/ldaptoolstesting';
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Cache\DoctrineCache');
@@ -34,9 +39,9 @@ class DoctrineCacheSpec extends ObjectBehavior
         $this->getCachePrefix()->shouldBeEqualTo('/foo');
     }
 
-    function it_should_have_the_system_temp_dir_as_the_default_cache_location()
+    function it_should_have_the_system_temp_dir_with_a_ldaptools_subfolder_as_the_default_cache_location()
     {
-        $this->getCacheFolder()->shouldBeEqualTo(sys_get_temp_dir());
+        $this->getCacheFolder()->shouldBeEqualTo(sys_get_temp_dir().'/ldaptools');
     }
 
     function it_should_support_setting_the_cache_folder()
@@ -65,14 +70,13 @@ class DoctrineCacheSpec extends ObjectBehavior
     function it_should_return_null_on_an_item_not_in_the_cache_when_calling_get()
     {
         $item = new LdapObjectSchema('foo', 'bar');
-        $this->setCachePrefix($this->testCacheDir);
+        $this->setCacheFolder($this->testCacheDir);
         $this->get($item->getCacheType(), 'foo.bar')->shouldBeEqualTo(null);
     }
 
     function it_should_cache_an_item_when_calling_set()
     {
-        $this->setCacheFolder(sys_get_temp_dir());
-        $this->setCachePrefix($this->testCacheDir);
+        $this->setCacheFolder($this->testCacheDir);
         $item = new LdapObjectSchema('foo', 'bar');
         $this->set($item);
         $this->get(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeLike($item);
@@ -89,8 +93,7 @@ class DoctrineCacheSpec extends ObjectBehavior
 
     function it_should_return_true_when_calling_contains_and_the_item_is_in_the_cache()
     {
-        $this->setCacheFolder(sys_get_temp_dir());
-        $this->setCachePrefix($this->testCacheDir);
+        $this->setCacheFolder($this->testCacheDir);
         $item = new LdapObjectSchema('foo', 'bar');
         $this->set($item);
         $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
@@ -99,8 +102,7 @@ class DoctrineCacheSpec extends ObjectBehavior
 
     function it_should_return_false_when_calling_contains_and_the_item_is_not_in_the_cache()
     {
-        $this->setCacheFolder(sys_get_temp_dir());
-        $this->setCachePrefix($this->testCacheDir);
+        $this->setCacheFolder($this->testCacheDir);
         $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
         $this->clear();
     }

@@ -36,7 +36,7 @@ class DoctrineCache implements CacheInterface
 
     public function __construct()
     {
-        $this->cacheFolder = sys_get_temp_dir();
+        $this->cacheFolder = sys_get_temp_dir().'/ldaptools';
     }
 
     /**
@@ -96,7 +96,7 @@ class DoctrineCache implements CacheInterface
             return null;
         }
 
-        return $this->getCache()->fetch($this->getCachePath($itemType, $itemName));
+        return $this->getCache()->fetch($this->getCacheName($itemType, $itemName));
     }
 
     /**
@@ -120,7 +120,7 @@ class DoctrineCache implements CacheInterface
      */
     public function contains($itemType, $itemName)
     {
-        return $this->getCache()->contains($this->getCachePath($itemType, $itemName));
+        return $this->getCache()->contains($this->getCacheName($itemType, $itemName));
     }
 
     /**
@@ -129,7 +129,7 @@ class DoctrineCache implements CacheInterface
     public function set(CacheableItemInterface $cacheableItem)
     {
         $this->getCache()->save(
-            $this->getCachePath($cacheableItem->getCacheType(), $cacheableItem->getCacheName()),
+            $this->getCacheName($cacheableItem->getCacheType(), $cacheableItem->getCacheName()),
             $cacheableItem
         );
 
@@ -145,20 +145,20 @@ class DoctrineCache implements CacheInterface
             // the doctrine deleteAll() doesn't seem to behave as expected. But flushAll() seems to work...
             $result = $this->getCache()->flushAll();
         } else {
-            $result = $this->getCache()->delete($this->cachePrefix.'/'.$itemType);
+            $result = $this->getCache()->delete($itemType);
         }
 
         return $result;
     }
 
     /**
-     * Form the "directory" string that Stash uses to look for the item.
+     * Form the name used to refer to the item for Doctrine cache
      *
      * @param string $itemType
      * @param string $itemName
      * @return string
      */
-    protected function getCachePath($itemType, $itemName)
+    protected function getCacheName($itemType, $itemName)
     {
         return $this->cachePrefix.'/'.$itemType.'/'.$itemName;
     }

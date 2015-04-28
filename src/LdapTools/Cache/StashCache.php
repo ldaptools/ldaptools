@@ -48,6 +48,7 @@ class StashCache implements CacheInterface
     public function __construct()
     {
         $this->driver = new FileSystem();
+        $this->setCacheFolder(sys_get_temp_dir().'/ldaptools');
         $this->pool = new Pool($this->driver);
     }
 
