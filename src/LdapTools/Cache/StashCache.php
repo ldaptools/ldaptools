@@ -158,11 +158,17 @@ class StashCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($itemType = '')
+    public function delete($type, $name)
     {
-        $path = $itemType ? $this->cachePrefix.'/'.$itemType : $this->cachePrefix;
+        return $this->pool->getItem($this->getCachePath($type, $name))->clear();
+    }
 
-        return $this->pool->getItem($path)->clear();
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteAll()
+    {
+        return $this->pool->flush();
     }
 
     /**

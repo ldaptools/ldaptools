@@ -68,9 +68,18 @@ interface CacheInterface
     public function contains($itemType, $itemName);
 
     /**
-     * Clear the cache.
+     * Delete a specific item from the cache.
      *
-     * @param string $itemType Optionally clear a specific item type only.
+     * @param string $type The item type.
+     * @param string $name The item name.
+     * @param bool
      */
-    public function clear($itemType = '');
+    public function delete($type, $name);
+
+    /**
+     * Delete all items from the cache.
+     *
+     * @return bool
+     */
+    public function deleteAll();
 }

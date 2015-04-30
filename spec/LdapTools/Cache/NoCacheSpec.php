@@ -40,9 +40,14 @@ class NoCacheSpec extends ObjectBehavior
         $this->get($item->getCacheType(), $item->getSchemaName().'.'.$item->getObjectType())->shouldBeNull();
     }
 
-    public function it_should_return_true_when_calling_clear()
+    public function it_should_return_true_when_calling_delete()
     {
-        $this->clear()->shouldBeEqualTo(true);
+        $this->delete('foo', 'bar')->shouldBeEqualTo(true);
+    }
+
+    public function it_should_return_true_when_calling_delete_all()
+    {
+        $this->deleteAll()->shouldBeEqualTo(true);
     }
 
     public function it_should_return_false_when_calling_getCacheCreationTime()

@@ -80,7 +80,7 @@ class StashCacheSpec extends ObjectBehavior
         $item = new LdapObjectSchema('foo', 'bar');
         $this->set($item);
         $this->get(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeLike($item);
-        $this->clear();
+        $this->deleteAll();
     }
 
     function it_should_return_false_when_calling_getCacheCreationTime_for_a_non_existent_item()
@@ -95,7 +95,7 @@ class StashCacheSpec extends ObjectBehavior
         $item = new LdapObjectSchema('foo', 'bar');
         $this->set($item);
         $this->getCacheCreationTime(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldReturnAnInstanceOf('\DateTime');
-        $this->clear();
+        $this->deleteAll();
     }
 
     function it_should_return_true_when_calling_contains_and_the_item_is_in_the_cache()
@@ -104,13 +104,37 @@ class StashCacheSpec extends ObjectBehavior
         $item = new LdapObjectSchema('foo', 'bar');
         $this->set($item);
         $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
-        $this->clear();
+        $this->deleteAll();
     }
 
     function it_should_return_false_when_calling_contains_and_the_item_is_not_in_the_cache()
     {
         $this->setCacheFolder($this->testCacheDir);
         $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
-        $this->clear();
+        $this->deleteAll();
+    }
+
+    function it_should_delete_an_item_from_the_cache()
+    {
+        $this->setCacheFolder($this->testCacheDir);
+        $item = new LdapObjectSchema('foo', 'bar');
+        $this->set($item);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
+        $this->delete(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
+    }
+
+    function it_should_delete_all_items_in_the_cache()
+    {
+        $this->setCacheFolder($this->testCacheDir);
+        $itemOne = new LdapObjectSchema('foo', 'bar');
+        $itemTwo = new LdapObjectSchema('bar', 'foo');
+        $this->set($itemOne);
+        $this->set($itemTwo);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(true);
+        $this->contains(LdapObjectSchema::getCacheType(), 'bar.foo')->shouldBeEqualTo(true);
+        $this->deleteAll()->shouldBeEqualTo(true);
+        $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
+        $this->contains(LdapObjectSchema::getCacheType(), 'bar.foo')->shouldBeEqualTo(false);
     }
 }

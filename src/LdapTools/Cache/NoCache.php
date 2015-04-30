@@ -43,7 +43,15 @@ class NoCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($itemType = '')
+    public function delete($type, $name)
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteAll()
     {
         return true;
     }

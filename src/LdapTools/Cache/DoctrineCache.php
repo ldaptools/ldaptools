@@ -139,16 +139,17 @@ class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function clear($itemType = '')
+    public function delete($type, $name)
     {
-        if (empty($path)) {
-            // the doctrine deleteAll() doesn't seem to behave as expected. But flushAll() seems to work...
-            $result = $this->getCache()->flushAll();
-        } else {
-            $result = $this->getCache()->delete($itemType);
-        }
+        return $this->getCache()->delete($this->getCacheName($type, $name));
+    }
 
-        return $result;
+    /**
+     * {@inheritdoc}
+     */
+    public function deleteAll()
+    {
+        return $this->getCache()->flushAll();
     }
 
     /**
