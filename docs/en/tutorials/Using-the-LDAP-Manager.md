@@ -18,10 +18,10 @@ $query = $ldapManager->buildLdapQuery();
 $users = $query->select(['username', 'city', 'state', 'guid'])
     ->fromUsers()
     ->where(
-        $query->filter->eq('firstName', 'John'),
-        $query->filter->startsWith('lastName', 'S'),
+        $query->filter()->eq('firstName', 'John'),
+        $query->filter()->startsWith('lastName', 'S'),
         // 'accountIsDisabled' is an Active Directory specific filter method. Negate a statement using 'not'.
-        $query->filter->not($query->filter->accountIsDisabled())
+        $query->filter()->not($query->filter()->accountIsDisabled())
     )
     ->getLdapQuery()
     ->execute();
