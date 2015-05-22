@@ -82,7 +82,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $serverPool;
 
     /**
-     * @var bool Whether or not to used paged results control when searching.
+     * @var bool Whether or not to use paged results control when searching.
      */
     protected $pagedResults = true;
 
