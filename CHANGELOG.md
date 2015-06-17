@@ -1,6 +1,15 @@
 CHANGELOG
 =========
 
+0.14.0 (2015-06-16)
+------------------
+  * Add the ability to use doctrine cache for the caching mechanism. This allows for easier Symfony integration.
+  * Update the cache interface for the delete and deleteAll methods.
+  * Allow retrieving the Cache, Parser, and LdapObjectSchemaFactory from the LdapManager.
+  * Respect LDAP SRV weight and priority when sorting for the server pool.
+  * Better base_dn guessing when using OpenLDAP and the base_dn is not defined.
+  * A few bug fixes.
+
 0.13.0 (2015-04-19)
 ------------------
 
