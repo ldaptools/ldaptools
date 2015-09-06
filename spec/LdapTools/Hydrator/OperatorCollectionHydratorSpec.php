@@ -35,7 +35,10 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $this->toLdapFilter($collection)->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
     }
 
-    function it_should_hydrate_a_operator_collection_to_ldap_without_a_schema(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_hydrate_a_operator_collection_to_ldap_without_a_schema($connection)
     {
         $filter = new FilterBuilder();
 

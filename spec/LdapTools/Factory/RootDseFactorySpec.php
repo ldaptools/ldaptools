@@ -36,7 +36,10 @@ class RootDseFactorySpec extends ObjectBehavior
 
     protected $connection;
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $connection->search("(&(objectClass=*))", ["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"], "", "base", null)
             ->willReturn($this->entry);
@@ -56,12 +59,18 @@ class RootDseFactorySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Factory\RootDseFactory');
     }
 
-    function it_should_get_a_LdapObject_for_a_connection(LdapConnection $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_get_a_LdapObject_for_a_connection($connection)
     {
         $this::get($this->connection)->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 
-    function it_should_have_supported_sasl_mechanisms_as_an_array(LdapConnection $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_have_supported_sasl_mechanisms_as_an_array($connection)
     {
         $this::get($this->connection)->getSupportedSaslMechanisms()->shouldBeArray();
         $this::get($this->connection)->hasSupportedSaslMechanisms('GSSAPI')->shouldBeEqualTo(true);

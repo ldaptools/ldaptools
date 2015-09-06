@@ -76,7 +76,10 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
     protected $ldap;
 
-    public function let(LdapConnectionInterface $ldap)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
+     */
+    public function let($ldap)
     {
         $attributes = ["cn", "givenName", "sn", "sAMAccountName", "mail", "distinguishedName", "objectGuid"];
         $config = new Configuration();

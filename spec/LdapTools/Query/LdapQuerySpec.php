@@ -75,7 +75,10 @@ class LdapQuerySpec extends ObjectBehavior
 
     protected $ldap;
 
-    function let(LdapConnection $ldap)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
+     */
+    function let($ldap)
     {
         $ldap->search(Argument::any(), ["cn", "givenName", "foo"], Argument::any(), Argument::any(), Argument::any())
             ->willReturn($this->ldapEntries);

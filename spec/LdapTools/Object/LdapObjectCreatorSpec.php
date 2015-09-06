@@ -15,7 +15,10 @@ use Prophecy\Argument;
 
 class LdapObjectCreatorSpec extends ObjectBehavior
 {
-    public function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    public function let($connection)
     {
         $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
         $connection->getSchemaName()->willReturn('example');
@@ -91,7 +94,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow('\Exception')->duringCreate('foo');
     }
 
-    function it_should_set_parameters_for_the_attributes_sent_to_ldap(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_set_parameters_for_the_attributes_sent_to_ldap($connection)
     {
         $arg = Argument::allOf(
             Argument::withEntry('cn', 'somedude'),
@@ -119,7 +125,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->execute();
     }
 
-    function it_should_respect_an_explicitly_set_dn(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_respect_an_explicitly_set_dn($connection)
     {
         $connection->getSchemaName()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
@@ -139,7 +148,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    function it_should_escape_the_base_dn_name_properly_when_using_a_schema(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_escape_the_base_dn_name_properly_when_using_a_schema($connection)
     {
         $connection->getSchemaName()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
@@ -166,7 +178,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow(new \LogicException('You must specify a container or OU to place this LDAP object in.'))->duringExecute();
     }
 
-    function it_should_use_a_default_container_defined_in_the_schema(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_use_a_default_container_defined_in_the_schema($connection)
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
@@ -185,7 +200,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    function it_should_allow_a_default_container_to_be_overwritten(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_allow_a_default_container_to_be_overwritten($connection)
     {
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
@@ -205,7 +223,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    function it_should_set_parameters_for_the_container_of_the_ldap_object(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_set_parameters_for_the_container_of_the_ldap_object($connection)
     {
         $arg = Argument::allOf(
             Argument::withEntry('cn', 'somedude'),

@@ -54,7 +54,10 @@ class BatchValueResolverSpec extends ObjectBehavior
      */
     protected $ldapObjectOpts = [['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user'];
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([

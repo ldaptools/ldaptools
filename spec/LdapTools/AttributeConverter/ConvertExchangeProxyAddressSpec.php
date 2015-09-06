@@ -42,7 +42,10 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         ],
     ];
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $this->connection = $connection;
         $options = [

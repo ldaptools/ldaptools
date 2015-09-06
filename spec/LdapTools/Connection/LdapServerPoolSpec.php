@@ -77,7 +77,10 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getSortedServersArray()->shouldNotBeEqualTo($this->servers);
     }
 
-    function it_should_throw_an_exception_when_no_servers_are_available(TcpSocket $tcp)
+    /**
+     * @param \LdapTools\Utilities\TcpSocket $tcp
+     */
+    function it_should_throw_an_exception_when_no_servers_are_available($tcp)
     {
         $tcp->connect('foo')->willReturn(false);
         $config = new DomainConfiguration('example.com');
@@ -87,7 +90,11 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->shouldThrow(new LdapConnectionException('No LDAP server is available.'))->duringGetServer();
     }
 
-    function it_should_lookup_servers_via_dns_if_no_servers_are_defined(TcpSocket $tcp, Dns $dns)
+    /**
+     * @param \LdapTools\Utilities\TcpSocket $tcp
+     * @param \LdapTools\Utilities\Dns $dns
+     */
+    function it_should_lookup_servers_via_dns_if_no_servers_are_defined($tcp, $dns)
     {
         $tcp->connect('foo.example.com')->willReturn(false);
         $tcp->connect('bar.example.com')->willReturn(true);
@@ -132,7 +139,11 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getServer()->shouldBeEqualTo('bar.example.com');
     }
 
-    function it_should_throw_an_error_when_no_servers_are_returned_from_dns(TcpSocket $tcp, Dns $dns)
+    /**
+     * @param \LdapTools\Utilities\TcpSocket $tcp
+     * @param \LdapTools\Utilities\Dns $dns
+     */
+    function it_should_throw_an_error_when_no_servers_are_returned_from_dns($tcp, $dns)
     {
         $e = new LdapConnectionException('No LDAP servers found via DNS for "example.com".');
         $dns->getRecord("_ldap._tcp.example.com", DNS_SRV)->willReturn(false);

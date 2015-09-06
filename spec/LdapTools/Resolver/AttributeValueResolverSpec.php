@@ -63,7 +63,10 @@ class AttributeValueResolverSpec extends ObjectBehavior
      */
     protected $connection;
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([

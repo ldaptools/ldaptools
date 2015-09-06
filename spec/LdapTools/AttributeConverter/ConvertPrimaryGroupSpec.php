@@ -24,7 +24,10 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
     protected $groupSid = 'S-1-5-21-1004336348-1177238915-682003330-513';
     protected $userSid = 'S-1-5-21-1004336348-1177238915-682003330-1223';
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $this->connection = $connection;
         $this->setLdapConnection($connection);

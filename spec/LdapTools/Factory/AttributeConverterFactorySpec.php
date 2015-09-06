@@ -135,7 +135,10 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this->shouldThrow('\Exception')->duringGet('foo_bar');
     }
 
-    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
+     */
+    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter($ldap)
     {
         $this->get('windows_guid')->setLdapConnection($ldap)->shouldBeNull();
     }

@@ -123,7 +123,10 @@ class ConvertGPLinkSpec extends ObjectBehavior
     protected $gPLinks = ['[LDAP://cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local;0]','[LDAP://cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local;0]'];
     protected $foobarGPLink = '[LDAP://cn={8E1F85EB-4882-4920-88A5-CF52F31D8D32},cn=policies,cn=system,DC=example,DC=local;0]';
 
-    function let(LdapConnectionInterface $connection)
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
         $this->connection = $connection;
