@@ -211,11 +211,28 @@ abstract class BaseOperator
      */
     public function __toString()
     {
-        return self::SEPARATOR_START
-            .$this->getAttributeToQuery()
-            .$this->operatorSymbol
-            .LdapUtilities::escapeValue($this->getValueForQuery())
-            .self::SEPARATOR_END;
+        if ( is_array($this->getValueForQuery() ) ) {
+
+            $values = Array();
+
+            foreach( $this->getValueForQuery() as $value ) {
+                    $values[] = self::SEPARATOR_START
+                            .$this->getAttributeToQuery()
+                            .$this->operatorSymbol
+                    .$value
+                            .self::SEPARATOR_END;
+            }
+            return self::SEPARATOR_START
+                ."&"
+                .implode($values)
+                .self::SEPARATOR_END;
+        }
+
+            return self::SEPARATOR_START
+                .$this->getAttributeToQuery()
+                .$this->operatorSymbol
+                .LdapUtilities::escapeValue($this->getValueForQuery())
+                .self::SEPARATOR_END;
     }
 
     /**
