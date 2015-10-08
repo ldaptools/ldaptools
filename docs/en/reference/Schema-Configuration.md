@@ -62,7 +62,8 @@ Default LDAP object types that the class has defined are: `user`, `group`, `comp
 #### class
  
 This is the `objectClass` value for the LDAP object you're defining. It can be any valid LDAP objectClass value (`user`,
-`inetOrgPerson`, `group`, etc) and will be used in the creation of LDAP query filters when using this type.
+`inetOrgPerson`, `group`, etc) and will be used in the creation of LDAP query filters when using this type. This can be
+either a single string, or an array with multiple class names.
 
 --------------------
 #### category

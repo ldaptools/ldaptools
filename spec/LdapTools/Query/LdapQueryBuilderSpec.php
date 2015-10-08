@@ -259,4 +259,51 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->fromOUs();
         $this->getLdapFilter()->shouldBeEqualTo($filter);
     }
+
+    function it_should_allow_a_schema_object_type_that_has_multiple_classes_defined_in_objectClass()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectClass(['foo', 'bar']);
+
+        $this->from($schema);
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectClass=\66\6f\6f)(objectClass=\62\61\72))');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_only_a_category_defined()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectCategory('foo');
+
+        $this->from($schema);
+        $this->getLdapFilter()->shouldBeEqualTo('(objectCategory=\66\6f\6f)');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_only_a_single_class_defined()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectClass('foo');
+
+        $this->from($schema);
+        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=\66\6f\6f)');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_class_defined()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectCategory('foo');
+        $schema->setObjectClass('bar');
+
+        $this->from($schema);
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\66\6f\6f)(objectClass=\62\61\72))');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_multiple_classes_defined()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectCategory('foo');
+        $schema->setObjectClass(['foo', 'bar']);
+
+        $this->from($schema);
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\66\6f\6f)(&(objectClass=\66\6f\6f)(objectClass=\62\61\72)))');
+    }
 }

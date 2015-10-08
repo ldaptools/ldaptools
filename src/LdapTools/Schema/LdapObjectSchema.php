@@ -30,9 +30,9 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $objectType = '';
 
     /**
-     * @var string The actual object class name in LDAP.
+     * @var array The actual object class name in LDAP.
      */
-    protected $objectClass = '';
+    protected $objectClass = [];
 
     /**
      * @var string The actual object category name in LDAP.
@@ -217,19 +217,19 @@ class LdapObjectSchema implements CacheableItemInterface
     }
 
     /**
-     * Set the LDAP object class for this object type.
+     * Set the LDAP object class(es) for this object type.
      *
-     * @param string $objectClass
+     * @param string|array $objectClass
      */
     public function setObjectClass($objectClass)
     {
-        $this->objectClass = $objectClass;
+        $this->objectClass = is_array($objectClass) ? $objectClass : [$objectClass];
     }
 
     /**
-     * Get the LDAP object class for this object type.
+     * Get the LDAP object class(es) for this object type.
      *
-     * @return string
+     * @return array
      */
     public function getObjectClass()
     {

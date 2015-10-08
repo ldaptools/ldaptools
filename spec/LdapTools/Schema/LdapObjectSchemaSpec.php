@@ -85,16 +85,23 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->getConverterMap()->shouldBeEqualTo(['foo' => 'bar']);
     }
 
-    function it_should_return_a_string_when_calling_getObjectClass()
+    function it_should_return_an_array_when_calling_getObjectClass()
     {
-        $this->getObjectClass()->shouldBeString();
+        $this->getObjectClass()->shouldBeArray();
     }
 
     function it_should_set_the_objectclass_when_calling_setObjectClass()
     {
         $objectClass = 'foo';
         $this->setObjectClass($objectClass);
-        $this->getObjectClass()->shouldBeEqualTo($objectClass);
+        $this->getObjectClass()->shouldBeEqualTo([$objectClass]);
+    }
+
+    function it_should_allow_multiple_objectclasses_when_calling_setObjectClass()
+    {
+        $objectClasses = ['foo', 'bar'];
+        $this->setObjectClass($objectClasses);
+        $this->getObjectClass()->shouldBeEqualTo($objectClasses);
     }
 
     function it_should_return_a_string_when_calling_getObjectCategory()

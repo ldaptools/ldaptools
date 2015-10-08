@@ -469,22 +469,31 @@ class LdapQueryBuilder
     /**
      * Given a schema object type, construct the filter that should be added to the "From" object. This requires some
      * extra logic as a definition can have either both a class and a category, or just one of them. If both, then it
-     * should be wrapped in a "bAnd" other a simple "Comparison" will do.
+     * should be wrapped in a "bAnd" otherwise a simple "Comparison" will do.
      *
      * @param LdapObjectSchema $schema
      * @return bAnd|Comparison
      */
     protected function getObjectFilterFromObjectSchema(LdapObjectSchema $schema)
     {
-        if ($schema->getObjectClass() && $schema->getObjectCategory()) {
-            $operator = new bAnd(
-                $this->filter()->eq(self::ATTR_OBJECT_CATEGORY, $schema->getObjectCategory()),
-                $this->filter()->eq(self::ATTR_OBJECT_CLASS, $schema->getObjectClass())
-            );
+        $classOperator = null;
+        $categoryOperator = $schema->getObjectCategory() ? $this->filter()->eq(self::ATTR_OBJECT_CATEGORY, $schema->getObjectCategory()) : null;
+
+        if (count($schema->getObjectClass()) > 1) {
+            $classOperator = new bAnd();
+            foreach ($schema->getObjectClass() as $class) {
+                $classOperator->add($this->filter()->eq(self::ATTR_OBJECT_CLASS, $class));
+            }
+        } elseif (count($schema->getObjectClass()) == 1) {
+            $classOperator = $this->filter()->eq(self::ATTR_OBJECT_CLASS, $schema->getObjectClass()[0]);
+        }
+
+        if ($classOperator && $categoryOperator) {
+            $operator = new bAnd($categoryOperator, $classOperator);
         } elseif ($schema->getObjectCategory()) {
-            $operator = $this->filter()->eq(self::ATTR_OBJECT_CATEGORY, $schema->getObjectCategory());
+            $operator = $categoryOperator;
         } else {
-            $operator = $this->filter()->eq(self::ATTR_OBJECT_CLASS, $schema->getObjectClass());
+            $operator = $classOperator;
         }
 
         return $operator;
