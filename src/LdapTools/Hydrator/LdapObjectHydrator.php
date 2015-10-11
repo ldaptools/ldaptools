@@ -31,7 +31,7 @@ class LdapObjectHydrator extends ArrayHydrator
 
         return new LdapObject(
             $entry,
-            is_array($class) ? $class : [$class],
+            $class,
             $schema ? $schema->getObjectCategory() : '',
             $type = $schema ? $schema->getObjectType() : ''
         );
