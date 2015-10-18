@@ -143,14 +143,14 @@ The full class name (ie `\MyNamespace\MyClasses\CustomRepository`) to use as the
  `getRepository('object_type')` on the `LdapManager` class. The class must extend `\LdapTools\Object\LdapObjectRepository`.
 
 --------------------
-#### attributes_to_select
+#### default_values
 
 An array of attributes with what their default value should be set to whe creating this object using the 
 `LdapObjectCreator`. These values also accept parameter values encased within `%` symbols that can resolve to other 
 attribute values.
 
 ```yaml
-    attributes_to_select:
+    default_values:
         firstName: "%username%"
         displayName: "%lastName%, %firstName%"
         description: "%displayName%: Located in %city%"
