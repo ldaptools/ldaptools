@@ -15,7 +15,8 @@
     "require": {
         "php": ">=5.6",
         "ext-ldap": "*",
-        "symfony/yaml": ">=2.0"
+        "symfony/yaml": ">=2.0",
+        "symfony/event-dispatcher": ">=2.0"
     },
     "suggest": {
         "tedivm/stash": "Provides the cache_type 'stash' to help increase performance.",

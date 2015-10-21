@@ -12,8 +12,8 @@ namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnection;
-use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Factory\EventDispatcherFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use PhpSpec\ObjectBehavior;
@@ -91,7 +91,8 @@ class LdapObjectRepositorySpec extends ObjectBehavior
 
         $cache = CacheFactory::get($config->getCacheType(), $config->getCacheOptions());
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $schemaFactory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($schemaFactory->get('ad', 'user'), $ldap);
     }

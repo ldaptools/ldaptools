@@ -11,6 +11,9 @@
 namespace LdapTools\Factory;
 
 use LdapTools\Cache\CacheInterface;
+use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\LdapObjectSchemaEvent;
 use LdapTools\Schema\Parser\SchemaParserInterface;
 use LdapTools\Schema\LdapObjectSchema;
 
@@ -27,18 +30,25 @@ class LdapObjectSchemaFactory
     protected $cache;
 
     /**
-     * @var \LdapTools\Schema\Parser\SchemaParserInterface The parser for the schema files.
+     * @var SchemaParserInterface The parser for the schema files.
      */
     protected $parser;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @param CacheInterface $cache
      * @param SchemaParserInterface $parser
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(CacheInterface $cache, SchemaParserInterface $parser)
+    public function __construct(CacheInterface $cache, SchemaParserInterface $parser, EventDispatcherInterface $dispatcher)
     {
         $this->cache = $cache;
         $this->parser = $parser;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -54,6 +64,7 @@ class LdapObjectSchemaFactory
 
         if ($this->shouldBuildCacheItem($schemaName, $cacheItem)) {
             $ldapObjectSchema = $this->parser->parse($schemaName, $objectType);
+            $this->dispatcher->dispatch(new LdapObjectSchemaEvent(Event::LDAP_SCHEMA_LOAD, $ldapObjectSchema));
             $this->cache->set($ldapObjectSchema);
         } else {
             $ldapObjectSchema = $this->cache->get(LdapObjectSchema::getCacheType(), $cacheItem);

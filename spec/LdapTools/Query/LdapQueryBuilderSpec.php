@@ -14,6 +14,7 @@ use LdapTools\Configuration;
 use LdapTools\DomainConfiguration;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Factory\EventDispatcherFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Query\Builder\ADFilterBuilder;
@@ -40,7 +41,8 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get($config->getCacheType(), []);
-        $schemaFactory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $schemaFactory);
     }

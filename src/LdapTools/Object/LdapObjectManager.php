@@ -13,6 +13,9 @@ namespace LdapTools\Object;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Query\LdapQueryBuilder;
@@ -40,14 +43,21 @@ class LdapObjectManager
     protected $hydratorFactory;
 
     /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
+
+    /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(LdapConnectionInterface $connection, LdapObjectSchemaFactory $schemaFactory)
+    public function __construct(LdapConnectionInterface $connection, LdapObjectSchemaFactory $schemaFactory, EventDispatcherInterface $dispatcher)
     {
         $this->hydratorFactory = new HydratorFactory();
         $this->schemaFactory = $schemaFactory;
         $this->connection = $connection;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -57,6 +67,7 @@ class LdapObjectManager
      */
     public function persist(LdapObject $ldapObject)
     {
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
         $this->validateObject($ldapObject);
 
         $batches = $ldapObject->getBatchCollection();
@@ -73,6 +84,7 @@ class LdapObjectManager
 
         $this->connection->modifyBatch($ldapObject->get('dn'), $batches);
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject));
     }
 
     /**
@@ -82,8 +94,10 @@ class LdapObjectManager
      */
     public function delete(LdapObject $ldapObject)
     {
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject));
         $this->validateObject($ldapObject);
         $this->connection->delete($ldapObject->get('dn'));
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject));
     }
 
     /**
@@ -94,6 +108,7 @@ class LdapObjectManager
      */
     public function move(LdapObject $ldapObject, $container)
     {
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject));
         $this->validateObject($ldapObject);
         $rdn = $this->getRdnFromLdapObject($ldapObject);
         $this->connection->move($ldapObject->get('dn'), $rdn, $container);
@@ -101,6 +116,7 @@ class LdapObjectManager
         $newDn = $rdn.','.$container;
         $ldapObject->refresh(['dn' => $newDn]);
         $ldapObject->getBatchCollection()->setDn($newDn);
+        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject));
     }
 
     /**

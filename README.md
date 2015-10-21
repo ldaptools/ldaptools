@@ -8,7 +8,8 @@ directory service, but contains default attribute converters and schemas for Act
  * Easily create common LDAP objects (Users, Groups, Contacts, Computers, OUs).
  * Easily modify LDAP objects with automatic setters/getters/properties/etc.
  * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
- * A dynamic and customizable attribute converter system to translate data between LDAP and PHP. 
+ * A dynamic and customizable attribute converter system to translate data between LDAP and PHP.
+ * An event system for further customization, extensibility, and integration.
  * Active Directory specific features to help ease development of applications.
  * Includes a comprehensive set of specs for the code.
 
@@ -189,6 +190,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
 * [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-Objects.md)
 * [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
+* [The Event System](/docs/en/reference/reference/Events.md)
 
 ### TODO
 
@@ -196,5 +198,4 @@ Things that still need to be implemented:
 
 * Automatic generation of the schema based off of information in LDAP.
 * A logging mechanism.
-* An event system.
 * More work needed on the OpenLDAP schema.

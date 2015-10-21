@@ -13,6 +13,7 @@ namespace LdapTools;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Factory\EventDispatcherFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
@@ -157,7 +158,7 @@ class LdapManager
      */
     public function createLdapObject()
     {
-        return new LdapObjectCreator($this->getConnection(), $this->getSchemaFactory());
+        return new LdapObjectCreator($this->getConnection(), $this->getSchemaFactory(), $this->getEventDispatcher());
     }
 
     /**
@@ -247,7 +248,9 @@ class LdapManager
     public function getSchemaFactory()
     {
         if (!$this->schemaFactory) {
-            $this->schemaFactory = new LdapObjectSchemaFactory($this->getCache(), $this->getSchemaParser());
+            $this->schemaFactory = new LdapObjectSchemaFactory(
+                $this->getCache(), $this->getSchemaParser(), $this->getEventDispatcher()
+            );
         }
 
         return $this->schemaFactory;
@@ -285,6 +288,16 @@ class LdapManager
     }
 
     /**
+     * Get the Event Dispatcher instance.
+     *
+     * @return Event\EventDispatcherInterface
+     */
+    public function getEventDispatcher()
+    {
+        return EventDispatcherFactory::get();
+    }
+
+    /**
      * Retrieve the LdapObjectManager for the current domain context.
      *
      * @return LdapObjectManager
@@ -294,7 +307,8 @@ class LdapManager
         if (!isset($this->ldapObjectManager[$this->context])) {
             $this->ldapObjectManager[$this->context] = new LdapObjectManager(
                 $this->getConnection(),
-                $this->getSchemaFactory()
+                $this->getSchemaFactory(),
+                $this->getEventDispatcher()
             );
         }
 

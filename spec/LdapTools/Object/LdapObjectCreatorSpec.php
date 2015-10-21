@@ -4,9 +4,11 @@ namespace spec\LdapTools\Object;
 
 use LdapTools\AttributeConverter\EncodeWindowsPassword;
 use LdapTools\Configuration;
-use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapObjectCreationEvent;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Factory\EventDispatcherFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
@@ -29,9 +31,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
     }
 
     function it_is_initializable()
@@ -112,9 +115,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -138,9 +142,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -161,9 +166,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['name' => 'foo=,bar', 'username' => 'foobar', 'password' => '12345'])
@@ -191,9 +197,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => 'foobar', 'password' => '12345'])
@@ -213,9 +220,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => 'foobar', 'password' => '12345'])
@@ -239,15 +247,60 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $factory = new LdapObjectSchemaFactory($cache, $parser);
+        $dispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($connection, $factory);
+        $this->beConstructedWith($connection, $factory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
             ->in('%SalesOU%,%_defaultnamingcontext_%')
             ->setParameter('foo', 'somedude')
             ->setParameter('SalesOU', 'ou=Sales')
+            ->setParameter('bar', '12345');
+
+        $this->execute();
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
+     */
+    function it_should_call_creation_events_when_creating_a_ldap_object($connection, $dispatcher)
+    {
+        $arg = Argument::allOf(
+            Argument::withEntry('cn', 'somedude'),
+            Argument::withEntry('sAMAccountName', 'somedude'),
+            Argument::withEntry('unicodePwd', (new EncodeWindowsPassword())->toLdap('12345'))
+        );
+        $connection->getSchemaName()->willReturn('ad');
+        $connection->getEncoding()->willReturn('UTF-8');
+        $connection->__toString()->willReturn('example.com');
+        $connection->add("cn=somedude,dc=foo,dc=bar", $arg)->willReturn(null);
+
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
+        $cache = CacheFactory::get('none', []);
+        $factoryDispatcher = EventDispatcherFactory::get();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
+
+        $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
+        $beforeEvent->setContainer('dc=foo,dc=bar');
+        $beforeEvent->setData(['username' => '%foo%', 'password' => '%bar%']);
+        $beforeEvent->setDn('');
+        $afterEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE);
+        $afterEvent->setContainer('dc=foo,dc=bar');
+        $afterEvent->setData(['username' => 'somedude', 'password' => '12345']);
+        $afterEvent->setDn('cn=somedude,dc=foo,dc=bar');
+        $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
+        $dispatcher->dispatch($afterEvent)->shouldBeCalled();
+
+        $this->beConstructedWith($connection, $factory, $dispatcher);
+
+        $this->createUser()
+            ->with(['username' => '%foo%', 'password' => '%bar%'])
+            ->in('dc=foo,dc=bar')
+            ->setParameter('foo', 'somedude')
             ->setParameter('bar', '12345');
 
         $this->execute();

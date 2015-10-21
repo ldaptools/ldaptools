@@ -12,6 +12,9 @@ namespace LdapTools\Object;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\LdapObjectCreationEvent;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Resolver\ParameterResolver;
@@ -33,6 +36,11 @@ class LdapObjectCreator
      * @var LdapConnectionInterface
      */
     protected $connection;
+
+    /**
+     * @var EventDispatcherInterface
+     */
+    protected $dispatcher;
 
     /**
      * @var HydratorFactory
@@ -67,11 +75,13 @@ class LdapObjectCreator
     /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
+     * @param EventDispatcherInterface $dispatcher
      */
-    public function __construct(LdapConnectionInterface $connection, LdapObjectSchemaFactory $schemaFactory)
+    public function __construct(LdapConnectionInterface $connection, LdapObjectSchemaFactory $schemaFactory, EventDispatcherInterface $dispatcher)
     {
         $this->connection = $connection;
         $this->schemaFactory = $schemaFactory;
+        $this->dispatcher = $dispatcher;
         $this->hydratorFactory = new HydratorFactory();
     }
 
@@ -207,6 +217,7 @@ class LdapObjectCreator
      */
     public function execute()
     {
+        $this->triggerBeforeCreationEvent();
         $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_ARRAY);
         foreach ($this->getAllParameters() as $parameter => $value) {
             $hydrator->setParameter($parameter, $value);
@@ -219,7 +230,9 @@ class LdapObjectCreator
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $attributes = $hydrator->hydrateToLdap($this->attributes);
 
-        $this->connection->add($this->getDnToUse($attributes), $attributes);
+        $dn = $this->getDnToUse($attributes);
+        $this->connection->add($dn, $attributes);
+        $this->triggerAfterCreationEvent($dn);
     }
 
     /**
@@ -278,5 +291,37 @@ class LdapObjectCreator
         $resolver = new ParameterResolver(['container' => $this->container], $this->getAllParameters());
 
         return $resolver->resolve()['container'];
+    }
+
+    /**
+     * Trigger a LDAP object before creation event.
+     */
+    protected function triggerBeforeCreationEvent()
+    {
+        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
+        $event->setData($this->attributes);
+        $event->setContainer($this->container);
+        $event->setDn($this->dn);
+
+        $this->dispatcher->dispatch($event);
+
+        $this->attributes = $event->getData();
+        $this->container = $event->getContainer();
+        $this->dn = $event->getDn();
+    }
+
+    /**
+     * Trigger a LDAP object after creation event.
+     *
+     * @param string $dn The final DN of the created object.
+     */
+    protected function triggerAfterCreationEvent($dn)
+    {
+        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE);
+        $event->setData((new ParameterResolver($this->attributes, $this->getAllParameters()))->resolve());
+        $event->setContainer($this->getContainerValue());
+        $event->setDn($dn);
+
+        $this->dispatcher->dispatch($event);
     }
 }
