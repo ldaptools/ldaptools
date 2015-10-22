@@ -128,9 +128,9 @@ interface LdapConnectionInterface
     public function getPageSize();
 
     /**
-     * Return a RootDse object for this connection.
+     * Return a RootDse LDAP object for this connection.
      *
-     * @return RootDse
+     * @return \LdapTools\Object\LdapObject
      * @throws \LdapTools\Exception\LdapBindException When not bound yet and an anonymous bind fails.
      */
     public function getRootDse();
