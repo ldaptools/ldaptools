@@ -8,14 +8,12 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools\Factory;
+namespace spec\LdapTools\Connection;
 
-use LdapTools\Connection\LdapConnection;
-use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class RootDseFactorySpec extends ObjectBehavior
+class RootDseSpec extends ObjectBehavior
 {
     protected $entry = [
         "count" => 1,
@@ -36,10 +34,13 @@ class RootDseFactorySpec extends ObjectBehavior
 
     protected $connection;
 
+    protected $dispatcher;
+
     /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function let($connection)
+    function let($connection, $dispatcher)
     {
         $connection->search("(&(objectClass=*))", ["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"], "", "base", null)
             ->willReturn($this->entry);
@@ -52,32 +53,34 @@ class RootDseFactorySpec extends ObjectBehavior
         $connection->getLdapType()->willReturn('ad');
 
         $this->connection = $connection;
+        $this->dispatcher = $dispatcher;
+        $this->beConstructedWith($connection, $dispatcher);
     }
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\Factory\RootDseFactory');
+        $this->shouldHaveType('LdapTools\Connection\RootDse');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_get_a_LdapObject_for_a_connection($connection)
+    function it_should_get_a_LdapObject_for_a_connection()
     {
-        $this::get($this->connection)->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
+        $this->get()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_have_supported_sasl_mechanisms_as_an_array($connection)
+    function it_should_have_supported_sasl_mechanisms_as_an_array()
     {
-        $this::get($this->connection)->getSupportedSaslMechanisms()->shouldBeArray();
-        $this::get($this->connection)->hasSupportedSaslMechanisms('GSSAPI')->shouldBeEqualTo(true);
+        $this->get()->getSupportedSaslMechanisms()->shouldBeArray();
+        $this->get()->hasSupportedSaslMechanisms('GSSAPI')->shouldBeEqualTo(true);
     }
 
     function it_should_be_able_to_get_the_default_naming_context()
     {
-        $this::get($this->connection)->getDefaultNamingContext()->shouldBeEqualTo("dc=example,dc=local");
+        $this->get()->getDefaultNamingContext()->shouldBeEqualTo("dc=example,dc=local");
+    }
+
+    function it_should_call_the_schema_load_event_when_getting_the_rootdse_schema()
+    {
+        $this->dispatcher->dispatch(Argument::type('\LdapTools\Event\LdapObjectSchemaEvent'))->shouldBeCalled();
+        $this->get();
     }
 }

@@ -11,9 +11,10 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
-use LdapTools\Factory\EventDispatcherFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
@@ -70,9 +71,15 @@ class LdapManager
     protected $ldapObjectManager = [];
 
     /**
-     * @param Configuration $config
+     * @var SymfonyEventDispatcher
      */
-    public function __construct(Configuration $config)
+    protected $dispatcher;
+
+    /**
+     * @param Configuration $config
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(Configuration $config, EventDispatcherInterface $dispatcher = null)
     {
         $this->config = $config;
         $this->domains = $config->getDomainConfiguration();
@@ -80,6 +87,7 @@ class LdapManager
         if (empty($this->domains)) {
             throw new \RuntimeException("Your configuration must have at least one domain.");
         }
+        $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
         $this->context = $this->config->getDefaultDomain() ?: array_keys($this->domains)[0];
         $this->registerAttributeConverters($config->getAttributeConverters());
 
@@ -294,7 +302,7 @@ class LdapManager
      */
     public function getEventDispatcher()
     {
-        return EventDispatcherFactory::get();
+        return $this->dispatcher;
     }
 
     /**

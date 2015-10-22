@@ -12,6 +12,7 @@ namespace spec\LdapTools\Connection;
 
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Event\SymfonyEventDispatcher;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use \LdapTools\DomainConfiguration;
@@ -30,6 +31,16 @@ class LdapConnectionSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Connection\LdapConnection');
+    }
+
+    function it_should_accept_an_event_dispatcher_as_a_second_constructor_argument()
+    {
+        $config = new DomainConfiguration('example.com');
+        $config->setServers(['test'])
+            ->setBaseDn('dc=example,dc=local')
+            ->setLazyBind(true);
+
+        $this->beConstructedWith($config, new SymfonyEventDispatcher());
     }
 
     function it_should_error_when_authenticate_is_called_without_username_or_password()

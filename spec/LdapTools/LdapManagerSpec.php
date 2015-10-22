@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools;
 
+use LdapTools\Event\SymfonyEventDispatcher;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use \LdapTools\Configuration;
@@ -41,6 +42,19 @@ class LdapManagerSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\LdapManager');
+    }
+
+    function it_should_accept_an_event_dispatcher_as_a_second_constructor_argument()
+    {
+        $config = new Configuration();
+        $domain = new DomainConfiguration('example.com');
+        $domain->setServers(['example'])
+            ->setLazyBind(true)
+            ->setLdapType('openldap')
+            ->setBaseDn('dc=example,dc=com');
+        $config->addDomain($domain);
+
+        $this->beConstructedWith($config, new SymfonyEventDispatcher());
     }
 
     function it_should_return_a_ldap_connection_when_calling_getConnection()

@@ -6,7 +6,7 @@ use LdapTools\Configuration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Factory\CacheFactory;
-use LdapTools\Factory\EventDispatcherFactory;
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
@@ -40,7 +40,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -72,7 +72,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -115,7 +115,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -141,7 +141,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -163,7 +163,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -185,7 +185,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -207,7 +207,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -231,7 +231,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -255,7 +255,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -284,7 +284,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = EventDispatcherFactory::get();
+        $factoryDispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -311,7 +311,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = EventDispatcherFactory::get();
+        $factoryDispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -353,7 +353,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $schemaDispatcher = EventDispatcherFactory::get();
+        $schemaDispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $schemaDispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);

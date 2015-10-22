@@ -10,10 +10,11 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
-use LdapTools\Factory\RootDseFactory;
 use LdapTools\Query\LdapQuery;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -97,13 +98,20 @@ class LdapConnection implements LdapConnectionInterface
     protected $rootDse;
 
     /**
-     * @param DomainConfiguration $config
+     * @var EventDispatcherInterface
      */
-    public function __construct(DomainConfiguration $config)
+    protected $dispatcher;
+
+    /**
+     * @param DomainConfiguration $config
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null)
     {
         $this->usernameFormatter = BindUserStrategy::getInstance($config);
         $this->serverPool = new LdapServerPool($config);
         $this->config = $config;
+        $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());
         if (!$config->getLazyBind()) {
@@ -118,7 +126,11 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getRootDse()
     {
-        return RootDseFactory::get($this);
+        if (!$this->rootDse) {
+            $this->rootDse = (new RootDse($this, $this->dispatcher))->get();
+        }
+
+        return $this->rootDse;
     }
 
     /**

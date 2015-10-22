@@ -8,7 +8,7 @@ use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectCreationEvent;
 use LdapTools\Factory\CacheFactory;
-use LdapTools\Factory\EventDispatcherFactory;
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
@@ -31,7 +31,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -115,7 +115,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -142,7 +142,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -166,7 +166,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -197,7 +197,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -220,7 +220,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -247,7 +247,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $dispatcher = EventDispatcherFactory::get();
+        $dispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
@@ -281,7 +281,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = EventDispatcherFactory::get();
+        $factoryDispatcher = new SymfonyEventDispatcher();
         $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
 
         $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
