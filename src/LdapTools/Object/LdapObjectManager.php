@@ -67,6 +67,9 @@ class LdapObjectManager
      */
     public function persist(LdapObject $ldapObject)
     {
+        if (empty($ldapObject->getBatchCollection()->toArray())) {
+            return;
+        }
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
         $this->validateObject($ldapObject);
 

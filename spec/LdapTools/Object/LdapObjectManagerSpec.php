@@ -28,6 +28,8 @@ class LdapObjectManagerSpec extends ObjectBehavior
         ]
     ];
 
+    protected $connection;
+
     /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
@@ -36,6 +38,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
+        $this->connection = $connection;
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
@@ -54,6 +57,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_error_on_update_or_delete_if_the_dn_is_not_set()
     {
         $ldapObject = new LdapObject(['foo' => 'bar'], [], 'user', 'user');
+        $ldapObject->set('foo', 'foobar');
 
         $this->shouldThrow('\InvalidArgumentException')->duringPersist($ldapObject);
         $this->shouldThrow('\InvalidArgumentException')->duringDelete($ldapObject);
@@ -368,6 +372,37 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
+
+        $this->persist($ldapObject);
+    }
+
+    function it_should_not_try_to_modify_an_ldap_object_that_has_not_changed()
+    {
+        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], [], 'user', 'user');
+        $this->connection->modifyBatch(Argument::any(), Argument::any())->shouldNotBeCalled();
+
+        $this->persist($ldapObject);
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
+     */
+    function it_should_not_call_the_event_dispatcher_modify_events_when_an_object_has_not_changed($connection, $dispatcher)
+    {
+        $config = new Configuration();
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $cache = CacheFactory::get('none', []);
+        $schemaDispatcher = new SymfonyEventDispatcher();
+        $factory = new LdapObjectSchemaFactory($cache, $parser, $schemaDispatcher);
+
+        $this->beConstructedWith($connection, $factory, $dispatcher);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject);
+        $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject);
+        $dispatcher->dispatch($beforeEvent)->shouldNotBeCalled();
+        $dispatcher->dispatch($afterEvent)->shouldNotBeCalled();
 
         $this->persist($ldapObject);
     }
