@@ -18,7 +18,7 @@ use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
-use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Handles updates and deletes to LDAP based off passed object data.
@@ -102,7 +102,7 @@ class LdapObjectManager
     {
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject));
         $this->validateObject($ldapObject);
-        $rdn = $this->getRdnFromLdapObject($ldapObject);
+        $rdn = $this->getRdnFromDn($ldapObject->get('dn'));
         $this->connection->move($ldapObject->get('dn'), $rdn, $container);
 
         $newDn = $rdn.','.$container;
@@ -119,56 +119,8 @@ class LdapObjectManager
     protected function validateObject(LdapObject $ldapObject)
     {
         if (!$ldapObject->has('dn')) {
-            throw new \InvalidArgumentException('To persist/delete a LDAP object it must have the DN attribute.');
+            throw new \InvalidArgumentException('To persist/delete/move a LDAP object it must have the DN attribute.');
         }
-    }
-
-    /**
-     * Gets the RDN for a LDAP object schema type. It should be mapped to the "name" attribute. This does not handle
-     * multi-valued RDNs. Though I'm not too sure how that should really be implemented either.
-     *
-     * @param LdapObject $ldapObject
-     * @return string
-     */
-    protected function getRdnFromLdapObject(LdapObject $ldapObject)
-    {
-        if (empty($ldapObject->getType())) {
-            throw new \InvalidArgumentException('The LDAP object must have a schema type defined to perform this action.');
-        }
-
-        $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $ldapObject->getType());
-        if (!$schema->hasAttribute('name')) {
-            throw new \InvalidArgumentException(sprintf(
-                'The LdapObject type "%s" needs a "name" attribute defined that references the RDN.',
-                $ldapObject->getType()
-            ));
-        }
-        $name = $ldapObject->has('name') ? $ldapObject->get('name') : $this->getRdnValueIfNotSelected($ldapObject);
-
-        return $schema->getAttributeToLdap('name').'='.ldap_escape($name, null, LDAP_ESCAPE_DN);
-    }
-
-    /**
-     * If for some reason the "name" attribute was not selected when the LdapObject was instantiated, then try to
-     * query its value here.
-     *
-     * @param LdapObject $ldapObject
-     * @return string
-     */
-    protected function getRdnValueIfNotSelected(LdapObject $ldapObject)
-    {
-        /** @var LdapObject $result */
-        $result = (new LdapQueryBuilder($this->connection, $this->schemaFactory))->select('name')
-            ->from($ldapObject->getType())
-            ->where(['dn' => $ldapObject->get('dn')])
-            ->getLdapQuery()
-            ->getOneOrNullResult();
-
-        if (is_null($result) || !$result->has('name')) {
-            throw new \RuntimeException('Unable to retrieve the RDN value for the LdapObject');
-        }
-
-        return $result->get('name');
     }
 
     /**
@@ -189,5 +141,20 @@ class LdapObjectManager
         }
 
         return $hydrator->hydrateToLdap($ldapObject);
+    }
+
+    /**
+     * Given a full escaped DN return the RDN in escaped form.
+     *
+     * @param $dn
+     * @return string
+     */
+    protected function getRdnFromDn($dn)
+    {
+        $rdn = LdapUtilities::explodeDn($dn, 0)[0];
+        $rdn = explode('=', $rdn, 2);
+        $rdn = $rdn[0].'='.ldap_escape($rdn[1], null, LDAP_ESCAPE_DN);
+
+        return $rdn;
     }
 }

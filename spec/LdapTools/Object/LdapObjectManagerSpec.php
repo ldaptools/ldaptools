@@ -162,7 +162,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo\2c bar', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $connection->move('cn=foo\, bar,dc=foo,dc=bar', 'cn=foo\2c bar', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -172,76 +172,16 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
         $this->beConstructedWith($connection, $factory, $dispatcher);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo\, bar,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_error_moving_if_a_schema_type_is_not_defined($connection)
+    function it_should_move_an_object_without_a_schema_type()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
-        $this->shouldThrow(new \InvalidArgumentException("The LDAP object must have a schema type defined to perform this action."))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
-    }
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_error_moving_if_a_schema_does_not_have_a_name_attribute($connection)
-    {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
-
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'noname');
-        $this->shouldThrow(new \InvalidArgumentException('The LdapObject type "noname" needs a "name" attribute defined that references the RDN.'))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
-    }
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_error_moving_if_the_ldap_object_name_field_cannot_be_queried_when_not_selected($connection)
-    {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->getLdapType()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
-        $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn([]);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
-
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
-        $this->shouldThrow(new \RuntimeException("Unable to retrieve the RDN value for the LdapObject"))->duringMove($ldapObject, 'ou=employees,dc=foo,dc=bar');
+        $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
     /**
