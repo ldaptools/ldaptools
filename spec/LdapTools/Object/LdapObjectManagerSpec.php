@@ -406,4 +406,13 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
         $this->persist($ldapObject);
     }
+
+    function it_should_persist_an_ldap_object_that_has_no_schema_type()
+    {
+        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], ['user'], 'user', '');
+        $ldapObject->set('foo', 'bar');
+
+        $this->connection->modifyBatch("cn=user,dc=foo,dc=bar", [["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]])->shouldBeCalled();
+        $this->persist($ldapObject);
+    }
 }

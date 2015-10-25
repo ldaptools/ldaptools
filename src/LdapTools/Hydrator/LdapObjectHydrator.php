@@ -56,6 +56,9 @@ class LdapObjectHydrator extends ArrayHydrator
         if (!($ldapObject instanceof LdapObject)) {
             throw new \InvalidArgumentException('Expects a LdapObject instance to convert batch modifications to LDAP.');
         }
+        if (!$this->schemas) {
+            return $ldapObject->getBatchCollection()->getBatchArray();
+        }
 
         $batches = $this->convertValuesToLdap($ldapObject->getBatchCollection(), $ldapObject->get('dn'));
         foreach ($batches as $batch) {

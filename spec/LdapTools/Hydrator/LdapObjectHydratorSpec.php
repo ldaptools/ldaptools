@@ -77,6 +77,28 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         'name' => '%firstname%',
     ];
 
+    protected $batch = [
+        [
+            'attrib' => 'givenName',
+            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+            'values' => ['Chad'],
+        ],
+        [
+            'attrib' => 'sn',
+            'modtype' => LDAP_MODIFY_BATCH_ADD,
+            'values' => ['Sikorra'],
+        ],
+        [
+            'attrib' => 'sAMAccountName',
+            'modtype' => LDAP_MODIFY_BATCH_REMOVE,
+            'values' => ['csikorra'],
+        ],
+        [
+            'attrib' => 'mail',
+            'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
+        ],
+    ];
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Hydrator\LdapObjectHydrator');
@@ -103,30 +125,8 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $this->hydrateAllFromLdap($this->ldapEntries)->count()->shouldBeEqualTo(2);
     }
 
-    function it_should_hydrate_a_ldap_batch_modify_spec_()
+    function it_should_hydrate_a_ldap_object_with_batch_modification()
     {
-        $batch = [
-            [
-                'attrib' => 'givenName',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => ['Chad'],
-            ],
-            [
-                'attrib' => 'sn',
-                'modtype' => LDAP_MODIFY_BATCH_ADD,
-                'values' => ['Sikorra'],
-            ],
-            [
-                'attrib' => 'sAMAccountName',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE,
-                'values' => ['csikorra'],
-            ],
-            [
-                'attrib' => 'mail',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
-            ],
-        ];
-
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([ 'firstName' => 'givenName','lastName' => 'sn', 'emailAddress' => 'mail', 'username' => 'sAMAccountName' ]);
         $this->setLdapObjectSchemas($schema);
@@ -137,7 +137,19 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $ldapObject->remove('username', 'csikorra');
         $ldapObject->reset('emailAddress');
 
-        $this->hydrateToLdap($ldapObject)->shouldBeEqualTo($batch);
+        $this->hydrateToLdap($ldapObject)->shouldBeEqualTo($this->batch);
+        $this->hydrateToLdap($ldapObject)->shouldHaveCount(4);
+    }
+
+    function it_should_hydrate_a_ldap_object_wihtout_a_schema_with_batch_modification()
+    {
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
+        $ldapObject->set('givenName', 'Chad');
+        $ldapObject->add('sn', 'Sikorra');
+        $ldapObject->remove('sAMAccountName', 'csikorra');
+        $ldapObject->reset('mail');
+
+        $this->hydrateToLdap($ldapObject)->shouldBeEqualTo($this->batch);
         $this->hydrateToLdap($ldapObject)->shouldHaveCount(4);
     }
 

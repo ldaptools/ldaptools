@@ -71,22 +71,11 @@ class LdapObjectManager
             return;
         }
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
+
         $this->validateObject($ldapObject);
-
-        $batches = $ldapObject->getBatchCollection();
-        $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_OBJECT);
-        $hydrator->setLdapConnection($this->connection);
-        $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $schema = $ldapObject->getType();
-
-        if ($schema) {
-            $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $schema);
-            $hydrator->setLdapObjectSchemas($schema);
-            $batches = $hydrator->hydrateToLdap($ldapObject);
-        }
-
-        $this->connection->modifyBatch($ldapObject->get('dn'), $batches);
+        $this->connection->modifyBatch($ldapObject->get('dn'), $this->getLdapObjectBatchArray($ldapObject));
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
+
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject));
     }
 
@@ -180,5 +169,25 @@ class LdapObjectManager
         }
 
         return $result->get('name');
+    }
+
+    /**
+     * Get the batch modification array that ldap_modify_batch expects.
+     *
+     * @param LdapObject $ldapObject
+     * @return array
+     */
+    protected function getLdapObjectBatchArray(LdapObject $ldapObject)
+    {
+        $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_OBJECT);
+        $hydrator->setLdapConnection($this->connection);
+        $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+
+        if ($ldapObject->getType()) {
+            $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $ldapObject->getType());
+            $hydrator->setLdapObjectSchemas($schema);
+        }
+
+        return $hydrator->hydrateToLdap($ldapObject);
     }
 }
