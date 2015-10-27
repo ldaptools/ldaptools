@@ -136,7 +136,7 @@ cache_options:
 -------------------
 #### attribute_converters
 
-An array of convert to class name mappings that will be registered in the `LdapManager` for use in the schemas.
+An array of converter to class name mappings that will be registered in the `LdapManager` for use in the schemas.
 
 ```yaml
 general:
