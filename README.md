@@ -116,6 +116,11 @@ if ($user->disabled) {
     $user->disabled = false;
 }
 
+// Add a value to an attribute...
+$user->addIpPhone('#001-5555');
+// Add a few values at one time...
+$user->addIpPhone('#001-4444', '#001-3333', '#001-2222');
+
 // Now actually save the changes back to LDAP...
 try {
     $ldap->persist($user);

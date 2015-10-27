@@ -22,8 +22,12 @@ $user->setTitle('CEO');
 $user->resetMobilePhone();
 // Remove a specific value from a multi-valued attribute. Careful! If it doesn't exist LDAP will complain.
 $user->removePhoneNumber('555-5555');
+// Remove multiple values for a multi-valued attribute at once (Using splat notation)...
+$user->removePhoneNumber(...['555-5555', '123-4567', '765-4321']);
 // Adds a value to an attribute in addition to what it might already have
 $user->addIpPhone('#001-1000');
+// Add multiple values at once...
+$user->addIpPhone('#001-1234','#002-5678', '#003-1001');
 
 // Check if a specific attribute exists
 if ($user->hasEmailAddress()) {

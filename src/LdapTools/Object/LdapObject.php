@@ -169,19 +169,21 @@ class LdapObject
     }
 
     /**
-     * Remove a specific value from an attribute.
+     * Remove a specific value, or multiple values, from an attribute.
      *
      * @param string $attribute
-     * @param mixed $value
+     * @param mixed $values
      * @return $this
      */
-    public function remove($attribute, $value)
+    public function remove($attribute, ...$values)
     {
-        if ($this->has($attribute)) {
-            $attribute = $this->resolveAttributeName($attribute);
-            $this->attributes[$attribute] = $this->removeAttributeValue($this->attributes[$attribute], $value);
+        foreach ($values as $value) {
+            if ($this->has($attribute)) {
+                $attribute = $this->resolveAttributeName($attribute);
+                $this->attributes[$attribute] = $this->removeAttributeValue($this->attributes[$attribute], $value);
+            }
+            $this->batches->add(new Batch(Batch::TYPE['REMOVE'], $attribute, $value));
         }
-        $this->batches->add(new Batch(Batch::TYPE['REMOVE'], $attribute, $value));
 
         return $this;
     }
@@ -204,21 +206,23 @@ class LdapObject
     }
 
     /**
-     * Add an additional value to an attribute.
+     * Add an additional value, or values, to an attribute.
      *
      * @param string $attribute
-     * @param mixed $value
+     * @param mixed $values
      * @return $this
      */
-    public function add($attribute, $value)
+    public function add($attribute, ...$values)
     {
-        if ($this->has($attribute)) {
-            $attribute = $this->resolveAttributeName($attribute);
-            $this->attributes[$attribute] = $this->addAttributeValue($this->attributes[$attribute], $value);
-        } else {
-            $this->attributes[$attribute] = $value;
+        foreach ($values as $value) {
+            if ($this->has($attribute)) {
+                $attribute = $this->resolveAttributeName($attribute);
+                $this->attributes[$attribute] = $this->addAttributeValue($this->attributes[$attribute], $value);
+            } else {
+                $this->attributes[$attribute] = $value;
+            }
+            $this->batches->add(new Batch(Batch::TYPE['ADD'], $attribute, $value));
         }
-        $this->batches->add(new Batch(Batch::TYPE['ADD'], $attribute, $value));
 
         return $this;
     }

@@ -301,4 +301,39 @@ class LdapObjectSpec extends ObjectBehavior
         $this->refresh(['foo' => 'bar']);
         $this->getFoo()->shouldBeEqualTo('bar');
     }
+
+    function it_should_be_able_to_add_multiple_values_at_once()
+    {
+        $addresses = ['foo@bar.com', 'bar@foo.com'];
+        $this->addEmailAddress(...$addresses);
+        $this->add('emailAddress', 'foobar@foo.com', 'foobar@bar.com', 'foobar@foobar.com');
+
+        $this->getEmailAddress()->shouldBeArray();
+        $this->getEmailAddress()->shouldContain('foo@bar.com');
+        $this->getEmailAddress()->shouldContain('bar@foo.com');
+        $this->getEmailAddress()->shouldContain('foobar@bar.com');
+        $this->getEmailAddress()->shouldContain('foobar@foo.com');
+        $this->getEmailAddress()->shouldContain('foobar@foobar.com');
+        $this->getEmailAddress()->shouldContain('chad.sikorra@example.com');
+    }
+
+    function it_should_be_able_to_remove_multiple_values_at_once()
+    {
+        $attributes = $this->attributes;
+        $attributes['emailAddress'] = [
+            'chad.sikorra@example.com',
+            'foo@bar.com',
+            'bar@foo.com',
+            'foobar@foo.com'
+        ];
+        $this->refresh($attributes);
+        $this->getEmailAddress()->shouldBeEqualTo($attributes['emailAddress']);
+
+        $this->removeEmailAddress(...['foo@bar.com', 'bar@foo.com']);
+        $this->getEmailAddress()->shouldNotContain('foo@bar.com');
+        $this->getEmailAddress()->shouldNotContain('bar@foo.com');
+        $this->remove('emailAddress', 'chad.sikorra@example.com', 'foobar@foo.com');
+        $this->getEmailAddress()->shouldBeEqualTo([]);
+
+    }
 }
