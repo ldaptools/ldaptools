@@ -235,6 +235,10 @@ the `TLS_REQCERT never` line. The `ldap.conf` file is in the following default l
   * Windows: `C:\OpenLDAP\sysconf\ldap.conf` (If this directory structure does not exist, then create it...and the file)
   * Linux: `/etc/ldap/ldap.conf`
 
+However, be warned that using `TLS_REQCERT never` can be a bit of a security risk as it ignores invalid certificates.
+Consider copying your domain CA cert to `/etc/ssl/certs` then reference it in your `ldap.conf` with the `TLS_CACERT /etc/ssl/certs/ca.pem`
+option combined with `TLS_REQCERT hard`.
+
 **Default**: `false`
 
 -------------------------------
