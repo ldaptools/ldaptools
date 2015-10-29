@@ -96,6 +96,20 @@ class FilterBuilder
     }
 
     /**
+     * A less-than comparison. Since an actual '<' operator does not exist in LDAP, this is a combination of a
+     * greater-than-or-equal-to operator along with a check if the attribute is set/present. This is encapsulated within
+     * a logical 'AND' operator.
+     *
+     * @param string  $attribute
+     * @param mixed $value
+     * @return bAnd
+     */
+    public function lt($attribute, $value)
+    {
+        return new bAnd(new bNot($this->gte($attribute, $value)), $this->present($attribute));
+    }
+
+    /**
      * A less-than-or-equal-to comparison.
      *
      * @param $attribute
@@ -105,6 +119,20 @@ class FilterBuilder
     public function lte($attribute, $value)
     {
         return new Comparison($attribute, Comparison::LTE, $value);
+    }
+
+    /**
+     * A greater-than comparison. Since an actual '>' operator does not exist in LDAP, this is a combination of a
+     * less-than-or-equal-to operator along with a check if the attribute is set/present. This is encapsulated within a
+     * logical 'AND' operator.
+     *
+     * @param string $attribute
+     * @param mixed $value
+     * @return bAnd
+     */
+    public function gt($attribute, $value)
+    {
+        return new bAnd(new bNot($this->lte($attribute, $value)), $this->present($attribute));
     }
 
     /**

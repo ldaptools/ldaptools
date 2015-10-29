@@ -100,4 +100,24 @@ class FilterBuilderSpec extends ObjectBehavior
     {
         $this->bitwiseOr('bar', 2)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
     }
+
+    function it_should_return_bAnd_when_calling_lt()
+    {
+        $this->lt('foo', '5')->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bAnd');
+    }
+
+    function it_should_return_bAnd_when_calling_gt()
+    {
+        $this->gt('foo', '5')->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bAnd');
+    }
+
+    function it_should_correctly_format_a_less_than_filter()
+    {
+        $this->lt('foo', '5')->getLdapFilter()->shouldBeEqualTo('(&(!(foo>=\35))(foo=*))');
+    }
+
+    function it_should_correctly_format_a_greater_than_filter()
+    {
+        $this->gt('foo', '5')->getLdapFilter()->shouldBeEqualTo('(&(!(foo<=\35))(foo=*))');
+    }
 }

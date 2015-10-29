@@ -428,9 +428,23 @@ Creates a "not-equal-to" comparison between the attribute and the value. This is
  `eq($attribute, $value)` within a 'NOT' statement: `(!(attribute=value))`
 
 ------------------------
+#### lt($attribute, $value)
+
+Creates a "less-than" comparison between the attribute and the value. Since an actual '<' operator does not exist in 
+LDAP, this is a combination of a greater-than-or-equal-to operator along with a check if the attribute is set/present.
+This is encapsulated within a logical 'AND' operator: `(&(!(attribute>=value))(attribute=*))`
+
+------------------------
 #### leq($attribute, $value)
 
 Creates a "less-than-or-equal-to" comparison between the attribute and the value: `(attribute<=value)`
+
+------------------------
+#### gt($attribute, $value)
+
+Creates a "greater-than" comparison between the attribute and the value. Since an actual '>' operator does not exist in 
+LDAP, this is a combination of a less-than-or-equal-to operator along with a check if the attribute is set/present.
+This is encapsulated within a logical 'AND' operator: `(&(!(attribute<=value))(attribute=*))`
 
 ------------------------
 #### geq($attribute, $value)
