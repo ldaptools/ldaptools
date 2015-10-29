@@ -31,6 +31,7 @@ class bNot extends BaseOperator implements ContainsOperatorsInterface
     public function __construct(BaseOperator $operator)
     {
         $this->add($operator);
+        $this->validOperators = [ self::SYMBOL ];
         $this->operatorSymbol = self::SYMBOL;
     }
 

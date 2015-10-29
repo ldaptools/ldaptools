@@ -28,6 +28,7 @@ class From extends BaseOperator implements ContainsOperatorsInterface
      */
     public function __construct(BaseOperator $operator)
     {
+        $this->validOperators = [ '|', '&' ];
         $this->parentAdd($operator);
     }
 

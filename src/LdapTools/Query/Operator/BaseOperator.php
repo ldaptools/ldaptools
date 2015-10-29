@@ -10,6 +10,7 @@
 
 namespace LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -63,6 +64,11 @@ abstract class BaseOperator
      * @var string The operator symbol (ie. &, |, =, <=, >=, etc)
      */
     protected $operatorSymbol = '';
+
+    /**
+     * @var array The valid operator symbols that can be set.
+     */
+    protected $validOperators = [];
 
     /**
      * Get the attribute value.
@@ -158,9 +164,18 @@ abstract class BaseOperator
      * Set the operator symbol in use.
      *
      * @param $symbol
+     * @throws LdapQueryException
      */
     public function setOperatorSymbol($symbol)
     {
+        if (!in_array($symbol, $this->validOperators)) {
+            throw new LdapQueryException(sprintf(
+                'Invalid operator symbol "%s". Valid operator symbols are: %s',
+                $symbol,
+                implode(', ', $this->validOperators)
+            ));
+        }
+
         $this->operatorSymbol = $symbol;
     }
 

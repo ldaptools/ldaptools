@@ -68,6 +68,7 @@ class Wildcard extends Comparison
 
         $this->attribute = $attribute;
         $this->value = $value;
+        $this->validOperators = [ self::EQ ];
         $this->operatorSymbol = self::EQ;
         $this->wildcardType = $type;
     }

@@ -27,6 +27,7 @@ class bAnd extends BaseOperator implements ContainsOperatorsInterface
     public function __construct(BaseOperator ...$operators)
     {
         $this->children = $operators;
+        $this->validOperators = [ self::SYMBOL ];
         $this->operatorSymbol = self::SYMBOL;
     }
 }

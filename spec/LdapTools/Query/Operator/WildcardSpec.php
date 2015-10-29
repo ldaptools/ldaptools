@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\Wildcard;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -91,6 +92,11 @@ class WildcardSpec extends ObjectBehavior
         $this->getUseConverter()->shouldBeEqualTo(false);
     }
 
+    function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
+    {
+        $ex = new LdapQueryException('Invalid operator symbol ">=". Valid operator symbols are: =');
+        $this->shouldThrow($ex)->duringSetOperatorSymbol('>=');
+    }
 
     public function getMatchers()
     {

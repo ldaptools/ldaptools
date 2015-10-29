@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\MatchingRuleOid;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -50,6 +51,12 @@ class MatchingRuleSpec extends ObjectBehavior
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
         $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\32)');
+    }
+
+    function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
+    {
+        $ex = new LdapQueryException('Invalid operator symbol ">=". Valid operator symbols are: =');
+        $this->shouldThrow($ex)->duringSetOperatorSymbol('>=');
     }
 
     public function getMatchers()

@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
@@ -68,5 +69,11 @@ class FromSpec extends ObjectBehavior
     {
         $this->add(new Comparison('objectClass', Comparison::EQ, 'group'));
         $this->getLdapFilter()->shouldBeEqualTo('(|(objectClass=\75\73\65\72)(objectClass=\67\72\6f\75\70))');
+    }
+
+    function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
+    {
+        $ex = new LdapQueryException('Invalid operator symbol "=". Valid operator symbols are: |, &');
+        $this->shouldThrow($ex)->duringSetOperatorSymbol('=');
     }
 }

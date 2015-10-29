@@ -46,19 +46,14 @@ class Comparison extends BaseOperator
      */
     public function __construct($attribute, $comparison, $value)
     {
-        if (!$this->isComparisonValid($comparison)) {
-            throw new \InvalidArgumentException(sprintf('Unknown comparison type "%s".', $comparison));
-        }
-
-        $this->operatorSymbol = $comparison;
+        $this->validOperators = [
+            self::AEQ,
+            self::EQ,
+            self::GTE,
+            self::LTE,
+        ];
+        $this->setOperatorSymbol($comparison);
         $this->attribute = $attribute;
         $this->value = $value;
-    }
-
-    protected function isComparisonValid($comparison)
-    {
-        return (self::EQ == $comparison || self::AEQ == $comparison
-            || self::GTE == $comparison || self::LTE == $comparison
-        );
     }
 }

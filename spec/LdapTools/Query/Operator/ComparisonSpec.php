@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -80,9 +81,18 @@ class ComparisonSpec extends ObjectBehavior
         $this->getValue()->shouldBeEqualTo('bar');
     }
 
-    function it_should_throw_InvalidArgumentException_on_an_unknown_comparison_type()
+    function it_should_throw_LdapQueryException_on_an_unknown_comparison_type()
     {
-        $this->shouldThrow('\InvalidArgumentException')->during('__construct',['foo','FOOBAR', 'bar']);
+        $ex = new LdapQueryException('Invalid operator symbol "FOOBAR". Valid operator symbols are: ~=, =, >=, <=');
+        $this->shouldThrow($ex)->during('__construct',['foo','FOOBAR', 'bar']);
+    }
+
+    function it_should_not_throw_LdapQueryException_on_a_valid_comparison_type()
+    {
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringSetOperatorSymbol(Comparison::GTE);
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringSetOperatorSymbol(Comparison::LTE);
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringSetOperatorSymbol(Comparison::AEQ);
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringSetOperatorSymbol(Comparison::EQ);
     }
 
     function it_should_return_the_correct_ldap_equals_filter_on_toString()

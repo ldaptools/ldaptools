@@ -33,6 +33,7 @@ class MatchingRule extends BaseOperator
      */
     public function __construct($attribute, $oid, $value)
     {
+        $this->validOperators = [ self::SYMBOL ];
         $this->operatorSymbol = self::SYMBOL;
         $this->attribute = $attribute;
         $this->value = $value;

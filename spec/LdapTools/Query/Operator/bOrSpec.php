@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\Wildcard;
@@ -64,5 +65,11 @@ class bOrSpec extends ObjectBehavior
     {
         $this->add(new bAnd(new Wildcard('description', Wildcard::CONTAINS,'bar')));
         $this->getLdapFilter()->shouldBeEqualTo('(|(foo=\62\61\72)(&(description=*\62\61\72*)))');
+    }
+
+    function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
+    {
+        $ex = new LdapQueryException('Invalid operator symbol "=". Valid operator symbols are: |');
+        $this->shouldThrow($ex)->duringSetOperatorSymbol('=');
     }
 }

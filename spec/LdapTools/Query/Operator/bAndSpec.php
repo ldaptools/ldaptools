@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\bNot;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Query\Operator\Comparison;
@@ -23,6 +24,7 @@ class bAndSpec extends ObjectBehavior
     {
         $this->beConstructedWith(new Comparison('foo', Comparison::EQ, 'bar'));
     }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Query\Operator\bAnd');
@@ -64,5 +66,11 @@ class bAndSpec extends ObjectBehavior
     {
         $this->add(new bNot(new Wildcard('description', Wildcard::CONTAINS,'bar')));
         $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(!(description=*\62\61\72*)))');
+    }
+
+    function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
+    {
+        $ex = new LdapQueryException('Invalid operator symbol "=". Valid operator symbols are: &');
+        $this->shouldThrow($ex)->duringSetOperatorSymbol('=');
     }
 }
