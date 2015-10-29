@@ -26,7 +26,7 @@ The recommended way to install LdapTools is using [Composer](http://getcomposer.
 composer require ldaptools/ldaptools
 ```
 
-### Getting Started
+## Getting Started
 
 The easiest way to get started is by creating a YAML config file. See the [example config](resources/config/example.yml) file for basic usage.
 
@@ -40,7 +40,7 @@ $config = (new Configuration())->load('/path/to/ldap/config.yml');
 $ldap = new LdapManager($config);
 ```
 
-### Searching LDAP
+## Searching LDAP
 
 With the `LdapManager` up and going you can now easily build LDAP queries without having to remember all the special 
 syntax for LDAP filters. All values are also automatically escaped.
@@ -95,7 +95,7 @@ echo "First name ".$user->getFirstName()." and last name ".$user->getLastName();
 
 The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
 
-### Modifying LDAP Objects
+## Modifying LDAP Objects
 
 Modifying LDAP is as easy as searching for the LDAP object as described above, then making changes directly to the object
 and saving it back to LDAP using the `LdapManager`.
@@ -134,7 +134,7 @@ try {
 }
 ```
 
-### Deleting LDAP Objects
+## Deleting LDAP Objects
 
 Deleting LDAP objects is a simple matter of searching for the object you want to remove, then passing it to the delete
 method on the `LdapManager`:
@@ -150,7 +150,7 @@ try {
 }
 ```
 
-### Creating LDAP Objects
+## Creating LDAP Objects
  
 Creating LDAP objects is easily performed by just passing what you want the attributes to be and what container/OU the
 object should end up in:
@@ -189,7 +189,7 @@ $ldapObject->createOU()
     ->execute();
 ```
 
-### Documentation
+## Documentation
 
 * [Main Configuration Reference](reference/Main-Configuration.md)
 * [Schema Configuration](reference/Schema-Configuration.md)
@@ -200,7 +200,7 @@ $ldapObject->createOU()
 * [Default Schema Attributes](reference/Default-Schema-Attributes.md)
 * [The Event System](reference/Events.md)
 
-### TODO
+## TODO
 
 Things that still need to be implemented:
 
