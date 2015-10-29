@@ -64,25 +64,25 @@ class WildcardSpec extends ObjectBehavior
     public function it_should_return_a_string_with_the_wildcard_operators_on_each_side_when_using_contains()
     {
         $this->beConstructedWith('foo', Wildcard::CONTAINS, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo=*\62\61\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62\61\72*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_right_side_when_using_starts_with()
     {
         $this->beConstructedWith('foo', Wildcard::STARTS_WITH, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo=\62\61\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=\62\61\72*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_left_side_when_using_ends_with()
     {
         $this->beConstructedWith('foo', Wildcard::ENDS_WITH, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo=*\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62\61\72)');
     }
 
     public function it_should_return_a_string_with_unescaped_wildcards_when_using_like()
     {
         $this->beConstructedWith('foo', Wildcard::LIKE, '*b*a*r*');
-        $this->__tostring()->shouldBeEqualTo('(foo=*\62*\61*\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62*\61*\72*)');
     }
 
     public function it_should_not_use_a_converter_if_the_type_is_present()

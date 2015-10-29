@@ -61,12 +61,12 @@ class FromSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_filter_with_one_operator()
     {
-        $this->__tostring()->shouldBeEqualTo('(objectClass=\75\73\65\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=\75\73\65\72)');
     }
 
     function it_should_return_the_correct_ldap_filter_with_two_operators()
     {
         $this->add(new Comparison('objectClass', Comparison::EQ, 'group'));
-        $this->__tostring()->shouldBeEqualTo('(|(objectClass=\75\73\65\72)(objectClass=\67\72\6f\75\70))');
+        $this->getLdapFilter()->shouldBeEqualTo('(|(objectClass=\75\73\65\72)(objectClass=\67\72\6f\75\70))');
     }
 }

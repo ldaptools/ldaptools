@@ -172,11 +172,10 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->filter()->shouldBeLike(new FilterBuilder());
     }
 
-    function it_should_return_the_filter_when_calling_getLdapFilter_or_toString()
+    function it_should_return_the_filter_when_calling_getLdapFilter()
     {
         $filter = '(objectClass=\67\72\6f\75\70)';
         $this->fromGroups();
-        $this->getLdapFilter()->shouldBeEqualTo($filter);
         $this->getLdapFilter()->shouldBeEqualTo($filter);
     }
 

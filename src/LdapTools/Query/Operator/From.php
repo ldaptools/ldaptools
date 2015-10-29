@@ -19,7 +19,6 @@ class From extends BaseOperator implements ContainsOperatorsInterface
 {
     use ContainsOperatorsTrait {
         add as parentAdd;
-        __toString as parentToString;
     }
 
     protected $objectTypes = [];
@@ -44,11 +43,11 @@ class From extends BaseOperator implements ContainsOperatorsInterface
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function getLdapFilter()
     {
         $start = (1 == count($this->children)) ? '' : '(';
         $end = (1 == count($this->children)) ? '' : ')';
 
-        return $start.$this->operatorSymbol.implode($this->children).$end;
+        return $start.$this->operatorSymbol.$this->getChildrenFilterString().$end;
     }
 }

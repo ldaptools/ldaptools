@@ -43,13 +43,13 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_bitwise_and_filter_on_toString()
     {
-        $this->__tostring()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=\32)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=\32)');
     }
 
     function it_should_return_the_correct_ldap_bitwise_or_filter_on_toString()
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
-        $this->__tostring()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\32)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\32)');
     }
 
     public function getMatchers()

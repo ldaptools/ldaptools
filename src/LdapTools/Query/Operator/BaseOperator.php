@@ -209,7 +209,7 @@ abstract class BaseOperator
      *
      * @return string
      */
-    public function __toString()
+    public function getLdapFilter()
     {
         return self::SEPARATOR_START
             .$this->getAttributeToQuery()

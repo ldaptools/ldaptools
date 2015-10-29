@@ -51,18 +51,18 @@ class bOrSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_filter_with_one_operator()
     {
-        $this->__tostring()->shouldBeEqualTo('(|(foo=\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(|(foo=\62\61\72))');
     }
 
     function it_should_return_the_correct_ldap_filter_with_two_operators()
     {
         $this->add(new Wildcard('foobar', Wildcard::ENDS_WITH,'bar'));
-        $this->__tostring()->shouldBeEqualTo('(|(foo=\62\61\72)(foobar=*\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(|(foo=\62\61\72)(foobar=*\62\61\72))');
     }
 
     function it_should_return_the_correct_ldap_filter_when_nesting_operators()
     {
         $this->add(new bAnd(new Wildcard('description', Wildcard::CONTAINS,'bar')));
-        $this->__tostring()->shouldBeEqualTo('(|(foo=\62\61\72)(&(description=*\62\61\72*)))');
+        $this->getLdapFilter()->shouldBeEqualTo('(|(foo=\62\61\72)(&(description=*\62\61\72*)))');
     }
 }

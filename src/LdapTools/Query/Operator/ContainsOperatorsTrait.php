@@ -45,10 +45,23 @@ trait ContainsOperatorsTrait
     }
 
     /**
+     * @inheritdoc
+     */
+    public function getLdapFilter()
+    {
+        return self::SEPARATOR_START.self::SYMBOL.$this->getChildrenFilterString().self::SEPARATOR_END;
+    }
+
+    /**
      * @return string
      */
-    public function __toString()
+    protected function getChildrenFilterString()
     {
-        return self::SEPARATOR_START.self::SYMBOL.implode($this->children).self::SEPARATOR_END;
+        $filters = [];
+        foreach ($this->children as $child) {
+            $filters[] = $child->getLdapFilter();
+        }
+
+        return implode($filters);
     }
 }

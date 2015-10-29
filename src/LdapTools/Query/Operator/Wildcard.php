@@ -75,7 +75,7 @@ class Wildcard extends Comparison
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function getLdapFilter()
     {
         if ($this->wildcardType == self::CONTAINS) {
             $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery()).'*';

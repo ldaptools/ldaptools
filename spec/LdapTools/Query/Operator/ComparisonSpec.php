@@ -88,25 +88,25 @@ class ComparisonSpec extends ObjectBehavior
     function it_should_return_the_correct_ldap_equals_filter_on_toString()
     {
         $this->beConstructedWith('foo', Comparison::EQ, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=\62\61\72)');
     }
 
     function it_should_return_the_correct_ldap_greater_than_or_equals_filter_on_toString()
     {
         $this->beConstructedWith('foo', Comparison::GTE, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo>=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo>=\62\61\72)');
     }
 
     function it_should_return_the_correct_ldap_less_than_or_equals_filter_on_toString()
     {
         $this->beConstructedWith('foo', Comparison::LTE, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo<=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo<=\62\61\72)');
     }
 
     function it_should_return_the_correct_ldap_approximately_equals_filter_on_toString()
     {
         $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
-        $this->__tostring()->shouldBeEqualTo('(foo~=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo~=\62\61\72)');
     }
 
     function it_should_be_able_to_set_and_get_the_value()

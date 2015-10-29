@@ -124,10 +124,13 @@ class OperatorCollectionHydrator
      */
     protected function buildLdapFilter(OperatorCollection $collection)
     {
-        $operators = $collection->toArray();
-        $filter = implode('', $operators);
+        $filters = [];
+        foreach ($collection->toArray() as $operator) {
+            $filters[] = $operator->getLdapFilter();
+        }
+        $filter = implode('', $filters);
 
-        if (1 < count($operators)) {
+        if (1 < count($collection->toArray())) {
             $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
         }
 

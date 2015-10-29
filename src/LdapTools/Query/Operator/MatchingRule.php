@@ -42,7 +42,7 @@ class MatchingRule extends BaseOperator
     /**
      * {@inheritdoc}
      */
-    public function __toString()
+    public function getLdapFilter()
     {
         return self::SEPARATOR_START
             .$this->getAttributeToQuery()

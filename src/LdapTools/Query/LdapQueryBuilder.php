@@ -438,15 +438,6 @@ class LdapQueryBuilder
     }
 
     /**
-     * @see getLdapFilter
-     * @return string
-     */
-    public function __toString()
-    {
-        return $this->getLdapFilter();
-    }
-
-    /**
      * When a 'From' operator is added for a specific object type, this will be called to load its corresponding
      * schema definition object and automatically update the "From" object for the query.
      *
