@@ -102,7 +102,7 @@ class LdapQueryBuilder
     protected $schemaFactory;
 
     /**
-     * @var Builder\FilterBuilder
+     * @var Builder\FilterBuilder|Builder\ADFilterBuilder
      */
     protected $filterBuilder;
 
