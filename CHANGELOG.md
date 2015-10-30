@@ -1,6 +1,16 @@
 CHANGELOG
 =========
 
+0.15.0 (2015-10-30)
+------------------
+  * Added an event system. Event listeners are available for LDAP object creation, deletion, and modification.
+  * Multiple class values can now be defined for a schema object type.
+  * Multiple values can now be passed to a LDAP objects 'add*()' and 'remove*()' methods.
+  * Added a 'less-than' and 'greater-than' LDAP filter shortcut.
+  * Fixes and optimizations for the LDAP object manager.
+  * Be strict about validating operator symbols for query syntax.
+  * Be strict about validating values used for attribute names/OIDs.
+  
 0.14.0 (2015-06-16)
 ------------------
   * Add the ability to use doctrine cache for the caching mechanism. This allows for easier Symfony integration.
