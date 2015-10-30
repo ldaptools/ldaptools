@@ -141,6 +141,24 @@ For example:
      }
  });
  ```
+ 
+## The LDAP Object Deletion and Modification Events
+---------------------------------------------------
+ 
+Both the deletion and modification events let you retrieve the LDAP object being processed and add your own custom logic:
+  
+  ```php
+  use LdapTools\Event\Event;
+  use LdapTools\Event\LdapObjectEvent;
+  
+  // Check some stuff before the changes are actually saved to LDAP...
+  $ldap->getEventDispatcher()->addListener(Event::TYPE_LDAP_OBJECT_BEFORE_MODIFY, function(LdapObjectEvent $event) {
+      $user = $event->getLdapObject();
+      // ...
+  });
+  ```
+
+The same `getLdapObject()` method used above is valid for deletion events as well.
 
 ## The LDAP Object Schema Event
 -------------------------------
