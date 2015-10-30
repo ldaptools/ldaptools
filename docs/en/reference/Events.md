@@ -148,7 +148,7 @@ own schema file: attribute mappings, default attributes to select, default conta
      $schema->setAttributesToSelect($select);
      
      // Set these users to always go to a default OU when you create them...
-     $schema->setDefaultContainer('OU=Employees,DC=example,DC=local");
+     $schema->setDefaultContainer("OU=Employees,DC=example,DC=local");
  });
  ```
  
