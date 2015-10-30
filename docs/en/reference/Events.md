@@ -117,4 +117,38 @@ event so you can modify the container/attributes/DN before they are sent to LDAP
      // $event->setContainer($container)
  });
  ```
+
+## The LDAP Object Schema Event
+-------------------------------
+
+When you hook into the LDAP Object Schema event you are given the ability to directly modify whatever schema object
+is being loaded before it is actually used. Using this you can directly modify many settings without creating your
+own schema file: attribute mappings, default attributes to select, default container for objects on creation, etc:
+
+ ```php
+ use LdapTools\Event\Event;
+ use LdapTools\Event\LdapObjectSchemaEvent;
+ use LdapTools\Object\LdapObjectType;
+ 
+ $ldap->getEventDispatcher()->addListener(Event::TYPE_LDAP_SCHEMA_LOAD, function(LdapObjectSchemaEvent $event) {
+     $schema = $event->getLdapObjectSchema();
+
+     // Only modify the 'user' schema type, ignore the others for this listener...
+     if ($schema->getObjectType() !== LdapObjectType::USER) {
+         return;
+     }
+     
+     // Have your own custom LDAP Object Repository class? Set it using the full class name.
+     $schema->setRepository('\Acme\Demo\UserRepository');
+     
+     // Want to get some additional default attributes selected on queries?
+     $select = $schema->getAttributesToSelect();
+     $select[] = 'upn';
+     $select[] = 'groups';
+     $schema->setAttributesToSelect($select);
+     
+     // Set these users to always go to a default OU when you create them...
+     $schema->setDefaultContainer('OU=Employees,DC=example,DC=local");
+ });
+ ```
  
