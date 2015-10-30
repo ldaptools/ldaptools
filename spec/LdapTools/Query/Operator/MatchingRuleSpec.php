@@ -59,6 +59,18 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->shouldThrow($ex)->duringSetOperatorSymbol('>=');
     }
 
+    function it_should_throw_a_LdapQueryException_on_an_invalid_oid()
+    {
+        $this->beConstructedWith('foo', 'foo=bar)(', 2);
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
+    function it_should_accept_text_as_an_oid()
+    {
+        $this->beConstructedWith('foo', 'FooBarMatch', 2);
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
     public function getMatchers()
     {
         return [

@@ -151,6 +151,12 @@ class ComparisonSpec extends ObjectBehavior
         $this->getWasConverterUsed()->shouldBeEqualTo(true);
     }
 
+    function it_should_throw_a_LdapQueryException_when_using_an_invalid_attribute_name()
+    {
+        $this->beConstructedWith('foo=*bar', Comparison::AEQ, 'bar');
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
     public function getMatchers()
     {
         return [

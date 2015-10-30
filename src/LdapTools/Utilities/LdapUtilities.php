@@ -28,6 +28,16 @@ class LdapUtilities
     const MATCH_SID = '/^S-\d-(\d+-){1,14}\d+$/i';
 
     /**
+     * Regex to match an OID.
+     */
+    const MATCH_OID = '/^[0-9]+(\.[0-9]+?)*?$/';
+
+    /**
+     * Regex to match an attribute descriptor.
+     */
+    const MATCH_DESCRIPTOR = '/^\pL[\pL\pN-]+$/iu';
+
+    /**
      * The prefix for a LDAP DNS SRV record.
      */
     const SRV_PREFIX = '_ldap._tcp.';
@@ -137,6 +147,18 @@ class LdapUtilities
     public static function isValidLdapObjectDn($dn)
     {
         return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] > 2);
+    }
+
+    /**
+     * Determine whether a value is a valid attribute name or OID. The name should meet the format described in RFC 2252.
+     * However, the regex is fairly forgiving for each.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isValidAttributeFormat($value)
+    {
+        return (preg_match(self::MATCH_DESCRIPTOR, $value) || preg_match(self::MATCH_OID, $value));
     }
 
     /**

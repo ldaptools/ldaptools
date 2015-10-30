@@ -80,4 +80,23 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::isValidLdapObjectDn('cn=foo,dc=example,dc=com')->shouldBeEqualTo(true);
         $this::isValidLdapObjectDn('foo,=bar')->shouldBeEqualTo(false);
     }
+
+    function it_should_check_if_an_attribute_is_a_valid_OID_or_short_name()
+    {
+        $this->isValidAttributeFormat('1.2.840.113556.1.4.221')->shouldBeEqualTo(true);
+
+        $this->isValidAttributeFormat('foo-bar')->shouldBeEqualTo(true);
+        $this->isValidAttributeFormat('foo1-bar')->shouldBeEqualTo(true);
+        $this->isValidAttributeFormat('fooBar')->shouldBeEqualTo(true);
+        $this->isValidAttributeFormat('имя')->shouldBeEqualTo(true);
+        $this->isValidAttributeFormat('名字')->shouldBeEqualTo(true);
+
+        $this->isValidAttributeFormat('1foobar')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat('foo_bar')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat(')(&)')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat('Test=*')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat('foo bar')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat('им=я')->shouldBeEqualTo(false);
+        $this->isValidAttributeFormat('名(字')->shouldBeEqualTo(false);
+    }
 }

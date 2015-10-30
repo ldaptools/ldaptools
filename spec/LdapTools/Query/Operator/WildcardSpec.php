@@ -98,6 +98,12 @@ class WildcardSpec extends ObjectBehavior
         $this->shouldThrow($ex)->duringSetOperatorSymbol('>=');
     }
 
+    function it_should_throw_a_LdapQueryException_when_using_an_invalid_attribute_name()
+    {
+        $this->beConstructedWith('foob<ar*', Wildcard::LIKE, '*bar*');
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
     public function getMatchers()
     {
         return [

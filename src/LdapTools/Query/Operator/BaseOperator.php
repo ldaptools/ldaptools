@@ -237,10 +237,18 @@ abstract class BaseOperator
      * This will get the translated attribute or just the attribute if no schema translation was done.
      *
      * @return string
+     * @throws LdapQueryException
      */
     protected function getAttributeToQuery()
     {
-        return $this->translatedAttribute ? $this->translatedAttribute : $this->attribute;
+        $attribute = $this->translatedAttribute ? $this->translatedAttribute : $this->attribute;
+
+        // This avoids possible LDAP injection from unverified input for an attribute name.
+        if (!LdapUtilities::isValidAttributeFormat($attribute)) {
+            throw new LdapQueryException(sprintf('Attribute "%s" is not a valid name or OID.', $attribute));
+        }
+
+        return $attribute;
     }
 
     /**

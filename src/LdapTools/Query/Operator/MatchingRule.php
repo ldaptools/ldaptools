@@ -10,6 +10,7 @@
 
 namespace LdapTools\Query\Operator;
 
+use LdapTools\Exception\LdapQueryException;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -45,6 +46,10 @@ class MatchingRule extends BaseOperator
      */
     public function getLdapFilter()
     {
+        if (!LdapUtilities::isValidAttributeFormat($this->oid)) {
+            throw new LdapQueryException(sprintf('Matching rule "%s" is not a valid format.', $this->oid));
+        }
+
         return self::SEPARATOR_START
             .$this->getAttributeToQuery()
             .':'.$this->oid.':'
