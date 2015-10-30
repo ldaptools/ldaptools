@@ -16,6 +16,7 @@ use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectEvent;
+use LdapTools\Event\LdapObjectMoveEvent;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Utilities\LdapUtilities;
@@ -100,7 +101,10 @@ class LdapObjectManager
      */
     public function move(LdapObject $ldapObject, $container)
     {
-        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject));
+        $event = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, $container);
+        $this->dispatcher->dispatch($event);
+        $container = $event->getContainer();
+
         $this->validateObject($ldapObject);
         $rdn = $this->getRdnFromDn($ldapObject->get('dn'));
         $this->connection->move($ldapObject->get('dn'), $rdn, $container);
@@ -108,7 +112,7 @@ class LdapObjectManager
         $newDn = $rdn.','.$container;
         $ldapObject->refresh(['dn' => $newDn]);
         $ldapObject->getBatchCollection()->setDn($newDn);
-        $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject));
+        $this->dispatcher->dispatch(new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, $container));
     }
 
     /**

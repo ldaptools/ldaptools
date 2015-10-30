@@ -90,12 +90,14 @@ are located in the `LdapTools\Event` namespace.
 | ldap.object.after_delete | `LDAP_OBJECT_AFTER_DELETE` | `LdapObjectEvent` | Triggered after an object is deleted from LDAP. Only triggered when using the `delete()` method of the `LdapManager`. |
 | ldap.object.before_create | `LDAP_OBJECT_BEFORE_CREATE` | `LdapObjectCreationEvent` | Triggered before an object is created in LDAP. Only triggered when using the `createLdapObject()` methods of the `LdapManager`. |
 | ldap.object.after_create | `LDAP_OBJECT_AFTER_CREATE` | `LdapObjectCreationEvent` | Triggered after an object is created in LDAP. Only triggered when using the `createLdapObject()` methods of the `LdapManager`. |
+| ldap.object.before_move | `LDAP_OBJECT_BEFORE_MOVE` | `LdapObjectMoveEvent` | Triggered before an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
+| ldap.object.after_move | `LDAP_OBJECT_AFTER_MOVE` | `LdapObjectMoveEvent` | Triggered after an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
 | ldap.schema.load | `LDAP_SCHEMA_LOAD` | `LdapObjectSchemaEvent` | Triggered when a LDAP object type schema is parsed, loaded, and before it gets cached. This allows you to modify the schema without creating your own file. |
 
 ## The LDAP Object Creation Event
 ---------------------------------
 
-The LDAP object creation events functions slightly different than the rest. The event object has setters for the ``LDAP_OBJECT_BEFORE_CREATE`
+The LDAP object creation events functions slightly different than the rest. The event object has setters for the `LDAP_OBJECT_BEFORE_CREATE`
 event so you can modify the container/attributes/DN before they are sent to LDAP. For example:
  
  ```php
@@ -115,6 +117,28 @@ event so you can modify the container/attributes/DN before they are sent to LDAP
      // Can also explicitly set the DN or container here too...
      // $event->setDn($dn);
      // $event->setContainer($container)
+ });
+ ```
+ 
+## The LDAP Object Move Event
+-----------------------------
+
+The LDAP object move event has setters for `LDAP_OBJECT_BEFORE_MOVE` so you can modify the container/OU before the 
+object is actually moved. You can also use the event's `getContainer()` method to check where the move was destined for.
+For example:
+ 
+ ```php
+ use LdapTools\Event\Event;
+ use LdapTools\Event\LdapObjectMoveEvent;
+ 
+ $ldap->getEventDispatcher()->addListener(Event::TYPE_LDAP_OBJECT_BEFORE_MOVE, function(LdapObjectMoveEvent $event) {
+     $user = $event->getLdapObject();
+     $container = $event->getContainer(); // Check where the move is going to put them if you want
+     
+     // Check the user object and change the location that the move will place them
+     if ($user->firstName == 'Joe') {
+         $event->setContainer('ou=disabled,dc=example,dc=com');
+     }
  });
  ```
 

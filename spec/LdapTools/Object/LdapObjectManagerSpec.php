@@ -5,6 +5,7 @@ namespace spec\LdapTools\Object;
 use LdapTools\Configuration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectEvent;
+use LdapTools\Event\LdapObjectMoveEvent;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -242,8 +243,8 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_call_the_event_dispatcher_move_events_when_moving_an_object($connection, $dispatcher)
     {
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
-        $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject);
-        $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject);
+        $beforeEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
+        $afterEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
         $connection->getSchemaName()->willReturn('example');
         $connection->getLdapType()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
