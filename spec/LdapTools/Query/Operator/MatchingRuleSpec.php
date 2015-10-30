@@ -42,12 +42,12 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->getValue()->shouldBeEqualTo('2');
     }
 
-    function it_should_return_the_correct_ldap_bitwise_and_filter_on_toString()
+    function it_should_return_the_correct_ldap_bitwise_and_filter()
     {
         $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=\32)');
     }
 
-    function it_should_return_the_correct_ldap_bitwise_or_filter_on_toString()
+    function it_should_return_the_correct_ldap_bitwise_or_filter()
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
         $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\32)');
