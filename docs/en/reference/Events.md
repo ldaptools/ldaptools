@@ -39,7 +39,7 @@ use LdapTools\Object\LdapObjectType;
 
 class UserSubscriber implements EventSubscriberInterface
 {
-    public function getSubscribedEvents()
+    public static function getSubscribedEvents()
     {
         return [
             Event::LDAP_OBJECT_BEFORE_DELETE => 'beforeDelete',
