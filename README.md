@@ -195,7 +195,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
 * [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-Objects.md)
 * [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
-* [The Event System](/docs/en/reference/reference/Events.md)
+* [The Event System](/docs/en/reference/Events.md)
 
 ### TODO
 
