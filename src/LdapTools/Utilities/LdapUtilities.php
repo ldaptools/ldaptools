@@ -121,7 +121,7 @@ class LdapUtilities
             if (count($values) === 1) {
                 throw new \InvalidArgumentException(sprintf('Unable to parse DN piece "%s".', $values[0]));
             }
-            $dn[$index] = $values[0].'='.ldap_escape($values[1], null, LDAP_ESCAPE_DN);
+            $dn[$index] = $values[0].'='.self::escapeValue($values[1], null, LDAP_ESCAPE_DN);
         }
 
         return implode(',', $dn);

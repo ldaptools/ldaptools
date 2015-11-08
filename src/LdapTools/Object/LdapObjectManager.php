@@ -157,7 +157,7 @@ class LdapObjectManager
     {
         $rdn = LdapUtilities::explodeDn($dn, 0)[0];
         $rdn = explode('=', $rdn, 2);
-        $rdn = $rdn[0].'='.ldap_escape($rdn[1], null, LDAP_ESCAPE_DN);
+        $rdn = $rdn[0].'='.LdapUtilities::escapeValue($rdn[1], null, LDAP_ESCAPE_DN);
 
         return $rdn;
     }

@@ -19,6 +19,7 @@ use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Allows for easy creation of LDAP objects.
@@ -259,7 +260,7 @@ class LdapObjectCreator
         }
         $attribute = $this->schema->getAttributeToLdap('name');
 
-        return $attribute.'='.ldap_escape($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->getContainerValue();
+        return $attribute.'='.LdapUtilities::escapeValue($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->getContainerValue();
     }
 
     /**
