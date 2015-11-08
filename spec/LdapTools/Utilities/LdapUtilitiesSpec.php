@@ -30,6 +30,28 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::escapeValue('*)(user=*)(', '*')->shouldBeEqualTo('*\29\28\75\73\65\72\3d*\29\28');
     }
 
+    function it_should_escape_to_hex_by_default()
+    {
+        $this::escapeValue("foo=bar\r")->shouldBeEqualTo('\66\6f\6f\3d\62\61\72\0d');
+    }
+
+    function it_should_allow_escaping_in_the_context_of_a_search_filter()
+    {
+        $this::escapeValue("cn=test=,stuff \r)", null, LDAP_ESCAPE_FILTER)
+            ->shouldBeEqualTo('cn=test=,stuff \0d\29');
+    }
+
+    function it_should_allow_escaping_a_dn()
+    {
+        $this::escapeValue(' Joe,= Smith ', null, LDAP_ESCAPE_DN)->shouldBeEqualTo('\20Joe\2c\3d Smith\20');
+    }
+
+    function it_should_encode_carriage_returns_when_escaping()
+    {
+        $this->escapeValue("This covers\r\nMultiple lines\rbecause\nstuff", null, LDAP_ESCAPE_FILTER)
+            ->shouldBeEqualTo('This covers\0dMultiple lines\0dbecause\0dstuff');
+    }
+
     function it_should_unescape_hex_values_back_to_a_string()
     {
         $this::unescapeValue('\46\6f\6f\3d\42\61\72')->shouldBeEqualTo('Foo=Bar');

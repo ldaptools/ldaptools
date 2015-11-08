@@ -47,12 +47,27 @@ class LdapUtilities
      *
      * @param mixed $value The value to escape.
      * @param null|string $ignore The characters to ignore.
+     * @param null|int $flags The context for the escaped string. LDAP_ESCAPE_FILTER or LDAP_ESCAPE_DN.
      * @return string The escaped value.
      */
-    public static function escapeValue($value, $ignore = null)
+    public static function escapeValue($value, $ignore = null, $flags = null)
     {
         // If this is a hexadecimal escaped string, then do not escape it.
-        return preg_match('/^(\\\[0-9a-fA-F]{2})+$/', (string) $value) ? $value : ldap_escape($value, $ignore);
+        $value = preg_match('/^(\\\[0-9a-fA-F]{2})+$/', (string) $value) ? $value : ldap_escape($value, $ignore, $flags);
+        // Per RFC 4514, carriage returns should be encoded. However, this does not seem to be handled by ldap_escape.
+        $value = str_replace(["\r\n", "\r", "\n"], '\0d', $value);
+
+        // Also per RFC 4514, leading/trailing spaces should be encoded in DNs, but they don't seem to be by ldap_escape.
+        if ((int)$flags & LDAP_ESCAPE_DN) {
+            if (!empty($value) && $value[0] === ' ') {
+                $value = '\\20' . substr($value, 1);
+            }
+            if (!empty($value) && $value[strlen($value) - 1] === ' ') {
+                $value = substr($value, 0, -1) . '\\20';
+            }
+        }
+
+        return $value;
     }
 
     /**
