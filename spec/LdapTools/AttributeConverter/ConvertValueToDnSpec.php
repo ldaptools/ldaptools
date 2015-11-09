@@ -53,7 +53,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_convert_a_name_back_to_a_dn($connection)
     {
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=\62\61\72))(cn=\46\6f\6f))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->search('(&(&(objectClass=bar))(cn=Foo))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -75,7 +75,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $guidSimpleHex = '\61\31\31\33\31\63\64\33\2d\39\30\32\62\2d\34\34\63\36\2d\62\34\39\61\2d\31\66\36\61\35\36\37\63\64\61\32\35';
 
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=\62\61\72))(|(objectGuid='.$guidHex.')(cn='.$guidSimpleHex.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->search('(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -97,7 +97,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $sidSimpleHex = '\53\2d\31\2d\35\2d\32\31\2d\31\30\30\34\33\33\36\33\34\38\2d\31\31\37\37\32\33\38\39\31\35\2d\36\38\32\30\30\33\33\33\30\2d\35\31\32';
 
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=\62\61\72))(|(objectSid='.$sidHex.')(cn='.$sidSimpleHex.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->search('(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -193,7 +193,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_allow_an_or_filter_for_an_attribute($connection)
     {
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(|(objectClass=\62\61\72)(objectClass=\66\6f\6f))(cn=\46\6f\6f))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->search('(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [

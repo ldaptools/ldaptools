@@ -62,13 +62,13 @@ class FromSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_filter_with_one_operator()
     {
-        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=\75\73\65\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=user)');
     }
 
     function it_should_return_the_correct_ldap_filter_with_two_operators()
     {
         $this->add(new Comparison('objectClass', Comparison::EQ, 'group'));
-        $this->getLdapFilter()->shouldBeEqualTo('(|(objectClass=\75\73\65\72)(objectClass=\67\72\6f\75\70))');
+        $this->getLdapFilter()->shouldBeEqualTo('(|(objectClass=user)(objectClass=group))');
     }
 
     function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()

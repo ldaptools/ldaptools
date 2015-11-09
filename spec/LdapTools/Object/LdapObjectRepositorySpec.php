@@ -150,6 +150,6 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $this->buildLdapQuery()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
 
         $this->buildLdapQuery()
-            ->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))');
+            ->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
     }
 }

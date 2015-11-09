@@ -174,7 +174,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_return_the_filter_when_calling_getLdapFilter()
     {
-        $filter = '(objectClass=\67\72\6f\75\70)';
+        $filter = '(objectClass=group)';
         $this->fromGroups();
         $this->getLdapFilter()->shouldBeEqualTo($filter);
     }
@@ -185,7 +185,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
         $this->fromUsers();
         $this->where(['objectGuid' => $guidHex]);
-        $this->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(objectGuid='.$guidHex.')))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(objectGuid='.$guidHex.')))');
     }
 
     function it_should_throw_a_RuntimeException_when_calling_getLdapQuery_and_a_ldap_connection_is_not_set()
@@ -231,7 +231,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     {
         $this->where(['foo' => 'bar']);
         $this->andWhere(['bar' => 'foo']);
-        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
     }
 
     function it_should_add_an_order_by_attribute_defaulting_to_asc()
@@ -256,7 +256,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_filter_by_OUs_when_calling_fromOUs()
     {
-        $filter = '(objectClass=\6f\72\67\61\6e\69\7a\61\74\69\6f\6e\61\6c\55\6e\69\74)';
+        $filter = '(objectClass=organizationalUnit)';
         $this->fromOUs();
         $this->getLdapFilter()->shouldBeEqualTo($filter);
     }
@@ -267,7 +267,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schema->setObjectClass(['foo', 'bar']);
 
         $this->from($schema);
-        $this->getLdapFilter()->shouldBeEqualTo('(&(objectClass=\66\6f\6f)(objectClass=\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectClass=foo)(objectClass=bar))');
     }
 
     function it_should_allow_a_schema_object_type_that_has_only_a_category_defined()
@@ -276,7 +276,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schema->setObjectCategory('foo');
 
         $this->from($schema);
-        $this->getLdapFilter()->shouldBeEqualTo('(objectCategory=\66\6f\6f)');
+        $this->getLdapFilter()->shouldBeEqualTo('(objectCategory=foo)');
     }
 
     function it_should_allow_a_schema_object_type_that_has_only_a_single_class_defined()
@@ -285,7 +285,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schema->setObjectClass('foo');
 
         $this->from($schema);
-        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=\66\6f\6f)');
+        $this->getLdapFilter()->shouldBeEqualTo('(objectClass=foo)');
     }
 
     function it_should_allow_a_schema_object_type_that_has_a_single_category_and_class_defined()
@@ -295,7 +295,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schema->setObjectClass('bar');
 
         $this->from($schema);
-        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\66\6f\6f)(objectClass=\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(objectClass=bar))');
     }
 
     function it_should_allow_a_schema_object_type_that_has_a_single_category_and_multiple_classes_defined()
@@ -305,6 +305,6 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schema->setObjectClass(['foo', 'bar']);
 
         $this->from($schema);
-        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=\66\6f\6f)(&(objectClass=\66\6f\6f)(objectClass=\62\61\72)))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=foo)(objectClass=bar)))');
     }
 }

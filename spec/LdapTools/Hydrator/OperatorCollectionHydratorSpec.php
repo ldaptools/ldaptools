@@ -32,7 +32,7 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $collection->add($filter->eq('foo','bar'));
         $collection->add($filter->eq('bar','foo'));
 
-        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
+        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
     }
 
     /**
@@ -46,7 +46,7 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $collection->add($filter->eq('foo','bar'));
         $collection->add($filter->eq('bar','foo'));
 
-        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(foo=\62\61\72)(bar=\66\6f\6f))');
+        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
     }
 
     function it_should_only_wrap_the_filter_in_an_and_when_the_collection_has_more_than_one_object()
@@ -56,7 +56,7 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $collection = new OperatorCollection();
         $collection->add($filter->eq('foo','bar'));
 
-        $this->toLdapFilter($collection)->shouldBeEqualTo('(foo=\62\61\72)');
+        $this->toLdapFilter($collection)->shouldBeEqualTo('(foo=bar)');
     }
 
     function it_should_convert_attributes_and_values()
@@ -70,7 +70,7 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $collection->add($filter->eq('foo',true));
         $collection->addLdapObjectSchema($schema);
 
-        $this->toLdapFilter($collection)->shouldBeEqualTo('(bar=\54\52\55\45)');
+        $this->toLdapFilter($collection)->shouldBeEqualTo('(bar=TRUE)');
     }
 
     function it_should_convert_attributes_and_values_when_the_operators_contain_other_operators()
@@ -86,6 +86,6 @@ class OperatorCollectionHydratorSpec extends ObjectBehavior
         $collection->addLdapObjectSchema($schema);
 
         // Something might not be right here...hex for FALSE seems off? I cannot find any issues though.
-        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(|(foo=\46\41\4c\53\45))(bar=\54\52\55\45))');
+        $this->toLdapFilter($collection)->shouldBeEqualTo('(&(|(foo=FALSE))(bar=TRUE))');
     }
 }

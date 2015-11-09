@@ -32,7 +32,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $connection->search('(&(distinguishedName='.ldap_escape($this->dn).'))', ['objectSid'], null, 'subtree', null)
+        $connection->search('(&(distinguishedName='.$this->dn.'))', ['objectSid'], null, 'subtree', null)
             ->willReturn([ 'count' => 1, [
                 "objectsid" => [
                     "count" => 1,
@@ -52,7 +52,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
             ]]);
-        $connection->search('(&(objectClass='.ldap_escape('group').')(cn='.ldap_escape('Domain Users').')(member='.ldap_escape($this->dn).')(groupType:1.2.840.113556.1.4.803:='.ldap_escape('2147483648').'))', ['objectSid'], null, 'subtree', null)
+        $connection->search('(&(objectClass=group)(cn=Domain Users)(member='.$this->dn.')(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
             ->willReturn([ 'count' => 1, [
                 "objectSid" => [
                     "count" => 1,
@@ -62,7 +62,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
             ]]);
-        $connection->search('(&(objectClass='.ldap_escape('group').')(cn='.ldap_escape('Domain Users').')(member='.ldap_escape('foo').')(groupType:1.2.840.113556.1.4.803:='.ldap_escape('2147483648').'))', ['objectSid'], null, 'subtree', null)
+        $connection->search('(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
             ->willReturn([ 'count' => 0]);
         $connection->getLdapType()->willReturn('ad');
     }
@@ -92,7 +92,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
 
     function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification()
     {
-        $this->connection->search('(&(objectClass='.ldap_escape('group').')(cn='.ldap_escape('Domain Users').')(groupType:1.2.840.113556.1.4.803:='.ldap_escape('2147483648').'))', ['objectSid'], null, 'subtree', null)
+        $this->connection->search('(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
             ->willReturn([ 'count' => 1, [
                 "objectSid" => [
                     "count" => 1,

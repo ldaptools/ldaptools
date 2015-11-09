@@ -12,20 +12,15 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
-use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertGPLinkSpec extends ObjectBehavior
 {
-    const FOO_DN_HEX = '\63\6e\3d\7b\38\45\31\46\38\35\45\42\2d\34\38\38\32\2d\34\39\32\30\2d\38\38\41\35\2d\43\46\35\32\46\33\31\44\38\44\33\31\7d\2c\63\6e\3d\70\6f\6c\69\63\69\65\73\2c\63\6e\3d\73\79\73\74\65\6d\2c\44\43\3d\65\78\61\6d\70\6c\65\2c\44\43\3d\6c\6f\63\61\6c';
-    const BAR_DN_HEX = '\63\6e\3d\7b\42\32\36\31\44\42\32\38\2d\35\45\41\33\2d\34\44\36\39\2d\42\37\39\44\2d\35\43\32\32\45\38\30\31\38\31\38\33\7d\2c\63\6e\3d\70\6f\6c\69\63\69\65\73\2c\63\6e\3d\73\79\73\74\65\6d\2c\44\43\3d\65\78\61\6d\70\6c\65\2c\44\43\3d\6c\6f\63\61\6c';
-    const FOOBAR_DN_HEX = '\63\6e\3d\7b\38\45\31\46\38\35\45\42\2d\34\38\38\32\2d\34\39\32\30\2d\38\38\41\35\2d\43\46\35\32\46\33\31\44\38\44\33\32\7d\2c\63\6e\3d\70\6f\6c\69\63\69\65\73\2c\63\6e\3d\73\79\73\74\65\6d\2c\44\43\3d\65\78\61\6d\70\6c\65\2c\44\43\3d\6c\6f\63\61\6c';
-
     protected $connection;
 
     protected $expectedCurrentValueSearch = [
-        '(&(distinguishedName=\6f\75\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72))',
+        '(&(distinguishedName=ou=foo,dc=foo,dc=bar))',
         ['gPLink'],
         null,
         "subtree",
@@ -33,7 +28,7 @@ class ConvertGPLinkSpec extends ObjectBehavior
     ];
 
     protected $expectedDNSearch = [
-        '(&(|(displayName=\46\6f\6f)(displayName=\42\61\72)))',
+        '(&(|(displayName=Foo)(displayName=Bar)))',
         ['distinguishedname'],
         null,
         "subtree",
@@ -41,7 +36,7 @@ class ConvertGPLinkSpec extends ObjectBehavior
     ];
 
     protected $expectedDisplaySearch = [
-        '(&(|(distinguishedName='.self::FOO_DN_HEX.')(distinguishedName='.self::BAR_DN_HEX.')))',
+        '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)))',
         ['displayname'],
         null,
         "subtree",
@@ -49,7 +44,7 @@ class ConvertGPLinkSpec extends ObjectBehavior
     ];
 
     protected $expectedSingleDisplaySearch = [
-        '(&(|(distinguishedName='.self::FOO_DN_HEX.')))',
+        '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))',
         ['displayname'],
         null,
         "subtree",
@@ -172,9 +167,9 @@ class ConvertGPLinkSpec extends ObjectBehavior
         $this->connection->search(...$this->expectedDNSearch)->willReturn($this->expectedDNResult);
         $this->connection->search(...$this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
         $search = $this->expectedDNSearch;
-        $search[0] = '(&(|(displayName=\46\6f\6f)(displayName=\42\61\72)(displayName=\46\6f\6f\42\61\72)))';
+        $search[0] = '(&(|(displayName=Foo)(displayName=Bar)(displayName=FooBar)))';
         $anotherSearch = $this->expectedDNSearch;
-        $anotherSearch[0] = '(&(|(displayName=\42\61\72)(displayName=\46\6f\6f\42\61\72)))';
+        $anotherSearch[0] = '(&(|(displayName=Bar)(displayName=FooBar)))';
         $result = $this->expectedDNResult;
         $result['count'] = '3';
         $result[] = [

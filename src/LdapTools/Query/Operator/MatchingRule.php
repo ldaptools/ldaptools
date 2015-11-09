@@ -54,7 +54,7 @@ class MatchingRule extends BaseOperator
             .$this->getAttributeToQuery()
             .':'.$this->oid.':'
             .$this->operatorSymbol
-            .LdapUtilities::escapeValue($this->getValueForQuery())
+            .LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER)
             .self::SEPARATOR_END;
     }
 }

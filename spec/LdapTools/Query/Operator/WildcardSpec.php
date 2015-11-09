@@ -65,25 +65,25 @@ class WildcardSpec extends ObjectBehavior
     public function it_should_return_a_string_with_the_wildcard_operators_on_each_side_when_using_contains()
     {
         $this->beConstructedWith('foo', Wildcard::CONTAINS, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62\61\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*bar*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_right_side_when_using_starts_with()
     {
         $this->beConstructedWith('foo', Wildcard::STARTS_WITH, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=\62\61\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_left_side_when_using_ends_with()
     {
         $this->beConstructedWith('foo', Wildcard::ENDS_WITH, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*bar)');
     }
 
     public function it_should_return_a_string_with_unescaped_wildcards_when_using_like()
     {
         $this->beConstructedWith('foo', Wildcard::LIKE, '*b*a*r*');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\62*\61*\72*)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*b*a*r*)');
     }
 
     public function it_should_not_use_a_converter_if_the_type_is_present()
@@ -102,6 +102,30 @@ class WildcardSpec extends ObjectBehavior
     {
         $this->beConstructedWith('foob<ar*', Wildcard::LIKE, '*bar*');
         $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap_with_starts_with()
+    {
+        $this->beConstructedWith('foo', Wildcard::STARTS_WITH, '*test');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=\2atest*)');
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap_with_ends_with()
+    {
+        $this->beConstructedWith('foo', Wildcard::ENDS_WITH, '*test=)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\2atest=\29)');
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap_with_contains()
+    {
+        $this->beConstructedWith('foo', Wildcard::ENDS_WITH, '*te*st<*');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\2ate\2ast<\2a)');
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap_with_like()
+    {
+        $this->beConstructedWith('foo', Wildcard::LIKE, '*te*s)t*');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=*te*s\29t*)');
     }
 
     public function getMatchers()

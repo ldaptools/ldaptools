@@ -79,13 +79,13 @@ class Wildcard extends Comparison
     public function getLdapFilter()
     {
         if ($this->wildcardType == self::CONTAINS) {
-            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery()).'*';
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER).'*';
         } elseif ($this->wildcardType == self::STARTS_WITH) {
-            $value = LdapUtilities::escapeValue($this->getValueForQuery()).'*';
+            $value = LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER).'*';
         } elseif ($this->wildcardType == self::ENDS_WITH) {
-            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery());
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER);
         } elseif ($this->wildcardType == self::LIKE) {
-            $value = LdapUtilities::escapeValue($this->getValueForQuery(), '*');
+            $value = LdapUtilities::escapeValue($this->getValueForQuery(), '*', LDAP_ESCAPE_FILTER);
         } else {
             $value = '*';
         }

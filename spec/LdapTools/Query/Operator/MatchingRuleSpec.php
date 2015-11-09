@@ -44,13 +44,13 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_bitwise_and_filter()
     {
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=\32)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
     }
 
     function it_should_return_the_correct_ldap_bitwise_or_filter()
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\32)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=2)');
     }
 
     function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
@@ -69,6 +69,12 @@ class MatchingRuleSpec extends ObjectBehavior
     {
         $this->beConstructedWith('foo', 'FooBarMatch', 2);
         $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap()
+    {
+        $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, '\*)3');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\5c\2a\293)');
     }
 
     public function getMatchers()

@@ -53,19 +53,19 @@ class bAndSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_filter_with_one_operator()
     {
-        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=bar))');
     }
 
     function it_should_return_the_correct_ldap_filter_with_two_operators()
     {
         $this->add(new Wildcard('foobar', Wildcard::ENDS_WITH,'bar'));
-        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(foobar=*\62\61\72))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=bar)(foobar=*bar))');
     }
 
     function it_should_return_the_correct_ldap_filter_when_nesting_operators()
     {
         $this->add(new bNot(new Wildcard('description', Wildcard::CONTAINS,'bar')));
-        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=\62\61\72)(!(description=*\62\61\72*)))');
+        $this->getLdapFilter()->shouldBeEqualTo('(&(foo=bar)(!(description=*bar*)))');
     }
 
     function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()

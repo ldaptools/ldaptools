@@ -98,25 +98,25 @@ class ComparisonSpec extends ObjectBehavior
     function it_should_return_the_correct_ldap_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::EQ, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar)');
     }
 
     function it_should_return_the_correct_ldap_greater_than_or_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::GTE, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo>=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo>=bar)');
     }
 
     function it_should_return_the_correct_ldap_less_than_or_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::LTE, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo<=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo<=bar)');
     }
 
     function it_should_return_the_correct_ldap_approximately_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo~=\62\61\72)');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo~=bar)');
     }
 
     function it_should_be_able_to_set_and_get_the_value()
@@ -155,6 +155,12 @@ class ComparisonSpec extends ObjectBehavior
     {
         $this->beConstructedWith('foo=*bar', Comparison::AEQ, 'bar');
         $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+    }
+
+    function it_should_escape_special_characters_when_going_to_ldap()
+    {
+        $this->beConstructedWith('foo', Comparison::AEQ, '*(foo=)(*');
+        $this->getLdapFilter()->shouldBeEqualTo('(foo~=\2a\28foo=\29\28\2a)');
     }
 
     public function getMatchers()
