@@ -54,10 +54,8 @@ class LdapUtilities
     {
         // If this is a hexadecimal escaped string, then do not escape it.
         $value = preg_match('/^(\\\[0-9a-fA-F]{2})+$/', (string) $value) ? $value : ldap_escape($value, $ignore, $flags);
-        // Per RFC 4514, carriage returns should be encoded. However, this does not seem to be handled by ldap_escape.
-        $value = str_replace(["\r\n", "\r", "\n"], '\0d', $value);
 
-        // Also per RFC 4514, leading/trailing spaces should be encoded in DNs, but they don't seem to be by ldap_escape.
+        // Per RFC 4514, leading/trailing spaces should be encoded in DNs, as well as carriage returns.
         if ((int)$flags & LDAP_ESCAPE_DN) {
             if (!empty($value) && $value[0] === ' ') {
                 $value = '\\20' . substr($value, 1);
@@ -65,6 +63,8 @@ class LdapUtilities
             if (!empty($value) && $value[strlen($value) - 1] === ' ') {
                 $value = substr($value, 0, -1) . '\\20';
             }
+            // Only carriage returns seem to be valid, not line feeds (per testing of AD anyway).
+            $value = str_replace("\r", '\0d', $value);
         }
 
         return $value;
