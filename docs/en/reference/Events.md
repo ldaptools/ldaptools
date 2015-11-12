@@ -25,8 +25,8 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_MODIFY, funct
 ---------------------------
 
 You can also add an event subscriber to respond to events. This allows you to encapsulate your listeners within the 
-context of a single class. All event subscribers must implement `LdapTools\Event\EventSubscriberInterface`, which is
-simple a single method called `getSubscribedEvents()` that should return an associated array containing keys of an event
+context of a single class. All event subscribers must implement `LdapTools\Event\EventSubscriberInterface`, which needs
+a single method called `getSubscribedEvents()` that should return an associated array containing keys of an event
 name and values that correspond to the method in the class they should call.
 
 For example, first define a class for your subscriber:
