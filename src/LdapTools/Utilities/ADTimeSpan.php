@@ -249,7 +249,7 @@ class ADTimeSpan
         if ($this->never) {
             $message = 'Never';
         } else {
-            $seconds = (int)$this->getLdapValue() / self::UNIT[self::SECONDS];
+            $seconds = $this->getLdapValue() / self::UNIT[self::SECONDS];
             $dtBase = new \DateTime('@0');
             $dtSeconds = new \DateTime('@' . $seconds);
 
