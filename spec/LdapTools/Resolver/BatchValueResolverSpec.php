@@ -12,6 +12,7 @@ namespace spec\LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
@@ -88,6 +89,7 @@ class BatchValueResolverSpec extends ObjectBehavior
             ->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')
             ->setAttributes(['userAccountControl']);
         $this->schema = $schema;
+        $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->connection = $connection;
     }
 
@@ -132,8 +134,6 @@ class BatchValueResolverSpec extends ObjectBehavior
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
         $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->getEncoding()->willReturn('UTF-8');
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -152,7 +152,6 @@ class BatchValueResolverSpec extends ObjectBehavior
 
         $batch = $ldapObject->getBatchCollection();
         $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -168,7 +167,6 @@ class BatchValueResolverSpec extends ObjectBehavior
 
         $batch = $ldapObject->getBatchCollection();
         $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');

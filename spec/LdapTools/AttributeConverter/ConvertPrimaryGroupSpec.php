@@ -11,7 +11,7 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\DomainConfiguration;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -30,6 +30,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
      */
     function let($connection)
     {
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -65,7 +66,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
             ]]);
         $connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
             ->willReturn([ 'count' => 0]);
-        $connection->getLdapType()->willReturn('ad');
+
     }
 
     function it_is_initializable()

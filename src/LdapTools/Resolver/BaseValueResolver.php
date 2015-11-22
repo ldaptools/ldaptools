@@ -219,7 +219,7 @@ abstract class BaseValueResolver
 
         foreach ($encoded as $index => $value) {
             if (is_string($value)) {
-                $encoded[$index] = LdapUtilities::encode($value, $this->connection->getEncoding());
+                $encoded[$index] = LdapUtilities::encode($value, $this->connection->getConfig()->getEncoding());
             }
         }
 

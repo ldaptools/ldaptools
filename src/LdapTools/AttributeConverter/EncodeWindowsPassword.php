@@ -28,7 +28,12 @@ class EncodeWindowsPassword implements AttributeConverterInterface
      */
     public function toLdap($password)
     {
-        $password = is_null($this->getLdapConnection()) ? $password : LdapUtilities::encode($password, $this->getLdapConnection()->getEncoding());
+        if (!is_null($this->getLdapConnection())) {
+            $password = LdapUtilities::encode(
+                $password,
+                $this->getLdapConnection()->getConfig()->getEncoding()
+            );
+        }
 
         return iconv("UTF-8", "UTF-16LE", '"'.$password.'"');
     }

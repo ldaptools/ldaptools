@@ -152,7 +152,7 @@ class LdapObjectManager
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
 
         if ($ldapObject->getType()) {
-            $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $ldapObject->getType());
+            $schema = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $ldapObject->getType());
             $hydrator->setLdapObjectSchemas($schema);
         }
 

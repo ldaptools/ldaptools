@@ -73,16 +73,6 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->getOptionsOnConnect()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 3);
     }
 
-    function it_should_have_an_ldap_type_of_ad()
-    {
-        $this->getLdapType()->shouldBeEqualTo(LdapConnection::TYPE_AD);
-    }
-
-    function it_should_have_a_schema_name_with_the_same_name_as_the_ldap_type_by_default()
-    {
-        $this->getSchemaName()->shouldBeEqualTo(LdapConnection::TYPE_AD);
-    }
-
     function it_should_honor_an_explicitly_set_schema_name_if_present()
     {
         $config = new DomainConfiguration('example.com');
@@ -92,7 +82,7 @@ class LdapConnectionSpec extends ObjectBehavior
             ->setSchemaName('foo');
         $this->beConstructedWith($config);
 
-        $this->getSchemaName()->shouldBeEqualTo('foo');
+        $this->getConfig()->getSchemaName()->shouldBeEqualTo('foo');
     }
 
     function it_should_have_a_page_size_as_specified_from_the_config()
@@ -104,7 +94,7 @@ class LdapConnectionSpec extends ObjectBehavior
             ->setPageSize(250);
         $this->beConstructedWith($config);
 
-        $this->getPageSize()->shouldBeEqualTo(250);
+        $this->getConfig()->getPageSize()->shouldBeEqualTo(250);
     }
 
     function it_should_have_the_base_dn_from_the_config()
@@ -112,25 +102,9 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->getBaseDn()->shouldBeEqualTo('dc=example,dc=local');
     }
 
-    function it_should_have_the_paged_results_control_st_to_true_by_default()
-    {
-        $this->getPagedResults()->shouldBeEqualTo(true);
-    }
-
-    function it_should_properly_set_the_paged_results_control()
-    {
-        $this->setPagedResults(false);
-        $this->getPagedResults()->shouldBeEqualTo(false);
-    }
-
     function it_should_output_the_domain_name_when_cast_as_a_string()
     {
         $this->__toString()->shouldBeEqualTo('example.com');
-    }
-
-    function it_should_have_UTF8_encoding_by_default()
-    {
-        $this->getEncoding()->shouldBeEqualTo('UTF-8');
     }
 
     public function getMatchers()

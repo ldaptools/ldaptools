@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Operation\QueryOperation;
@@ -90,6 +91,7 @@ class LdapQuerySpec extends ObjectBehavior
             ->willReturn($this->ldapEntries);
         $this->beConstructedWith($ldap);
         $this->setQueryOperation($this->operation);
+        $ldap->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $this->ldap = $ldap;
     }
 
@@ -304,7 +306,6 @@ class LdapQuerySpec extends ObjectBehavior
 
     function it_should_force_arrays_on_multivalued_attributes_when_returning_results()
     {
-        $this->ldap->getEncoding()->willReturn('UTF-8');
         $this->ldap->execute(Argument::any())->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setMultivaluedAttributes(['otherHomePhone']);
@@ -322,7 +323,6 @@ class LdapQuerySpec extends ObjectBehavior
             'firstName' => 'givenName',
             'lastName' => 'sn',
         ];
-        $this->ldap->getEncoding()->willReturn('UTF-8');
         $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);
@@ -347,7 +347,6 @@ class LdapQuerySpec extends ObjectBehavior
             'firstName' => 'givenName',
             'lastName' => 'sn',
         ];
-        $this->ldap->getEncoding()->willReturn('UTF-8');
         $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);
@@ -371,7 +370,6 @@ class LdapQuerySpec extends ObjectBehavior
             'firstName' => 'givenName',
             'lastName' => 'sn',
         ];
-        $this->ldap->getEncoding()->willReturn('UTF-8');
         $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);

@@ -10,6 +10,7 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Operation\LdapOperationInterface;
 
 /**
@@ -19,6 +20,13 @@ use LdapTools\Operation\LdapOperationInterface;
  */
 interface LdapConnectionInterface
 {
+    /**
+     * Get the DomainConfiguration instance in use by the connection.
+     *
+     * @return DomainConfiguration
+     */
+    public function getConfig();
+
     /**
      * Add a LDAP_OPT_* constant to be used when connecting to LDAP.
      *
@@ -81,13 +89,6 @@ interface LdapConnectionInterface
     public function getBaseDn();
 
     /**
-     * Get the page size configured for this connection.
-     *
-     * @return int
-     */
-    public function getPageSize();
-
-    /**
      * Return a RootDse LDAP object for this connection.
      *
      * @return \LdapTools\Object\LdapObject
@@ -115,41 +116,6 @@ interface LdapConnectionInterface
      * @return int
      */
     public function getExtendedErrorNumber();
-
-    /**
-     * Get the schema name used by this connection.
-     *
-     * @return string
-     */
-    public function getSchemaName();
-
-    /**
-     * Get the encoding type used by this connection.
-     *
-     * @return string
-     */
-    public function getEncoding();
-
-    /**
-     * Get the LDAP type that the connection was set as (ie. ad, openldap).
-     *
-     * @return string
-     */
-    public function getLdapType();
-
-    /**
-     * Get whether or not the search is set to use the paging control.
-     *
-     * @return bool
-     */
-    public function getPagedResults();
-
-    /**
-     * Set whether or not the search should use paging control.
-     *
-     * @param bool $pagedResults
-     */
-    public function setPagedResults($pagedResults);
 
     /**
      * Outputs the domain name for the connection.

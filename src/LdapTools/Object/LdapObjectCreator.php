@@ -102,7 +102,7 @@ class LdapObjectCreator
             );
         }
         if (!($type instanceof LdapObjectSchema)) {
-            $type = $this->schemaFactory->get($this->connection->getSchemaName(), $type);
+            $type = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $type);
         }
         $this->schema = $type;
         $this->container = $type->getDefaultContainer();

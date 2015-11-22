@@ -3,6 +3,7 @@
 namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
+use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Event\LdapObjectMoveEvent;
@@ -34,23 +35,33 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     protected $connection;
 
+    protected $objectSchemaFactoryTest;
+
+    protected $objectSchemaFactory;
+
+    protected $dispatcher;
+
+    protected $dispatcherTest;
+
     /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
     function let($connection)
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
+        $config = (new DomainConfiguration('example.com'))->setSchemaName('example');
+        $connection->getConfig()->willReturn($config);
         $this->connection = $connection;
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $parserTest = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
+        $this->dispatcherTest = new SymfonyEventDispatcher();
+        $this->dispatcher = new SymfonyEventDispatcher();
+        $this->objectSchemaFactoryTest = new LdapObjectSchemaFactory($cache, $parserTest, $this->dispatcherTest);
+        $this->objectSchemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
 
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->beConstructedWith($connection, $this->objectSchemaFactory, $this->dispatcher);
     }
 
     function it_is_initializable()
@@ -67,32 +78,15 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->shouldThrow('\InvalidArgumentException')->duringDelete($ldapObject);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_delete_a_ldap_object_from_its_dn($connection)
+    function it_should_delete_a_ldap_object_from_its_dn()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $this->delete($ldapObject);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_update_a_ldap_object_using_batch_modify($connection)
+    function it_should_update_a_ldap_object_using_batch_modify()
     {
         $batch = [
             [
@@ -115,18 +109,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
                 'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
             ],
         ];
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');
@@ -136,53 +119,25 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->persist($ldapObject);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_move_a_ldap_object_using_move($connection)
+    function it_should_move_a_ldap_object_using_move()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
         $operation = (new RenameOperation())
             ->setDn('cn=foo,dc=foo,dc=bar')
             ->setNewLocation('ou=employees,dc=foo,dc=bar')
             ->setNewRdn('cn=foo');
-        $connection->execute($operation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_escape_the_RDN_when_moving_a_ldap_object($connection)
+    function it_should_escape_the_RDN_when_moving_a_ldap_object()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
         $operation = (new RenameOperation())
             ->setDn('cn=foo\, bar,dc=foo,dc=bar')
             ->setNewLocation('ou=employees,dc=foo,dc=bar')
             ->setNewRdn('cn=foo\2c bar');
-        $connection->execute($operation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo\, bar,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
@@ -200,88 +155,58 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_not_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected($connection)
+    function it_should_not_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected()
     {
-        $connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldNotBeCalled();
-        $connection->execute(Argument::type('\LdapTools\Operation\RenameOperation'))->shouldBeCalled();
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldNotBeCalled();
+        $this->connection->execute(Argument::type('\LdapTools\Operation\RenameOperation'))->shouldBeCalled();
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function it_should_call_the_event_dispatcher_delete_events_when_deleting_an_object($connection, $dispatcher)
+    function it_should_call_the_event_dispatcher_delete_events_when_deleting_an_object($dispatcher)
     {
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject);
         $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject);
-        $connection->getSchemaName()->willReturn('example');
-        $connection->getLdapType()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
+
+        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
         $this->delete($ldapObject);
     }
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function it_should_call_the_event_dispatcher_move_events_when_moving_an_object($connection, $dispatcher)
+    function it_should_call_the_event_dispatcher_move_events_when_moving_an_object($dispatcher)
     {
         $operation = (new RenameOperation())
             ->setDn('cn=foo,dc=foo,dc=bar')
             ->setNewLocation('ou=employees,dc=foo,dc=bar')
             ->setNewRdn('cn=foo');
+
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
         $beforeEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
         $afterEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
-        $connection->getSchemaName()->willReturn('example');
-        $connection->getLdapType()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->execute($operation)->willReturn(true);
+
+        $this->connection->execute($operation)->willReturn(true);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
+        $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function it_should_call_the_event_dispatcher_modify_events_when_persisting_an_object($connection, $dispatcher)
+    function it_should_call_the_event_dispatcher_modify_events_when_persisting_an_object($dispatcher)
     {
         $batch = [
             [
@@ -304,18 +229,8 @@ class LdapObjectManagerSpec extends ObjectBehavior
                 'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
             ],
         ];
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $schemaDispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $schemaDispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
+        $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');
@@ -340,18 +255,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
     }
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function it_should_not_call_the_event_dispatcher_modify_events_when_an_object_has_not_changed($connection, $dispatcher)
+    function it_should_not_call_the_event_dispatcher_modify_events_when_an_object_has_not_changed($dispatcher)
     {
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $schemaDispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $schemaDispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject);

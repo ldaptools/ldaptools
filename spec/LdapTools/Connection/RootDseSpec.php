@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Connection;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -45,13 +46,10 @@ class RootDseSpec extends ObjectBehavior
     {
         $connection->execute((new QueryOperation())->setFilter("(&(objectClass=*))")->setAttributes(["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"])->setBaseDn("")->setScope(QueryOperation::SCOPE['BASE']))
             ->willReturn($this->entry);
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->__toString()->willReturn('example.local');
-        $connection->getPagedResults()->willReturn(true);
         $connection->isBound()->willReturn(false);
-        $connection->setPagedResults(true)->willReturn(null);
-        $connection->setPagedResults(false)->willReturn(null);
         $connection->connect('','', true)->willReturn(null);
-        $connection->getLdapType()->willReturn('ad');
 
         $this->connection = $connection;
         $this->dispatcher = $dispatcher;

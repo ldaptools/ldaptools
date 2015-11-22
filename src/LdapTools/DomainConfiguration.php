@@ -393,13 +393,13 @@ class DomainConfiguration
     }
 
     /**
-     * Get the schema name set for this domain.
+     * Get the schema name set for this domain. If none is set explicitly, it will return the LDAP type name.
      *
      * @return string
      */
     public function getSchemaName()
     {
-        return $this->config['schemaName'];
+        return $this->config['schemaName'] ?: $this->config['ldapType'];
     }
 
     /**

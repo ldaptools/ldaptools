@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
@@ -52,7 +53,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
      */
     function it_should_convert_a_name_back_to_a_dn($connection)
     {
-        $connection->getLdapType()->willReturn('ad');
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -60,8 +61,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
                 'objectClass' => 'bar'
             ],
         ]]);
-        $this->setAttribute('foo');
         $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
         $this->toLdap('Foo')->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
     }
 
@@ -73,7 +75,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $guid = 'a1131cd3-902b-44c6-b49a-1f6a567cda25';
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
 
-        $connection->getLdapType()->willReturn('ad');
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -94,7 +96,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $sid = 'S-1-5-21-1004336348-1177238915-682003330-512';
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';
 
-        $connection->getLdapType()->willReturn('ad');
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -149,7 +151,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_convert_a_dn_back_to_a_dn($connection)
     {
         $dn = $this->entry[0]['distinguishedname'][0];
-        $connection->getLdapType()->willReturn('ad');
+        $connection->getConfig()->willReturn(new DomainConfiguration('bar.foo'));
         $connection->execute(Argument::any())->shouldNotBeCalled();
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -190,7 +192,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
      */
     function it_should_allow_an_or_filter_for_an_attribute($connection)
     {
-        $connection->getLdapType()->willReturn('ad');
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute((new QueryOperation())->setFilter('(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',

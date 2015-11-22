@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\DomainConfiguration;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -130,6 +131,7 @@ class ConvertGPLinkSpec extends ObjectBehavior
             ->setScope(QueryOperation::SCOPE['SUBTREE']);
 
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
+        $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('ou=foo,dc=foo,dc=bar');
@@ -147,8 +149,6 @@ class ConvertGPLinkSpec extends ObjectBehavior
 
     function it_should_convert_a_gPLink_string_to_an_array_of_GPO_names()
     {
-        $this->connection->getLdapType()->willReturn('ad');
-
         $this->connection->execute($this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
         $this->fromLdap([implode('', $this->gPLinks)])->shouldBeEqualTo(['Foo','Bar']);
 
@@ -158,7 +158,6 @@ class ConvertGPLinkSpec extends ObjectBehavior
 
     function it_should_convert_an_array_of_GPO_names_to_a_bracket_encased_dn_string_form_for_ldap()
     {
-        $this->connection->getLdapType()->willReturn('ad');
         $this->connection->execute($this->expectedDNSearch)->willReturn($this->expectedDNResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
@@ -168,7 +167,6 @@ class ConvertGPLinkSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_an_array_of_GPO_names_to_ldap_on_modification()
     {
         // This is starting to get really pug fugly...
-        $this->connection->getLdapType()->willReturn('ad');
         $this->connection->execute($this->expectedCurrentValueSearch)->willReturn($this->expectedCurrentValueResult);
         $this->connection->execute($this->expectedDNSearch)->willReturn($this->expectedDNResult);
         $this->connection->execute($this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);

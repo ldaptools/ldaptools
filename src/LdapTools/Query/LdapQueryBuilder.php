@@ -102,7 +102,7 @@ class LdapQueryBuilder
         $this->schemaFactory = $schemaFactory;
         $this->operation = new QueryOperation();
 
-        if ($connection && $connection->getLdapType() == LdapConnection::TYPE_AD) {
+        if ($connection && $connection->getConfig()->getLdapType() == LdapConnection::TYPE_AD) {
             $this->filterBuilder = new ADFilterBuilder();
         } else {
             $this->filterBuilder = new FilterBuilder();
@@ -443,7 +443,7 @@ class LdapQueryBuilder
     protected function addLdapObjectSchema($schema)
     {
         if (!($schema instanceof LdapObjectSchema)) {
-            $schema = $this->schemaFactory->get($this->connection->getSchemaName(), $schema);
+            $schema = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $schema);
         }
         $this->defaultAttributes = array_filter(
             array_merge($this->defaultAttributes, $schema->getAttributesToSelect())

@@ -12,6 +12,7 @@ namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnection;
+use LdapTools\DomainConfiguration;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -85,8 +86,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $config->setCacheType('none');
         $this->ldap = $ldap;
         $ldap->execute(Argument::any())->willReturn($this->ldapEntries);
-        $ldap->getLdapType()->willReturn(LdapConnection::TYPE_AD);
-        $ldap->getEncoding()->willReturn('UTF-8');
+        $ldap->getConfig()->willReturn(new DomainConfiguration('example.local'));
 
         $cache = CacheFactory::get($config->getCacheType(), $config->getCacheOptions());
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());

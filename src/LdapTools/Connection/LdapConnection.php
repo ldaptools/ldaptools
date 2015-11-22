@@ -67,19 +67,9 @@ class LdapConnection implements LdapConnectionInterface
     protected $ldapUrl;
 
     /**
-     * @var string The LDAP type in use (ie. AD, OpenLDAP, etc).
-     */
-    protected $type;
-
-    /**
      * @var LdapServerPool
      */
     protected $serverPool;
-
-    /**
-     * @var bool Whether or not to use paged results control when searching.
-     */
-    protected $pagedResults = true;
 
     /**
      * @var ADBindUserStrategy|BindUserStrategy
@@ -118,6 +108,14 @@ class LdapConnection implements LdapConnectionInterface
         if (!$config->getLazyBind()) {
             $this->connect();
         }
+    }
+
+    /**
+     * {@ineritdoc}
+     */
+    public function getConfig()
+    {
+        return $this->config;
     }
 
     /**
@@ -201,7 +199,7 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getLastError()
     {
-        return LastErrorStrategy::getInstance($this->getLdapType(), $this->connection)->getLastErrorMessage();
+        return LastErrorStrategy::getInstance($this->config->getLdapType(), $this->connection)->getLastErrorMessage();
     }
 
     /**
@@ -209,7 +207,7 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function getExtendedErrorNumber()
     {
-        return LastErrorStrategy::getInstance($this->getLdapType(), $this->connection)->getExtendedErrorNumber();
+        return LastErrorStrategy::getInstance($this->config->getLdapType(), $this->connection)->getExtendedErrorNumber();
     }
 
     /**
@@ -230,32 +228,6 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getSchemaName()
-    {
-        return $this->config->getSchemaName() ?: $this->config->getLdapType();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getLdapType()
-    {
-        return $this->config->getLdapType();
-    }
-
-    /**
-     * The page size for paging operations.
-     *
-     * @return int
-     */
-    public function getPageSize()
-    {
-        return $this->config->getPageSize();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseDn()
     {
         if (!empty($this->config->getBaseDn())) {
@@ -269,30 +241,6 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         return $baseDn;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getEncoding()
-    {
-        return $this->config->getEncoding();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setPagedResults($pagedResults)
-    {
-        $this->pagedResults = (bool) $pagedResults;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getPagedResults()
-    {
-        return $this->pagedResults;
     }
 
     /**
@@ -320,7 +268,7 @@ class LdapConnection implements LdapConnectionInterface
         $allEntries = [];
 
         // If this is not a paged search then set this to null so it ends the loop on the first pass.
-        $cookie = $this->pagedResults ? '' : null;
+        $cookie = $this->config->getUsePaging() ? '' : null;
         do {
             $this->setPagedResultsControl($operation->getPageSize(), $cookie, $operation->getScope());
 
@@ -349,7 +297,7 @@ class LdapConnection implements LdapConnectionInterface
     protected function setQueryOperationDefaults(QueryOperation $operation)
     {
         if (is_null($operation->getPageSize())) {
-            $operation->setPageSize($this->getPageSize());
+            $operation->setPageSize($this->config->getPageSize());
         }
         if (is_null($operation->getBaseDn())) {
             $operation->setBaseDn($this->getBaseDn());
@@ -397,8 +345,8 @@ class LdapConnection implements LdapConnectionInterface
         } else {
             $this->isBound = @ldap_bind(
                 $this->connection,
-                LdapUtilities::encode($username, $this->getEncoding()),
-                LdapUtilities::encode($password, $this->getEncoding())
+                LdapUtilities::encode($username, $this->config->getEncoding()),
+                LdapUtilities::encode($password, $this->config->getEncoding())
             );
         }
 
@@ -432,9 +380,9 @@ class LdapConnection implements LdapConnectionInterface
      */
     protected function setPagedResultsControl($pageSize, &$cookie, $scope)
     {
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
-        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result($this->connection, 0)) {
+        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result($this->connection, 0)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results for read operation: %s',
                 $this->getLastError()
@@ -452,7 +400,7 @@ class LdapConnection implements LdapConnectionInterface
      */
     protected function setPagedResultsResponse($result, &$cookie, $scope)
     {
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->getLastError())
             );

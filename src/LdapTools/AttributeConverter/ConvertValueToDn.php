@@ -30,7 +30,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
      */
     public function toLdap($value)
     {
-        $this->validateCurrentAttribute($this->options);
+        $this->validateCurrentAttribute();
 
         return $this->getDnFromValue($value);
     }

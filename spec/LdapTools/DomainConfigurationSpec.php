@@ -28,6 +28,11 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\DomainConfiguration');
     }
 
+    function it_should_have_a_default_schema_name_of_the_ldap_type()
+    {
+        $this->getSchemaName()->shouldBeEqualTo('ad');
+    }
+
     function it_should_set_the_username_when_calling_setUsername()
     {
         $this->setUsername('bar');

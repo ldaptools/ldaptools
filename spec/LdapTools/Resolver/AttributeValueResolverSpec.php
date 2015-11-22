@@ -12,6 +12,7 @@ namespace spec\LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\DomainConfiguration;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -88,6 +89,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
             ]
         ]);
         $this->schema = $schema;
+        $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->connection = $connection;
         $this->beConstructedThrough('getInstance', [$schema, $this->entryTo, AttributeConverterInterface::TYPE_CREATE]);
     }
@@ -135,8 +137,6 @@ class AttributeValueResolverSpec extends ObjectBehavior
 
         $this->connection->execute(
             (new QueryOperation())->setFilter('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))')->setAttributes(['userAccountControl']))->willReturn($this->expectedResult);
-        $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->getEncoding()->willReturn('UTF-8');
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');

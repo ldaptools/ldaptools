@@ -4,6 +4,7 @@ namespace spec\LdapTools\Object;
 
 use LdapTools\AttributeConverter\EncodeWindowsPassword;
 use LdapTools\Configuration;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectCreationEvent;
@@ -35,25 +36,50 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     ];
 
     /**
+     * @var LdapConnectionInterface
+     */
+    protected $connection;
+
+    /**
+     * @var DomainConfiguration
+     */
+    protected $config;
+
+    /**
+     * @var LdapObjectSchemaFactory
+     */
+    protected $schemaFactory;
+
+    /**
+     * @var LdapObjectSchemaFactory
+     */
+    protected $schemaFactoryTest;
+
+    protected $dispatcher;
+
+    /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
     public function let($connection)
     {
-        $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
-        $connection->getSchemaName()->willReturn('example');
+        $this->config = (new DomainConfiguration('example.com'))->setSchemaName('example');
         $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
+        $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
+        $connection->getConfig()->willReturn($this->config);
         $connection->getRootDse()->willReturn($ldapObject);
 
         $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
+        $parserTest = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
+        $this->dispatcher = new SymfonyEventDispatcher();
+        $this->schemaFactoryTest = new LdapObjectSchemaFactory($cache, $parserTest, $this->dispatcher);
+        $this->schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
         $this->attributes['unicodePwd'] = (new EncodeWindowsPassword())->toLdap('12345');
         $this->addOperation = (new AddOperation())->setDn("cn=somedude,dc=foo,dc=bar")->setAttributes($this->attributes);
+        $this->connection = $connection;
 
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->beConstructedWith($this->connection, $this->schemaFactoryTest, $this->dispatcher);
     }
 
     function it_is_initializable()
@@ -116,23 +142,9 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow('\Exception')->duringCreate('foo');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_set_parameters_for_the_attributes_sent_to_ldap($connection)
+    function it_should_set_parameters_for_the_attributes_sent_to_ldap()
     {
-        $connection->getSchemaName()->willReturn('ad');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->__toString()->willReturn('example.com');
-        $connection->execute($this->addOperation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute($this->addOperation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -143,24 +155,13 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->execute();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_respect_an_explicitly_set_dn($connection)
+    function it_should_respect_an_explicitly_set_dn()
     {
-        $connection->getSchemaName()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
+        $this->connection->execute($this->addOperation)->willReturn(true);
         $this->addOperation->setDn('cn=chad,ou=users,dc=foo,dc=bar');
-        $connection->execute($this->addOperation)->willReturn(true);
 
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->config->setSchemaName('ad');
+        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
@@ -168,26 +169,15 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_escape_the_base_dn_name_properly_when_using_a_schema($connection)
+    function it_should_escape_the_base_dn_name_properly_when_using_a_schema()
     {
-        $connection->getSchemaName()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
         $attributes = $this->attributes;
         $attributes['cn'] = 'foo=,bar';
         $operation = (new AddOperation())->setDn('cn=foo\\3d\\2cbar,dc=foo,dc=bar')->setAttributes($attributes);
-        $connection->execute($operation)->willReturn(true);
+        $this->connection->execute($operation)->willReturn(true);
 
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->config->setSchemaName('ad');
+        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['name' => 'foo=,bar', 'username' => 'somedude', 'password' => '12345'])
@@ -201,50 +191,22 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow(new \LogicException('You must specify a container or OU to place this LDAP object in.'))->duringExecute();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_use_a_default_container_defined_in_the_schema($connection)
+    function it_should_use_a_default_container_defined_in_the_schema()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=foo,ou=bar,dc=example,dc=local');
-        $connection->execute($operation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute($operation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
             ->execute();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_allow_a_default_container_to_be_overwritten($connection)
+    function it_should_allow_a_default_container_to_be_overwritten()
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
-        $connection->execute($operation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->connection->execute($operation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
@@ -252,28 +214,14 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_set_parameters_for_the_container_of_the_ldap_object($connection)
+    function it_should_set_parameters_for_the_container_of_the_ldap_object()
     {
-        $arg = Argument::allOf(
-            Argument::withEntry('cn', 'somedude'),
-            Argument::withEntry('sAMAccountName', 'somedude'),
-            Argument::withEntry('unicodePwd', (new EncodeWindowsPassword())->toLdap('12345'))
-        );
-        $connection->getSchemaName()->willReturn('ad');
         $operation = clone $this->addOperation;
         $operation->setDn("cn=somedude,ou=Sales,dc=example,dc=com");
-        $connection->execute($operation)->willReturn(true);
+        $this->connection->execute($operation)->willReturn(true);
 
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $cache = CacheFactory::get('none', []);
-        $dispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
-
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->config->setSchemaName('ad');
+        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -281,26 +229,15 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->setParameter('foo', 'somedude')
             ->setParameter('SalesOU', 'ou=Sales')
             ->setParameter('bar', '12345');
-
         $this->execute();
     }
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
      */
-    function it_should_call_creation_events_when_creating_a_ldap_object($connection, $dispatcher)
+    function it_should_call_creation_events_when_creating_a_ldap_object($dispatcher)
     {
-        $connection->getSchemaName()->willReturn('ad');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->__toString()->willReturn('example.com');
-        $connection->execute($this->addOperation)->willReturn(true);
-
-        $config = new Configuration();
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $cache = CacheFactory::get('none', []);
-        $factoryDispatcher = new SymfonyEventDispatcher();
-        $factory = new LdapObjectSchemaFactory($cache, $parser, $factoryDispatcher);
+        $this->connection->execute($this->addOperation)->willReturn(true);
 
         $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
         $beforeEvent->setContainer('dc=foo,dc=bar');
@@ -313,7 +250,8 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
-        $this->beConstructedWith($connection, $factory, $dispatcher);
+        $this->config->setSchemaName('ad');
+        $this->beConstructedWith($this->connection, $this->schemaFactory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])

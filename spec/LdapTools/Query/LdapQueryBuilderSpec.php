@@ -27,16 +27,18 @@ use Prophecy\Argument;
 
 class LdapQueryBuilderSpec extends ObjectBehavior
 {
-    function let()
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function let($connection)
     {
         $config = new Configuration();
         $domain = new DomainConfiguration('example.com');
         $domain->setServers(['example'])
             ->setBaseDn('dc=example,dc=com')
             ->setLazyBind(true)
-            ->setPageSize(500)
-            ->setLdapType(LdapConnection::TYPE_AD);
-        $connection = new LdapConnection($domain);
+            ->setPageSize(500);
+        $connection->getConfig()->willReturn($domain);
         $config->setCacheType('none');
 
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());

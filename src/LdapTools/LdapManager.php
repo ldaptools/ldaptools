@@ -353,7 +353,7 @@ class LdapManager
      */
     protected function getLdapObjectSchema($type)
     {
-        return $this->getSchemaFactory()->get($this->getConnection()->getSchemaName(), $type);
+        return $this->getSchemaFactory()->get($this->getConnection()->getConfig()->getSchemaName(), $type);
     }
 
     /**
