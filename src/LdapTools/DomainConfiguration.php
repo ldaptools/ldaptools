@@ -43,6 +43,7 @@ class DomainConfiguration
         'use_ssl' => 'useSsl',
         'port' => 'port',
         'base_dn' => 'baseDn',
+        'use_paging' => 'usePaging',
         'page_size' => 'pageSize',
         'username' => 'username',
         'password' => 'password',
@@ -74,6 +75,7 @@ class DomainConfiguration
         'useSsl' => false,
         'useTls' => false,
         'port' => self::PORT,
+        'usePaging' => true,
         'pageSize' => 1000,
         'servers' => [],
         'ldapType' => LdapConnection::TYPE_AD,
@@ -444,6 +446,29 @@ class DomainConfiguration
     public function getBindFormat()
     {
         return $this->config['bindFormat'];
+    }
+
+    /**
+     * Get whether or not LDAP paging control should be used.
+     *
+     * @return bool
+     */
+    public function getUsePaging()
+    {
+        return $this->config['usePaging'];
+    }
+
+    /**
+     * Set whether or not LDAP paging control should be used.
+     *
+     * @param bool $paging
+     * @return $this
+     */
+    public function setUsePaging($paging)
+    {
+        $this->config['usePaging'] = $paging;
+
+        return $this;
     }
 
     /**

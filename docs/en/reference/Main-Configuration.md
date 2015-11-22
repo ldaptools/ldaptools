@@ -204,6 +204,13 @@ are `order` (tried in the order they appear) or `random`.
 **Default**: `order`
 
 -------------------------------
+#### use_paging
+
+Whether or not the connection should try to page results by default.
+
+**Default**: `true`
+
+-------------------------------
 #### page_size
 
 The default page size to use for paging operations.

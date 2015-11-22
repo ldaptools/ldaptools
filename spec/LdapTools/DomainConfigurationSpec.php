@@ -34,20 +34,10 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getUsername()->shouldBeEqualTo('bar');
     }
 
-    function it_should_return_self_when_setting_username()
-    {
-        $this->setUsername('test')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
     function it_should_set_the_password_when_calling_setPassword()
     {
         $this->setPassword('foo');
         $this->getPassword()->shouldBeEqualTo('foo');
-    }
-
-    function it_should_return_self_when_setting_password()
-    {
-        $this->setPassword('test')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_have_the_correct_string_as_domain_name()
@@ -57,20 +47,10 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getDomainName()->shouldBeEqualTo('foo.bar');
     }
 
-    function it_should_return_self_when_setting_domain_name()
-    {
-        $this->setDomainName('example.com')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
     function it_should_properly_set_the_base_dn_when_calling_setBaseDn()
     {
         $this->setBaseDn('dc=foo,dc=bar');
         $this->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
-    }
-
-    function it_should_return_self_when_setting_baseDn()
-    {
-        $this->setBaseDn('dc=example,dc=com')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_set_use_ssl_when_calling_setUseSsl()
@@ -80,21 +60,11 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getUseSsl()->shouldBeEqualTo(true);
     }
 
-    function it_should_return_self_when_setting_use_ssl()
-    {
-        $this->setUseSsl(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
     function it_should_set_use_tls_when_calling_setUseTls()
     {
         $this->getUseTls()->shouldBeEqualTo(false);
         $this->setUseTls(true);
         $this->getUseTls()->shouldBeEqualTo(true);
-    }
-
-    function it_should_return_self_when_setting_use_tls()
-    {
-        $this->setUseTls(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_have_the_correct_port_after_calling_setPort()
@@ -106,17 +76,12 @@ class DomainConfigurationSpec extends ObjectBehavior
 
     function it_should_allow_a_numeric_string_when_setting_port()
     {
-        $this->setPort('123')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->shouldNotThrow('\InvalidArgumentException')->duringSetPort('123');
     }
 
     function it_should_throw_InvalidTypeException_when_setting_port_as_non_int()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringSetPort('test');
-    }
-
-    function it_should_return_self_when_setting_port()
-    {
-        $this->setPort(123)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_return_the_correct_page_size_after_calling_setPageSize()
@@ -134,21 +99,6 @@ class DomainConfigurationSpec extends ObjectBehavior
     function it_should_throw_InvalidTypeException_when_setting_page_size_as_non_int()
     {
         $this->shouldThrow('\InvalidArgumentException')->duringSetPageSize('test');
-    }
-
-    function it_should_return_self_when_setting_page_size()
-    {
-        $this->setPageSize(500)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
-    function it_should_return_self_when_setting_servers()
-    {
-        $this->setServers(['test'])->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
-    function it_should_return_self_when_setting_schema_name()
-    {
-        $this->setSchemaName('custom')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_return_a_string_when_calling_getSchemaName()
@@ -170,21 +120,11 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getServers()->shouldBeEqualTo($servers);
     }
 
-    function it_should_return_self_when_setting_lazy_bind()
-    {
-        $this->setLazyBind(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
     function it_should_have_the_correct_value_for_lazy_bind_after_calling_setLazyBind()
     {
         $this->getLazyBind()->shouldBeEqualTo(false);
         $this->setLazyBind(true);
         $this->getLazyBind()->shouldBeEqualTo(true);
-    }
-
-    function it_should_return_self_when_setting_ldap_type()
-    {
-        $this->setLdapType(LdapConnection::TYPE_AD)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
     }
 
     function it_should_have_the_correct_ldap_type_after_calling_setLdapType()
@@ -204,11 +144,6 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->shouldThrow('\InvalidArgumentException')->duringSetLdapType('SuperHappyFunTime');
     }
 
-    function it_should_return_self_when_calling_setServerSelection()
-    {
-        $this->setServerSelection(LdapServerPool::SELECT_RANDOM)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
-    }
-
     function it_should_return_the_correct_server_selection_type_after_calling_setServerSelection()
     {
         $this->setServerSelection(LdapServerPool::SELECT_RANDOM);
@@ -220,11 +155,6 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getServerSelection()->shouldBeEqualTo(LdapServerPool::SELECT_ORDER);
     }
 
-    function it_should_return_self_when_setting_the_encoding()
-    {
-        $this->setEncoding('UTF-8')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-    }
-
     function it_should_have_the_correct_encoding_after_calling_setEncoding()
     {
         $this->getEncoding()->shouldBeEqualTo('UTF-8');
@@ -232,10 +162,31 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getEncoding()->shouldBeEqualTo('Foo');
     }
 
-
-    function it_should_return_self_when_setting_the_bind_format()
+    function it_should_set_whether_paging_control_should_be_used()
     {
+        $this->getUsePaging()->shouldBeEqualTo(true);
+        $this->setUsePaging(false);
+        $this->getUsePaging()->shouldBeEqualTo(false);
+    }
+
+    function it_should_return_self_when_calling_the_setters()
+    {
+        $this->setUsePaging(true)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
+        $this->setPassword('test')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setDomainName('example.com')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setBaseDn('dc=example,dc=com')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setUseSsl(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setUseTls(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setPort(123)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setPageSize(500)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setServers(['test'])->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setSchemaName('custom')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setLazyBind(true)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setLdapType(LdapConnection::TYPE_AD)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
         $this->setBindFormat('%username%')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setUsername('test')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setEncoding('UTF-8')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
+        $this->setServerSelection(LdapServerPool::SELECT_RANDOM)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
     }
 
     function it_should_have_the_correct_encoding_after_calling_setBindFormat()
