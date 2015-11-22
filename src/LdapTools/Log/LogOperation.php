@@ -106,7 +106,7 @@ class LogOperation
     /**
      * Set the domain name that this log operation pertains to.
      *
-     * @param $domain
+     * @param string $domain
      * @return $this
      */
     public function setDomain($domain)
