@@ -21,7 +21,6 @@ use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
-use LdapTools\Operation\MoveOperation;
 use LdapTools\Operation\RenameOperation;
 use LdapTools\Utilities\LdapUtilities;
 
