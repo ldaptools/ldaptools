@@ -125,7 +125,9 @@ class LdapQueryBuilder
     }
 
     /**
-     * @return string The base DN for the query.
+     * Get the base DN for the query.
+     *
+     * @return string
      */
     public function getBaseDn()
     {
@@ -133,6 +135,8 @@ class LdapQueryBuilder
     }
 
     /**
+     * Get the page size for the query.
+     *
      * @return int
      */
     public function getPageSize()
@@ -141,7 +145,9 @@ class LdapQueryBuilder
     }
 
     /**
-     * @param $pageSize
+     * Set the page size for the query.
+     *
+     * @param int $pageSize
      */
     public function setPageSize($pageSize)
     {
@@ -339,6 +345,8 @@ class LdapQueryBuilder
 
     /**
      * Set the scope of the query to search the complete the baseDn and all children.
+     *
+     * @return $this
      */
     public function setScopeSubTree()
     {
@@ -349,6 +357,8 @@ class LdapQueryBuilder
 
     /**
      * Set the scope of the query to search only the entries within the baseDn but none of its children.
+     *
+     * @return $this
      */
     public function setScopeOneLevel()
     {
@@ -359,6 +369,8 @@ class LdapQueryBuilder
 
     /**
      * Set the scope of the query to only the entry defined by the baseDn.
+     *
+     * @return $this
      */
     public function setScopeBase()
     {
