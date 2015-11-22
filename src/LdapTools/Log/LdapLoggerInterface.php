@@ -17,7 +17,17 @@ namespace LdapTools\Log;
  */
 interface LdapLoggerInterface
 {
+    /**
+     * The start method is called against a LDAP operation prior to the operation being executed.
+     *
+     * @param LogOperation $operation
+     */
     public function start(LogOperation $operation);
 
+    /**
+     * The end method is called against a LDAP operation after the operation has finished executing.
+     *
+     * @param LogOperation $operation
+     */
     public function end(LogOperation $operation);
 }
