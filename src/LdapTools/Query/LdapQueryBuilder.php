@@ -114,7 +114,7 @@ class LdapQueryBuilder
     /**
      * Sets the base DN for the query.
      *
-     * @param $baseDn
+     * @param string $baseDn
      * @return $this
      */
     public function setBaseDn($baseDn)
