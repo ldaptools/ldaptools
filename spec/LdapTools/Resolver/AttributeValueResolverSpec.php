@@ -12,7 +12,7 @@ namespace spec\LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
-use LdapTools\Object\LdapObject;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -31,14 +31,6 @@ class AttributeValueResolverSpec extends ObjectBehavior
         'emailAddress' => 'Chad.Sikorra@gmail.com',
         'disabled' => 512,
         'passwordMustChange' => 0,
-    ];
-
-    protected $expectedSearch = [
-        '(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72))',
-        ['userAccountControl'],
-        null,
-        "subtree",
-        null,
     ];
 
     protected $expectedResult = [
@@ -141,7 +133,8 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['passwordNeverExpires'] = true;
         $entry['trustedForAllDelegation'] = true;
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute(
+            (new QueryOperation())->setFilter('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))')->setAttributes(['userAccountControl']))->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
         $this->connection->getEncoding()->willReturn('UTF-8');
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
