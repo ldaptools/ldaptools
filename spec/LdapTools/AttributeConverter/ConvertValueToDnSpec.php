@@ -10,8 +10,8 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
-use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Object\LdapObject;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -53,7 +53,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_convert_a_name_back_to_a_dn($connection)
     {
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=bar))(cn=Foo))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -72,10 +72,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $guid = 'a1131cd3-902b-44c6-b49a-1f6a567cda25';
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
-        $guidSimpleHex = '\61\31\31\33\31\63\64\33\2d\39\30\32\62\2d\34\34\63\36\2d\62\34\39\61\2d\31\66\36\61\35\36\37\63\64\61\32\35';
 
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -94,10 +93,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $sid = 'S-1-5-21-1004336348-1177238915-682003330-512';
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';
-        $sidSimpleHex = '\53\2d\31\2d\35\2d\32\31\2d\31\30\30\34\33\33\36\33\34\38\2d\31\31\37\37\32\33\38\39\31\35\2d\36\38\32\30\30\33\33\33\30\2d\35\31\32';
 
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -152,7 +150,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $dn = $this->entry[0]['distinguishedname'][0];
         $connection->getLdapType()->willReturn('ad');
-        $connection->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())->shouldNotBeCalled();
+        $connection->execute(Argument::any())->shouldNotBeCalled();
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -193,7 +191,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_allow_an_or_filter_for_an_attribute($connection)
     {
         $connection->getLdapType()->willReturn('ad');
-        $connection->search('(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))', ['distinguishedName'], null, 'subtree', null)->willReturn($this->entry);
+        $connection->execute((new QueryOperation())->setFilter('(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [

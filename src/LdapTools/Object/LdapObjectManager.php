@@ -19,6 +19,10 @@ use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Event\LdapObjectMoveEvent;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
+use LdapTools\Operation\BatchModifyOperation;
+use LdapTools\Operation\DeleteOperation;
+use LdapTools\Operation\MoveOperation;
+use LdapTools\Operation\RenameOperation;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -74,7 +78,10 @@ class LdapObjectManager
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
 
         $this->validateObject($ldapObject);
-        $this->connection->modifyBatch($ldapObject->get('dn'), $this->getLdapObjectBatchArray($ldapObject));
+        $operation = (new BatchModifyOperation())
+            ->setDn($ldapObject->get('dn'))
+            ->setBatch($this->getLdapObjectBatchArray($ldapObject));
+        $this->connection->execute($operation);
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
 
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject));
@@ -89,7 +96,7 @@ class LdapObjectManager
     {
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject));
         $this->validateObject($ldapObject);
-        $this->connection->delete($ldapObject->get('dn'));
+        $this->connection->execute((new DeleteOperation())->setDn($ldapObject->get('dn')));
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject));
     }
 
@@ -106,12 +113,18 @@ class LdapObjectManager
         $container = $event->getContainer();
 
         $this->validateObject($ldapObject);
-        $rdn = $this->getRdnFromDn($ldapObject->get('dn'));
-        $this->connection->move($ldapObject->get('dn'), $rdn, $container);
+        $operation = (new RenameOperation())
+            ->setDn($ldapObject->get('dn'))
+            ->setNewLocation($container)
+            ->setDeleteOldRdn(true)
+            ->setNewRdn(LdapUtilities::getRdnFromDn($ldapObject->get('dn')));
+        $this->connection->execute($operation);
 
-        $newDn = $rdn.','.$container;
+        // Update the object to reference the new DN after the move...
+        $newDn = LdapUtilities::getRdnFromDn($ldapObject->get('dn')).','.$container;
         $ldapObject->refresh(['dn' => $newDn]);
         $ldapObject->getBatchCollection()->setDn($newDn);
+
         $this->dispatcher->dispatch(new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, $container));
     }
 
@@ -145,20 +158,5 @@ class LdapObjectManager
         }
 
         return $hydrator->hydrateToLdap($ldapObject);
-    }
-
-    /**
-     * Given a full escaped DN return the RDN in escaped form.
-     *
-     * @param $dn
-     * @return string
-     */
-    protected function getRdnFromDn($dn)
-    {
-        $rdn = LdapUtilities::explodeDn($dn, 0)[0];
-        $rdn = explode('=', $rdn, 2);
-        $rdn = $rdn[0].'='.LdapUtilities::escapeValue($rdn[1], null, LDAP_ESCAPE_DN);
-
-        return $rdn;
     }
 }

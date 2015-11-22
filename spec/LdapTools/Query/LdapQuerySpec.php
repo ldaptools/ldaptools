@@ -10,10 +10,9 @@
 
 namespace spec\LdapTools\Query;
 
-use LdapTools\Connection\LdapConnection;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Factory\HydratorFactory;
-use LdapTools\Query\LdapQuery;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -76,13 +75,21 @@ class LdapQuerySpec extends ObjectBehavior
     protected $ldap;
 
     /**
+     * @var QueryOperation
+     */
+    protected $operation;
+
+    /**
      * @param \LdapTools\Connection\LdapConnectionInterface $ldap
      */
     function let($ldap)
     {
-        $ldap->search(Argument::any(), ["cn", "givenName", "foo"], Argument::any(), Argument::any(), Argument::any())
+        $this->operation = new QueryOperation();
+        $this->operation->setAttributes(["cn", "givenName", "foo"]);
+        $ldap->execute($this->operation)
             ->willReturn($this->ldapEntries);
         $this->beConstructedWith($ldap);
+        $this->setQueryOperation($this->operation);
         $this->ldap = $ldap;
     }
 
@@ -91,21 +98,34 @@ class LdapQuerySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Query\LdapQuery');
     }
 
+    function it_should_return_the_query_operation()
+    {
+        $this->getQueryOperation()->shouldBeEqualTo($this->operation);
+    }
+
+    function it_should_allow_setting_the_query_operation()
+    {
+        $operation = clone $this->operation;
+        $operation->setBaseDn('dc=foo,dc=bar');
+        $this->setQueryOperation($operation);
+        $this->getQueryOperation()->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
+    }
+
     function it_should_return_a_LdapObjectCollection_by_default()
     {
-        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->operation->setAttributes(["cn", "givenName", "foo"]);
         $this->execute()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
     function it_should_return_a_result_when_calling_getResult()
     {
-        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->operation->setAttributes(["cn", "givenName", "foo"]);
         $this->getResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
     function it_should_return_an_array_result_when_calling_getArrayResult()
     {
-        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->operation->setAttributes(["cn", "givenName", "foo"]);
         $this->getArrayResult()->shouldBeArray();
     }
 
@@ -114,10 +134,9 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['objectGuid']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["objectGuid"]);
         $this->getSingleResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
         $this->getSingleResult(HydratorFactory::TO_ARRAY)->shouldBeArray();
     }
@@ -127,17 +146,16 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['objectGuid']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["objectGuid"]);
         $this->getOneOrNullResult()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
         $this->getOneOrNullResult(HydratorFactory::TO_ARRAY)->shouldBeArray();
     }
 
     function it_should_throw_MultiResultException_when_many_results_are_returned_when_only_one_is_expected()
     {
-        $this->setAttributes(["cn", "givenName", "foo"]);
+        $this->operation->setAttributes(["cn", "givenName", "foo"]);
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult();
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetOneOrNullResult();
@@ -146,20 +164,18 @@ class LdapQuerySpec extends ObjectBehavior
 
     function it_should_throw_EmptyResultException_when_no_results_are_returned_but_one_is_expected()
     {
-        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(array());
+        $this->operation->setAttributes(['objectGuid']);
+        $this->ldap->execute($this->operation)->willReturn([]);
 
-        $this->setAttributes(["objectGuid"]);
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult();
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleResult(HydratorFactory::TO_ARRAY);
     }
 
     function it_should_return_null_when_calling_getOneOrNullResult_and_no_results_are_found()
     {
-        $this->ldap->search(Argument::any(), ["objectGuid"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(array());
+        $this->operation->setAttributes(['objectGuid']);
+        $this->ldap->execute($this->operation)->willReturn([]);
 
-        $this->setAttributes(["objectGuid"]);
         $this->getOneOrNullResult()->shouldBeNull();
         $this->getOneOrNullResult(HydratorFactory::TO_ARRAY)->shouldBeNull();
     }
@@ -169,10 +185,9 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["sn"]);
         $this->getSingleScalarResult()->shouldBeEqualTo('Bourke');
     }
 
@@ -181,42 +196,38 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["foo"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['foo']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["foo"]);
         $this->shouldThrow('\LdapTools\Exception\AttributeNotFoundException')->duringGetSingleScalarResult();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_no_LDAP_object_is_found()
     {
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(['count' => 0]);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn(['count' => 0]);
 
-        $this->setAttributes(["sn"]);
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleScalarResult();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_more_than_one_LDAP_object_is_found()
     {
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
 
-        $this->setAttributes(["sn"]);
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleScalarResult();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarResult_and_more_than_one_attribute_is_selected()
     {
-        $this->ldap->search(Argument::any(), ["sn","givenname"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->operation->setAttributes(['sn','givenname']);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
 
-        $this->setAttributes(["sn","givenname"]);
         $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetSingleScalarResult();
-        $this->setAttributes(["*"]);
+        $this->operation->setAttributes(['*']);
         $e = new LdapQueryException('When retrieving a single value you should only select a single attribute. All are selected.');
         $this->shouldThrow($e)->duringGetSingleScalarResult();
-        $this->setAttributes(["**"]);
+        $this->operation->setAttributes(['**']);
         $this->shouldThrow($e)->duringGetSingleScalarResult();
     }
 
@@ -225,10 +236,9 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["sn"]);
         $this->getSingleScalarOrNullResult()->shouldBeEqualTo('Bourke');
     }
 
@@ -237,72 +247,34 @@ class LdapQuerySpec extends ObjectBehavior
         $result = $this->ldapEntries;
         $result['count'] = 1;
         unset($result[1]);
-        $this->ldap->search(Argument::any(), ["foo"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($result);
+        $this->operation->setAttributes(['foo']);
+        $this->ldap->execute($this->operation)->willReturn($result);
 
-        $this->setAttributes(["foo"]);
         $this->getSingleScalarOrNullResult()->shouldBeNull();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_no_LDAP_object_is_found()
     {
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn(['count' => 0]);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn(['count' => 0]);
 
-        $this->setAttributes(["sn"]);
         $this->shouldThrow('\LdapTools\Exception\EmptyResultException')->duringGetSingleScalarOrNullResult();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_more_than_one_LDAP_object_is_found()
     {
-        $this->ldap->search(Argument::any(), ["sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->operation->setAttributes(['sn']);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
 
-        $this->setAttributes(["sn"]);
         $this->shouldThrow('\LdapTools\Exception\MultiResultException')->duringGetSingleScalarOrNullResult();
     }
 
     function it_should_throw_an_exception_when_calling_getSingleScalarOrNullResult_and_more_than_one_attribute_is_selected()
     {
-        $this->ldap->search(Argument::any(), ["sn","givenname"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->operation->setAttributes(['sn','givenname']);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
 
-        $this->setAttributes(["sn","givenname"]);
         $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetSingleScalarOrNullResult();
-    }
-
-    function it_should_set_the_filter_when_calling_setLdapFilter()
-    {
-        $filter = '(objectClass=*)';
-        $this->setLdapFilter($filter)->getLdapFilter()->shouldBeEqualTo($filter);
-    }
-
-    function it_should_set_the_baseDn_when_calling_setBaseDn()
-    {
-        $baseDn = 'dc=foo,dc=bar';
-        $this->setBaseDn($baseDn)->getBaseDn()->shouldBeEqualTo($baseDn);
-    }
-
-    function it_should_set_the_page_size_when_calling_setPageSize()
-    {
-        $pageSize = 1000;
-        $this->setPageSize($pageSize)->getPageSize()->shouldBeEqualTo($pageSize);
-    }
-
-    function it_should_set_the_attributes_to_get_when_calling_setAttributes()
-    {
-        $attributes = ['foo', 'bar'];
-        $this->setAttributes($attributes)->getAttributes()->shouldBeEqualTo($attributes);
-    }
-
-    function it_should_set_the_scope_when_calling_setScope()
-    {
-        $this->setScope(LdapQuery::SCOPE_BASE)->getScope()->shouldBeEqualTo(LdapQuery::SCOPE_BASE);
-    }
-
-    function it_should_throw_InvalidArgumentException_when_setting_an_invalid_scope()
-    {
-        $this->shouldThrow('\InvalidArgumentException')->duringSetScope('foo');
     }
 
     function it_should_set_the_LdapObjectSchemas_when_calling_setLdapObjectSchemas()
@@ -325,21 +297,20 @@ class LdapQuerySpec extends ObjectBehavior
     function it_should_add_order_by_attributes_to_the_selection_if_not_explicitly_done()
     {
         $this->setOrderBy(['foo' => 'ASC']);
-        $this->setAttributes(['cn', 'givenName']);
-        $this->setBaseDn('dc=foo,dc=bar');
+        $this->operation->setAttributes(['cn','givenName']);
+        $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->execute(HydratorFactory::TO_ARRAY);
     }
 
     function it_should_force_arrays_on_multivalued_attributes_when_returning_results()
     {
         $this->ldap->getEncoding()->willReturn('UTF-8');
-        $this->ldap->search(Argument::any(), Argument::any(), Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->ldap->execute(Argument::any())->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setMultivaluedAttributes(['otherHomePhone']);
 
-        $this->setAttributes(['otherHomePhone']);
-        $this->setBaseDn('dc=foo,dc=bar');
+        $this->operation->setAttributes(['otherHomePhone']);
+        $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->setLdapObjectSchemas($schema);
         $this->execute(HydratorFactory::TO_OBJECT)->first()->getOtherHomePhone()->shouldBeArray();
         $this->execute(HydratorFactory::TO_OBJECT)->last()->getOtherHomePhone()->shouldBeArray();
@@ -352,13 +323,13 @@ class LdapQuerySpec extends ObjectBehavior
             'lastName' => 'sn',
         ];
         $this->ldap->getEncoding()->willReturn('UTF-8');
-        $this->ldap->search(Argument::any(), ["givenName","sn"], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);
 
-        $this->setAttributes(['*']);
-        $this->setBaseDn('dc=foo,dc=bar');
+        $this->operation->setAttributes(['givenName','sn']);
+        $this->operation->setAttributes(['*']);
+        $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->setLdapObjectSchemas($schema);
         $this->getResult()->first()->toArray()->shouldHaveKeys(array_keys($map));
     }
@@ -377,13 +348,12 @@ class LdapQuerySpec extends ObjectBehavior
             'lastName' => 'sn',
         ];
         $this->ldap->getEncoding()->willReturn('UTF-8');
-        $this->ldap->search(Argument::any(), ['*'], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);
 
-        $this->setAttributes(['**']);
-        $this->setBaseDn('dc=foo,dc=bar');
+        $this->operation->setAttributes(['**']);
+        $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->setLdapObjectSchemas($schema);
         $this->getResult()->first()->toArray()->shouldHaveKeys($attributes);
     }
@@ -402,14 +372,13 @@ class LdapQuerySpec extends ObjectBehavior
             'lastName' => 'sn',
         ];
         $this->ldap->getEncoding()->willReturn('UTF-8');
-        $this->ldap->search(Argument::any(), ['*'], Argument::any(), Argument::any(), Argument::any())
-            ->willReturn($this->ldapEntries);
+        $this->ldap->execute($this->operation)->willReturn($this->ldapEntries);
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap($map);
 
         $this->setOrderBy(['firstName' => 'ASC']);
-        $this->setAttributes(['**']);
-        $this->setBaseDn('dc=foo,dc=bar');
+        $this->operation->setAttributes(['**']);
+        $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->setLdapObjectSchemas($schema);
         $this->getResult()->first()->toArray()->shouldHaveKeys($attributes);
     }

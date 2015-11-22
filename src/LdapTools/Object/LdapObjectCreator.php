@@ -17,6 +17,7 @@ use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectCreationEvent;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Operation\AddOperation;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\LdapUtilities;
@@ -232,7 +233,7 @@ class LdapObjectCreator
         $attributes = $hydrator->hydrateToLdap($this->attributes);
 
         $dn = $this->getDnToUse($attributes);
-        $this->connection->add($dn, $attributes);
+        $this->connection->execute((new AddOperation())->setDn($dn)->setAttributes($attributes));
         $this->triggerAfterCreationEvent($dn);
     }
 

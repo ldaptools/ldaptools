@@ -188,4 +188,18 @@ class LdapUtilities
 
         return is_array($hosts) ? array_column($hosts, 'target') : [];
     }
+
+    /**
+     * Given a full escaped DN return the RDN in escaped form.
+     *
+     * @param string $dn
+     * @return string
+     */
+    public static function getRdnFromDn($dn)
+    {
+        $rdn = self::explodeDn($dn, 0)[0];
+        $rdn = explode('=', $rdn, 2);
+
+        return $rdn[0].'='.self::escapeValue($rdn[1], null, LDAP_ESCAPE_DN);
+    }
 }

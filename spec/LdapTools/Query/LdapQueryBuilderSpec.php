@@ -17,9 +17,9 @@ use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Builder\ADFilterBuilder;
 use LdapTools\Query\Builder\FilterBuilder;
-use LdapTools\Query\LdapQuery;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -143,14 +143,14 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_set_the_scope_types_correctly()
     {
-        $this->setScopeBase()->getScope()->shouldBeEqualTo(LdapQuery::SCOPE_BASE);
-        $this->setScopeOneLevel()->getScope()->shouldBeEqualTo(LdapQuery::SCOPE_ONELEVEL);
-        $this->setScopeSubTree()->getScope()->shouldBeEqualTo(LdapQuery::SCOPE_SUBTREE);
+        $this->setScopeBase()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['BASE']);
+        $this->setScopeOneLevel()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
+        $this->setScopeSubTree()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['SUBTREE']);
     }
 
     function it_should_set_subtree_as_the_default_scope()
     {
-        $this->getScope()->shouldBeEqualTo(LdapQuery::SCOPE_SUBTREE);
+        $this->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['SUBTREE']);
     }
 
     function it_should_return_ADFilterBuilder_when_calling_filter_and_the_ldap_type_is_ActiveDirectory()
@@ -306,5 +306,29 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
         $this->from($schema);
         $this->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=foo)(objectClass=bar)))');
+    }
+
+    function it_should_pass_operation_options_on_to_the_LdapQuery_class_correctly()
+    {
+        $attributes = ['foo', 'bar'];
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectClass('user');
+        $schema->setObjectCategory('person');
+        $schema->setAttributesToSelect($attributes);
+
+        $this->select();
+        $this->from($schema);
+        $this->setScopeOneLevel();
+        $this->setBaseDn('ou=stuff,dc=foo,dc=bar');
+        $this->setPageSize('9001');
+
+        $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo($attributes);
+        $this->getLdapQuery()->getQueryOperation()->getBaseDn()->shouldBeEqualTo('ou=stuff,dc=foo,dc=bar');
+        $this->getLdapQuery()->getQueryOperation()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
+        $this->getLdapQuery()->getQueryOperation()->getPageSize()->shouldBeEqualTo('9001');
+        $this->getLdapQuery()->getQueryOperation()->getFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+
+        $this->select('foo');
+        $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo(['foo']);
     }
 }

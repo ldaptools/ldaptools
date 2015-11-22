@@ -122,4 +122,9 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this->isValidAttributeFormat('им=я')->shouldBeEqualTo(false);
         $this->isValidAttributeFormat('名(字')->shouldBeEqualTo(false);
     }
+
+    function it_should_get_the_rdn_from_a_dn()
+    {
+        $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');
+    }
 }

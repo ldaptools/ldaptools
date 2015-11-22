@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -19,37 +20,25 @@ class ConvertGPLinkSpec extends ObjectBehavior
 {
     protected $connection;
 
-    protected $expectedCurrentValueSearch = [
-        '(&(distinguishedName=ou=foo,dc=foo,dc=bar))',
-        ['gPLink'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedCurrentValueSearch;
 
-    protected $expectedDNSearch = [
-        '(&(|(displayName=Foo)(displayName=Bar)))',
-        ['distinguishedname'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedDNSearch;
 
-    protected $expectedDisplaySearch = [
-        '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)))',
-        ['displayname'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedDisplaySearch;
 
-    protected $expectedSingleDisplaySearch = [
-        '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))',
-        ['displayname'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedSingleDisplaySearch;
 
     protected $expectedDNResult = [
         'count' => 2,
@@ -123,6 +112,23 @@ class ConvertGPLinkSpec extends ObjectBehavior
      */
     function let($connection)
     {
+        $this->expectedDisplaySearch = (new QueryOperation())
+            ->setFilter('(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)))')
+            ->setAttributes(['displayname'])
+            ->setScope(QueryOperation::SCOPE['SUBTREE']);
+        $this->expectedSingleDisplaySearch = (new QueryOperation())
+            ->setFilter('(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))')
+            ->setAttributes(['displayname'])
+            ->setScope(QueryOperation::SCOPE['SUBTREE']);
+        $this->expectedDNSearch = (new QueryOperation())
+            ->setFilter('(&(|(displayName=Foo)(displayName=Bar)))')
+            ->setAttributes(['distinguishedname'])
+            ->setScope(QueryOperation::SCOPE['SUBTREE']);
+        $this->expectedCurrentValueSearch = (new QueryOperation())
+            ->setFilter('(&(distinguishedName=ou=foo,dc=foo,dc=bar))')
+            ->setAttributes(['gPLink'])
+            ->setScope(QueryOperation::SCOPE['SUBTREE']);
+
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
         $this->connection = $connection;
         $this->setLdapConnection($connection);
@@ -143,17 +149,17 @@ class ConvertGPLinkSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        $this->connection->search(...$this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
+        $this->connection->execute($this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
         $this->fromLdap([implode('', $this->gPLinks)])->shouldBeEqualTo(['Foo','Bar']);
 
-        $this->connection->search(...$this->expectedSingleDisplaySearch)->willReturn($this->expectedSingleDisplayResult);
+        $this->connection->execute($this->expectedSingleDisplaySearch)->willReturn($this->expectedSingleDisplayResult);
         $this->fromLdap($this->gPLinks[0])->shouldBeEqualTo(['Foo']);
     }
 
     function it_should_convert_an_array_of_GPO_names_to_a_bracket_encased_dn_string_form_for_ldap()
     {
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedDNSearch)->willReturn($this->expectedDNResult);
+        $this->connection->execute($this->expectedDNSearch)->willReturn($this->expectedDNResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->toLdap(['Foo','Bar'])->shouldBeEqualTo(implode('', $this->gPLinks));
@@ -163,13 +169,13 @@ class ConvertGPLinkSpec extends ObjectBehavior
     {
         // This is starting to get really pug fugly...
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedCurrentValueSearch)->willReturn($this->expectedCurrentValueResult);
-        $this->connection->search(...$this->expectedDNSearch)->willReturn($this->expectedDNResult);
-        $this->connection->search(...$this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
-        $search = $this->expectedDNSearch;
-        $search[0] = '(&(|(displayName=Foo)(displayName=Bar)(displayName=FooBar)))';
-        $anotherSearch = $this->expectedDNSearch;
-        $anotherSearch[0] = '(&(|(displayName=Bar)(displayName=FooBar)))';
+        $this->connection->execute($this->expectedCurrentValueSearch)->willReturn($this->expectedCurrentValueResult);
+        $this->connection->execute($this->expectedDNSearch)->willReturn($this->expectedDNResult);
+        $this->connection->execute($this->expectedDisplaySearch)->willReturn($this->expectedDisplayResult);
+        $search = clone $this->expectedDNSearch;
+        $search->setFilter('(&(|(displayName=Foo)(displayName=Bar)(displayName=FooBar)))');
+        $anotherSearch = clone $this->expectedDNSearch;
+        $anotherSearch->setFilter('(&(|(displayName=Bar)(displayName=FooBar)))');
         $result = $this->expectedDNResult;
         $result['count'] = '3';
         $result[] = [
@@ -190,8 +196,8 @@ class ConvertGPLinkSpec extends ObjectBehavior
             'count' => 2,
             'dn' => "cn={8E1F85EB-4882-4920-88A5-CF52F31D8D32},cn=policies,cn=system,DC=example,DC=local",
         ];
-        $this->connection->search(...$search)->willReturn($result);
-        $this->connection->search(...$anotherSearch)->willReturn($anotherResult);
+        $this->connection->execute($search)->willReturn($result);
+        $this->connection->execute($anotherSearch)->willReturn($anotherResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setBatch(new Batch(Batch::TYPE['ADD'],'gpoLinks',['FooBar']));

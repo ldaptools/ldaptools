@@ -4,55 +4,169 @@ objects:
         class: user
         category: person
         repository: '\Foo\Bar'
+        converter_options:
+            user_account_control:
+                defaultValue: '512'
+                uacMap:
+                    disabled: '2'
+                    passwordIsReversible: '128'
+                    passwordNeverExpires: '65536'
+                    smartCardRequired: '262144'
+                    trustedForAllDelegation: '524288'
+                    trustedForAnyAuthDelegation: '16777216'
+            group_membership:
+                groups:
+                    attribute: sAMAccountName
+                    to_attribute: member
+                    filter:
+                        objectClass: group
+            value_to_dn:
+                exchangeMailboxDatabase:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchMDB
+                exchangePolicyActiveSync:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchMobileMailboxPolicy
+                exchangePolicyRBAC:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchRBACPolicy
+                exchangePolicyRetention:
+                    attribute: cn
+                    filter:
+                        objectClass: msExchRecipientPolicy
+                exchangeSendOnBehalfOf:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: person
+                manager:
+                    display_dn: true
+                    attribute: sAMAccountName
+                    or_filter: true
+                    filter:
+                        objectClass: contact
+                        objectCategory: person
+            exchange_proxy_address:
+                addressType:
+                    exchangeSmtpAddresses: 'smtp'
+                    exchangeDefaultSmtpAddress: 'smtp'
+                default:
+                    - 'exchangeDefaultSmtpAddress'
         converters:
-            windows_time:
-                - 'created'
-                - 'modified'
-            encode_windows_password:
-                - 'password'
-            windows_sid:
-                - 'sid'
-                - 'guid'
-            windows_guid:
-                - 'guid'
+             bool:
+                 - 'exchangeHideFromGAL'
+             int:
+                 - 'badPasswordCount'
+                 - 'employeeNumber'
+             windows_guid:
+                 - 'exchangeMailboxGuid'
+                 - 'guid'
+             encode_windows_password:
+                 - 'password'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+             windows_time:
+                 - 'passwordLastSet'
+             user_account_control:
+                 - 'disabled'
+                 - 'passwordIsReversible'
+                 - 'passwordNeverExpires'
+                 - 'smartCardRequired'
+                 - 'trustedForAllDelegation'
+                 - 'trustedForAnyAuthDelegation'
+             password_must_change: [ passwordMustChange ]
+             value_to_dn:
+                - 'exchangeMailboxDatabase'
+                - 'exchangePolicyRBAC'
+                - 'exchangePolicyActiveSync'
+                - 'exchangePolicyRetention'
+                - 'groups'
+                - 'manager'
+             exchange_proxy_address:
+                - 'exchangeSmtpAddresses'
+                - 'exchangeDefaultSmtpAddress'
+             logon_workstations: [ logonWorkstations ]
+             account_expires: [ accountExpirationDate ]
+             primary_group: [ primaryGroup ]
         attributes:
-            firstName: givenName
-            lastName: sn
-            initials: initials
-            displayName: displayname
-            description: description
-            emailAddress: mail
-            streetAddress: streetAddress
+            accountExpirationDate: accountExpires
+            badPasswordCount: badPwdCount
             city: l
-            state: st
-            zipCode: postalCode
-            poBox: postOfficeBox
-            country: c
-            office: physicalDeliveryOfficeName
             company: company
+            country: c
+            created: whenCreated
             department: department
+            description: description
+            division: division
+            disabled: userAccountControl
+            displayName: displayname
+            dn: distinguishedName
+            emailAddress: mail
+            employeeId: employeeId
+            employeeNumber: employeeNumber
+            exchangeAlias: mailNickname
+            exchangeHideFromGAL: msExchHideFromAddressLists
+            exchangeMailboxDatabase: homeMDB
+            exchangeMailboxGuid: msExchMailboxGUID
+            exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
+            exchangePolicyRBAC: msExchRBACPolicyLink
+            exchangePolicyRetention: msExchMailboxTemplateLink
+            exchangeSendOnBehalfOf: publicDelegates
+            exchangeSmtpAddresses: proxyAddresses
+            exchangeDefaultSmtpAddress: proxyAddresses
+            fax: facsimileTelephoneNumber
+            firstName: givenName
+            groups: memberOf
+            guid: objectGuid
             homeDirectory: homeDirectory
             homeDrive: homeDrive
+            homePage: wWWHomePage
+            homePhone: homePhone
+            initials: initials
+            ipPhone: ipPhone
+            lastName: sn
+            logonWorkstations: userWorkstations
+            manager: manager
+            middleName: middleName
+            mobilePhone: mobile
+            modified: whenChanged
+            name: cn
+            office: physicalDeliveryOfficeName
+            organization: o
+            otherFaxes: otherFacsimileTelephoneNumber
+            otherHomePhones: otherHomePhone
+            otherIpPhones: otherIpPhone
+            otherPagers: otherPager
+            otherPhoneNumbers: otherTelephoneNumber
+            pager: pager
+            password: unicodePwd
+            passwordIsReversible: userAccountControl
+            passwordLastSet: pwdLastSet
+            passwordNeverExpires: userAccountControl
+            passwordMustChange: pwdLastSet
+            phoneNumber: telephoneNumber
+            poBox: postOfficeBox
+            primaryGroup: primaryGroupID
             profilePath: profilePath
             scriptPath: scriptPath
-            userPrincipalName: userPrincipalName
-            title: title
-            phoneNumber: telephoneNumber
-            cellPhone: mobile
-            ipPhone: ipPhone
-            pager: pager
-            fax: facsimileTelephoneNumber
-            homePhone: homePhone
-            webPage: wWWHomePage
-            enabled: userAccountControl
-            changePassword: pwdLastSet
-            password: unicodePwd
-            modified: whenChanged
-            created: whenCreated
+            servicePrincipalNames: servicePrincipalName
             sid: objectSid
-            guid: objectGuid
-            name: cn
+            smartCardRequired: userAccountControl
+            state: st
+            streetAddress: streetAddress
+            title: title
+            trustedForAllDelegation: userAccountControl
+            trustedForAnyAuthDelegation: userAccountControl
             username: sAMAccountName
+            upn: userPrincipalName
+            zipCode: postalCode
+        # These attributes will be forced into an array regardless of the number of results they return.
         multivalued_attributes:
             - otherHomePhone
         default_values:
@@ -60,8 +174,9 @@ objects:
             displayName: "%username%"
             firstName: "%username%"
             upn: "%username%@%_domainname_%"
-            userAccountControl: "512"
+            disabled: false
             objectclass: [ 'top', 'person', 'organizationalPerson', 'user' ]
+            userAccountControl: "512"
         required_attributes:
             - 'username'
             - 'password'

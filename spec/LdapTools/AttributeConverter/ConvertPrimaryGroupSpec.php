@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -32,7 +33,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $connection->search('(&(distinguishedName='.$this->dn.'))', ['objectSid'], null, 'subtree', null)
+        $connection->execute((new QueryOperation())->setFilter('(&(distinguishedName='.$this->dn.'))')->setAttributes(['objectSid']))
             ->willReturn([ 'count' => 1, [
                 "objectsid" => [
                     "count" => 1,
@@ -42,7 +43,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 'count' => 1,
                 'dn' => $this->dn,
             ]]);
-        $connection->search('(&(objectSid='.$this->groupSidHex.'))', ['cn'], null, 'subtree', null)
+        $connection->execute((new QueryOperation())->setFilter('(&(objectSid='.$this->groupSidHex.'))')->setAttributes(['cn']))
             ->willReturn([ 'count' => 1, [
                 "cn" => [
                     "count" => 1,
@@ -52,7 +53,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
             ]]);
-        $connection->search('(&(objectClass=group)(cn=Domain Users)(member='.$this->dn.')(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
+        $connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(member='.$this->dn.')(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
             ->willReturn([ 'count' => 1, [
                 "objectSid" => [
                     "count" => 1,
@@ -62,7 +63,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
             ]]);
-        $connection->search('(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
+        $connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
             ->willReturn([ 'count' => 0]);
         $connection->getLdapType()->willReturn('ad');
     }
@@ -92,7 +93,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
 
     function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification()
     {
-        $this->connection->search('(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))', ['objectSid'], null, 'subtree', null)
+        $this->connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
             ->willReturn([ 'count' => 1, [
                 "objectSid" => [
                     "count" => 1,

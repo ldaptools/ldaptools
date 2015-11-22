@@ -18,6 +18,7 @@ use LdapTools\Exception\LdapQueryException;
 use LdapTools\Exception\MultiResultException;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Object\LdapObjectCollection;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -28,32 +29,12 @@ use LdapTools\Schema\LdapObjectSchema;
 class LdapQuery
 {
     /**
-     * A subtree scope queries the complete directory from the base dn.
-     */
-    const SCOPE_SUBTREE = 'subtree';
-
-    /**
-     * A single level scope queries the directory one level from the base dn.
-     */
-    const SCOPE_ONELEVEL = 'onelevel';
-
-    /**
-     * A base scope reads the entry from the base dn.
-     */
-    const SCOPE_BASE = 'base';
-
-    /**
      * The valid ordering types for data hydrated from LDAP.
      */
     const ORDER = [
         'ASC' => 'ASC',
         'DESC' => 'DESC',
     ];
-
-    /**
-     * @var string The scope level for the search.
-     */
-    protected $scope = self::SCOPE_SUBTREE;
 
     /**
      * @var LdapConnectionInterface
@@ -71,29 +52,14 @@ class LdapQuery
     protected $schemas = [];
 
     /**
-     * @var array The LDAP attribute names to retrieve as passed to this query.
+     * @var QueryOperation|null
      */
-    protected $attributes = [];
+    protected $operation;
 
     /**
      * @var array The attributes to order by, if any. They will be in ['attribute' => 'ASC'] form.
      */
     protected $orderBy = [];
-
-    /**
-     * @var null|string The BaseDN search scope.
-     */
-    protected $baseDn = null;
-
-    /**
-     * @var null|int The paging size to use.
-     */
-    protected $pageSize = null;
-
-    /**
-     * @var string The LDAP filter.
-     */
-    protected $ldapFilter = '';
 
     /**
      * @param LdapConnectionInterface $ldap
@@ -155,14 +121,14 @@ class LdapQuery
      */
     public function getSingleScalarResult()
     {
-        if (count($this->getAttributes()) !== 1 || $this->isWildCardSelection()) {
-            $selected = $this->isWildCardSelection() ? 'All' : count($this->getAttributes());
+        if (count($this->operation->getAttributes()) !== 1 || $this->isWildCardSelection()) {
+            $selected = $this->isWildCardSelection() ? 'All' : count($this->operation->getAttributes());
             throw new LdapQueryException(sprintf(
                 'When retrieving a single value you should only select a single attribute. %s are selected.',
                 $selected
             ));
         }
-        $attribute = $this->getAttributes();
+        $attribute = $this->operation->getAttributes();
         $attribute = reset($attribute);
         $result = $this->getSingleResult();
 
@@ -222,6 +188,7 @@ class LdapQuery
     public function execute($hydratorType = HydratorFactory::TO_OBJECT)
     {
         $hydrator = $this->hydratorFactory->get($hydratorType);
+        $operatorAttributes = $this->operation->getAttributes();
         $attributes = $this->getAttributesToLdap($this->getSelectedAttributes());
 
         $hydrator->setLdapObjectSchemas(...$this->schemas);
@@ -230,132 +197,34 @@ class LdapQuery
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $hydrator->setOrderBy($this->orderBy);
 
-        return $hydrator->hydrateAllFromLdap($this->ldap->search(
-            $this->ldapFilter,
-            $attributes,
-            $this->baseDn,
-            $this->scope,
-            $this->pageSize
-        ));
+        $this->operation->setAttributes($attributes);
+        $results = $hydrator->hydrateAllFromLdap($this->ldap->execute($this->operation));
+        $this->operation->setAttributes($operatorAttributes);
+
+        return $results;
     }
 
     /**
-     * Set the LDAP filter.
+     * Set the query operation to run against LDAP.
      *
-     * @param string $ldapFilter
+     * @param QueryOperation $operation
      * @return $this
      */
-    public function setLdapFilter($ldapFilter)
+    public function setQueryOperation(QueryOperation $operation)
     {
-        $this->ldapFilter = $ldapFilter;
+        $this->operation = $operation;
 
         return $this;
     }
 
     /**
-     * The LDAP filter.
+     * Get the query operation that will run against LDAP.
      *
-     * @return string
+     * @return QueryOperation|null
      */
-    public function getLdapFilter()
+    public function getQueryOperation()
     {
-        return $this->ldapFilter;
-    }
-
-    /**
-     * Set the BaseDN search scope.
-     *
-     * @param string $baseDn
-     * @return $this
-     */
-    public function setBaseDn($baseDn)
-    {
-        $this->baseDn = $baseDn;
-
-        return $this;
-    }
-
-    /**
-     * The BaseDN search scope.
-     *
-     * @return null|string
-     */
-    public function getBaseDn()
-    {
-        return $this->baseDn;
-    }
-
-    /**
-     * Set the paging size.
-     *
-     * @param int $pageSize
-     * @return $this
-     */
-    public function setPageSize($pageSize)
-    {
-        $this->pageSize = $pageSize;
-
-        return $this;
-    }
-
-    /**
-     * The paging size.
-     *
-     * @return int|null
-     */
-    public function getPageSize()
-    {
-        return $this->pageSize;
-    }
-
-    /**
-     * Set the LDAP attributes to get.
-     *
-     * @param array $attributes
-     * @return $this
-     */
-    public function setAttributes(array $attributes)
-    {
-        $this->attributes = $attributes;
-
-        return $this;
-    }
-
-    /**
-     * The LDAP attributes to get.
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Set the scope for this query.
-     *
-     * @param string $scope One of the SCOPE_* constants.
-     * @return $this
-     */
-    public function setScope($scope)
-    {
-        if (!defined('self::'.strtoupper('SCOPE_'.$scope))) {
-            throw new \InvalidArgumentException(sprintf('The scope type "%s" is invalid.', $scope));
-        }
-
-        $this->scope = $scope;
-
-        return $this;
-    }
-
-    /**
-     * Get the current scope for this query.
-     *
-     * @return string
-     */
-    public function getScope()
-    {
-        return $this->scope;
+        return $this->operation;
     }
 
     /**
@@ -465,7 +334,7 @@ class LdapQuery
      */
     protected function getSelectedAttributes()
     {
-        $attributes = $this->attributes;
+        $attributes = $this->operation->getAttributes();
 
         // Interpret a single wildcard as only schema attributes.
         if (!empty($this->schemas) && !empty($attributes) && $attributes[0] == '*') {
@@ -484,6 +353,6 @@ class LdapQuery
      */
     protected function isWildCardSelection()
     {
-        return (count($this->attributes) === 1 && ($this->attributes[0] == '*' || $this->attributes[0] == '**'));
+        return (count($this->operation->getAttributes()) === 1 && ($this->operation->getAttributes()[0] == '*' || $this->operation->getAttributes()[0] == '**'));
     }
 }

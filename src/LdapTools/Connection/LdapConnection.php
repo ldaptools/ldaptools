@@ -15,7 +15,10 @@ use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
-use LdapTools\Query\LdapQuery;
+use LdapTools\Log\LdapLoggerInterface;
+use LdapTools\Log\LogOperation;
+use LdapTools\Operation\LdapOperationInterface;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -34,15 +37,6 @@ class LdapConnection implements LdapConnectionInterface
      * OpenLDAP connection.
      */
     const TYPE_OPENLDAP = 'openldap';
-
-    /**
-     * @var array Maps the scope type to the corresponding function of the LdapConnection
-     */
-    protected $scopeMap = [
-        'subtree' => 'ldap_search',
-        'onelevel' => 'ldap_list',
-        'base' => 'ldap_read',
-    ];
 
     /**
      * @var array These options will be set before the bind occurs.
@@ -103,15 +97,22 @@ class LdapConnection implements LdapConnectionInterface
     protected $dispatcher;
 
     /**
+     * @var LdapLoggerInterface|null
+     */
+    protected $logger;
+
+    /**
      * @param DomainConfiguration $config
      * @param EventDispatcherInterface $dispatcher
+     * @param LdapLoggerInterface $logger
      */
-    public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null)
+    public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null)
     {
         $this->usernameFormatter = BindUserStrategy::getInstance($config);
         $this->serverPool = new LdapServerPool($config);
         $this->config = $config;
         $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
+        $this->logger = $logger;
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());
         if (!$config->getLazyBind()) {
@@ -295,67 +296,41 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * {@inheritdoc}
+     * @param LdapOperationInterface $operation
+     * @return array|mixed
+     * @throws LdapConnectionException
      */
-    public function search($ldapFilter, array $attributes = [], $baseDn = null, $scope = 'subtree', $pageSize = null)
+    public function execute(LdapOperationInterface $operation)
     {
-        $searchMethod = $this->getLdapFunctionForScope($scope);
-        $baseDn = !is_null($baseDn) ? $baseDn : $this->getBaseDn();
-        $pageSize = !is_null($pageSize) ? $pageSize : $this->getPageSize();
+        $log = $this->logger ? (new LogOperation($operation))->setDomain($this->config->getDomainName()) : null;
 
+        try {
+            return $this->getLdapResponse($operation, $log);
+        } catch (\Throwable $e) {
+            $this->logExceptionAndThrow($e, $log);
+        } catch (\Exception $e) {
+            $this->logExceptionAndThrow($e, $log);
+        } finally {
+            $this->log($log, false);
+        }
+    }
+
+    protected function query(QueryOperation $operation)
+    {
         $allEntries = [];
+
         // If this is not a paged search then set this to null so it ends the loop on the first pass.
         $cookie = $this->pagedResults ? '' : null;
         do {
-            $this->setPagedResultsControl($pageSize, $cookie, $scope);
+            $this->setPagedResultsControl($operation->getPageSize(), $cookie, $operation->getScope());
 
-            $result = @$searchMethod($this->connection, $baseDn, $ldapFilter, $attributes);
+            $result = @call_user_func($operation->getLdapFunction(), $this->connection, ...$operation->getArguments());
             $allEntries = $this->processSearchResult($result, $allEntries);
 
-            $this->setPagedResultsResponse($result, $cookie, $scope);
+            $this->setPagedResultsResponse($result, $cookie, $operation->getScope());
         } while ($cookie !== null && $cookie != '');
 
         return $allEntries;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function add($dn, array $entry)
-    {
-        if (!@ldap_add($this->connection, $dn, $entry)) {
-            throw new LdapConnectionException(sprintf('Unable to add LDAP object: %s', $this->getLastError()));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function delete($dn)
-    {
-        if (!@ldap_delete($this->connection, $dn)) {
-            throw new LdapConnectionException(sprintf('Unable to delete LDAP object: %s', $this->getLastError()));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function move($dn, $newRdn, $container, $deleteOldRdn = true)
-    {
-        if (!@ldap_rename($this->connection, $dn, $newRdn, $container, $deleteOldRdn)) {
-            throw new LdapConnectionException(sprintf('Unable to move LDAP object: %s', $this->getLastError()));
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function modifyBatch($dn, array $entries)
-    {
-        if (!@ldap_modify_batch($this->connection, $dn, $entries)) {
-            throw new LdapConnectionException(sprintf('Unable to batch modify LDAP object: %s', $this->getLastError()));
-        }
     }
 
     /**
@@ -367,20 +342,18 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Given a scope type, get the corresponding LDAP function to use.
+     * Looks for some needed query parameters and sets the defaults for this connection if they are not provided.
      *
-     * @param string $scope
-     * @return string
+     * @param QueryOperation $operation
      */
-    protected function getLdapFunctionForScope($scope)
+    protected function setQueryOperationDefaults(QueryOperation $operation)
     {
-        if (!isset($this->scopeMap[$scope])) {
-            throw new \InvalidArgumentException(sprintf(
-                'Scope type "%s" is invalid. See LdapQuery::SCOPE_* constants for valid types.', $scope
-            ));
+        if (is_null($operation->getPageSize())) {
+            $operation->setPageSize($this->getPageSize());
         }
-
-        return $this->scopeMap[$scope];
+        if (is_null($operation->getBaseDn())) {
+            $operation->setBaseDn($this->getBaseDn());
+        }
     }
 
     /**
@@ -459,9 +432,9 @@ class LdapConnection implements LdapConnectionInterface
      */
     protected function setPagedResultsControl($pageSize, &$cookie, $scope)
     {
-        if ($scope !== LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
-        } elseif ($scope == LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result($this->connection, 0)) {
+        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result($this->connection, 0)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results for read operation: %s',
                 $this->getLastError()
@@ -479,7 +452,7 @@ class LdapConnection implements LdapConnectionInterface
      */
     protected function setPagedResultsResponse($result, &$cookie, $scope)
     {
-        if ($scope !== LdapQuery::SCOPE_BASE && $this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->pagedResults && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->getLastError())
             );
@@ -506,5 +479,70 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         return $allEntries;
+    }
+
+    /**
+     * Send the operation to the logger if it exists.
+     *
+     * @param LogOperation $log
+     * @param bool $start If true, this is the start of the logging. If false it is the end.
+     */
+    protected function log(LogOperation $log = null, $start = true)
+    {
+        if ($this->logger && $log && $start) {
+            $this->logger->start($log);
+        } elseif ($this->logger && $log && !$start) {
+            $this->logger->end($log->stop());
+        }
+    }
+
+    /**
+     * Handles exception error message logging if logging is enabled then re-throws the exception.
+     *
+     * @param LogOperation|null $log
+     * @param \Throwable|\Exception $exception
+     * @throws LdapConnectionException
+     * @throws null
+     */
+    protected function logExceptionAndThrow($exception, LogOperation $log = null)
+    {
+        if (!is_null($log)) {
+            $log->setError($exception->getMessage());
+        }
+
+        // It's possible for a query operation to fail before it even begins. Trigger the log start if so.
+        if ($log && $log->getStartTime() === null) {
+            $this->log($log);
+        }
+
+        throw $exception;
+    }
+
+    /**
+     * @param LdapOperationInterface $operation
+     * @param LogOperation|null $log
+     * @return array|mixed
+     * @throws LdapConnectionException
+     */
+    protected function getLdapResponse(LdapOperationInterface $operation, LogOperation $log = null)
+    {
+        if ($operation instanceof QueryOperation) {
+            $this->setQueryOperationDefaults($operation);
+            $this->log($log);
+            $result = $this->query($operation);
+        } else {
+            $this->log($log);
+            $result = @call_user_func($operation->getLdapFunction(), $this->connection, ...$operation->getArguments());
+        }
+
+        if ($result === false) {
+            throw new LdapConnectionException(sprintf(
+                'LDAP %s Operation Error: %s',
+                $operation->getName(),
+                $this->getLastError()
+            ));
+        }
+
+        return $result;
     }
 }

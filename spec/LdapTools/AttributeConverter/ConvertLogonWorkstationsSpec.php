@@ -12,7 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
-use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -75,7 +75,7 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute((new QueryOperation())->setAttributes(['userWorkstations'])->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))'))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setBatch(new Batch(Batch::TYPE['ADD'],'logonWorkstations',['pc1']));

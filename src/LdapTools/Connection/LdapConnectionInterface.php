@@ -10,7 +10,7 @@
 
 namespace LdapTools\Connection;
 
-use LdapTools\Query\LdapQuery;
+use LdapTools\Operation\LdapOperationInterface;
 
 /**
  * An interface for LDAP Connection classes.
@@ -59,52 +59,12 @@ interface LdapConnectionInterface
     public function authenticate($username, $password, &$errorMessage = false, &$errorNumber = false);
 
     /**
-     * Perform a query against LDAP.
+     * Execute an operation against LDAP (Add, Modify, Delete, Move, Query, etc).
      *
-     * @param string $ldapFilter The LDAP filter string.
-     * @param array $attributes The attributes to retrieve.
-     * @param null|string $baseDn The Base DN for the search.
-     * @param string $scope The scope of the query.
-     * @param null|int $pageSize The page size to use.
-     * @return array The entries from LDAP.
+     * @param LdapOperationInterface $operation
+     * @return mixed
      */
-    public function search($ldapFilter, array $attributes = [], $baseDn = null, $scope = LdapQuery::SCOPE_SUBTREE, $pageSize = null);
-
-    /**
-     * Adds a LDAP entry to the directory.
-     *
-     * @param string $dn The full distinguished name of the entry.
-     * @param array $entry An array of attributes for the entry.
-     * @return bool
-     */
-    public function add($dn, array $entry);
-
-    /**
-     * Delete a LDAP entry from the directory.
-     *
-     * @param string $dn The full distinguished name of the entry.
-     * @return bool
-     */
-    public function delete($dn);
-
-    /**
-     * Modify a LDAP entry from the directory using the ldap_modify_batch specification.
-     *
-     * @param string $dn The full distinguished name of the entry.
-     * @param array $entries The ldap_modify_batch array specification of changes to perform.
-     * @return bool
-     */
-    public function modifyBatch($dn, array $entries);
-
-    /**
-     * Moves a LDAP object to a new location in the directory.
-     *
-     * @param string $dn The full distinguished name of the entry.
-     * @param string $newRdn The RDN of the entry (ie. 'cn=user').
-     * @param string $container The path for the OU/container (ie. 'ou=Employees,dc=example,dc=local').
-     * @param bool $deleteOldRdn
-     */
-    public function move($dn, $newRdn, $container, $deleteOldRdn = true);
+    public function execute(LdapOperationInterface $operation);
 
     /**
      * If the connection is bound, this closes the LDAP connection.

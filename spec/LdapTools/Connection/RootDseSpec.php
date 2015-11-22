@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Connection;
 
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -42,7 +43,7 @@ class RootDseSpec extends ObjectBehavior
      */
     function let($connection, $dispatcher)
     {
-        $connection->search("(&(objectClass=*))", ["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"], "", "base", null)
+        $connection->execute((new QueryOperation())->setFilter("(&(objectClass=*))")->setAttributes(["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"])->setBaseDn("")->setScope(QueryOperation::SCOPE['BASE']))
             ->willReturn($this->entry);
         $connection->__toString()->willReturn('example.local');
         $connection->getPagedResults()->willReturn(true);

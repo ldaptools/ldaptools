@@ -17,6 +17,7 @@ use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Log\LdapLoggerInterface;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCreator;
 use LdapTools\Object\LdapObjectManager;
@@ -76,12 +77,19 @@ class LdapManager
     protected $dispatcher;
 
     /**
+     * @var LdapLoggerInterface|null
+     */
+    protected $logger;
+
+    /**
      * @param Configuration $config
      * @param EventDispatcherInterface $dispatcher
+     * @param LdapLoggerInterface $logger
      */
-    public function __construct(Configuration $config, EventDispatcherInterface $dispatcher = null)
+    public function __construct(Configuration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null)
     {
         $this->config = $config;
+        $this->logger = $logger;
         $this->domains = $config->getDomainConfiguration();
 
         if (empty($this->domains)) {
@@ -142,7 +150,11 @@ class LdapManager
     public function getConnection()
     {
         if (!$this->connections[$this->context]) {
-            $this->connections[$this->context] = new LdapConnection($this->domains[$this->context]);
+            $this->connections[$this->context] = new LdapConnection(
+                $this->domains[$this->context],
+                $this->getEventDispatcher(),
+                $this->getLogger()
+            );
         }
 
         return $this->connections[$this->context];
@@ -303,6 +315,16 @@ class LdapManager
     public function getEventDispatcher()
     {
         return $this->dispatcher;
+    }
+
+    /**
+     * Get the LdapLogger in use (or null if none is set).
+     *
+     * @return LdapLoggerInterface|null
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**

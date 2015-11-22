@@ -81,11 +81,10 @@ class LdapObjectRepositorySpec extends ObjectBehavior
      */
     public function let($ldap)
     {
-        $attributes = ["cn", "givenName", "sn", "sAMAccountName", "mail", "distinguishedName", "objectGuid"];
         $config = new Configuration();
         $config->setCacheType('none');
         $this->ldap = $ldap;
-        $ldap->search(Argument::any(), $attributes, Argument::any(), Argument::any(), Argument::any())->willReturn($this->ldapEntries);
+        $ldap->execute(Argument::any())->willReturn($this->ldapEntries);
         $ldap->getLdapType()->willReturn(LdapConnection::TYPE_AD);
         $ldap->getEncoding()->willReturn('UTF-8');
 
@@ -108,7 +107,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $results['count'] = 1;
         unset($results[1]);
         $this->setAttributes(['guid']);
-        $this->ldap->search(Argument::any(), ['objectGuid'], Argument::any(), Argument::any(), Argument::any())->willReturn($results);
+        $this->ldap->execute(Argument::any())->willReturn($results);
         $this->findOneByGuid('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 

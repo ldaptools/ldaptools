@@ -13,19 +13,17 @@ namespace spec\LdapTools\Resolver;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Object\LdapObject;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class BatchValueResolverSpec extends ObjectBehavior
 {
-    protected $expectedSearch = [
-        '(&(distinguishedName=cn=foo,dc=foo,dc=bar))',
-        ['userAccountControl'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedSearch;
 
     protected $expectedResult = [
         'count' => 1,
@@ -86,6 +84,9 @@ class BatchValueResolverSpec extends ObjectBehavior
                 'defaultValue' => '512',
             ]
         ]);
+        $this->expectedSearch = (new QueryOperation())
+            ->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')
+            ->setAttributes(['userAccountControl']);
         $this->schema = $schema;
         $this->connection = $connection;
     }
@@ -130,7 +131,7 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
         $this->connection->getEncoding()->willReturn('UTF-8');
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
@@ -150,7 +151,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         $ldapObject->remove('disabled', true);
 
         $batch = $ldapObject->getBatchCollection();
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
@@ -166,7 +167,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         $ldapObject->add('trustedForAllDelegation', true);
 
         $batch = $ldapObject->getBatchCollection();
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->connection->getLdapType()->willReturn('ad');
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);

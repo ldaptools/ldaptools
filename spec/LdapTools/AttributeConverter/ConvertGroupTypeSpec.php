@@ -12,20 +12,18 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertGroupTypeSpec extends ObjectBehavior
 {
-    protected $connection;
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedSearch;
 
-    protected $expectedSearch = [
-        '(&(distinguishedName=cn=foo,dc=foo,dc=bar))',
-        ['groupType'],
-        null,
-        "subtree",
-        null,
-    ];
+    protected $connection;
 
     protected $expectedResult = [
         'count' => 1,
@@ -61,6 +59,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
                 'scopeUniversal' => '8',
             ],
         ];
+        $this->expectedSearch = (new QueryOperation())->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')->setAttributes(['groupType']);
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -117,7 +116,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
     {
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
@@ -133,7 +132,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('typeDistribution');
@@ -150,7 +149,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
         $this->toLdap(true)->shouldBeEqualTo('-2147483646');
@@ -161,7 +160,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
     {
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedSearch)->willReturn(['count' => 0]);
+        $this->connection->execute($this->expectedSearch)->willReturn(['count' => 0]);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
         $this->shouldThrow(new \RuntimeException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
@@ -179,7 +178,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('TypeSecuritY');
         $this->toLdap(true)->shouldBeEqualTo("-2147483646");

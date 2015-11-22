@@ -11,7 +11,7 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -19,13 +19,10 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 {
     protected $connection;
 
-    protected $expectedSearch = [
-        '(&(distinguishedName=cn=foo,dc=foo,dc=bar))',
-        ['userAccountControl'],
-        null,
-        "subtree",
-        null,
-    ];
+    /**
+     * @var QueryOperation
+     */
+    protected $expectedSearch;
 
     protected $expectedResult = [
         'count' => 1,
@@ -68,6 +65,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
             ],
             'defaultValue' => '512',
         ];
+        $this->expectedSearch = (new QueryOperation())->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')->setAttributes(['userAccountControl']);
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -119,7 +117,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('disabled');
@@ -133,7 +131,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('disabled');
@@ -149,7 +147,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($result);
+        $this->connection->execute($this->expectedSearch)->willReturn($result);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->toLdap(true)->shouldBeEqualTo('514');
@@ -161,7 +159,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($result);
+        $this->connection->execute($this->expectedSearch)->willReturn($result);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->toLdap(false)->shouldBeEqualTo('512');
@@ -170,7 +168,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
     function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
     {
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedSearch)->willReturn(['count' => 0]);
+        $this->connection->execute($this->expectedSearch)->willReturn(['count' => 0]);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->shouldThrow(new \RuntimeException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
@@ -190,7 +188,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->search(...$this->expectedSearch)->willReturn($result);
+        $this->connection->execute($this->expectedSearch)->willReturn($result);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('DisaBleD');
         $this->toLdap(false)->shouldBeEqualTo('512');

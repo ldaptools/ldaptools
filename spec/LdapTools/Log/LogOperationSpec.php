@@ -1,0 +1,68 @@
+<?php
+/**
+ * This file is part of the LdapTools package.
+ *
+ * (c) Chad Sikorra <Chad.Sikorra@gmail.com>
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
+ */
+
+namespace spec\LdapTools\Log;
+
+use LdapTools\Operation\QueryOperation;
+use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
+
+class LogOperationSpec extends ObjectBehavior
+{
+    /**
+     * @var QueryOperation
+     */
+    protected $operation;
+
+    public function let()
+    {
+        $this->operation = new QueryOperation();
+        $this->operation->setAttributes(['foo'])
+            ->setBaseDn('foo')
+            ->setFilter('(foo=bar)')
+            ->setPageSize(2000)
+            ->setScope(QueryOperation::SCOPE['SUBTREE']);
+        $this->beConstructedWith($this->operation);
+    }
+
+    function it_is_initializable()
+    {
+        $this->shouldHaveType('LdapTools\Log\LogOperation');
+    }
+
+    function it_should_have_a_start_time_value()
+    {
+        $this->getStartTime()->shouldNotBeEqualTo(null);
+    }
+
+    function it_should_set_the_domain()
+    {
+        $this->setDomain('example.local');
+        $this->getDomain()->shouldBeEqualTo('example.local');
+    }
+
+    function it_should_set_an_error_message()
+    {
+        $this->setError('foo');
+        $this->getError()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_set_a_stop_time()
+    {
+        $this->getStopTime()->shouldBeEqualTo(null);
+        $this->stop();
+        $this->getStopTime()->shouldNotBeEqualTo(null);
+    }
+
+    function it_should_get_the_ldap_operation()
+    {
+        $this->getOperation()->shouldBeEqualTo($this->operation);
+    }
+}

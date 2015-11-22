@@ -11,6 +11,9 @@ use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
+use LdapTools\Operation\BatchModifyOperation;
+use LdapTools\Operation\DeleteOperation;
+use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -72,7 +75,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->delete('cn=foo,dc=foo,dc=bar')->willReturn(null);
+        $connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
@@ -115,7 +118,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->modifyBatch('cn=foo,dc=foo,dc=bar', $batch)->willReturn(null);
+        $connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -141,7 +144,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $operation = (new RenameOperation())
+            ->setDn('cn=foo,dc=foo,dc=bar')
+            ->setNewLocation('ou=employees,dc=foo,dc=bar')
+            ->setNewRdn('cn=foo');
+        $connection->execute($operation)->willReturn(true);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -163,7 +170,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo\, bar,dc=foo,dc=bar', 'cn=foo\2c bar', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $operation = (new RenameOperation())
+            ->setDn('cn=foo\, bar,dc=foo,dc=bar')
+            ->setNewLocation('ou=employees,dc=foo,dc=bar')
+            ->setNewRdn('cn=foo\2c bar');
+        $connection->execute($operation)->willReturn(true);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -179,7 +190,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_move_an_object_without_a_schema_type()
     {
-        $this->connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $operation = (new RenameOperation())
+            ->setDn('cn=foo,dc=foo,dc=bar')
+            ->setNewLocation('ou=employees,dc=foo,dc=bar')
+            ->setNewRdn('cn=foo');
+        $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
@@ -188,15 +203,10 @@ class LdapObjectManagerSpec extends ObjectBehavior
     /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
-    function it_should_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected($connection, $dispatcher)
+    function it_should_not_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected($connection)
     {
-        $connection->getSchemaName()->willReturn('example');
-        $connection->getLdapType()->willReturn('ad');
-        $connection->__toString()->willReturn('example.com');
-        $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
-        $connection->search('(&(&(objectCategory=\70\65\72\73\6f\6e)(objectClass=\75\73\65\72))(&(dn=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))',["cn"], null,'subtree', null)->willReturn($this->ldapEntries);
-
+        $connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldNotBeCalled();
+        $connection->execute(Argument::type('\LdapTools\Operation\RenameOperation'))->shouldBeCalled();
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
@@ -222,7 +232,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getLdapType()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->delete('cn=foo,dc=foo,dc=bar')->willReturn(null);
+        $connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
@@ -242,6 +252,10 @@ class LdapObjectManagerSpec extends ObjectBehavior
      */
     function it_should_call_the_event_dispatcher_move_events_when_moving_an_object($connection, $dispatcher)
     {
+        $operation = (new RenameOperation())
+            ->setDn('cn=foo,dc=foo,dc=bar')
+            ->setNewLocation('ou=employees,dc=foo,dc=bar')
+            ->setNewRdn('cn=foo');
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
         $beforeEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
         $afterEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
@@ -249,7 +263,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getLdapType()->willReturn('ad');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->move('cn=foo,dc=foo,dc=bar', 'cn=foo', 'ou=employees,dc=foo,dc=bar')->willReturn(null);
+        $connection->execute($operation)->willReturn(true);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
@@ -293,7 +307,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->getSchemaName()->willReturn('example');
         $connection->__toString()->willReturn('example.com');
         $connection->getEncoding()->willReturn('UTF-8');
-        $connection->modifyBatch('cn=foo,dc=foo,dc=bar', $batch)->willReturn(null);
+        $connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
@@ -320,7 +334,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_not_try_to_modify_an_ldap_object_that_has_not_changed()
     {
         $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], [], 'user', 'user');
-        $this->connection->modifyBatch(Argument::any(), Argument::any())->shouldNotBeCalled();
+        $this->connection->execute(Argument::any())->shouldNotBeCalled();
 
         $this->persist($ldapObject);
     }
@@ -353,7 +367,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], ['user'], 'user', '');
         $ldapObject->set('foo', 'bar');
 
-        $this->connection->modifyBatch("cn=user,dc=foo,dc=bar", [["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]])->shouldBeCalled();
+        $this->connection->execute((new BatchModifyOperation())->setDn("cn=user,dc=foo,dc=bar")->setBatch([["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]]))->shouldBeCalled();
         $this->persist($ldapObject);
     }
 }

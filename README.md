@@ -202,5 +202,4 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 Things that still need to be implemented:
 
 * Automatic generation of the schema based off of information in LDAP.
-* A logging mechanism.
 * More work needed on the OpenLDAP schema.

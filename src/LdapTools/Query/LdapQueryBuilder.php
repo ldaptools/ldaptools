@@ -14,6 +14,7 @@ use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Hydrator\OperatorCollectionHydrator;
 use LdapTools\Object\LdapObjectType;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Builder\ADFilterBuilder;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\Operator\BaseOperator;
@@ -47,24 +48,9 @@ class LdapQueryBuilder
     protected $connection;
 
     /**
-     * @var string The base DN for the query.
+     * @var QueryOperation The operation that will eventually be sent to the LDAP connection.
      */
-    protected $baseDn = null;
-
-    /**
-     * @var int The page size for the search.
-     */
-    protected $pageSize = null;
-
-    /**
-     * @var string The LDAP query filter string.
-     */
-    protected $filter = '';
-
-    /**
-     * @var array The LDAP attributes for the operation explicitly called for selection.
-     */
-    protected $attributes = [];
+    protected $operation;
 
     /**
      * @var array The combined default attributes to select from each schema.
@@ -107,11 +93,6 @@ class LdapQueryBuilder
     protected $filterBuilder;
 
     /**
-     * @var string The LDAP scope of the query (ie. subtree, onelevel, base).
-     */
-    protected $scope = LdapQuery::SCOPE_SUBTREE;
-
-    /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
      */
@@ -119,6 +100,7 @@ class LdapQueryBuilder
     {
         $this->connection = $connection;
         $this->schemaFactory = $schemaFactory;
+        $this->operation = new QueryOperation();
 
         if ($connection && $connection->getLdapType() == LdapConnection::TYPE_AD) {
             $this->filterBuilder = new ADFilterBuilder();
@@ -137,7 +119,7 @@ class LdapQueryBuilder
      */
     public function setBaseDn($baseDn)
     {
-        $this->baseDn = $baseDn;
+        $this->operation->setBaseDn($baseDn);
 
         return $this;
     }
@@ -147,7 +129,7 @@ class LdapQueryBuilder
      */
     public function getBaseDn()
     {
-        return $this->baseDn;
+        return $this->operation->getBaseDn();
     }
 
     /**
@@ -155,7 +137,7 @@ class LdapQueryBuilder
      */
     public function getPageSize()
     {
-        return $this->pageSize;
+        return $this->operation->getPageSize();
     }
 
     /**
@@ -163,7 +145,7 @@ class LdapQueryBuilder
      */
     public function setPageSize($pageSize)
     {
-        $this->pageSize = $pageSize;
+        $this->operation->setPageSize($pageSize);
     }
 
     /**
@@ -178,7 +160,7 @@ class LdapQueryBuilder
         if (!(is_array($attributes) || is_string($attributes))) {
             throw new \InvalidArgumentException('The attributes to select should either be a string or an array');
         }
-        $this->attributes = is_array($attributes) ? $attributes : [ $attributes ];
+        $this->operation->setAttributes(is_array($attributes) ? $attributes : [ $attributes ]);
 
         return $this;
     }
@@ -322,6 +304,7 @@ class LdapQueryBuilder
      *
      * @param string $attribute The attribute name
      * @param string $direction Either 'ASC' or 'DESC'. Defaults to 'ASC'.
+     * @return $this
      */
     public function orderBy($attribute, $direction = LdapQuery::ORDER['ASC'])
     {
@@ -335,6 +318,7 @@ class LdapQueryBuilder
      *
      * @param string $attribute The attribute name
      * @param string $direction Either 'ASC' or 'DESC'. Defaults to 'ASC'.
+     * @return $this
      */
     public function addOrderBy($attribute, $direction = LdapQuery::ORDER['ASC'])
     {
@@ -358,7 +342,7 @@ class LdapQueryBuilder
      */
     public function setScopeSubTree()
     {
-        $this->scope = LdapQuery::SCOPE_SUBTREE;
+        $this->operation->setScope(QueryOperation::SCOPE['SUBTREE']);
 
         return $this;
     }
@@ -368,7 +352,7 @@ class LdapQueryBuilder
      */
     public function setScopeOneLevel()
     {
-        $this->scope = LdapQuery::SCOPE_ONELEVEL;
+        $this->operation->setScope(QueryOperation::SCOPE['ONELEVEL']);
 
         return $this;
     }
@@ -378,7 +362,7 @@ class LdapQueryBuilder
      */
     public function setScopeBase()
     {
-        $this->scope = LdapQuery::SCOPE_BASE;
+        $this->operation->setScope(QueryOperation::SCOPE['BASE']);
 
         return $this;
     }
@@ -390,7 +374,7 @@ class LdapQueryBuilder
      */
     public function getScope()
     {
-        return $this->scope;
+        return $this->operation->getScope();
     }
 
     /**
@@ -400,7 +384,7 @@ class LdapQueryBuilder
      */
     public function getAttributes()
     {
-        return $this->getAttributesToSelect();
+        return $this->getAttributesToSelect($this->operation);
     }
 
     /**
@@ -415,15 +399,15 @@ class LdapQueryBuilder
                 'To get a LdapQuery instance you must pass a LdapConnection to the constructor'
             );
         }
-        $ldapQuery =  new LdapQuery($this->connection);
+        $ldapQuery = new LdapQuery($this->connection);
+        $operation = clone $this->operation;
+
+        $operation->setFilter($this->getLdapFilter());
+        $operation->setAttributes($this->getAttributesToSelect($operation));
 
         return $ldapQuery
-            ->setBaseDn($this->baseDn)
-            ->setPageSize($this->pageSize)
-            ->setScope($this->scope)
             ->setOrderBy($this->orderBy)
-            ->setAttributes($this->getAttributesToSelect())
-            ->setLdapFilter($this->getLdapFilter())
+            ->setQueryOperation($operation)
             ->setLdapObjectSchemas(...$this->operators->getLdapObjectSchemas());
     }
 
@@ -537,10 +521,11 @@ class LdapQueryBuilder
     /**
      * Get the attributes that will be selected based on whether a specific selection was called for or not.
      *
+     * @param QueryOperation $operation
      * @return array
      */
-    protected function getAttributesToSelect()
+    protected function getAttributesToSelect(QueryOperation $operation)
     {
-        return !empty($this->attributes) ? $this->attributes : $this->defaultAttributes;
+        return empty($operation->getAttributes()) ? $this->defaultAttributes : $operation->getAttributes();
     }
 }

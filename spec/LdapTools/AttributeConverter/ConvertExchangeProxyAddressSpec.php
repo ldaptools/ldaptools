@@ -12,21 +12,13 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
-use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 {
     protected $connection;
-
-    protected $expectedSearch = [
-        '(&(distinguishedName=cn=foo,dc=foo,dc=bar))',
-        ['proxyAddresses'],
-        null,
-        "subtree",
-        null,
-    ];
 
     protected $expectedResult = [
         'count' => 1,
@@ -98,7 +90,6 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
     {
         $this->connection->getLdapType()->willReturn('ad');
 
-        //$this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->setAttribute('exchangeSmtpAddress');
         $this->toLdap(['foo@bar.com','foo.bar@foo.com'])->shouldBeEqualTo(['smtp:foo@bar.com', 'smtp:foo.bar@foo.com']);
@@ -109,8 +100,11 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
+        $operation = new QueryOperation();
+        $operation->setAttributes(['proxyAddresses'])->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))');
+
         $this->connection->getLdapType()->willReturn('ad');
-        $this->connection->search(...$this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute($operation)->willReturn($this->expectedResult);
         $addresses = [
             "smtp:foo@foo.bar",
             "SMTP:Foo.Bar@foo.bar",
