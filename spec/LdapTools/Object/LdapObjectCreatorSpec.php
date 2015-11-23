@@ -63,6 +63,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     public function let($connection)
     {
         $this->config = (new DomainConfiguration('example.com'))->setSchemaName('example');
+        $this->config->setUseTls(true);
         $connection->__toString()->willReturn('example.com');
         $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
         $connection->getConfig()->willReturn($this->config);
