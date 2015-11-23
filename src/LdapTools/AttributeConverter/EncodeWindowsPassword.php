@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -28,6 +29,7 @@ class EncodeWindowsPassword implements AttributeConverterInterface
      */
     public function toLdap($password)
     {
+        $this->validateConfiguration();
         if (!is_null($this->getLdapConnection())) {
             $password = LdapUtilities::encode(
                 $password,
@@ -43,5 +45,28 @@ class EncodeWindowsPassword implements AttributeConverterInterface
      */
     public function fromLdap($password)
     {
+    }
+
+    /**
+     * AD requires SSL/TLS by default to modify the unicodePwd attribute. This is probably the source of a lot of
+     * confusion when trying to create/modify a user and sending a password across. The default error from LDAP is
+     * not very helpful. This at least makes it clear what the problem is. However, it is possible for someone to disable
+     * the requirement for AD to require SSL/TLS for password modifications. But I cannot imagine that being a common
+     * change.
+     *
+     * @throws LdapConnectionException
+     */
+    protected function validateConfiguration()
+    {
+        if (!$this->getLdapConnection()) {
+            return;
+        }
+        $config = $this->getLdapConnection()->getConfig();
+
+        if (!($config->getUseTls() || $config->getUseSsl())) {
+            throw new LdapConnectionException(
+                'To send a password to AD you need to enable either TLS or SSL in your configuration.'
+            );
+        }
     }
 }
