@@ -333,4 +333,10 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->select('foo');
         $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo(['foo']);
     }
+
+    function it_should_allow_use_paging_to_be_set_per_query()
+    {
+        $this->where(['foo' => 'bar'])->getLdapQuery()->getQueryOperation()->getUsePaging()->shouldBeEqualTo(null);
+        $this->where(['foo' => 'bar'])->setUsePaging(true)->getLdapQuery()->getQueryOperation()->getUsePaging()->shouldBeEqualTo(true);
+    }
 }

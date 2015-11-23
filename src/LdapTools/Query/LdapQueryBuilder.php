@@ -155,6 +155,29 @@ class LdapQueryBuilder
     }
 
     /**
+     * Get whether or not paging should be used for the query.
+     *
+     * @return bool
+     */
+    public function getUsePaging()
+    {
+        return (bool) $this->operation->getUsePaging();
+    }
+
+    /**
+     * Set whether or not paging should be used for the query.
+     *
+     * @param bool $usePaging
+     * @return $this
+     */
+    public function setUsePaging($usePaging)
+    {
+        $this->operation->setUsePaging($usePaging);
+
+        return $this;
+    }
+
+    /**
      * Set the attributes to select from the object. Either specify a single attribute as a string or an array of
      * attribute names.
      *

@@ -40,6 +40,13 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getFilter()->shouldBeEqualTo($filter);
     }
 
+    function it_should_set_whether_paging_is_used_for_the_query_operation()
+    {
+        $this->getUsePaging()->shouldBeEqualTo(null);
+        $this->setUsePaging(true);
+        $this->getUsePaging()->shouldBeEqualTo(true);
+    }
+
     function it_should_set_the_page_size_for_the_query_operation()
     {
         $pageSize = 1000;
@@ -68,6 +75,7 @@ class QueryOperationSpec extends ObjectBehavior
         $this->setPageSize('9001')->shouldReturnAnInstanceOf('\LdapTools\Operation\QueryOperation');
         $this->setScope(QueryOperation::SCOPE['SUBTREE'])->shouldReturnAnInstanceOf('\LdapTools\Operation\QueryOperation');
         $this->setAttributes(['foo'])->shouldReturnAnInstanceOf('\LdapTools\Operation\QueryOperation');
+        $this->setUsePaging(true)->shouldReturnAnInstanceOf('\LdapTools\Operation\QueryOperation');
     }
 
     function it_should_get_the_name_of_the_operation()
@@ -108,5 +116,6 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Page Size');
         $this->getLogArray()->shouldHaveKey('Filter');
         $this->getLogArray()->shouldHaveKey('Attributes');
+        $this->getLogArray()->shouldHaveKey('Use Paging');
     }
 }

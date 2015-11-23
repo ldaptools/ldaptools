@@ -45,6 +45,7 @@ class QueryOperation implements LdapOperationInterface
         'filter' => null,
         'attributes' => [],
         'pageSize' => null,
+        'usePaging' => null,
         'scope' => self::SCOPE['SUBTREE'],
     ];
 
@@ -101,6 +102,16 @@ class QueryOperation implements LdapOperationInterface
     public function getAttributes()
     {
         return $this->properties['attributes'];
+    }
+
+    /**
+     * Get whether or not paging should be used for the query operation.
+     *
+     * @return bool|null
+     */
+    public function getUsePaging()
+    {
+        return $this->properties['usePaging'];
     }
 
     /**
@@ -174,6 +185,19 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
+     * Set whether or not paging should be used for the query operation.
+     *
+     * @param bool $paging
+     * @return $this
+     */
+    public function setUsePaging($paging)
+    {
+        $this->properties['usePaging'] = $paging;
+
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getArguments()
@@ -211,6 +235,7 @@ class QueryOperation implements LdapOperationInterface
             'Base DN' => $this->properties['baseDn'],
             'Attributes' => implode(',', $this->properties['attributes']),
             'Scope' => $this->properties['scope'],
+            'Use Paging' => var_export($this->properties['usePaging'], true),
             'Page Size' => $this->properties['pageSize'],
         ];
     }

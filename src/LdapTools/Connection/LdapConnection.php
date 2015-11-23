@@ -268,14 +268,14 @@ class LdapConnection implements LdapConnectionInterface
         $allEntries = [];
 
         // If this is not a paged search then set this to null so it ends the loop on the first pass.
-        $cookie = $this->config->getUsePaging() ? '' : null;
+        $cookie = $operation->getUsePaging() ? '' : null;
         do {
-            $this->setPagedResultsControl($operation->getPageSize(), $cookie, $operation->getScope());
+            $this->setPagedResultsControl($operation, $cookie);
 
             $result = @call_user_func($operation->getLdapFunction(), $this->connection, ...$operation->getArguments());
             $allEntries = $this->processSearchResult($result, $allEntries);
 
-            $this->setPagedResultsResponse($result, $cookie, $operation->getScope());
+            $this->setPagedResultsResponse($operation, $result, $cookie);
         } while ($cookie !== null && $cookie != '');
 
         return $allEntries;
@@ -301,6 +301,9 @@ class LdapConnection implements LdapConnectionInterface
         }
         if (is_null($operation->getBaseDn())) {
             $operation->setBaseDn($this->getBaseDn());
+        }
+        if (!is_null($operation->getUsePaging())) {
+            $operation->setUsePaging($this->config->getUsePaging());
         }
     }
 
@@ -373,16 +376,19 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * Send the LDAP pagination control if specified and check for errors.
      *
-     * @param int $pageSize
+     * @param QueryOperation $operation
      * @param string $cookie
-     * @param string $scope
      * @throws LdapConnectionException
      */
-    protected function setPagedResultsControl($pageSize, &$cookie, $scope)
+    protected function setPagedResultsControl(QueryOperation $operation, &$cookie)
     {
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
+        $scope = $operation->getScope();
+        $usePaging = $operation->getUsePaging();
+        $pageSize = $operation->getPageSize();
+
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
             throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
-        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result($this->connection, 0)) {
+        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result($this->connection, 0)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results for read operation: %s',
                 $this->getLastError()
@@ -393,14 +399,17 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * Retrieves the LDAP pagination cookie based on the result if specified and check for errors.
      *
+     * @param QueryOperation $operation
      * @param resource $result
      * @param string $cookie
-     * @param string $scope
      * @throws LdapConnectionException
      */
-    protected function setPagedResultsResponse($result, &$cookie, $scope)
+    protected function setPagedResultsResponse(QueryOperation $operation, $result, &$cookie)
     {
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $this->config->getUsePaging() && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
+        $scope = $operation->getScope();
+        $usePaging = $operation->getUsePaging();
+
+        if ($scope !== QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->getLastError())
             );

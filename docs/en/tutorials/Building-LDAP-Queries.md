@@ -263,6 +263,16 @@ $lqb->setPageSize(500);
 ```
 
 ------------------------
+#### setUsePaging($usePaging)
+
+This methods lets you set whether or not paging should be used for the query. This overrides whatever is set in the
+domain configuration. If this is not set, then whatever is set in the domain configuration is used.
+
+```php
+$lqb->setUsePaging(false);
+```
+
+------------------------
 #### getLdapFilter()
 
 Gets the LDAP filter, as a string, that the query would produce.
