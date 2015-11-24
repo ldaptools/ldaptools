@@ -38,6 +38,10 @@ class EchoLdapLogger implements LdapLoggerInterface
     {
         $duration = $log->getStopTime() - $log->getStartTime();
 
+        if (!is_null($log->getError())) {
+            echo "\tError: ".$log->getError().PHP_EOL;
+        }
+
         echo "(".$log->getDomain().") -- End Operation Type: ".$log->getOperation()->getName()." -- ($duration seconds)".PHP_EOL;
     }
 }
