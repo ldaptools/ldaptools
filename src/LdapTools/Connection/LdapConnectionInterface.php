@@ -107,11 +107,4 @@ interface LdapConnectionInterface
      * @return int
      */
     public function getExtendedErrorNumber();
-
-    /**
-     * Outputs the domain name for the connection.
-     *
-     * @return string
-     */
-    public function __toString();
 }

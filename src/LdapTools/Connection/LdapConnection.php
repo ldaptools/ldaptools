@@ -274,14 +274,6 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function __toString()
-    {
-        return $this->config->getDomainName();
-    }
-
-    /**
      * Looks for some needed query parameters and sets the defaults for this connection if they are not provided.
      *
      * @param QueryOperation $operation

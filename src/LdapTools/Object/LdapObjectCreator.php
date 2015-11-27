@@ -272,7 +272,7 @@ class LdapObjectCreator
     protected function getAllParameters()
     {
         $parameters = $this->parameters;
-        $parameters['_domainname_'] = (string) $this->connection;
+        $parameters['_domainname_'] = $this->connection->getConfig()->getDomainName();
 
         $rootDse = $this->connection->getRootDse();
         // Would this ever not be true? I'm unable to find any RFCs specifically regarding Root DSE structure.

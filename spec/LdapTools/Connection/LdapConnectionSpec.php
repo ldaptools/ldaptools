@@ -10,8 +10,6 @@
 
 namespace spec\LdapTools\Connection;
 
-use LdapTools\Connection\LdapConnection;
-use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Event\SymfonyEventDispatcher;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -82,11 +80,6 @@ class LdapConnectionSpec extends ObjectBehavior
     function it_should_have_the_base_dn_from_the_config()
     {
         $this->getBaseDn()->shouldBeEqualTo('dc=example,dc=local');
-    }
-
-    function it_should_output_the_domain_name_when_cast_as_a_string()
-    {
-        $this->__toString()->shouldBeEqualTo('example.com');
     }
 
     function it_should_get_the_current_server()
