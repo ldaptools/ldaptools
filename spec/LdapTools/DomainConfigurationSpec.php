@@ -174,6 +174,33 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getUsePaging()->shouldBeEqualTo(false);
     }
 
+    function it_should_set_the_ldap_option_when_calling_setLdapOption()
+    {
+        $this->setLdapOption(LDAP_OPT_DEBUG_LEVEL, 8);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 8);
+    }
+
+    function it_should_overwrite_an_ldap_option_when_calling_setLdapOption()
+    {
+        $this->setLdapOption(LDAP_OPT_DEBUG_LEVEL, 8);
+        $this->setLdapOption(LDAP_OPT_DEBUG_LEVEL, 3);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 3);
+    }
+
+    function it_should_allow_a_string_representation_of_a_connection_option()
+    {
+        $this->setLdapOption('ldap_opt_debug_level', 3);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 3);
+        $this->setLdapOptions(['ldap_opt_debug_level' => 8]);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 8);
+    }
+
+    function it_should_use_ldap_v3_by_default_and_not_follow_referrals()
+    {
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_PROTOCOL_VERSION, 3);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_REFERRALS, 0);
+    }
+
     function it_should_return_self_when_calling_the_setters()
     {
         $this->setUsePaging(true)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
@@ -192,6 +219,8 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->setUsername('test')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
         $this->setEncoding('UTF-8')->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
         $this->setServerSelection(LdapServerPool::SELECT_RANDOM)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
+        $this->setLdapOption(LDAP_OPT_DEBUG_LEVEL, 8)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
+        $this->setLdapOptions([LDAP_OPT_DEBUG_LEVEL => 8])->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
     }
 
     function it_should_have_the_correct_encoding_after_calling_setBindFormat()
@@ -209,12 +238,14 @@ class DomainConfigurationSpec extends ObjectBehavior
             'username' => 'admin',
             'password' => '12345',
             'servers' => ['test'],
+            'ldap_options' => ['ldap_opt_protocol_version' => 2],
         ];
         $this->load($config)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
         $this->getDomainName()->shouldBeEqualTo('example.local');
         $this->getUsername()->shouldBeEqualTo('admin');
         $this->getPassword()->shouldBeEqualTo('12345');
         $this->getServers()->shouldReturn(['test']);
+        $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_PROTOCOL_VERSION, 2);
     }
 
     function it_should_error_when_missing_required_config_values()
@@ -236,5 +267,14 @@ class DomainConfigurationSpec extends ObjectBehavior
             'awesome_level' => 9001,
         ];
         $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringLoad($config);
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'haveKeyWithValue' => function($subject, $key, $value) {
+                return isset($subject[$key]) && ($subject[$key] === $value);
+            },
+        ];
     }
 }

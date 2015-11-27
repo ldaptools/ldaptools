@@ -60,6 +60,11 @@ domains:
         #   the default is "%username%@%domainname%", for OpenLDAP it is simply "%username%". But you could easily
         #   make it something like "CN=%username%,OU=Users,DC=example,DC=local".
         bind_format: "%username%"
+        # Optional: The LDAP_OPT_* constants to use when connecting to LDAP. Default: Sets the protocol version to 3 and
+        #   disables referrals.
+        ldap_options:
+            ldap_opt_protocol_version: 3
+            ldap_opt_referrals: 0
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

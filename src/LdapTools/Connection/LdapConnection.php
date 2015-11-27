@@ -39,14 +39,6 @@ class LdapConnection implements LdapConnectionInterface
     const TYPE_OPENLDAP = 'openldap';
 
     /**
-     * @var array These options will be set before the bind occurs.
-     */
-    protected $optionsOnConnect = [
-        LDAP_OPT_PROTOCOL_VERSION => 3,
-        LDAP_OPT_REFERRALS => 0,
-    ];
-
-    /**
      * @var bool Whether the connection is bound using a username/password
      */
     protected $isBound = false;
@@ -218,21 +210,6 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function setOptionOnConnect($option, $value)
-    {
-        $this->optionsOnConnect[$option] = $value;
-
-        return $this;
-    }
-
-    public function getOptionsOnConnect()
-    {
-        return $this->optionsOnConnect;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getBaseDn()
     {
         if (!empty($this->config->getBaseDn())) {
@@ -336,7 +313,7 @@ class LdapConnection implements LdapConnectionInterface
             );
         }
 
-        foreach ($this->optionsOnConnect as $option => $value) {
+        foreach ($this->config->getLdapOptions() as $option => $value) {
             if (!ldap_set_option($this->connection, $option, $value)) {
                 throw new LdapConnectionException("Failed to set LDAP connection option.");
             }

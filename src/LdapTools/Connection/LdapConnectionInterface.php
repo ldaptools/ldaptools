@@ -28,22 +28,6 @@ interface LdapConnectionInterface
     public function getConfig();
 
     /**
-     * Add a LDAP_OPT_* constant to be used when connecting to LDAP.
-     *
-     * @param $option
-     * @param $value
-     * @return $this
-     */
-    public function setOptionOnConnect($option, $value);
-
-    /**
-     * Get the LDAP_OPT_* constants to when connecting.
-     *
-     * @return array
-     */
-    public function getOptionsOnConnect();
-
-    /**
      * Connect and bind to LDAP.
      *
      * @param string|null $username The username to connect with. If not specified, the one in the config is used.

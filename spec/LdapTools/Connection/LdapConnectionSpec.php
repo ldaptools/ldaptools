@@ -55,24 +55,6 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->isBound()->shouldBeEqualTo(false);
     }
 
-    function it_should_return_self_when_calling_setLdapOption()
-    {
-        $this->setOptionOnConnect(LDAP_OPT_DEBUG_LEVEL, 8)->shouldReturnAnInstanceOf('\LdapTools\Connection\LdapConnection');
-    }
-
-    function it_should_set_the_ldap_option_when_calling_setLdapOption()
-    {
-        $this->setOptionOnConnect(LDAP_OPT_DEBUG_LEVEL, 8);
-        $this->getOptionsOnConnect()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 8);
-    }
-
-    function it_should_overwrite_an_ldap_option_when_calling_setLdapOption()
-    {
-        $this->setOptionOnConnect(LDAP_OPT_DEBUG_LEVEL, 8);
-        $this->setOptionOnConnect(LDAP_OPT_DEBUG_LEVEL, 3);
-        $this->getOptionsOnConnect()->shouldHaveKeyWithValue(LDAP_OPT_DEBUG_LEVEL, 3);
-    }
-
     function it_should_honor_an_explicitly_set_schema_name_if_present()
     {
         $config = new DomainConfiguration('example.com');
@@ -110,14 +92,5 @@ class LdapConnectionSpec extends ObjectBehavior
     function it_should_get_the_current_server()
     {
         $this->getServer()->shouldBeEqualTo(null);
-    }
-
-    public function getMatchers()
-    {
-        return [
-            'haveKeyWithValue' => function($subject, $key, $value) {
-                return isset($subject[$key]) && ($subject[$key] === $value);
-            },
-        ];
     }
 }

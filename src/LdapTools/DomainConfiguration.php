@@ -53,6 +53,7 @@ class DomainConfiguration
         'server_selection' => 'serverSelection',
         'encoding' => 'encoding',
         'bind_format' => 'bindFormat',
+        'ldap_options' => 'ldapOptions',
     ];
 
     /**
@@ -84,6 +85,10 @@ class DomainConfiguration
         'serverSelection' => LdapServerPool::SELECT_ORDER,
         'encoding' => 'UTF-8',
         'bindFormat' => '',
+        'ldapOptions' => [
+            LDAP_OPT_PROTOCOL_VERSION => 3,
+            LDAP_OPT_REFERRALS => 0,
+        ],
     ];
 
     /**
@@ -469,6 +474,54 @@ class DomainConfiguration
         $this->config['usePaging'] = $paging;
 
         return $this;
+    }
+
+    /**
+     * Set the LDAP_OPT_* constants to be used when connecting. This should be in the form of:
+     *
+     *     [
+     *         LDAP_OPT_* => value,
+     *     ]
+     *
+     * ...where LDAP_OPT_* is either the int value of the constant, or the constant name in the form of a string.
+     *
+     * @param array $ldapOptions
+     * @return $this
+     */
+    public function setLdapOptions(array $ldapOptions)
+    {
+        foreach ($ldapOptions as $ldapOption => $value) {
+            $this->setLdapOption($ldapOption, $value);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set a specific LDAP_OPT_* constant and value.
+     *
+     * @param string|int $option
+     * @param $value
+     * @return $this
+     */
+    public function setLdapOption($option, $value)
+    {
+        if (!filter_var($option, FILTER_VALIDATE_INT) && is_string($option)) {
+            $option = constant(strtoupper($option));
+        }
+        $this->config['ldapOptions'][$option] = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the array of LDAP_OPT_* constants and values that will be used when connecting.
+     *
+     * @return array
+     */
+    public function getLdapOptions()
+    {
+        return $this->config['ldapOptions'];
     }
 
     /**

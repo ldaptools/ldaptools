@@ -277,3 +277,18 @@ The encoding to use for this domain. Usernames, passwords, and any values not ex
 Converter will be encoded with this encoding choice.
 
 **Default**: UTF-8
+
+-------------------------------
+#### ldap_options
+
+The `LDAP_OPT_*` constants and values to use when connecting to LDAP. This is expected to be an array:
+
+```yaml
+domains:
+    example:
+        ldap_options:
+            ldap_opt_protocol_version: 3
+            ldap_opt_referrals: 0
+```
+
+**Default**: `[LDAP_OPT_PROTOCOL_VERSION => 3, LDAP_OPT_REFERRALS => 0]`
