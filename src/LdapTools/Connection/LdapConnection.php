@@ -67,6 +67,11 @@ class LdapConnection implements LdapConnectionInterface
     protected $ldapUrl;
 
     /**
+     * @var string|null The LDAP server that we are currently connected to.
+     */
+    protected $server;
+
+    /**
      * @var LdapServerPool
      */
     protected $serverPool;
@@ -263,6 +268,16 @@ class LdapConnection implements LdapConnectionInterface
         }
     }
 
+    /**
+     * Get the server the connection is using. If it is not yet connected this will return null.
+     *
+     * @return string|null
+     */
+    public function getServer()
+    {
+        return $this->server;
+    }
+
     protected function query(QueryOperation $operation)
     {
         $allEntries = [];
@@ -367,7 +382,8 @@ class LdapConnection implements LdapConnectionInterface
     protected function getLdapUrl()
     {
         if (!$this->ldapUrl) {
-            $this->ldapUrl = ($this->config->getUseSsl() ? 'ldaps' : 'ldap').'://'.$this->serverPool->getServer();
+            $this->server = $this->serverPool->getServer();
+            $this->ldapUrl = ($this->config->getUseSsl() ? 'ldaps' : 'ldap').'://'.$this->server;
         }
 
         return $this->ldapUrl;

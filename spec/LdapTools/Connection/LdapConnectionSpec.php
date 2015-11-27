@@ -107,6 +107,11 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->__toString()->shouldBeEqualTo('example.com');
     }
 
+    function it_should_get_the_current_server()
+    {
+        $this->getServer()->shouldBeEqualTo(null);
+    }
+
     public function getMatchers()
     {
         return [

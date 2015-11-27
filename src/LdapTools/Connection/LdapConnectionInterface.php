@@ -89,6 +89,13 @@ interface LdapConnectionInterface
     public function getBaseDn();
 
     /**
+     * Get the LDAP server that the connection is currently connected to.
+     *
+     * @return string|null
+     */
+    public function getServer();
+
+    /**
      * Return a RootDse LDAP object for this connection.
      *
      * @return \LdapTools\Object\LdapObject
