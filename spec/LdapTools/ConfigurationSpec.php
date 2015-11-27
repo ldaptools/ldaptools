@@ -10,8 +10,10 @@
 
 namespace spec\LdapTools;
 
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\ConfigurationException;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Log\EchoLdapLogger;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use \LdapTools\DomainConfiguration;
@@ -149,5 +151,18 @@ class ConfigurationSpec extends ObjectBehavior
     function it_should_return_self_after_calling_set_attribute_converters()
     {
         $this->setAttributeConverters(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+    }
+
+    function it_should_set_an_event_dispatcher()
+    {
+        $this->getEventDispatcher()->shouldReturnAnInstanceOf('\LdapTools\Event\SymfonyEventDispatcher');
+        $this->setEventDispatcher(new SymfonyEventDispatcher())->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+    }
+
+    function it_should_set_a_logger()
+    {
+        $this->getLogger()->shouldBeEqualTo(null);
+        $this->setLogger(new EchoLdapLogger())->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+        $this->getLogger()->shouldReturnAnInstanceOf('\LdapTools\Log\EchoLdapLogger');
     }
 }

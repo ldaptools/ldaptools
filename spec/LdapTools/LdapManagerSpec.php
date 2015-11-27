@@ -44,19 +44,6 @@ class LdapManagerSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\LdapManager');
     }
 
-    function it_should_accept_an_event_dispatcher_as_a_second_constructor_argument()
-    {
-        $config = new Configuration();
-        $domain = new DomainConfiguration('example.com');
-        $domain->setServers(['example'])
-            ->setLazyBind(true)
-            ->setLdapType('openldap')
-            ->setBaseDn('dc=example,dc=com');
-        $config->addDomain($domain);
-
-        $this->beConstructedWith($config, new SymfonyEventDispatcher());
-    }
-
     function it_should_return_a_ldap_connection_when_calling_getConnection()
     {
         $this->getConnection()->shouldReturnAnInstanceOf('\LdapTools\Connection\LdapConnectionInterface');
@@ -189,10 +176,5 @@ class LdapManagerSpec extends ObjectBehavior
     function it_should_return_the_ldap_object_schema_factory_in_use()
     {
         $this->getSchemaFactory()->shouldReturnAnInstanceOf('\LdapTools\Factory\LdapObjectSchemaFactory');
-    }
-
-    function it_should_return_the_event_dispatcher()
-    {
-        $this->getEventDispatcher()->shouldReturnAnInstanceOf('\LdapTools\Event\EventDispatcherInterface');
     }
 }

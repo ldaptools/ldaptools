@@ -10,9 +10,12 @@
 
 namespace LdapTools;
 
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\ConfigurationException;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Factory\CacheFactory;
+use LdapTools\Log\LdapLoggerInterface;
 use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Yaml\Exception\ParseException;
 
@@ -55,6 +58,16 @@ class Configuration
     protected $domains = [];
 
     /**
+     * @var EventDispatcherInterface The event dispatcher that should be used.
+     */
+    protected $eventDispatcher;
+
+    /**
+     * @var null|LdapLoggerInterface The logger that should be used.
+     */
+    protected $logger;
+
+    /**
      * @param DomainConfiguration ...$domain
      */
     public function __construct(DomainConfiguration ...$domains)
@@ -65,6 +78,7 @@ class Configuration
 
         $this->config['cacheOptions']['cache_folder'] = sys_get_temp_dir();
         $this->config['schemaFolder'] = __DIR__ . $this->config['schemaFolder'];
+        $this->eventDispatcher = new SymfonyEventDispatcher();
     }
 
     /**
@@ -251,6 +265,52 @@ class Configuration
     public function getAttributeConverters()
     {
         return $this->config['attributeConverters'];
+    }
+
+    /**
+     * Set an event dispatcher, other than the default, to be used.
+     *
+     * @param EventDispatcherInterface $eventDispatcher
+     * @return $this
+     */
+    public function setEventDispatcher(EventDispatcherInterface $eventDispatcher)
+    {
+        $this->eventDispatcher = $eventDispatcher;
+
+        return $this;
+    }
+
+    /**
+     * Get the explicitly set event dispatcher to be used.
+     *
+     * @return EventDispatcherInterface|null
+     */
+    public function getEventDispatcher()
+    {
+        return $this->eventDispatcher;
+    }
+
+    /**
+     * Set a logger to be used.
+     *
+     * @param LdapLoggerInterface $logger
+     * @return $this
+     */
+    public function setLogger(LdapLoggerInterface $logger)
+    {
+        $this->logger = $logger;
+
+        return $this;
+    }
+
+    /**
+     * Get the logger to be used.
+     *
+     * @return LdapLoggerInterface|null
+     */
+    public function getLogger()
+    {
+        return $this->logger;
     }
 
     /**

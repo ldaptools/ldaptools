@@ -16,10 +16,19 @@ is a class that lets you chain several loggers into one.
 ```php
 use LdapTools\Log\EchoLdapLogger;
 use LdapTools\Log\LoggerChain;
+use LdapTools\LdapManager;
+use LdapTools\Configuration;
 
-# Adds a simple echo logger
+# Load your overall config
+$config = new Configuration();
+
+# ... add/set domain configuration, load from YML, etc...
+
+# Adds a simple echo logger to the config
 $logger = new EchoLdapLogger();
-$ldap = new LdapManager($config, null, $logger);
+$config->setLogger($logger);
+
+$ldap = new LdapManager($config);
 
 # Add a logger chain so several loggers can be used at once
 $logger = new LoggerChain();
@@ -27,10 +36,11 @@ $logger = new LoggerChain();
 # Add some loggers to the chain...
 $logger->addLogger(new EchoLdapLogger());
 $logger->addLogger(new EchoLdapLogger());
+$config->setLogger($logger);
 
 # You will now see duplicated echo statements as the result of both loggers.
 # Not a very useful example, but demonstrates the capability for several logging mechanisms.
-$ldap = new LdapManager($config, null, $logger);
+$ldap = new LdapManager($config);
 ```
 
 ## The LdapLoggerInterface and the LogOperation

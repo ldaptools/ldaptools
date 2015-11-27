@@ -11,13 +11,10 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
-use LdapTools\Event\EventDispatcherInterface;
-use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
-use LdapTools\Log\LdapLoggerInterface;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCreator;
 use LdapTools\Object\LdapObjectManager;
@@ -72,30 +69,16 @@ class LdapManager
     protected $ldapObjectManager = [];
 
     /**
-     * @var SymfonyEventDispatcher
-     */
-    protected $dispatcher;
-
-    /**
-     * @var LdapLoggerInterface|null
-     */
-    protected $logger;
-
-    /**
      * @param Configuration $config
-     * @param EventDispatcherInterface $dispatcher
-     * @param LdapLoggerInterface $logger
      */
-    public function __construct(Configuration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null)
+    public function __construct(Configuration $config)
     {
         $this->config = $config;
-        $this->logger = $logger;
         $this->domains = $config->getDomainConfiguration();
 
         if (empty($this->domains)) {
             throw new \RuntimeException("Your configuration must have at least one domain.");
         }
-        $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
         $this->context = $this->config->getDefaultDomain() ?: array_keys($this->domains)[0];
         $this->registerAttributeConverters($config->getAttributeConverters());
 
@@ -155,8 +138,8 @@ class LdapManager
         if (!$this->connections[$domain]) {
             $this->connections[$domain] = new LdapConnection(
                 $this->domains[$domain],
-                $this->getEventDispatcher(),
-                $this->getLogger()
+                $this->config->getEventDispatcher(),
+                $this->config->getLogger()
             );
         }
 
@@ -181,7 +164,11 @@ class LdapManager
      */
     public function createLdapObject()
     {
-        return new LdapObjectCreator($this->getConnection(), $this->getSchemaFactory(), $this->getEventDispatcher());
+        return new LdapObjectCreator(
+            $this->getConnection(),
+            $this->getSchemaFactory(),
+            $this->config->getEventDispatcher()
+        );
     }
 
     /**
@@ -272,7 +259,7 @@ class LdapManager
     {
         if (!$this->schemaFactory) {
             $this->schemaFactory = new LdapObjectSchemaFactory(
-                $this->getCache(), $this->getSchemaParser(), $this->getEventDispatcher()
+                $this->getCache(), $this->getSchemaParser(), $this->config->getEventDispatcher()
             );
         }
 
@@ -311,26 +298,6 @@ class LdapManager
     }
 
     /**
-     * Get the Event Dispatcher instance.
-     *
-     * @return Event\EventDispatcherInterface
-     */
-    public function getEventDispatcher()
-    {
-        return $this->dispatcher;
-    }
-
-    /**
-     * Get the LdapLogger in use (or null if none is set).
-     *
-     * @return LdapLoggerInterface|null
-     */
-    public function getLogger()
-    {
-        return $this->logger;
-    }
-
-    /**
      * Validates that the domain name actually exists.
      *
      * @param string $domain
@@ -353,7 +320,7 @@ class LdapManager
             $this->ldapObjectManager[$this->context] = new LdapObjectManager(
                 $this->getConnection(),
                 $this->getSchemaFactory(),
-                $this->getEventDispatcher()
+                $this->config->getEventDispatcher()
             );
         }
 

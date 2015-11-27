@@ -193,4 +193,28 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_SCHEMA_LOAD, function(LdapO
     $schema->setDefaultContainer("OU=Employees,DC=example,DC=local");
 });
 ```
- 
+
+## Using a Custom/Specific Event Dispatcher
+-------------------------------------------
+
+To use a specific Event Dispatcher (which must implement `\LdapTools\Event\EventDispatcherInterface`) you must set it in
+the configuration before constructing the LdapManager class:
+
+```php
+use LdapTools\Event\SymfonyEventDispatcher;
+use LdapTools\LdapManager;
+use LdapTools\Configuration;
+
+# Load your overall config
+$config = new Configuration();
+
+# ... add/set domain configuration, load from YML, etc...
+
+# Add the event dispatcher to the config
+$dispatcher = new SymfonyEventDispatcher();
+$config->setEventDispatcher($dispatcher);
+
+$ldap = new LdapManager($config);
+```
+
+If one is not explicitly defined it will instantiate a default event dispatcher (`\LdapTools\Event\SymfonyEventDispatcher`).
