@@ -134,30 +134,33 @@ class LdapManager
      */
     public function switchDomain($domain)
     {
-        if (!array_key_exists($domain, $this->domains)) {
-            throw new \InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
-        }
+        $this->validateDomainName($domain);
         $this->context = $domain;
 
         return $this;
     }
 
     /**
-     * Get the Ldap Connection object.
+     * Get the Ldap Connection object. By default it will get the connection of the domain currently in context. To get
+     * a different domain connection pass the domain name as a parameter.
      *
-     * @return \LdapTools\Connection\LdapConnectionInterface
+     * @param null|string $domain
+     * @return Connection\LdapConnectionInterface
      */
-    public function getConnection()
+    public function getConnection($domain = null)
     {
-        if (!$this->connections[$this->context]) {
-            $this->connections[$this->context] = new LdapConnection(
-                $this->domains[$this->context],
+        $domain = $domain ?: $this->context;
+        $this->validateDomainName($domain);
+
+        if (!$this->connections[$domain]) {
+            $this->connections[$domain] = new LdapConnection(
+                $this->domains[$domain],
                 $this->getEventDispatcher(),
                 $this->getLogger()
             );
         }
 
-        return $this->connections[$this->context];
+        return $this->connections[$domain];
     }
 
     /**
@@ -325,6 +328,18 @@ class LdapManager
     public function getLogger()
     {
         return $this->logger;
+    }
+
+    /**
+     * Validates that the domain name actually exists.
+     *
+     * @param string $domain
+     */
+    protected function validateDomainName($domain)
+    {
+        if (!array_key_exists($domain, $this->domains)) {
+            throw new \InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
+        }
     }
 
     /**
