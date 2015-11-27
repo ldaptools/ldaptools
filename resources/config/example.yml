@@ -33,6 +33,8 @@ domains:
         # Recommended: One or more LDAP servers to connect to. If this is empty then it will query DNS for a
         #   list of LDAP servers for the domain.
         servers: [ 'example1','example2' ]
+        # Optional: Whether or not paging should be used for query operations. Default: true
+        use_paging: true
         # Optional: The page size to use for paging operations, such as searches. Default: 1000
         page_size: 1000
         # Optional: The port to communicate to the LDAP servers on. If this is not set, the default is 389.
