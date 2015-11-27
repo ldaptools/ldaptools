@@ -11,6 +11,7 @@
 namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -70,21 +71,28 @@ class LdapManager
 
     /**
      * @param Configuration $config
+     * @param Connection\LdapConnectionInterface[] $connections
      */
-    public function __construct(Configuration $config)
+    public function __construct(Configuration $config, LdapConnectionInterface ...$connections)
     {
         $this->config = $config;
         $this->domains = $config->getDomainConfiguration();
 
-        if (empty($this->domains)) {
+        if (empty($this->domains) && empty($connections)) {
             throw new \RuntimeException("Your configuration must have at least one domain.");
         }
-        $this->context = $this->config->getDefaultDomain() ?: array_keys($this->domains)[0];
         $this->registerAttributeConverters($config->getAttributeConverters());
 
         // Pre-populate the connections array. They will be instantiated as needed.
         foreach (array_keys($this->domains) as $domain) {
             $this->connections[$domain] = null;
+        }
+        $this->addConnection(...$connections);
+
+        $this->context = array_keys($this->domains)[0];
+        if (!empty($this->config->getDefaultDomain())) {
+            $this->validateDomainName($this->config->getDefaultDomain());
+            $this->context = $this->config->getDefaultDomain();
         }
     }
 
@@ -119,6 +127,22 @@ class LdapManager
     {
         $this->validateDomainName($domain);
         $this->context = $domain;
+
+        return $this;
+    }
+
+    /**
+     * Explicitly add connections using already constructed connection objects.
+     *
+     * @param Connection\LdapConnectionInterface[] $connections
+     * @return $this
+     */
+    public function addConnection(LdapConnectionInterface ...$connections)
+    {
+        foreach ($connections as $connection) {
+            $this->domains[$connection->getConfig()->getDomainName()] = $connection->getConfig();
+            $this->connections[$connection->getConfig()->getDomainName()] = $connection;
+        }
 
         return $this;
     }

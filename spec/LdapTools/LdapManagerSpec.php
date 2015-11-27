@@ -44,6 +44,26 @@ class LdapManagerSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\LdapManager');
     }
 
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection2
+     */
+    function it_should_allow_ldap_connections_to_be_passed_to_the_constructor($connection, $connection2)
+    {
+        $domainConfig2 = new DomainConfiguration('foo.bar');
+        $connection2->getConfig()->willReturn($domainConfig2);
+
+        $domainConfig = new DomainConfiguration('example.local');
+        $connection->getConfig()->willReturn($domainConfig);
+
+        $config = new Configuration();
+        $this->beConstructedWith($config, $connection, $connection2);
+
+        $this->getDomainContext()->shouldBeEqualTo('example.local');
+        $this->getConnection()->shouldBeEqualTo($connection);
+        $this->switchDomain('foo.bar')->getConnection()->shouldBeEqualTo($connection2);
+    }
+
     function it_should_return_a_ldap_connection_when_calling_getConnection()
     {
         $this->getConnection()->shouldReturnAnInstanceOf('\LdapTools\Connection\LdapConnectionInterface');
@@ -136,11 +156,33 @@ class LdapManagerSpec extends ObjectBehavior
     }
 
     /**
-     * Unsure of how to really mock this behavior since the connection is instantiated from the config.
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
-    function it_should_attempt_to_authenticate_a_username_and_password()
+    function it_should_attempt_to_authenticate_a_username_and_password($connection)
     {
-        $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringAuthenticate('foo','bar');
+        $domainConfig = new DomainConfiguration('example.local');
+        $connection->getConfig()->willReturn($domainConfig);
+        $connection->authenticate('foo','bar', false, false)->willReturn(true);
+        $this->beConstructedWith(new Configuration(), $connection);
+
+        $this->authenticate('foo','bar')->shouldBeEqualTo(true);
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection2
+     */
+    function it_should_set_a_ldap_connection($connection, $connection2)
+    {
+        $domainConfig = new DomainConfiguration('foo.bar');
+        $connection->getConfig()->willReturn($domainConfig);
+
+        $domainConfig2 = new DomainConfiguration('chad.sikorra');
+        $connection2->getConfig()->willReturn($domainConfig2);
+
+        $this->addConnection($connection, $connection2)->shouldReturnAnInstanceOf('\LdapTools\LdapManager');
+        $this->getConnection('foo.bar')->shouldBeEqualTo($connection);
+        $this->getConnection('chad.sikorra')->shouldBeEqualTo($connection2);
     }
 
     function it_should_register_converters_listed_in_the_config()

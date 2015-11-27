@@ -224,9 +224,6 @@ class Configuration
      */
     public function setDefaultDomain($domain)
     {
-        if (!isset($this->domains[$domain])) {
-            throw new ConfigurationException(sprintf('The domain "%s" is not valid.', $domain));
-        }
         $this->config['defaultDomain'] = $domain;
 
         return $this;
