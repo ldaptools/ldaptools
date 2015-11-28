@@ -28,6 +28,13 @@ interface LdapConnectionInterface
     public function getConfig();
 
     /**
+     * Get the LDAP connection resource.
+     *
+     * @return resource
+     */
+    public function getConnection();
+
+    /**
      * Connect and bind to LDAP.
      *
      * @param string|null $username The username to connect with. If not specified, the one in the config is used.

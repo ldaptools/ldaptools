@@ -86,4 +86,9 @@ class LdapConnectionSpec extends ObjectBehavior
     {
         $this->getServer()->shouldBeEqualTo(null);
     }
+
+    function it_should_have_a_method_to_get_the_connection_resource()
+    {
+        $this->getConnection()->shouldBeEqualTo(null);
+    }
 }

@@ -116,6 +116,14 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getConnection()
+    {
+        return $this->connection;
+    }
+
+    /**
      * Get a LdapObject that represents the RootDSE information for the domain.
      *
      * @return \LdapTools\Object\LdapObject
