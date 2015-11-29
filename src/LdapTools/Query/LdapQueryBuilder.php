@@ -148,10 +148,13 @@ class LdapQueryBuilder
      * Set the page size for the query.
      *
      * @param int $pageSize
+     * @return $this
      */
     public function setPageSize($pageSize)
     {
         $this->operation->setPageSize($pageSize);
+
+        return $this;
     }
 
     /**

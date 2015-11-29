@@ -143,6 +143,12 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->setScopeSubTree()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
     }
 
+    function it_should_return_self_when_setting_the_paging_size_and_use()
+    {
+        $this->setUsePaging(true)->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+        $this->setPageSize(1)->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+    }
+
     function it_should_set_the_scope_types_correctly()
     {
         $this->setScopeBase()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['BASE']);
