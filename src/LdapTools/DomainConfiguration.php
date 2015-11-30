@@ -13,6 +13,8 @@ namespace LdapTools;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapServerPool;
 use LdapTools\Exception\ConfigurationException;
+use LdapTools\Operation\Invoker\LdapOperationInvoker;
+use LdapTools\Operation\Invoker\LdapOperationInvokerInterface;
 
 /**
  * Represents a domain configuration.
@@ -85,6 +87,7 @@ class DomainConfiguration
         'serverSelection' => LdapServerPool::SELECT_ORDER,
         'encoding' => 'UTF-8',
         'bindFormat' => '',
+        'operationInvoker' => null,
         'ldapOptions' => [
             LDAP_OPT_PROTOCOL_VERSION => 3,
             LDAP_OPT_REFERRALS => 0,
@@ -97,6 +100,7 @@ class DomainConfiguration
     public function __construct($domainName = '')
     {
         $this->setDomainName($domainName);
+        $this->setOperationInvoker(new LdapOperationInvoker());
     }
 
     /**
@@ -522,6 +526,29 @@ class DomainConfiguration
     public function getLdapOptions()
     {
         return $this->config['ldapOptions'];
+    }
+
+    /**
+     * Set the operation invoker used in the LDAP connection.
+     *
+     * @param LdapOperationInvokerInterface $operationInvoker
+     * @return $this
+     */
+    public function setOperationInvoker(LdapOperationInvokerInterface $operationInvoker)
+    {
+        $this->config['operationInvoker'] = $operationInvoker;
+
+        return $this;
+    }
+
+    /**
+     * Get the operation invoker used in the LDAP connection.
+     *
+     * @return LdapOperationInvokerInterface
+     */
+    public function getOperationInvoker()
+    {
+        return $this->config['operationInvoker'];
     }
 
     /**

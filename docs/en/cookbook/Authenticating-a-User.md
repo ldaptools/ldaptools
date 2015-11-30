@@ -12,8 +12,21 @@ if ($ldapManager->authenticate($username, $password)) {
 }
 ```
 
-This method actually uses the already existing `authenticate()` method of the `LdapConnection` class in the current
-context and is included as a quick shortcut for not having to do `$ldapManager->getConnection()->authenticate($username, $password)`.
+This method creates an authentication operation object and executes it against the current connection. You could also
+do the following:
+
+```php
+use LdapTools\Operation\AuthenticationOperation;
+
+$operation = (new AuthenticationOperation())->setUsername($username)->setPassword($password);
+
+// With your LdapManager class already instantiated...
+$response = $ldapManager->getConnection()->execute($operation);
+
+if (!$response->isAuthenticated()) {
+    echo "Error validating password for '".$operation->getUsername()."': ".$response->getErrorMessage();
+}
+```
 
 ## Valid Username Formats
 

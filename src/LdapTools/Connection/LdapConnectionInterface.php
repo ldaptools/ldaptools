@@ -45,19 +45,6 @@ interface LdapConnectionInterface
     public function connect($username = null, $password = null, $anonymous = false);
 
     /**
-     * Try to connect and bind to LDAP as a user account.
-     *
-     * @param string $username
-     * @param string $password
-     * @param bool|string $errorMessage Optionally, the last LDAP error message will be set here if any occurs.
-     * @param bool|string $errorNumber Optionally, the last LDAP error number will be set here if any occurs.
-     * @return bool
-     * @throws \LdapTools\Exception\LdapBindException If re-binding fails after authentication.
-     * @throws \LdapTools\Exception\LdapConnectionException If re-connecting fails after authentication.
-     */
-    public function authenticate($username, $password, &$errorMessage = false, &$errorNumber = false);
-
-    /**
      * Execute an operation against LDAP (Add, Modify, Delete, Move, Query, etc).
      *
      * @param LdapOperationInterface $operation
@@ -71,13 +58,6 @@ interface LdapConnectionInterface
      * @return $this
      */
     public function close();
-
-    /**
-     * Get the Base DN configured for this connection.
-     *
-     * @return string
-     */
-    public function getBaseDn();
 
     /**
      * Get the LDAP server that the connection is currently connected to.

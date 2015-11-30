@@ -41,13 +41,6 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->beConstructedWith($config, new SymfonyEventDispatcher());
     }
 
-    function it_should_error_when_authenticate_is_called_without_username_or_password()
-    {
-        $this->shouldThrow('\Exception')->duringAuthenticate();
-        $this->shouldThrow('\Exception')->duringAuthenticate('foo');
-        $this->shouldThrow('\Exception')->duringAuthenticate('','bar');
-    }
-
     function it_should_return_false_when_calling_isBound_and_there_is_no_connection_yet()
     {
         $this->isBound()->shouldBeEqualTo(false);
@@ -75,11 +68,6 @@ class LdapConnectionSpec extends ObjectBehavior
         $this->beConstructedWith($config);
 
         $this->getConfig()->getPageSize()->shouldBeEqualTo(250);
-    }
-
-    function it_should_have_the_base_dn_from_the_config()
-    {
-        $this->getBaseDn()->shouldBeEqualTo('dc=example,dc=local');
     }
 
     function it_should_get_the_current_server()

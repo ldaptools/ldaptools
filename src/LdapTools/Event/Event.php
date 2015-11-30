@@ -63,6 +63,16 @@ abstract class Event implements EventInterface
     const LDAP_SCHEMA_LOAD = 'ldap.schema.load';
 
     /**
+     * Occurs before a LDAP authentication operation.
+     */
+    const LDAP_AUTHENTICATION_BEFORE = 'ldap.authentication.before';
+
+    /**
+     * Occurs after a LDAP authentication operation.
+     */
+    const LDAP_AUTHENTICATION_AFTER = 'ldap.authentication.after';
+
+    /**
      * @var string The event name.
      */
     protected $name;

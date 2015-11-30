@@ -93,6 +93,8 @@ are located in the `LdapTools\Event` namespace.
 | ldap.object.before_move | `LDAP_OBJECT_BEFORE_MOVE` | `LdapObjectMoveEvent` | Triggered before an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
 | ldap.object.after_move | `LDAP_OBJECT_AFTER_MOVE` | `LdapObjectMoveEvent` | Triggered after an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
 | ldap.schema.load | `LDAP_SCHEMA_LOAD` | `LdapObjectSchemaEvent` | Triggered when a LDAP object type schema is parsed, loaded, and before it gets cached. This allows you to modify the schema without creating your own file. |
+| ldap.authentication.before | `LDAP_AUTHENTICATION_BEFORE` | `LdapAuthenticationEvent` | Triggered before an LDAP authentication operation. Allows you to get the operation details before it is sent. |
+| ldap.authentication.after | `LDAP_AUTHENTICATION_AFTER` | `LdapAuthenticationEvent` | Triggered after an LDAP authentication operation. Allows you to get the result and any error messages/codes. |
 
 ## The LDAP Object Creation Event
 ---------------------------------
@@ -194,6 +196,35 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_SCHEMA_LOAD, function(LdapO
 });
 ```
 
+## The LDAP Authentication Event
+--------------------------------
+
+The LDAP authentication event allows you to retrieve the operation details using `getOperation()`. You can also retrieve
+the LDAP response to the authentication operation using the `getResponse()` method. That will only return a response in 
+the `ldap.authentication.after` event.
+ 
+```php
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapAuthenticationEvent;
+ 
+$ldap->getEventDispatcher()->addListener(Event::LDAP_AUTHENTICATION_BEFORE, function(LdapAuthenticationEvent $event) {
+    $operation = $event->getOperation();
+    
+    // The setters for both the username/password can be called as well to modify the operation...
+    echo $operation->getUsername(); // The username to be authenticated.
+    echo $operation->getPassword(); // The password for the username. 
+});
+
+$ldap->getEventDispatcher()->addListener(Event::LDAP_AUTHENTICATION_AFTER, function(LdapAuthenticationEvent $event) {
+    $operation = $event->getOperation();
+    $response = $event->getResponse();
+    
+    if (!$response->isAuthenticated()) {
+        echo "User '".$operation->getUsername()."' failed to login:".$response->getErrorMessage();
+    }
+});
+```
+ 
 ## Using a Custom/Specific Event Dispatcher
 -------------------------------------------
 

@@ -16,9 +16,7 @@ use LdapTools\Exception\LdapBindException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
 use LdapTools\Log\LdapLoggerInterface;
-use LdapTools\Log\LogOperation;
 use LdapTools\Operation\LdapOperationInterface;
-use LdapTools\Operation\QueryOperation;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -100,6 +98,7 @@ class LdapConnection implements LdapConnectionInterface
         $this->config = $config;
         $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
         $this->logger = $logger;
+        $this->setupOperationInvoker();
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());
         if (!$config->getLazyBind()) {
@@ -135,32 +134,6 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         return $this->rootDse;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function authenticate($username, $password, &$errorMessage = false, &$errorCode = false)
-    {
-        if (!$username || !$password) {
-            throw new \InvalidArgumentException("You must specify a username and password.");
-        }
-        $wasBound = $this->isBound;
-
-        // Only catch a bind failure. Let the others through, as it's probably a sign of other issues.
-        try {
-            $authenticated = (bool) $this->close()->connect($username, $password);
-        } catch (LdapBindException $e) {
-            $authenticated = false;
-            $errorMessage = ($errorMessage === false) ?: $this->getLastError();
-            $errorCode = ($errorCode === false) ?: $this->getExtendedErrorNumber();
-        }
-        $this->close();
-
-        // Only reconnect afterwards if the connection was bound to begin with.
-        !$wasBound ?: $this->connect();
-
-        return $authenticated;
     }
 
     /**
@@ -216,41 +189,13 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getBaseDn()
-    {
-        if (!empty($this->config->getBaseDn())) {
-            $baseDn = $this->config->getBaseDn();
-        } elseif ($this->getRootDse()->has('defaultNamingContext')) {
-            $baseDn = $this->getRootDse()->get('defaultNamingContext');
-        } elseif ($this->getRootDse()->has('namingContexts')) {
-            $baseDn =  $this->getRootDse()->get('namingContexts')[0];
-        } else {
-            throw new LdapConnectionException('The base DN is not defined and could not be found in the RootDSE.');
-        }
-
-        return $baseDn;
-    }
-
-    /**
      * @param LdapOperationInterface $operation
      * @return array|mixed
      * @throws LdapConnectionException
      */
     public function execute(LdapOperationInterface $operation)
     {
-        $log = $this->logger ? (new LogOperation($operation))->setDomain($this->config->getDomainName()) : null;
-
-        try {
-            return $this->getLdapResponse($operation, $log);
-        } catch (\Throwable $e) {
-            $this->logExceptionAndThrow($e, $log);
-        } catch (\Exception $e) {
-            $this->logExceptionAndThrow($e, $log);
-        } finally {
-            $this->log($log, false);
-        }
+        return $this->config->getOperationInvoker()->execute($operation);
     }
 
     /**
@@ -261,42 +206,6 @@ class LdapConnection implements LdapConnectionInterface
     public function getServer()
     {
         return $this->server;
-    }
-
-    protected function query(QueryOperation $operation)
-    {
-        $allEntries = [];
-
-        // If this is not a paged search then set this to null so it ends the loop on the first pass.
-        $cookie = $operation->getUsePaging() ? '' : null;
-        do {
-            $this->setPagedResultsControl($operation, $cookie);
-
-            $result = @call_user_func($operation->getLdapFunction(), $this->connection, ...$operation->getArguments());
-            $allEntries = $this->processSearchResult($result, $allEntries);
-
-            $this->setPagedResultsResponse($operation, $result, $cookie);
-        } while ($cookie !== null && $cookie != '');
-
-        return $allEntries;
-    }
-
-    /**
-     * Looks for some needed query parameters and sets the defaults for this connection if they are not provided.
-     *
-     * @param QueryOperation $operation
-     */
-    protected function setQueryOperationDefaults(QueryOperation $operation)
-    {
-        if (is_null($operation->getPageSize())) {
-            $operation->setPageSize($this->config->getPageSize());
-        }
-        if (is_null($operation->getBaseDn())) {
-            $operation->setBaseDn($this->getBaseDn());
-        }
-        if (!is_null($operation->getUsePaging())) {
-            $operation->setUsePaging($this->config->getUsePaging());
-        }
     }
 
     /**
@@ -367,132 +276,14 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Send the LDAP pagination control if specified and check for errors.
-     *
-     * @param QueryOperation $operation
-     * @param string $cookie
-     * @throws LdapConnectionException
+     * Sets the needed objects on the operation invoker.
      */
-    protected function setPagedResultsControl(QueryOperation $operation, &$cookie)
+    protected function setupOperationInvoker()
     {
-        $scope = $operation->getScope();
-        $usePaging = $operation->getUsePaging();
-        $pageSize = $operation->getPageSize();
-
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result($this->connection, $pageSize, false, $cookie)) {
-            throw new LdapConnectionException(sprintf('Unable to enable paged results: %s', $this->getLastError()));
-        } elseif ($scope == QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result($this->connection, 0)) {
-            throw new LdapConnectionException(sprintf(
-                'Unable to reset paged results for read operation: %s',
-                $this->getLastError()
-            ));
+        $this->config->getOperationInvoker()->setEventDispatcher($this->dispatcher);
+        $this->config->getOperationInvoker()->setConnection($this);
+        if ($this->logger) {
+            $this->config->getOperationInvoker()->setLogger($this->logger);
         }
-    }
-
-    /**
-     * Retrieves the LDAP pagination cookie based on the result if specified and check for errors.
-     *
-     * @param QueryOperation $operation
-     * @param resource $result
-     * @param string $cookie
-     * @throws LdapConnectionException
-     */
-    protected function setPagedResultsResponse(QueryOperation $operation, $result, &$cookie)
-    {
-        $scope = $operation->getScope();
-        $usePaging = $operation->getUsePaging();
-
-        if ($scope !== QueryOperation::SCOPE['BASE'] && $usePaging && !@ldap_control_paged_result_response($this->connection, $result, $cookie)) {
-            throw new LdapConnectionException(
-                sprintf('Unable to set paged results response: %s', $this->getLastError())
-            );
-        }
-    }
-
-    /**
-     * Process a LDAP search result and merge it with the existing entries if possible.
-     *
-     * @param resource $result
-     * @param array $allEntries
-     * @return array
-     * @throws LdapConnectionException
-     */
-    protected function processSearchResult($result, array $allEntries)
-    {
-        if (!$result) {
-            throw new LdapConnectionException(sprintf('LDAP search failed: %s', $this->getLastError()));
-        }
-        $entries = @ldap_get_entries($this->connection, $result);
-
-        if ($entries) {
-            $allEntries = array_merge($allEntries, $entries);
-        }
-
-        return $allEntries;
-    }
-
-    /**
-     * Send the operation to the logger if it exists.
-     *
-     * @param LogOperation $log
-     * @param bool $start If true, this is the start of the logging. If false it is the end.
-     */
-    protected function log(LogOperation $log = null, $start = true)
-    {
-        if ($this->logger && $log && $start) {
-            $this->logger->start($log);
-        } elseif ($this->logger && $log && !$start) {
-            $this->logger->end($log->stop());
-        }
-    }
-
-    /**
-     * Handles exception error message logging if logging is enabled then re-throws the exception.
-     *
-     * @param LogOperation|null $log
-     * @param \Throwable|\Exception $exception
-     * @throws LdapConnectionException
-     * @throws null
-     */
-    protected function logExceptionAndThrow($exception, LogOperation $log = null)
-    {
-        if (!is_null($log)) {
-            $log->setError($exception->getMessage());
-        }
-
-        // It's possible for a query operation to fail before it even begins. Trigger the log start if so.
-        if ($log && $log->getStartTime() === null) {
-            $this->log($log);
-        }
-
-        throw $exception;
-    }
-
-    /**
-     * @param LdapOperationInterface $operation
-     * @param LogOperation|null $log
-     * @return array|mixed
-     * @throws LdapConnectionException
-     */
-    protected function getLdapResponse(LdapOperationInterface $operation, LogOperation $log = null)
-    {
-        if ($operation instanceof QueryOperation) {
-            $this->setQueryOperationDefaults($operation);
-            $this->log($log);
-            $result = $this->query($operation);
-        } else {
-            $this->log($log);
-            $result = @call_user_func($operation->getLdapFunction(), $this->connection, ...$operation->getArguments());
-        }
-
-        if ($result === false) {
-            throw new LdapConnectionException(sprintf(
-                'LDAP %s Operation Error: %s',
-                $operation->getName(),
-                $this->getLastError()
-            ));
-        }
-
-        return $result;
     }
 }

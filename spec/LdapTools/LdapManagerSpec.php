@@ -10,7 +10,8 @@
 
 namespace spec\LdapTools;
 
-use LdapTools\Event\SymfonyEventDispatcher;
+use LdapTools\Operation\AuthenticationOperation;
+use LdapTools\Operation\AuthenticationResponse;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use \LdapTools\Configuration;
@@ -160,9 +161,12 @@ class LdapManagerSpec extends ObjectBehavior
      */
     function it_should_attempt_to_authenticate_a_username_and_password($connection)
     {
+        $operation = new AuthenticationOperation();
+        $operation->setUsername('foo')->setPassword('bar');
+        $response = new AuthenticationResponse(true);
         $domainConfig = new DomainConfiguration('example.local');
         $connection->getConfig()->willReturn($domainConfig);
-        $connection->authenticate('foo','bar', false, false)->willReturn(true);
+        $connection->execute($operation)->willReturn($response);
         $this->beConstructedWith(new Configuration(), $connection);
 
         $this->authenticate('foo','bar')->shouldBeEqualTo(true);

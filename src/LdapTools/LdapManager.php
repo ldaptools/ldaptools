@@ -20,6 +20,8 @@ use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCreator;
 use LdapTools\Object\LdapObjectManager;
 use LdapTools\Object\LdapObjectRepository;
+use LdapTools\Operation\AuthenticationOperation;
+use LdapTools\Operation\AuthenticationResponse;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -271,7 +273,18 @@ class LdapManager
      */
     public function authenticate($user, $password, &$errorMessage = false, &$errorNumber = false)
     {
-        return $this->getConnection()->authenticate($user, $password, $errorMessage, $errorNumber);
+        $operation = (new AuthenticationOperation())->setUsername($user)->setPassword($password);
+        /** @var AuthenticationResponse $response */
+        $response = $this->getConnection()->execute($operation);
+
+        if ($errorMessage !== false) {
+            $errorMessage = $response->getErrorMessage();
+        }
+        if ($errorNumber !== false) {
+            $errorNumber = $response->getErrorCode();
+        }
+
+        return $response->isAuthenticated();
     }
 
     /**
