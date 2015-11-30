@@ -50,7 +50,6 @@ class LogOperation
     public function __construct(LdapOperationInterface $operation)
     {
         $this->operation = $operation;
-        $this->start = microtime(true);
     }
 
     /**
@@ -130,7 +129,21 @@ class LogOperation
     }
 
     /**
+     * Signifies that the operation has started.
+     *
+     * @return $this
+     */
+    public function start()
+    {
+        $this->start = microtime(true);
+
+        return $this;
+    }
+
+    /**
      * Signifies that the operation is over.
+     *
+     * @return $this
      */
     public function stop()
     {
