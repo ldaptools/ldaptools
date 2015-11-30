@@ -35,7 +35,7 @@ class LdapAuthenticationEvent extends Event
      * @param AuthenticationOperation $operation
      * @param AuthenticationResponse|null $response
      */
-    function __construct($eventName, AuthenticationOperation $operation, AuthenticationResponse $response = null)
+    public function __construct($eventName, AuthenticationOperation $operation, AuthenticationResponse $response = null)
     {
         $this->operation = $operation;
         $this->response = $response;
