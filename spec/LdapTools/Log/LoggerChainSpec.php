@@ -46,11 +46,17 @@ class LoggerChainSpec extends ObjectBehavior
 // A rather hacky way to verify what is being done. Not sure how else to configure this at the moment.
 class LoggerTest1 implements LdapLoggerInterface
 {
+    /**
+     * @param LogOperation $operation
+     */
     public function start(\LdapTools\Log\LogOperation $operation)
     {
         throw new \InvalidArgumentException("Start=".$operation->getOperation()->getDn());
     }
 
+    /**
+     * @param LogOperation $operation
+     */
     public function end(\LdapTools\Log\LogOperation $operation)
     {
         throw new \InvalidArgumentException("End=".$operation->getOperation()->getDn());
