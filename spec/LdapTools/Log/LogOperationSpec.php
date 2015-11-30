@@ -37,11 +37,6 @@ class LogOperationSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Log\LogOperation');
     }
 
-    function it_should_have_a_start_time_value()
-    {
-        $this->getStartTime()->shouldNotBeEqualTo(null);
-    }
-
     function it_should_set_the_domain()
     {
         $this->setDomain('example.local');
@@ -52,6 +47,13 @@ class LogOperationSpec extends ObjectBehavior
     {
         $this->setError('foo');
         $this->getError()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_set_a_start_time()
+    {
+        $this->getStartTime()->shouldBeEqualTo(null);
+        $this->start();
+        $this->getStartTime()->shouldNotBeEqualTo(null);
     }
 
     function it_should_set_a_stop_time()
