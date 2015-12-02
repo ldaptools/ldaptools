@@ -22,7 +22,9 @@ use LdapTools\Operation\QueryOperation;
  */
 class QueryOperationHandler implements OperationHandlerInterface
 {
-    use OperationHandlerTrait;
+    use OperationHandlerTrait {
+        setOperationDefaults as parentSetDefaults;
+    }
 
     /**
      * @var PageControl
@@ -108,6 +110,7 @@ class QueryOperationHandler implements OperationHandlerInterface
         if (is_null($operation->getUsePaging())) {
             $operation->setUsePaging($this->connection->getConfig()->getUsePaging());
         }
+        $this->parentSetDefaults($operation);
     }
 
     /**

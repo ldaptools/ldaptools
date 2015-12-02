@@ -77,5 +77,6 @@ class BatchModifyOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldBeArray();
         $this->getLogArray()->shouldHaveKey('DN');
         $this->getLogArray()->shouldHaveKey('Batch');
+        $this->getLogArray()->shouldHaveKey('Server');
     }
 }

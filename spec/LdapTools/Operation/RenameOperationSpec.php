@@ -92,5 +92,6 @@ class RenameOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('New Location');
         $this->getLogArray()->shouldHaveKey('Delete Old RDN');
         $this->getLogArray()->shouldHaveKey('DN');
+        $this->getLogArray()->shouldHaveKey('Server');
     }
 }

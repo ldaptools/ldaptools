@@ -17,6 +17,8 @@ namespace LdapTools\Operation;
  */
 class AddOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * @var array
      */
@@ -100,9 +102,9 @@ class AddOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        return [
+        return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
             'Attributes' => print_r($this->properties['attributes'], true),
-        ];
+        ]);
     }
 }

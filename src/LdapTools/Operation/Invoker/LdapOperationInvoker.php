@@ -12,6 +12,7 @@ namespace LdapTools\Operation\Invoker;
 
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Log\LogOperation;
+use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\Handler\AuthenticationOperationHandler;
 use LdapTools\Operation\Handler\OperationHandler;
 use LdapTools\Operation\Handler\QueryOperationHandler;
@@ -39,11 +40,13 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
     public function execute(LdapOperationInterface $operation)
     {
         $log = $this->getLogObject($operation);
+        $state = new ConnectionState($this->connection);
 
         try {
             $handler = $this->getOperationHandler($operation);
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
+            $this->switchServerIfNeeded($this->connection->getServer(), $operation->getServer(), $operation);
 
             return $handler->execute($operation);
         } catch (\Throwable $e) {
@@ -52,6 +55,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->logExceptionAndThrow($e, $log);
         } finally {
             $this->logEnd($log);
+            $this->switchServerIfNeeded($this->connection->getServer(),$state->getLastServer(), $operation);
         }
     }
 
@@ -93,5 +97,23 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $operation->getName(),
             get_class($operation)
         ));
+    }
+
+    /**
+     * Performs the logic for switching the LDAP server connection.
+     *
+     * @param string|null $currentServer The server we are currently on.
+     * @param string|null $wantedServer The server we want the connection to be on.
+     * @param LdapOperationInterface $operation
+     */
+    protected function switchServerIfNeeded($currentServer, $wantedServer, $operation)
+    {
+        if ($operation instanceof AuthenticationOperation || strtolower($currentServer) == strtolower($wantedServer)) {
+            return;
+        }
+        if ($this->connection->isBound()) {
+            $this->connection->close();
+        }
+        $this->connection->connect(null, null, false, $wantedServer);
     }
 }

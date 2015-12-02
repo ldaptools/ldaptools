@@ -261,4 +261,25 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
         $this->execute();
     }
+
+    function it_should_allow_a_ldap_server_to_be_set()
+    {
+        $operation = clone $this->addOperation;
+        $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
+        $operation->setServer('foo');
+        $this->connection->execute($operation)->willReturn(true);
+
+        $this->createUser()
+            ->with(['username' => 'somedude', 'password' => '12345'])
+            ->in('ou=employees,dc=example,dc=local')
+            ->setServer('foo')
+            ->execute();
+    }
+
+    function it_should_get_the_ldap_server_set()
+    {
+        $this->getServer()->shouldBeEqualTo(null);
+        $this->setServer('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
+        $this->getServer()->shouldBeEqualTo('foo');
+    }
 }

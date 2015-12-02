@@ -17,6 +17,8 @@ namespace LdapTools\Operation;
  */
 class DeleteOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * @var string The DN to remove.
      */
@@ -74,8 +76,8 @@ class DeleteOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        return [
+        return $this->mergeLogDefaults([
             'DN' => $this->dn,
-        ];
+        ]);
     }
 }

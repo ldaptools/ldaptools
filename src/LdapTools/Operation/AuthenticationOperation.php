@@ -19,6 +19,8 @@ use LdapTools\Exception\LdapBindException;
  */
 class AuthenticationOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * @var array
      */
@@ -142,6 +144,7 @@ class AuthenticationOperation implements LdapOperationInterface
             $this->properties['username'],
             $this->properties['password'],
             $this->properties['isAnonymousBind'],
+            $this->server,
         ];
     }
 
@@ -152,12 +155,12 @@ class AuthenticationOperation implements LdapOperationInterface
     {
         // By default we probably shouldn't expose password info to the logger.
         // Though it is still available via the getPassword() method if needed.
-        return [
+        return $this->mergeLogDefaults([
             'Username' => $this->properties['username'],
             'Password' => '******',
             'Anonymous' => var_export($this->properties['isAnonymousBind'], true),
             'Switch to Credentials' => var_export($this->properties['switchToCredentials'], true),
-        ];
+        ]);
     }
 
     /**

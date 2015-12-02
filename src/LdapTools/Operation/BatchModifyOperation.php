@@ -17,6 +17,8 @@ namespace LdapTools\Operation;
  */
 class BatchModifyOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * @var array
      */
@@ -103,9 +105,9 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        return [
+        return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
             'Batch' => print_r($this->properties['batch'], true),
-        ];
+        ]);
     }
 }

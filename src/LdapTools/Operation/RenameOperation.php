@@ -17,6 +17,8 @@ namespace LdapTools\Operation;
  */
 class RenameOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * @var array
      */
@@ -155,11 +157,11 @@ class RenameOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        return [
+        return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
             'New Location' => $this->properties['newLocation'],
             'New RDN' => $this->properties['newRdn'],
             'Delete Old RDN' => var_export($this->properties['deleteOldRdn'], true),
-        ];
+        ]);
     }
 }

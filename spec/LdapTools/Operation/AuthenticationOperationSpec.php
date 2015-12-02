@@ -75,6 +75,7 @@ class AuthenticationOperationSpec extends ObjectBehavior
             'foo',
             'bar',
             false,
+            null,
         ];
         $this->setUsername($args[0]);
         $this->setPassword($args[1]);
@@ -86,6 +87,7 @@ class AuthenticationOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldBeArray();
         $this->getLogArray()->shouldHaveKey('Username');
         $this->getLogArray()->shouldHaveKey('Password');
+        $this->getLogArray()->shouldHaveKey('Server');
     }
 
     function it_should_error_when_validating_on_get_arguments()

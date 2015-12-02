@@ -123,6 +123,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $this->connection->getConfig()->willReturn($config);
         $this->connection->getRootDse()->shouldBeCalled();
         $this->connection->getRootDse()->willReturn($object);
+        $this->connection->getServer()->willReturn('foo');
 
         $this->setOperationDefaults(new QueryOperation());
     }
@@ -133,6 +134,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
         $this->connection->getConfig()->willReturn($config);
         $this->connection->getRootDse()->shouldNotBeCalled();
+        $this->connection->getServer()->willReturn('foo');
 
         $this->setOperationDefaults(new QueryOperation());
     }
@@ -143,11 +145,12 @@ class QueryOperationHandlerSpec extends ObjectBehavior
     function it_should_not_set_the_defaults_when_they_are_explicitly_set($config)
     {
         $this->connection->getConfig()->willReturn($config);
+        $this->connection->getServer()->shouldNotBeCalled();
         $config->getBaseDn()->shouldNotBeCalled();
         $config->getUsePaging()->shouldNotBeCalled();
         $config->getPageSize()->shouldNotBeCalled();
 
-        $operation = (new QueryOperation())->setUsePaging(true)->setPageSize(10)->setBaseDn('ou=users,dc=foo,dc=bar');
+        $operation = (new QueryOperation())->setUsePaging(true)->setPageSize(10)->setBaseDn('ou=users,dc=foo,dc=bar')->setServer('foo');
         $this->setOperationDefaults($operation);
     }
 
@@ -157,6 +160,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
     function it_should_set_the_defaults_when_they_are_not_explicitly_set($config)
     {
         $this->connection->getConfig()->willReturn($config);
+        $this->connection->getServer()->willReturn('foo');
         $config->getBaseDn()->willReturn('dc=foo,dc=bar');
         $config->getBaseDn()->shouldBeCalled();
         $config->getUsePaging()->shouldBeCalled();

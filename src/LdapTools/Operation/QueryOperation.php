@@ -19,6 +19,8 @@ use LdapTools\Exception\LdapQueryException;
  */
 class QueryOperation implements LdapOperationInterface
 {
+    use LdapOperationTrait;
+
     /**
      * Scope name to LDAP function mappings.
      */
@@ -230,13 +232,13 @@ class QueryOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        return [
+        return $this->mergeLogDefaults([
             'Filter' => $this->properties['filter'],
             'Base DN' => $this->properties['baseDn'],
             'Attributes' => implode(',', $this->properties['attributes']),
             'Scope' => $this->properties['scope'],
             'Use Paging' => var_export($this->properties['usePaging'], true),
             'Page Size' => $this->properties['pageSize'],
-        ];
+        ]);
     }
 }

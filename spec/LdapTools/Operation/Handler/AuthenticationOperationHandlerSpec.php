@@ -71,7 +71,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     function it_should_authenticate_a_user()
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar');
-        $this->connection->connect('foo', 'bar', false)->willReturn($this->connection);
+        $this->connection->connect('foo', 'bar', false, null)->willReturn($this->connection);
         $this->connection->isBound()->willReturn(true);
         $this->connection->close()->willReturn($this->connection);
         $this->connection->connect()->willReturn($this->connection);
@@ -83,7 +83,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     function it_should_authenticate_a_user_but_not_reconnect_if_the_connection_wasnt_bound()
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar');
-        $this->connection->connect('foo', 'bar', false)->willReturn($this->connection);
+        $this->connection->connect('foo', 'bar', false, null)->willReturn($this->connection);
         $this->connection->isBound()->willReturn(false);
         $this->connection->close()->willReturn($this->connection);
 
@@ -96,7 +96,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     function it_should_authenticate_a_user_and_stay_connected_as_them_if_specified($config)
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar')->setSwitchToCredentials(true);
-        $this->connection->connect('foo', 'bar', false)->willReturn($this->connection);
+        $this->connection->connect('foo', 'bar', false, null)->willReturn($this->connection);
         $this->connection->isBound()->willReturn(true);
         $this->connection->close()->willReturn($this->connection);
         $this->connection->getConfig()->willReturn($config);
@@ -112,7 +112,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     {
         $ex = new LdapBindException('Foo');
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar');
-        $this->connection->connect('foo', 'bar', false)->willThrow($ex);
+        $this->connection->connect('foo', 'bar', false, null)->willThrow($ex);
         $this->connection->getLastError()->willReturn('foo');
         $this->connection->getExtendedErrorNumber()->willReturn(99);
         $this->connection->isBound()->willReturn(true);
@@ -129,7 +129,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     {
         $ex = new LdapBindException('Foo');
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar')->setSwitchToCredentials(true);
-        $this->connection->connect('foo', 'bar', false)->willThrow($ex);
+        $this->connection->connect('foo', 'bar', false, null)->willThrow($ex);
         $this->connection->getLastError()->willReturn('foo');
         $this->connection->getExtendedErrorNumber()->willReturn(99);
         $this->connection->isBound()->willReturn(true);
@@ -145,7 +145,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
     function it_should_call_the_event_dispatchers()
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('bar');
-        $this->connection->connect('foo', 'bar', false)->willReturn($this->connection);
+        $this->connection->connect('foo', 'bar', false, null)->willReturn($this->connection);
         $this->connection->isBound()->willReturn(true);
         $this->connection->close()->willReturn($this->connection);
         $this->connection->connect()->willReturn($this->connection);

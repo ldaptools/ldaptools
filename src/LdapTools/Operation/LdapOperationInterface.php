@@ -18,6 +18,21 @@ namespace LdapTools\Operation;
 interface LdapOperationInterface
 {
     /**
+     * Set the LDAP server that should be used for the operation.
+     *
+     * @param string|null $server
+     * @return $this
+     */
+    public function setServer($server);
+
+    /**
+     * Get the server that should be used for the operation.
+     *
+     * @return null|string
+     */
+    public function getServer();
+
+    /**
      * Gets an array of arguments that will be passed to the LDAP function for executing this operation.
      *
      * @return array

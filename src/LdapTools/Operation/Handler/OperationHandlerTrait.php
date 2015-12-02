@@ -52,5 +52,8 @@ trait OperationHandlerTrait
      */
     public function setOperationDefaults(LdapOperationInterface $operation)
     {
+        if (is_null($operation->getServer())) {
+            $operation->setServer($this->connection->getServer());
+        }
     }
 }

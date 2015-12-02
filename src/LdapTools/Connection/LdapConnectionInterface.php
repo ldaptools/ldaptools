@@ -40,9 +40,10 @@ interface LdapConnectionInterface
      * @param string|null $username The username to connect with. If not specified, the one in the config is used.
      * @param string|null $password The password for the username.
      * @param bool $anonymous Whether this is an attempt to bind anonymously, ignoring the username and password.
+     * @param string|null $server The server to connect to. If not specified, the server(s) in the config are used.
      * @return $this
      */
-    public function connect($username = null, $password = null, $anonymous = false);
+    public function connect($username = null, $password = null, $anonymous = false, $server = null);
 
     /**
      * Execute an operation against LDAP (Add, Modify, Delete, Move, Query, etc).

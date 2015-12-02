@@ -75,6 +75,11 @@ class LdapObjectCreator
     protected $dn = '';
 
     /**
+     * @var string A specific server to execute the LDAP object creation against.
+     */
+    protected $server;
+
+    /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
      * @param EventDispatcherInterface $dispatcher
@@ -187,6 +192,30 @@ class LdapObjectCreator
     }
 
     /**
+     * Set an explicit LDAP server to execute against.
+     *
+     * @param string $server
+     * @return $this
+     */
+    public function setServer($server)
+    {
+        $this->server = $server;
+
+        return $this;
+    }
+
+
+    /**
+     * Get an explicit LDAP server to execute against, if any is set.
+     *
+     * @return string|null
+     */
+    public function getServer()
+    {
+        return $this->server;
+    }
+
+    /**
      * Explicitly set the DN to use when adding it to LDAP.
      *
      * @param string $dn
@@ -233,7 +262,7 @@ class LdapObjectCreator
         $attributes = $hydrator->hydrateToLdap($this->attributes);
 
         $dn = $this->getDnToUse($attributes);
-        $this->connection->execute((new AddOperation())->setDn($dn)->setAttributes($attributes));
+        $this->connection->execute((new AddOperation())->setDn($dn)->setAttributes($attributes)->setServer($this->server));
         $this->triggerAfterCreationEvent($dn);
     }
 

@@ -345,4 +345,17 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->where(['foo' => 'bar'])->getLdapQuery()->getQueryOperation()->getUsePaging()->shouldBeEqualTo(null);
         $this->where(['foo' => 'bar'])->setUsePaging(true)->getLdapQuery()->getQueryOperation()->getUsePaging()->shouldBeEqualTo(true);
     }
+
+    function it_should_allow_the_ldap_server_to_be_set_per_query()
+    {
+        $this->where(['foo' => 'bar'])->getLdapQuery()->getQueryOperation()->getServer()->shouldBeEqualTo(null);
+        $this->where(['foo' => 'bar'])->setServer('foo')->getLdapQuery()->getQueryOperation()->getServer()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_set_the_ldap_server()
+    {
+        $this->getServer()->shouldBeEqualTo(null);
+        $this->setServer('foo')->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+        $this->getServer()->shouldBeEqualTo('foo');
+    }
 }

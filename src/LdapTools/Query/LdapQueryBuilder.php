@@ -260,6 +260,29 @@ class LdapQueryBuilder
     }
 
     /**
+     * Set a specific LDAP server to run the query on.
+     *
+     * @param string $server
+     * @return $this
+     */
+    public function setServer($server)
+    {
+        $this->operation->setServer($server);
+
+        return $this;
+    }
+
+    /**
+     * Get the specific LDAP server that the query should be run on, if any is set.
+     *
+     * @return null|string
+     */
+    public function getServer()
+    {
+        return $this->operation->getServer();
+    }
+
+    /**
      * Create a logical 'and' from the passed statements. Either pass a key => value array with attribute names and
      * expected values (which will be compared in terms of equality) or pass arbitrary Operator objects using the
      * 'filter' method shortcuts or some other way.
