@@ -161,7 +161,7 @@ class LdapServerPoolSpec extends ObjectBehavior
     /**
      * @param \LdapTools\Utilities\TcpSocket $tcp
      */
-    function it_should_throw_adjust_the_port_if_it_changes_in_the_domain_config($tcp)
+    function it_should_adjust_the_port_if_it_changes_in_the_domain_config($tcp)
     {
         $tcp->connect('foo', 389)->willReturn(true);
         $tcp->close()->shouldBeCalled();
