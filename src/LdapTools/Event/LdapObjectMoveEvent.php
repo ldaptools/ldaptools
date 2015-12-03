@@ -29,7 +29,7 @@ class LdapObjectMoveEvent extends LdapObjectEvent
      * @param LdapObject $object
      * @param string $container
      */
-    function __construct($eventName, LdapObject $object, $container)
+    public function __construct($eventName, LdapObject $object, $container)
     {
         $this->container = $container;
         parent::__construct($eventName, $object);

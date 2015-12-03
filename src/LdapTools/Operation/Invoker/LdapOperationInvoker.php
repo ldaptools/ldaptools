@@ -55,7 +55,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->logExceptionAndThrow($e, $log);
         } finally {
             $this->logEnd($log);
-            $this->switchServerIfNeeded($this->connection->getServer(),$state->getLastServer(), $operation);
+            $this->switchServerIfNeeded($this->connection->getServer(), $state->getLastServer(), $operation);
         }
     }
 

@@ -206,7 +206,8 @@ class StashCache implements CacheInterface
      * @param string $itemName
      * @return \Stash\Interfaces\ItemInterface
      */
-    protected function getCacheItem($itemType, $itemName) {
+    protected function getCacheItem($itemType, $itemName)
+    {
         return $this->pool->getItem($this->getCachePath($itemType, $itemName));
     }
 }

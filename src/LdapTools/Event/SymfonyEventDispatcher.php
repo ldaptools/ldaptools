@@ -38,9 +38,9 @@ class SymfonyEventDispatcher implements  EventDispatcherInterface
      */
     public function dispatch(EventInterface $event)
     {
-       foreach ($this->dispatcher->getListeners($event->getName()) as $listener) {
-           call_user_func($listener, $event);
-       }
+        foreach ($this->dispatcher->getListeners($event->getName()) as $listener) {
+            call_user_func($listener, $event);
+        }
     }
 
     /**
