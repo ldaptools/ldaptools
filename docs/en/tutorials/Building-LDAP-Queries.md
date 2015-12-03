@@ -184,6 +184,12 @@ The shorthand `$lqb->filter()` methods is what does the heavy-lifting for creati
 should not need to call this method explicitly, but it is included if you need it.
 
 ------------------------
+#### setServer($server)
+
+This lets you set the LDAP server that the query will run against when executed. After the query finishes executing the
+connection switches back to the LDAP server it was originally connected to.
+
+------------------------
 #### setBaseDn($baseDn)
 
 This method sets the base DN (distinguished name) for the query. That means that any LDAP object at or below this point

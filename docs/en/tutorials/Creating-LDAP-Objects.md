@@ -141,6 +141,12 @@ This allows you to manually specify a LDAP object type from the schema that you 
 that all the other shorthand `create*` methods actually call. 
 
 ------------------------
+#### setServer($server)
+
+This lets you set the LDAP server that the LDAP object will be initially created on. This switches the connections LDAP
+server during execution and then switches back to the LDAP server you were originally connected to afterwards.
+
+------------------------
 #### execute()
 
 Takes all of your set attributes, parameters, OU location, etc and adds the object to LDAP. If an issue is encountered
