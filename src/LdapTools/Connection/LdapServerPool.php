@@ -61,7 +61,7 @@ class LdapServerPool
     public function __construct(DomainConfiguration $config, TcpSocket $tcp = null, Dns $dns = null)
     {
         $this->config = $config;
-        $this->tcp = $tcp ?: new TcpSocket($config->getPort());
+        $this->tcp = $tcp ?: new TcpSocket();
         $this->dns = $dns ?: new Dns();
     }
 
@@ -132,7 +132,7 @@ class LdapServerPool
      */
     protected function isServerAvailable($server)
     {
-        $result = $this->tcp->connect($server);
+        $result = $this->tcp->connect($server, $this->config->getPort());
         if ($result) {
             $this->tcp->close();
         }

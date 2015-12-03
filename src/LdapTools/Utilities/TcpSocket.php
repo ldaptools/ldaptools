@@ -18,32 +18,20 @@ namespace LdapTools\Utilities;
 class TcpSocket
 {
     /**
-     * @var int The TCP port number.
-     */
-    protected $port;
-
-    /**
      * @var bool|resource
      */
     protected $socket = false;
 
     /**
-     * @param int $port The TCP port number.
-     */
-    public function __construct($port)
-    {
-        $this->port = $port;
-    }
-
-    /**
      * Connect to the host on the port defined for this TCP socket.
      *
      * @param string $host
+     * @param int $port
      * @return bool
      */
-    public function connect($host)
+    public function connect($host, $port)
     {
-        $this->socket = @fsockopen($host, $this->port, $errorNumber, $errorMessage, 1);
+        $this->socket = @fsockopen($host, $port, $errorNumber, $errorMessage, 1);
 
         return (bool) $this->socket;
     }

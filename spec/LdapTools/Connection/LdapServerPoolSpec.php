@@ -81,7 +81,7 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_throw_an_exception_when_no_servers_are_available($tcp)
     {
-        $tcp->connect('foo')->willReturn(false);
+        $tcp->connect('foo', 389)->willReturn(false);
         $config = new DomainConfiguration('example.com');
         $config->setServers(['foo']);
         $this->beConstructedWith($config, $tcp);
@@ -98,8 +98,8 @@ class LdapServerPoolSpec extends ObjectBehavior
         if (version_compare(PHP_VERSION, '7.0', '>=')) {
             throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy related issue?");
         };
-        $tcp->connect('foo.example.com')->willReturn(false);
-        $tcp->connect('bar.example.com')->willReturn(true);
+        $tcp->connect('foo.example.com', 389)->willReturn(false);
+        $tcp->connect('bar.example.com', 389)->willReturn(true);
         $tcp->close()->willReturn(null);
         $srvRecords = [
             [
@@ -156,6 +156,27 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->beConstructedWith($config, $tcp, $dns);
 
         $this->shouldThrow($e)->duringGetServer();
+    }
+
+    /**
+     * @param \LdapTools\Utilities\TcpSocket $tcp
+     */
+    function it_should_throw_adjust_the_port_if_it_changes_in_the_domain_config($tcp)
+    {
+        $tcp->connect('foo', 389)->willReturn(true);
+        $tcp->close()->shouldBeCalled();
+        $config = new DomainConfiguration('example.com');
+        $config->setServers(['foo']);
+        $this->beConstructedWith($config, $tcp);
+
+
+        $this->getServer()->shouldReturn('foo');
+        $config->setPort(9001);
+
+        $tcp->connect('foo', 9001)->shouldBeCalled();
+        $tcp->connect('foo', 9001)->willReturn(true);
+
+        $this->getServer()->shouldReturn('foo');
     }
 
     public function getMatchers()
