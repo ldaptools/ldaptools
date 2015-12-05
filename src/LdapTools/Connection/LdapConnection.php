@@ -235,8 +235,7 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Binds to LDAP with the supplied credentials or anonymously if specified. You should NOT have to use this directly.
-     * Instead you should call either 'connect()' or 'authenticate()'.
+     * Binds to LDAP with the supplied credentials or anonymously if specified.
      *
      * @param string $username The username to bind with.
      * @param string $password The password to bind with.
