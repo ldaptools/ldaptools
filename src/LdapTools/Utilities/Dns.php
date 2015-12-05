@@ -20,7 +20,7 @@ class Dns
     /**
      * Call this just like you would dns_get_record.
      *
-     * @param ...$arguments
+     * @param mixed ...$arguments
      * @return array
      */
     public function getRecord(...$arguments)
