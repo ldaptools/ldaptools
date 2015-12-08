@@ -223,4 +223,9 @@ class LdapManagerSpec extends ObjectBehavior
     {
         $this->getSchemaFactory()->shouldReturnAnInstanceOf('\LdapTools\Factory\LdapObjectSchemaFactory');
     }
+
+    function it_should_return_the_event_dispatcher_instance()
+    {
+        $this->getEventDispatcher()->shouldReturnAnInstanceOf('\LdapTools\Event\EventDispatcherInterface');
+    }
 }

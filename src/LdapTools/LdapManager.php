@@ -335,6 +335,16 @@ class LdapManager
     }
 
     /**
+     * Get the event dispatcher instance.
+     *
+     * @return Event\EventDispatcherInterface|null
+     */
+    public function getEventDispatcher()
+    {
+        return $this->config->getEventDispatcher();
+    }
+
+    /**
      * Validates that the domain name actually exists.
      *
      * @param string $domain
