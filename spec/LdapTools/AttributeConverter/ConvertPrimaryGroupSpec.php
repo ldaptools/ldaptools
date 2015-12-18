@@ -89,7 +89,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
     {
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setDn('foo');
-        $this->shouldThrow('\InvalidArgumentException')->duringToLdap('Domain Users');
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('Domain Users');
     }
 
     function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification()

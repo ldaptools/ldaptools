@@ -142,7 +142,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         ]]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
-        $this->shouldThrow('\RuntimeException')->duringToLdap($ldapObject);
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap($ldapObject);
     }
 
     /**
@@ -177,7 +177,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute($ldap)
     {
         $this->setLdapConnection($ldap);
-        $this->shouldThrow('\RuntimeException')->duringToLdap('foo');
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
     }
 
     function it_should_display_the_dn_from_ldap_if_specified()

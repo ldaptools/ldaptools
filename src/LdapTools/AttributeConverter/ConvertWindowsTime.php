@@ -10,6 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
+
 /**
  * Converts a Windows timestamp into a \DateTime object, and from a \DateTime object back to Windows time.
  *
@@ -35,7 +37,7 @@ class ConvertWindowsTime implements AttributeConverterInterface
     public function toLdap($date)
     {
         if (!$date instanceof \DateTime) {
-            throw new \InvalidArgumentException('The datetime going to LDAP should be a DateTime object.');
+            throw new AttributeConverterException('The datetime going to LDAP should be a DateTime object.');
         }
 
         // The number_format call is to make sure a float is properly converted to a string across all platforms.

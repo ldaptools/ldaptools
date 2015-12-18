@@ -10,6 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
+
 /**
  * Used to convert an accountExpires value to a DateTime object, or detect if the value indicates it never expires and
  * either set it as false. To set the account to never expire always pass a bool false as the value. Otherwise to set a
@@ -33,7 +35,7 @@ class ConvertAccountExpiration implements AttributeConverterInterface
     public function toLdap($value)
     {
         if (!($value === false || ($value instanceof \DateTime))) {
-            throw new \InvalidArgumentException('Expecting a bool or DateTime when converting to LDAP.');
+            throw new AttributeConverterException('Expecting a bool or DateTime when converting to LDAP.');
         }
 
         return ($value === false) ? '0' : (new ConvertWindowsTime())->toLdap($value);

@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Exception\EmptyResultException;
 use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Query\LdapQueryBuilder;
@@ -67,6 +68,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
      *
      * @param string $name The group name.
      * @return string The text SID of the group.
+     * @throws AttributeConverterException
      */
     protected function validateAndGetGroupSID($name)
     {
@@ -82,7 +84,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
                  ->getLdapQuery()
                  ->getSingleScalarResult();
         } catch (EmptyResultException $e) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new AttributeConverterException(sprintf(
                 'Either the group "%s" doesn\'t exist, the user with DN "%s" is not a member of the group, the group'
                 .' is not a security group, or this group is already their primary group.',
                 $name,

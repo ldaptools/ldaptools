@@ -45,4 +45,9 @@ class ConvertAccountExpirationSpec extends ObjectBehavior
     {
         $this->toLdap(false)->shouldBeEqualTo('0');
     }
+
+    function it_should_throw_an_attribute_converter_exception_if_the_value_to_ldap_is_not_supported()
+    {
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new \SplObjectStorage());
+    }
 }

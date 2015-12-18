@@ -55,4 +55,9 @@ class ConvertGeneralizedTimeSpec extends ObjectBehavior
     {
         $this->fromLdap($this->tsWithOffset)->shouldBeLike(new \DateTime('20001231235959', new \DateTimeZone('CET')));
     }
+
+    function it_should_error_when_the_value_going_to_ldap_is_not_a_datetime_object()
+    {
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
+    }
 }

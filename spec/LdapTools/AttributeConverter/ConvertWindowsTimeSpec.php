@@ -39,4 +39,8 @@ class ConvertWindowsTimeSpec extends ObjectBehavior
         $this->toLdap(new \DateTime($this->genTime, new \DateTimeZone('UTC')))->shouldBeEqualTo($this->timestamp);
     }
 
+    function it_should_error_when_the_value_going_to_ldap_is_not_a_datetime_object()
+    {
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
+    }
 }

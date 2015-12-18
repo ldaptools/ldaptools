@@ -10,6 +10,8 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
+
 /**
  * Converts Generalized Time format to/from a \DateTime object.
  *
@@ -26,7 +28,7 @@ class ConvertGeneralizedTime implements AttributeConverterInterface
     public function toLdap($date)
     {
         if (!$date instanceof \DateTime) {
-            throw new \InvalidArgumentException('The datetime going to LDAP should be a DateTime object.');
+            throw new AttributeConverterException('The datetime going to LDAP should be a DateTime object.');
         }
 
         return $date->format('YmdHis').$this->getTzOffsetForTimestamp($date->format('P'));

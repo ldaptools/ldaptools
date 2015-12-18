@@ -35,8 +35,8 @@ class ConvertADTimeSpanSpec extends ObjectBehavior
 
     function it_should_error_when_not_an_instace_of_ADTimeSpan_going_to_ldap()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringToLdap('foo');
-        $this->shouldThrow('\InvalidArgumentException')->duringToLdap(true);
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(true);
     }
 
     function it_should_convert_a_ldap_time_span_value_into_an_ADTimeSpan_object()

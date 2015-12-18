@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Utilities\ADTimeSpan;
 
 /**
@@ -27,7 +28,7 @@ class ConvertADTimeSpan implements AttributeConverterInterface
     public function toLdap($value)
     {
         if (!($value instanceof ADTimeSpan)) {
-            throw new \InvalidArgumentException(sprintf(
+            throw new AttributeConverterException(sprintf(
                 'The time span format for "%s" should be an instance of "\LdapTools\Utilities\ADTimeSpan"',
                 $this->getAttribute()
             ));

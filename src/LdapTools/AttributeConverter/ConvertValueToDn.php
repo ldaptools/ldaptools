@@ -10,6 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Object\LdapObject;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\Operator\bOr;
@@ -55,11 +56,12 @@ class ConvertValueToDn implements  AttributeConverterInterface
      *
      * @param string $value
      * @return string $dn
+     * @throws AttributeConverterException
      */
     protected function getDnFromValue($value)
     {
         if ($value instanceof LdapObject && !$value->has('dn')) {
-            throw new \RuntimeException('The LdapObject must have a DN defined.');
+            throw new AttributeConverterException('The LdapObject must have a DN defined.');
         } elseif ($value instanceof LdapObject) {
             $value = $value->get('dn');
         } elseif (!LdapUtilities::isValidLdapObjectDn($value) && !is_null($this->getLdapConnection())) {
@@ -138,6 +140,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
      * Validates and retrieves the options array for the current attribute.
      *
      * @return array
+     * @throws AttributeConverterException
      */
     protected function getOptionsArray()
     {
@@ -145,10 +148,10 @@ class ConvertValueToDn implements  AttributeConverterInterface
         $options = $this->getArrayValue($this->options, $this->getAttribute());
 
         if (!isset($options['filter']) || !is_array($options['filter'])) {
-            throw new \RuntimeException(sprintf('Filter not valid for "%s".', $this->getAttribute()));
+            throw new AttributeConverterException(sprintf('Filter not valid for "%s".', $this->getAttribute()));
         }
         if (!isset($options['attribute'])) {
-            throw new \RuntimeException(sprintf('Attribute to search on not defined for "%s"', $this->getAttribute()));
+            throw new AttributeConverterException(sprintf('Attribute to search on not defined for "%s"', $this->getAttribute()));
         }
 
         return $options;
@@ -156,11 +159,13 @@ class ConvertValueToDn implements  AttributeConverterInterface
 
     /**
      * Make sure that the current attribute has actually been defined.
+     *
+     * @throws AttributeConverterException
      */
     protected function validateCurrentAttribute()
     {
         if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($this->getOptions()))) {
-            throw new \RuntimeException(
+            throw new AttributeConverterException(
                 sprintf('Attribute "%s" must be defined in the converter options.', $this->getAttribute())
             );
         }

@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
+use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Factory\HydratorFactory;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Query\LdapQueryBuilder;
@@ -111,12 +112,13 @@ class ConvertGPLink implements AttributeConverterInterface
      *
      * @param string $gpLink
      * @return string[]
+     * @throws AttributeConverterException
      */
     protected function explodeGPOLinkString($gpLink)
     {
         preg_match_all('/(?:\[LDAP\:\/\/(.*?);\d\])/', $gpLink, $matches);
         if (!isset($matches[1])) {
-            throw new \RuntimeException(sprintf('Unable to parse gPLink value: %s', $gpLink));
+            throw new AttributeConverterException(sprintf('Unable to parse gPLink value: %s', $gpLink));
         }
 
         return $matches[1];
