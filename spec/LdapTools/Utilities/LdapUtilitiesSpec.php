@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Utilities;
 
+use LdapTools\Utilities\LdapUtilities;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -126,5 +127,46 @@ class LdapUtilitiesSpec extends ObjectBehavior
     function it_should_get_the_rdn_from_a_dn()
     {
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');
+    }
+
+    function it_should_mask_passwords_in_an_array_of_attributes_and_values()
+    {
+        $attributes = [
+            'username' => 'foo',
+            'unicodePwd' => 'correct horse battery staple',
+            'userPassword' => '12345',
+        ];
+        $masked = $attributes;
+        $masked['unicodePwd'] = LdapUtilities::MASK;
+        $masked['userPassword'] = LdapUtilities::MASK;
+
+        $this::maskAttributeArray($attributes)->shouldBeEqualTo($masked);
+    }
+
+    function it_should_mask_passwords_in_a_ldap_batch_array()
+    {
+        $batch = [
+            [
+                "attrib"  => "unicodePwd",
+                "modtype" => LDAP_MODIFY_BATCH_REMOVE,
+                "values"  => ["password"],
+            ],
+            [
+                "attrib"  => "userPassword",
+                "modtype" => LDAP_MODIFY_BATCH_ADD,
+                "values"  => ["correct horse battery staple"],
+            ],
+            [
+                "attrib"  => "givenName",
+                "modtype" => LDAP_MODIFY_BATCH_REPLACE,
+                "values"  => ["Jack"],
+            ],
+        ];
+
+        $masked = $batch;
+        $masked[0]['values'] = ['******'];
+        $masked[1]['values'] = ['******'];
+
+        $this::maskBatchArray($batch)->shouldBeEqualTo($masked);
     }
 }
