@@ -129,6 +129,19 @@ class LogOperation
     }
 
     /**
+     * Set the LDAP operation represented for this log.
+     *
+     * @param LdapOperationInterface $operation
+     * @return $this
+     */
+    public function setOperation(LdapOperationInterface $operation)
+    {
+        $this->operation = $operation;
+
+        return $this;
+    }
+
+    /**
      * Signifies that the operation has started.
      *
      * @return $this

@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Log;
 
+use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -66,5 +67,13 @@ class LogOperationSpec extends ObjectBehavior
     function it_should_get_the_ldap_operation()
     {
         $this->getOperation()->shouldBeEqualTo($this->operation);
+    }
+
+    function it_should_set_the_ldap_operation()
+    {
+        $op = new DeleteOperation();
+
+        $this->setOperation($op)->shouldBeAnInstanceOf('\LdapTools\Log\LogOperation');
+        $this->getOperation()->shouldBeEqualTo($op);
     }
 }
