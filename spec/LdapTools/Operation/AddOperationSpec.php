@@ -73,4 +73,12 @@ class AddOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Attributes');
         $this->getLogArray()->shouldHaveKey('Server');
     }
+
+    function it_should_mask_password_values_in_the_log_formatted_array()
+    {
+        $this->setAttributes(['username' => 'foo', 'unicodePwd' => 'correct horse battery staple']);
+        $this->getLogArray()->shouldContain(print_r(['username' => 'foo', 'unicodePwd' => '******'], true));
+        $this->setAttributes(['username' => 'foo', 'userPassword' => 'correct horse battery staple']);
+        $this->getLogArray()->shouldContain(print_r(['username' => 'foo', 'userPassword' => '******'], true));
+    }
 }

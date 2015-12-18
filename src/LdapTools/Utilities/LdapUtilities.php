@@ -43,6 +43,19 @@ class LdapUtilities
     const SRV_PREFIX = '_ldap._tcp.';
 
     /**
+     * The mask to use when sanitizing arrays with LDAP password information.
+     */
+    const MASK = '******';
+
+    /**
+     * The attributes to mask in a batch/attribute array.
+     */
+    const MASK_ATTRIBUTES = [
+        'unicodepwd',
+        'userpassword',
+    ];
+
+    /**
      * Escape any special characters for LDAP to their hexadecimal representation.
      *
      * @param mixed $value The value to escape.
@@ -174,6 +187,44 @@ class LdapUtilities
     public static function isValidAttributeFormat($value)
     {
         return (preg_match(self::MATCH_DESCRIPTOR, $value) || preg_match(self::MATCH_OID, $value));
+    }
+
+    /**
+     * Attempts to mask passwords in a LDAP batch array while keeping the rest intact.
+     *
+     * @param array $batch
+     * @return array
+     */
+    public static function maskBatchArray(array $batch)
+    {
+        foreach ($batch as $i => $batchItem) {
+            if (!isset($batchItem['attrib']) || !isset($batchItem['values'])) {
+                continue;
+            }
+            if (!in_array(strtolower($batchItem['attrib']), self::MASK_ATTRIBUTES)) {
+                continue;
+            }
+            $batch[$i]['values'] = [self::MASK];
+        }
+
+        return $batch;
+    }
+
+    /**
+     * Attempts to mask password attribute values used in logging.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    public static function maskAttributeArray(array $attributes)
+    {
+        foreach ($attributes as $key => $value) {
+            if (in_array(strtolower($key), self::MASK_ATTRIBUTES)) {
+                $attributes[$key] = self::MASK;
+            }
+        }
+
+        return $attributes;
     }
 
     /**

@@ -79,4 +79,31 @@ class BatchModifyOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Batch');
         $this->getLogArray()->shouldHaveKey('Server');
     }
+
+    function it_should_mask_password_values_in_the_log_formatted_array()
+    {
+        $batch = [
+            [
+                "attrib"  => "unicodePwd",
+                "modtype" => LDAP_MODIFY_BATCH_REMOVE,
+                "values"  => ["password"],
+            ],
+            [
+                "attrib"  => "userPassword",
+                "modtype" => LDAP_MODIFY_BATCH_ADD,
+                "values"  => ["correct horse battery staple"],
+            ],
+            [
+                "attrib"  => "givenName",
+                "modtype" => LDAP_MODIFY_BATCH_REPLACE,
+                "values"  => ["Jack"],
+            ],
+        ];
+
+        $this->setBatch($batch);
+        $batch[0]['values'] = ['******'];
+        $batch[1]['values'] = ['******'];
+
+        $this->getLogArray()->shouldContain(print_r($batch, true));
+    }
 }

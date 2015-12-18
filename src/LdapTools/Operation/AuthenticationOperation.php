@@ -11,6 +11,7 @@
 namespace LdapTools\Operation;
 
 use LdapTools\Exception\LdapBindException;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Represents an authentication operation against LDAP.
@@ -157,7 +158,7 @@ class AuthenticationOperation implements LdapOperationInterface
         // Though it is still available via the getPassword() method if needed.
         return $this->mergeLogDefaults([
             'Username' => $this->properties['username'],
-            'Password' => '******',
+            'Password' => LdapUtilities::MASK,
             'Anonymous' => var_export($this->properties['isAnonymousBind'], true),
             'Switch to Credentials' => var_export($this->properties['switchToCredentials'], true),
         ]);

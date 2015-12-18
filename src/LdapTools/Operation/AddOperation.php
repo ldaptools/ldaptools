@@ -10,6 +10,8 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Utilities\LdapUtilities;
+
 /**
  * Represents an operation to add an object to LDAP.
  *
@@ -104,7 +106,7 @@ class AddOperation implements LdapOperationInterface
     {
         return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
-            'Attributes' => print_r($this->properties['attributes'], true),
+            'Attributes' => print_r(LdapUtilities::maskAttributeArray($this->properties['attributes']), true),
         ]);
     }
 }

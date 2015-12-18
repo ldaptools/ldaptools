@@ -10,6 +10,8 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Utilities\LdapUtilities;
+
 /**
  * Represents an operation to batch modify attribute values on an existing LDAP object .
  *
@@ -105,9 +107,11 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
+        $batch = is_array($this->properties['batch']) ? LdapUtilities::maskBatchArray($this->properties['batch']) : $this->properties['batch'];
+
         return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
-            'Batch' => print_r($this->properties['batch'], true),
+            'Batch' => print_r($batch, true),
         ]);
     }
 }
