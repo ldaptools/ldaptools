@@ -72,6 +72,18 @@ class ConfigurationSpec extends ObjectBehavior
         $this->loadFromArray($config)->getDomainConfiguration('foo.bar')->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');
     }
 
+    function it_should_allow_loading_from_an_array_with_no_domains_set()
+    {
+        $config = [
+            'general' => [
+                'schema_folder' => '/foo/bar',
+            ],
+        ];
+        $this->beConstructedWith();
+        $this->loadFromArray($config)->shouldReturnAnInstanceOf('\LdapTools\Configuration');
+        $this->loadFromArray($config)->getDomainConfiguration()->shouldBeEqualTo([]);
+    }
+
     function it_should_return_self_when_calling_setDefaultDomain()
     {
         $this->setDefaultDomain('foo.bar')->shouldReturnAnInstanceOf('\LdapTools\Configuration');

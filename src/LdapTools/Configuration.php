@@ -342,7 +342,9 @@ class Configuration
      */
     public function loadFromArray(array $config)
     {
-        $this->loadDomainConfiguration($config);
+        if (isset($config['domains'])) {
+            $this->loadDomainConfiguration($config);
+        }
 
         if (isset($config['general'])) {
             $generalConfig = $this->getParsedConfig(
@@ -365,10 +367,6 @@ class Configuration
      */
     protected function loadDomainConfiguration(array $config)
     {
-        if (!isset($config['domains'])) {
-            throw new ConfigurationException("Your configuration file must have at least one domain.");
-        }
-
         try {
             foreach ($config['domains'] as $domain => $options) {
                 $domain = new DomainConfiguration();
