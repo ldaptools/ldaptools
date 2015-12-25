@@ -1,6 +1,13 @@
 CHANGELOG
 =========
 
+0.17.0 (2015-12-25)
+------------------
+  * Added a method to retrieve the event dispatcher from the LdapManager.
+  * Mask sensitive data in the operation's log array by default.
+  * When loading a configuration from an array, the array no longer has to have a domain defined.
+  * Added an AttributeConverterException for issues encountered during attribute value conversion.
+
 0.16.0 (2015-12-02)
 ------------------
   * Implemented a logging mechanism for LDAP operations.
