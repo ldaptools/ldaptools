@@ -15,7 +15,7 @@ namespace LdapTools\Connection;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class LdapControls
+class LdapControlType
 {
     /**
      * Paged operation support that splits results into multiple result sets.
