@@ -10,8 +10,12 @@
 
 namespace spec\LdapTools;
 
+use LdapTools\Connection\LdapControl;
+use LdapTools\Connection\LdapControlType;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\AuthenticationResponse;
+use LdapTools\Operation\DeleteOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use \LdapTools\Configuration;
@@ -227,5 +231,26 @@ class LdapManagerSpec extends ObjectBehavior
     function it_should_return_the_event_dispatcher_instance()
     {
         $this->getEventDispatcher()->shouldReturnAnInstanceOf('\LdapTools\Event\EventDispatcherInterface');
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_delete_a_ldap_object($connection)
+    {
+        $domainConfig = new DomainConfiguration('example.local');
+        $connection->getConfig()->willReturn($domainConfig);
+        $this->beConstructedWith(new Configuration(), $connection);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'],['user'], 'user', 'user');
+        $operation = (new DeleteOperation())->setDn($ldapObject->get('dn'));
+        $connection->execute($operation)->shouldBeCalled();
+
+        $this->delete($ldapObject);
+
+        $operation->addControl((new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true));
+        $connection->execute($operation)->shouldBeCalled();
+
+        $this->delete($ldapObject, true);
     }
 }

@@ -13,6 +13,8 @@ namespace LdapTools\Object;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Connection\LdapControl;
+use LdapTools\Connection\LdapControlType;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectEvent;
@@ -90,12 +92,19 @@ class LdapObjectManager
      * Removes an object from LDAP.
      *
      * @param LdapObject $ldapObject
+     * @param bool $recursively
      */
-    public function delete(LdapObject $ldapObject)
+    public function delete(LdapObject $ldapObject, $recursively = false)
     {
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject));
         $this->validateObject($ldapObject);
-        $this->connection->execute((new DeleteOperation())->setDn($ldapObject->get('dn')));
+
+        $operation = (new DeleteOperation())->setDn($ldapObject->get('dn'));
+        if ($recursively) {
+            $operation->addControl((new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true));
+        }
+
+        $this->connection->execute($operation);
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject));
     }
 

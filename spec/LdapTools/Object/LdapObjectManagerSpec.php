@@ -3,6 +3,8 @@
 namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
+use LdapTools\Connection\LdapControl;
+use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectEvent;
@@ -84,6 +86,17 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $this->delete($ldapObject);
+    }
+
+    function it_should_delete_a_ldap_object_recursively_if_specified()
+    {
+        $control = (new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true);
+        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar')->addControl($control))
+            ->shouldBeCalled()
+            ->willReturn(true);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $this->delete($ldapObject, true);
     }
 
     function it_should_update_a_ldap_object_using_batch_modify()

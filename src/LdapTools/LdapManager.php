@@ -234,14 +234,19 @@ class LdapManager
     }
 
     /**
-     * Delete an object from LDAP.
+     * Delete an object from LDAP. Optionally you can set the second argument to true which sends a control to LDAP to
+     * perform a recursive deletion. This is helpful in the case of deleting an OU with with objects underneath it. By
+     * setting the second parameter to true the OU and all objects below it would be deleted. Use with care!
+     *
+     * If recursive deletion does not work, first check that 'accidental deletion' is not enabled on the object (AD).
      *
      * @param LdapObject $ldapObject
+     * @param bool $recursively
      * @return $this
      */
-    public function delete(LdapObject $ldapObject)
+    public function delete(LdapObject $ldapObject, $recursively = false)
     {
-        $this->getObjectManager()->delete($ldapObject);
+        $this->getObjectManager()->delete($ldapObject, $recursively);
 
         return $this;
     }
