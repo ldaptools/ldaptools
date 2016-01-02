@@ -47,6 +47,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
             $this->switchServerIfNeeded($this->connection->getServer(), $operation->getServer(), $operation);
+            $this->setLdapControls($operation);
 
             return $handler->execute($operation);
         } catch (\Throwable $e) {
@@ -55,6 +56,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->logExceptionAndThrow($e, $log);
         } finally {
             $this->logEnd($log);
+            $this->resetLdapControls($operation);
             $this->switchServerIfNeeded($this->connection->getServer(), $state->getLastServer(), $operation);
         }
     }
@@ -115,5 +117,40 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->connection->close();
         }
         $this->connection->connect(null, null, false, $wantedServer);
+    }
+
+    /**
+     * Set any specific LDAP controls for this operation.
+     *
+     * @param LdapOperationInterface $operation
+     */
+    protected function setLdapControls(LdapOperationInterface $operation)
+    {
+        if (empty($operation->getControls())) {
+            return;
+        }
+
+        foreach ($operation->getControls() as $control) {
+            $this->connection->setControl($control);
+        }
+    }
+
+    /**
+     * Reset any specific LDAP controls used with this operation. This is to make sure they are not accidentally used in
+     * future operations when it is not expected.
+     *
+     * @param LdapOperationInterface $operation
+     */
+    protected function resetLdapControls(LdapOperationInterface $operation)
+    {
+        if (empty($operation->getControls())) {
+            return;
+        }
+
+        foreach ($operation->getControls() as $control) {
+            $reset = clone $control;
+            $reset->setValue(false);
+            $this->connection->setControl($reset);
+        }
     }
 }

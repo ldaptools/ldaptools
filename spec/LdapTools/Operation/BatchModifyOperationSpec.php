@@ -78,6 +78,7 @@ class BatchModifyOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('DN');
         $this->getLogArray()->shouldHaveKey('Batch');
         $this->getLogArray()->shouldHaveKey('Server');
+        $this->getLogArray()->shouldHaveKey('Controls');
     }
 
     function it_should_mask_password_values_in_the_log_formatted_array()

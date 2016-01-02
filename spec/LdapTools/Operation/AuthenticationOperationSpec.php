@@ -88,6 +88,7 @@ class AuthenticationOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Username');
         $this->getLogArray()->shouldHaveKey('Password');
         $this->getLogArray()->shouldHaveKey('Server');
+        $this->getLogArray()->shouldHaveKey('Controls');
     }
 
     function it_should_error_when_validating_on_get_arguments()

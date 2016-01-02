@@ -10,6 +10,8 @@
 
 namespace spec\LdapTools\Operation\Invoker;
 
+use LdapTools\Connection\LdapControl;
+use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\DeleteOperation;
@@ -76,6 +78,10 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
         $operation->getServer()->willReturn('foo');
+        $operation->getControls()->willReturn([]);
+
+        // This should not be called unless a control is explicitly set
+        $this->connection->setControl(Argument::any())->shouldNotBeCalled();
 
         $this->addHandler($handler);
         $this->addHandler($queryHandler);
@@ -87,7 +93,6 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_switch_the_server_if_the_operation_requested_it($handler)
     {
-
         $operation = (new DeleteOperation())->setDn('foo')->setServer('bar');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
@@ -111,7 +116,6 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_NOT_switch_the_server_if_the_operation_doesnt_request_it($handler)
     {
-
         $operation = (new DeleteOperation())->setDn('foo');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
@@ -137,7 +141,6 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_NOT_switch_the_server_if_the_server_is_already_active($handler)
     {
-
         $operation = (new DeleteOperation())->setDn('foo')->setServer('foo');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
@@ -170,6 +173,33 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->connection->getServer()->willReturn('bar');
         $this->setConnection($this->connection);
 
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_set_controls_specified_by_the_operation($handler)
+    {
+        $control = new LdapControl(LdapControlType::SUB_TREE_DELETE);
+        $operation = (new DeleteOperation())->setDn('ou=test,dc=foo,dc=bar')->addControl($control);
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+
+        $this->connection->close()->shouldBeCalled();
+        $this->connection->connect(null, null, false, null)->shouldBeCalled();
+        $this->connection->setControl($control)->shouldBeCalled();
+
+        $reset = clone $control;
+        $reset->setValue(false);
+
+        // It should also reset the control too...
+        $this->connection->setControl($reset)->shouldBeCalled();
+
+        $this->addHandler($handler);
         $this->execute($operation);
     }
 }

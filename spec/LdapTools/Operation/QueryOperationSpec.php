@@ -118,5 +118,6 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Attributes');
         $this->getLogArray()->shouldHaveKey('Use Paging');
         $this->getLogArray()->shouldHaveKey('Server');
+        $this->getLogArray()->shouldHaveKey('Controls');
     }
 }

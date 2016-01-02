@@ -59,5 +59,6 @@ class DeleteOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldBeArray();
         $this->getLogArray()->shouldHaveKey('DN');
         $this->getLogArray()->shouldHaveKey('Server');
+        $this->getLogArray()->shouldHaveKey('Controls');
     }
 }

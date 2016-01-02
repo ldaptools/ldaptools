@@ -10,6 +10,8 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Connection\LdapControl;
+
 /**
  * The interface to represent a LDAP operation to be executed.
  *
@@ -31,6 +33,21 @@ interface LdapOperationInterface
      * @return null|string
      */
     public function getServer();
+
+    /**
+     * Add a control to the operation.
+     *
+     * @param LdapControl $control
+     * @return $this
+     */
+    public function addControl(LdapControl $control);
+
+    /**
+     * Get the controls set for the operation.
+     *
+     * @return LdapControl[]
+     */
+    public function getControls();
 
     /**
      * Gets an array of arguments that will be passed to the LDAP function for executing this operation.

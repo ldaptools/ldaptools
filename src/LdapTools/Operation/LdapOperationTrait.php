@@ -10,6 +10,8 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Connection\LdapControl;
+
 /**
  * Common LDAP operation functions.
  *
@@ -21,6 +23,11 @@ trait LdapOperationTrait
      * @var null|string
      */
     protected $server;
+
+    /**
+     * @var LdapControl[]
+     */
+    protected $controls = [];
 
     /**
      * Set the LDAP server that should be used for the operation.
@@ -46,6 +53,29 @@ trait LdapOperationTrait
     }
 
     /**
+     * Get the controls set for the operation.
+     *
+     * @return LdapControl[]
+     */
+    public function getControls()
+    {
+        return $this->controls;
+    }
+
+    /**
+     * Add a control to the operation.
+     *
+     * @param LdapControl $control
+     * @return $this
+     */
+    public function addControl(LdapControl $control)
+    {
+        $this->controls[] = $control;
+
+        return $this;
+    }
+
+    /**
      * Merges the log array with common log properties.
      *
      * @param array $log
@@ -53,6 +83,16 @@ trait LdapOperationTrait
      */
     protected function mergeLogDefaults(array $log)
     {
-        return array_merge($log, ['Server' => $this->server]);
+        $controls = [];
+        if (!empty($this->controls)) {
+            foreach ($this->controls as $control) {
+                $controls[] = $control->toArray();
+            }
+        }
+
+        return array_merge($log, [
+            'Server' => $this->server,
+            'Controls' => var_export($controls, true),
+        ]);
     }
 }
