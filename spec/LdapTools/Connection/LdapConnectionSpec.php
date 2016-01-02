@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Connection;
 
+use LdapTools\Connection\LdapControl;
 use LdapTools\Event\SymfonyEventDispatcher;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -78,5 +79,10 @@ class LdapConnectionSpec extends ObjectBehavior
     function it_should_have_a_method_to_get_the_connection_resource()
     {
         $this->getConnection()->shouldBeEqualTo(null);
+    }
+
+    function it_should_set_a_control()
+    {
+        $this->setControl(new LdapControl('foo'));
     }
 }

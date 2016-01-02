@@ -11,6 +11,7 @@
 namespace LdapTools\Connection;
 
 use LdapTools\DomainConfiguration;
+use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Operation\LdapOperationInterface;
 
 /**
@@ -95,4 +96,12 @@ interface LdapConnectionInterface
      * @return int
      */
     public function getExtendedErrorNumber();
+
+    /**
+     * Set the LDAP control for the connection.
+     *
+     * @param LdapControl $control
+     * @throws LdapConnectionException
+     */
+    public function setControl(LdapControl $control);
 }

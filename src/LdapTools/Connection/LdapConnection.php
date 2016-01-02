@@ -205,6 +205,16 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function setControl(LdapControl $control)
+    {
+        if (!@ldap_set_option($this->connection, LDAP_OPT_SERVER_CONTROLS, [$control->toArray()]) && $control->getCriticality()) {
+            throw new LdapConnectionException(sprintf('Unable to set control for OID "%s".', $control->getOid()));
+        }
+    }
+
+    /**
      * Makes the initial connection to LDAP, sets connection options, and starts TLS if specified.
      *
      * @param null|string $server
