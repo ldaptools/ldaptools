@@ -82,29 +82,29 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->execute($operation);
     }
 
-        /**
-         * @param \LdapTools\Operation\Handler\OperationHandler $handler
-         */
-        function it_should_switch_the_server_if_the_operation_requested_it($handler)
-        {
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_switch_the_server_if_the_operation_requested_it($handler)
+    {
 
-            $operation = (new DeleteOperation())->setDn('foo')->setServer('bar');
-            $handler->supports($operation)->willReturn(true);
-            $handler->setConnection($this->connection)->shouldBeCalled();
-            $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
-            $handler->setOperationDefaults($operation)->shouldBeCalled();
-            $handler->execute($operation)->shouldBeCalled();
-            $this->connection->close()->shouldBeCalled();
-            $this->connection->connect(null, null, false, 'foo')->shouldBeCalled();
-            $this->connection->connect(null, null, false, 'bar')->shouldBeCalled();
+        $operation = (new DeleteOperation())->setDn('foo')->setServer('bar');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+        $this->connection->close()->shouldBeCalled();
+        $this->connection->connect(null, null, false, 'foo')->shouldBeCalled();
+        $this->connection->connect(null, null, false, 'bar')->shouldBeCalled();
 
-            // Apparently this is the magic/undocumented way to say that calling this function will return X value on
-            // the Nth attempt, where Nth is the argument number passed to willReturn(). *sigh* ... ridiculousness.
-            $this->connection->getServer()->willReturn('foo','foo','bar');
+        // Apparently this is the magic/undocumented way to say that calling this function will return X value on
+        // the Nth attempt, where Nth is the argument number passed to willReturn(). *sigh* ... ridiculousness.
+        $this->connection->getServer()->willReturn('foo','foo','bar');
 
-            $this->addHandler($handler);
-            $this->execute($operation);
-        }
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
 
     /**
      * @param \LdapTools\Operation\Handler\OperationHandler $handler
