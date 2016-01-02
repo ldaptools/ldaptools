@@ -26,4 +26,9 @@ class LdapControls
      * Used to specify that tombstones and deleted objects should be visible to the operation.
      */
     const SHOW_DELETED = '1.2.840.113556.1.4.417';
+
+    /**
+     * Used to specify that all children of a LDAP object should be removed during a delete operation.
+     */
+    const SUB_TREE_DELETE = '1.2.840.113556.1.4.805';
 }
