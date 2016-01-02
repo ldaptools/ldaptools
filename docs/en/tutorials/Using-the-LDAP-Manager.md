@@ -108,9 +108,10 @@ try {
 ### Deleting LDAP Objects
 --------------------------
 
-Using the `LdapManager` class you can also remove an object from LDAP using the `delete($ldapObject)` method.
+Using the `LdapManager` class you can also remove an object from LDAP using the `delete($ldapObject)` method. To 
+recursively delete a LDAP object (including anything beneath it) pass `true` to the second parameter. 
 
-`persist($ldapObject)` method.
+A simple deletion:
 
 ```php
 use LdapTools\Object\LdapObjectTypes;
@@ -128,6 +129,23 @@ try {
 }
 ```
 
+Recursively deleting an OU and anything beneath it:
+
+```php
+use LdapTools\Object\LdapObjectTypes;
+
+$repository = $ldapManager->getRepository(LdapObjectTypes::OU);
+
+// Retrieve the user that has a specific GUID.
+$ou = $repository->findOneByName('Consultants');
+
+// Delete the OU, along with anything beneath it...
+try {
+    $ldapManager->delete($ou, true);
+} catch (\Exception $e) {
+    echo "Error deleting OU: ".$e->getMessage();
+}
+```
 
 ### Moving LDAP Objects
 -----------------------
