@@ -56,7 +56,13 @@ If you have multiple domains defined in your configuration, you can easily switc
 
 ```php
 // Now calls to 'getRepository', 'buildLdapQuery', etc will return objects that execute in the context of this domain.
-$ldapManager->switchDomain('example.local');
+$query = $ldapManager->switchDomain('example.local')->buildLdapQuery();
+
+// Will return 'example.local'
+$ldapManager->getDomainContext();
+
+// Switch back to the other domain...
+$ldapManager->switchDomain('foo.bar');
 ```
 
 ### Getting The LdapConnection
@@ -66,11 +72,23 @@ The `LdapConnection` is what ultimately executes queries against LDAP. It encaps
 an object oriented form. It has several functions that also may be useful on their own.
  
 ```php
-$connection = $ldapManager->getConnection();
+use LdapTools\Operation\AuthenticationOperation;
 
-// Attempt to authenticate a user by username/password combination and get the result as a bool
-if ($connection->authenticate('username','password')) {
-    echo "Successfully authenticated $username!".PHP_EOL;
+$connection = $ldapManager->getConnection();
+// Construct a LDAP authentication operation to run against the connection...
+$operation = (new AuthenticationOperation())->setUsername('username')->setPassword('password');
+// Run the authentication operation against the connection to get the response object...
+$response = $connection->execute($operation);
+
+if ($response->isAuthenticated()) {
+    echo sprintf("Successfully authenticated %s.".PHP_EOL, $operation->getUsername());
+} else {
+    echo sprintf(
+        "Failed to authenticate %s. (%s) %s.".PHP_EOL,
+         $operation->getUsername(),
+         $response->getErrorCode(),
+         $response->getErrorMessage()
+     );
 }
 
 // Retrieve an object containing the RootDSE for the domain
