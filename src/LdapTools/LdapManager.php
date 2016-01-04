@@ -278,7 +278,7 @@ class LdapManager
      */
     public function authenticate($user, $password, &$errorMessage = false, &$errorNumber = false)
     {
-        $operation = (new AuthenticationOperation())->setUsername($user)->setPassword($password);
+        $operation = new AuthenticationOperation($user, $password);
         /** @var AuthenticationResponse $response */
         $response = $this->getConnection()->execute($operation);
 
