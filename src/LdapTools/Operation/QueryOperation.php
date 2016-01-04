@@ -51,8 +51,10 @@ class QueryOperation implements LdapOperationInterface
         'scope' => self::SCOPE['SUBTREE'],
     ];
 
-    public function __construct()
+    public function __construct($filter = null, array $attributes = [])
     {
+        $this->properties['filter'] = $filter;
+        $this->properties['attributes'] = $attributes;
         $this->properties['scope'] = self::SCOPE['SUBTREE'];
     }
 

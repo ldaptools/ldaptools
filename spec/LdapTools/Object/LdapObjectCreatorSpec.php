@@ -76,7 +76,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->schemaFactoryTest = new LdapObjectSchemaFactory($cache, $parserTest, $this->dispatcher);
         $this->schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
         $this->attributes['unicodePwd'] = (new EncodeWindowsPassword())->toLdap('12345');
-        $this->addOperation = (new AddOperation())->setDn("cn=somedude,dc=foo,dc=bar")->setAttributes($this->attributes);
+        $this->addOperation = (new AddOperation('foo'))->setDn("cn=somedude,dc=foo,dc=bar")->setAttributes($this->attributes);
         $this->connection = $connection;
 
         $this->beConstructedWith($this->connection, $this->schemaFactoryTest, $this->dispatcher);
@@ -173,7 +173,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $attributes = $this->attributes;
         $attributes['cn'] = 'foo=,bar';
-        $operation = (new AddOperation())->setDn('cn=foo\\3d\\2cbar,dc=foo,dc=bar')->setAttributes($attributes);
+        $operation = (new AddOperation('cn=foo\\3d\\2cbar,dc=foo,dc=bar', $attributes));
         $this->connection->execute($operation)->willReturn(true);
 
         $this->config->setSchemaName('ad');

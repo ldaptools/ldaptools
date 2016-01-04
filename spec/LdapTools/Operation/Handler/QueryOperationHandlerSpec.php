@@ -65,11 +65,11 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
     function it_should_not_support_other_operations()
     {
-        $this->supports(new AddOperation())->shouldBeEqualTo(false);
-        $this->supports(new DeleteOperation())->shouldBeEqualTo(false);
-        $this->supports(new RenameOperation())->shouldBeEqualTo(false);
+        $this->supports(new AddOperation('foo'))->shouldBeEqualTo(false);
+        $this->supports(new DeleteOperation('foo'))->shouldBeEqualTo(false);
+        $this->supports(new RenameOperation('foo'))->shouldBeEqualTo(false);
         $this->supports(new AuthenticationOperation())->shouldBeEqualTo(false);
-        $this->supports(new BatchModifyOperation())->shouldBeEqualTo(false);
+        $this->supports(new BatchModifyOperation('foo'))->shouldBeEqualTo(false);
     }
 
     function it_should_enable_paging_when_executing_an_operation_that_uses_paging()

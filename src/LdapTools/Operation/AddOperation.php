@@ -30,6 +30,16 @@ class AddOperation implements LdapOperationInterface
     ];
 
     /**
+     * @param string $dn The DN for the LDAP object.
+     * @param array $attributes The attributes in [key => value] form for the LDAP object.
+     */
+    public function __construct($dn, $attributes = [])
+    {
+        $this->properties['dn'] = $dn;
+        $this->properties['attributes'] = $attributes;
+    }
+
+    /**
      * Get either: The attributes selected for a query operation. The attributes to be set for an add operation.
      *
      * @return array|null

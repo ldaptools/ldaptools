@@ -262,7 +262,7 @@ class LdapObjectCreator
         $attributes = $hydrator->hydrateToLdap($this->attributes);
 
         $dn = $this->getDnToUse($attributes);
-        $this->connection->execute((new AddOperation())->setDn($dn)->setAttributes($attributes)->setServer($this->server));
+        $this->connection->execute((new AddOperation($dn, $attributes))->setServer($this->server));
         $this->triggerAfterCreationEvent($dn);
     }
 

@@ -93,7 +93,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_switch_the_server_if_the_operation_requested_it($handler)
     {
-        $operation = (new DeleteOperation())->setDn('foo')->setServer('bar');
+        $operation = (new DeleteOperation('foo'))->setServer('bar');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
         $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
@@ -116,7 +116,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_NOT_switch_the_server_if_the_operation_doesnt_request_it($handler)
     {
-        $operation = (new DeleteOperation())->setDn('foo');
+        $operation = new DeleteOperation('foo');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
         $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
@@ -141,7 +141,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
      */
     function it_should_NOT_switch_the_server_if_the_server_is_already_active($handler)
     {
-        $operation = (new DeleteOperation())->setDn('foo')->setServer('foo');
+        $operation = (new DeleteOperation('foo'))->setServer('foo');
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
         $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
@@ -182,7 +182,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
     function it_should_set_controls_specified_by_the_operation($handler)
     {
         $control = new LdapControl(LdapControlType::SUB_TREE_DELETE);
-        $operation = (new DeleteOperation())->setDn('ou=test,dc=foo,dc=bar')->addControl($control);
+        $operation = (new DeleteOperation('ou=test,dc=foo,dc=bar'))->addControl($control);
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($this->connection)->shouldBeCalled();
         $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();

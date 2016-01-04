@@ -25,6 +25,14 @@ class DeleteOperation implements LdapOperationInterface
     protected $dn;
 
     /**
+     * @param string $dn The DN of the LDAP object to delete.
+     */
+    public function __construct($dn)
+    {
+        $this->dn = $dn;
+    }
+
+    /**
      * Get the distinguished name to be deleted by this operation.
      *
      * @return null|string

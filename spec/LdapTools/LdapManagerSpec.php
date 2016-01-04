@@ -243,7 +243,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->beConstructedWith(new Configuration(), $connection);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'],['user'], 'user', 'user');
-        $operation = (new DeleteOperation())->setDn($ldapObject->get('dn'));
+        $operation = new DeleteOperation($ldapObject->get('dn'));
         $connection->execute($operation)->shouldBeCalled();
 
         $this->delete($ldapObject);

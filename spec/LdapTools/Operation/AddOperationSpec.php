@@ -15,6 +15,11 @@ use Prophecy\Argument;
 
 class AddOperationSpec extends ObjectBehavior
 {
+    public function let()
+    {
+        $this->beConstructedWith('foo');
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Operation\AddOperation');

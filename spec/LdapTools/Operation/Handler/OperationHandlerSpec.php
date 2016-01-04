@@ -43,10 +43,10 @@ class OperationHandlerSpec extends ObjectBehavior
 
     function it_should_support_an_add_delete_rename_or_modify_operation()
     {
-        $this->supports(new AddOperation())->shouldBeEqualTo(true);
-        $this->supports(new DeleteOperation())->shouldBeEqualTo(true);
-        $this->supports(new RenameOperation())->shouldBeEqualTo(true);
-        $this->supports(new BatchModifyOperation())->shouldBeEqualTo(true);
+        $this->supports(new AddOperation('foo'))->shouldBeEqualTo(true);
+        $this->supports(new DeleteOperation('foo'))->shouldBeEqualTo(true);
+        $this->supports(new RenameOperation('foo'))->shouldBeEqualTo(true);
+        $this->supports(new BatchModifyOperation('foo'))->shouldBeEqualTo(true);
     }
 
     function it_should_not_support_query_or_authentication_operations()

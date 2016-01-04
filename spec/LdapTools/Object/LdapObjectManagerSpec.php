@@ -82,7 +82,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_delete_a_ldap_object_from_its_dn()
     {
-        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
+        $this->connection->execute(new DeleteOperation('cn=foo,dc=foo,dc=bar'))->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $this->delete($ldapObject);
@@ -91,7 +91,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_delete_a_ldap_object_recursively_if_specified()
     {
         $control = (new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true);
-        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar')->addControl($control))
+        $this->connection->execute((new DeleteOperation('cn=foo,dc=foo,dc=bar'))->addControl($control))
             ->shouldBeCalled()
             ->willReturn(true);
 
@@ -122,7 +122,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
                 'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
             ],
         ];
-        $this->connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
+        $this->connection->execute(new BatchModifyOperation('cn=foo,dc=foo,dc=bar', $batch))->willReturn(null);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');
@@ -134,10 +134,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_move_a_ldap_object_using_move()
     {
-        $operation = (new RenameOperation())
-            ->setDn('cn=foo,dc=foo,dc=bar')
-            ->setNewLocation('ou=employees,dc=foo,dc=bar')
-            ->setNewRdn('cn=foo');
+        $operation = new RenameOperation(
+            'cn=foo,dc=foo,dc=bar',
+            'cn=foo',
+            'ou=employees,dc=foo,dc=bar'
+        );
         $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
@@ -146,10 +147,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_escape_the_RDN_when_moving_a_ldap_object()
     {
-        $operation = (new RenameOperation())
-            ->setDn('cn=foo\, bar,dc=foo,dc=bar')
-            ->setNewLocation('ou=employees,dc=foo,dc=bar')
-            ->setNewRdn('cn=foo\2c bar');
+        $operation = new RenameOperation(
+            'cn=foo\, bar,dc=foo,dc=bar',
+            'cn=foo\2c bar',
+            'ou=employees,dc=foo,dc=bar'
+        );
         $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo\, bar,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
@@ -158,10 +160,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_move_an_object_without_a_schema_type()
     {
-        $operation = (new RenameOperation())
-            ->setDn('cn=foo,dc=foo,dc=bar')
-            ->setNewLocation('ou=employees,dc=foo,dc=bar')
-            ->setNewRdn('cn=foo');
+        $operation = new RenameOperation(
+            'cn=foo,dc=foo,dc=bar',
+            'cn=foo',
+            'ou=employees,dc=foo,dc=bar'
+        );
         $this->connection->execute($operation)->willReturn(true);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
@@ -186,7 +189,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject);
         $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject);
 
-        $this->connection->execute((new DeleteOperation())->setDn('cn=foo,dc=foo,dc=bar'))->willReturn(true);
+        $this->connection->execute(new DeleteOperation('cn=foo,dc=foo,dc=bar'))->willReturn(true);
         $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
@@ -199,10 +202,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
      */
     function it_should_call_the_event_dispatcher_move_events_when_moving_an_object($dispatcher)
     {
-        $operation = (new RenameOperation())
-            ->setDn('cn=foo,dc=foo,dc=bar')
-            ->setNewLocation('ou=employees,dc=foo,dc=bar')
-            ->setNewRdn('cn=foo');
+        $operation = new RenameOperation(
+            'cn=foo,dc=foo,dc=bar',
+            'cn=foo',
+            'ou=employees,dc=foo,dc=bar'
+        );
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
         $beforeEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
@@ -242,7 +246,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
                 'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
             ],
         ];
-        $this->connection->execute((new BatchModifyOperation())->setDn('cn=foo,dc=foo,dc=bar')->setBatch($batch))->willReturn(null);
+        $this->connection->execute(new BatchModifyOperation('cn=foo,dc=foo,dc=bar', $batch))->willReturn(null);
         $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
@@ -288,7 +292,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], ['user'], 'user', '');
         $ldapObject->set('foo', 'bar');
 
-        $this->connection->execute((new BatchModifyOperation())->setDn("cn=user,dc=foo,dc=bar")->setBatch([["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]]))->shouldBeCalled();
+        $this->connection->execute(new BatchModifyOperation("cn=user,dc=foo,dc=bar", [["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]]))->shouldBeCalled();
         $this->persist($ldapObject);
     }
 }

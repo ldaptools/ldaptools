@@ -71,7 +71,7 @@ class LogOperationSpec extends ObjectBehavior
 
     function it_should_set_the_ldap_operation()
     {
-        $op = new DeleteOperation();
+        $op = new DeleteOperation('foo');
 
         $this->setOperation($op)->shouldBeAnInstanceOf('\LdapTools\Log\LogOperation');
         $this->getOperation()->shouldBeEqualTo($op);

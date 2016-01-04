@@ -30,6 +30,20 @@ class RenameOperation implements LdapOperationInterface
     ];
 
     /**
+     * @param string $dn The DN of the LDAP object to rename.
+     * @param null|string $newRdn The new RDN in the form of "CN=NewName"
+     * @param null|string $newLocation The new container/OU it should be placed. Leave null if only changing the RDN.
+     * @param bool $deleteOldRdn Whether the old RDN should be deleted.
+     */
+    public function __construct($dn, $newRdn = null, $newLocation = null, $deleteOldRdn = true)
+    {
+        $this->properties['dn'] = $dn;
+        $this->properties['newLocation'] = $newLocation;
+        $this->properties['newRdn'] = $newRdn;
+        $this->properties['deleteOldRdn'] = $deleteOldRdn;
+    }
+
+    /**
      * The distinguished name for an add, delete, or move operation.
      *
      * @return null|string

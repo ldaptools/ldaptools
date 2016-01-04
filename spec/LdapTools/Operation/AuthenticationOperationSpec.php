@@ -106,4 +106,12 @@ class AuthenticationOperationSpec extends ObjectBehavior
         $this->setPassword('bar');
         $this->shouldNotThrow('\Exception')->duringGetArguments();
     }
+
+    function it_should_support_being_constructed_with_a_username_and_password()
+    {
+        $this->beConstructedWith('foo', 'bar');
+
+        $this->getUsername()->shouldBeEqualTo('foo');
+        $this->getPassword()->shouldBeEqualTo('bar');
+    }
 }

@@ -56,10 +56,10 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
 
     function it_should_NOT_support_add_delete_rename_query_or_modify_operation()
     {
-        $this->supports(new AddOperation())->shouldBeEqualTo(false);
-        $this->supports(new DeleteOperation())->shouldBeEqualTo(false);
-        $this->supports(new RenameOperation())->shouldBeEqualTo(false);
-        $this->supports(new BatchModifyOperation())->shouldBeEqualTo(false);
+        $this->supports(new AddOperation('foo'))->shouldBeEqualTo(false);
+        $this->supports(new DeleteOperation('foo'))->shouldBeEqualTo(false);
+        $this->supports(new RenameOperation('foo'))->shouldBeEqualTo(false);
+        $this->supports(new BatchModifyOperation('foo'))->shouldBeEqualTo(false);
         $this->supports(new QueryOperation())->shouldBeEqualTo(false);
     }
 

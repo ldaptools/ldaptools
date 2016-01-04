@@ -15,6 +15,11 @@ use Prophecy\Argument;
 
 class BatchModifyOperationSpec extends ObjectBehavior
 {
+    function let()
+    {
+        $this->beConstructedWith('foo');
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Operation\BatchModifyOperation');

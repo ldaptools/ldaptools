@@ -30,6 +30,16 @@ class BatchModifyOperation implements LdapOperationInterface
     ];
 
     /**
+     * @param string $dn The DN of the LDAP object to be modified.
+     * @param array|null $batch The batch modification array structure.
+     */
+    public function __construct($dn, array $batch = null)
+    {
+        $this->properties['dn'] = $dn;
+        $this->properties['batch'] = $batch;
+    }
+
+    /**
      * The distinguished name for an add, delete, or move operation.
      *
      * @return null|string

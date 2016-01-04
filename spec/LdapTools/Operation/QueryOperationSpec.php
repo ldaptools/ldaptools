@@ -120,4 +120,12 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Server');
         $this->getLogArray()->shouldHaveKey('Controls');
     }
+
+    function it_should_support_being_constructed_with_a_filter_and_attributes()
+    {
+        $this->beConstructedWith('foo', ['bar']);
+
+        $this->getFilter()->shouldBeEqualTo('foo');
+        $this->getAttributes()->shouldBeEqualTo(['bar']);
+    }
 }

@@ -79,9 +79,7 @@ class LdapObjectManager
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
 
         $this->validateObject($ldapObject);
-        $operation = (new BatchModifyOperation())
-            ->setDn($ldapObject->get('dn'))
-            ->setBatch($this->getLdapObjectBatchArray($ldapObject));
+        $operation = new BatchModifyOperation($ldapObject->get('dn'), $this->getLdapObjectBatchArray($ldapObject));
         $this->connection->execute($operation);
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
 
@@ -99,7 +97,7 @@ class LdapObjectManager
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject));
         $this->validateObject($ldapObject);
 
-        $operation = (new DeleteOperation())->setDn($ldapObject->get('dn'));
+        $operation = new DeleteOperation($ldapObject->get('dn'));
         if ($recursively) {
             $operation->addControl((new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true));
         }
@@ -121,11 +119,12 @@ class LdapObjectManager
         $container = $event->getContainer();
 
         $this->validateObject($ldapObject);
-        $operation = (new RenameOperation())
-            ->setDn($ldapObject->get('dn'))
-            ->setNewLocation($container)
-            ->setDeleteOldRdn(true)
-            ->setNewRdn(LdapUtilities::getRdnFromDn($ldapObject->get('dn')));
+        $operation = new RenameOperation(
+            $ldapObject->get('dn'),
+            LdapUtilities::getRdnFromDn($ldapObject->get('dn')),
+            $container,
+            true
+        );
         $this->connection->execute($operation);
 
         // Update the object to reference the new DN after the move...

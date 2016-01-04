@@ -33,6 +33,16 @@ class AuthenticationOperation implements LdapOperationInterface
     ];
 
     /**
+     * @param null|string $username
+     * @param null|string $password
+     */
+    public function __construct($username = null, $password = null)
+    {
+        $this->properties['username'] = $username;
+        $this->properties['password'] = $password;
+    }
+
+    /**
      * Set the username that will be used in the authentication operation.
      *
      * @param string $username
