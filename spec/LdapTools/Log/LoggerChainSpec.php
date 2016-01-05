@@ -39,7 +39,7 @@ class LoggerChainSpec extends ObjectBehavior
         if (version_compare(PHP_VERSION, '7.0', '>=')) {
             throw new SkippingException("This spec currently doesn't work on PHP >= 7. Needs investigation.");
         };
-        $operation = (new DeleteOperation())->setDn('foo');
+        $operation = new DeleteOperation('foo');
         $log = new LogOperation($operation);
         $this->addLogger(new LoggerTest1());
         $this->shouldThrow(new \InvalidArgumentException("Start=foo"))->duringStart($log);
