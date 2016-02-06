@@ -13,6 +13,7 @@ namespace LdapTools;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\ConfigurationException;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Log\LdapLoggerInterface;
@@ -93,7 +94,7 @@ class Configuration
         if ($domain && isset($this->domains[$domain])) {
             return $this->domains[$domain];
         } elseif ($domain) {
-            throw new \InvalidArgumentException(sprintf('Domain "%s" not found.', $domain));
+            throw new InvalidArgumentException(sprintf('Domain "%s" not found.', $domain));
         } else {
             return $this->domains;
         }

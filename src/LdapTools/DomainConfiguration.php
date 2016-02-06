@@ -13,6 +13,7 @@ namespace LdapTools;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapServerPool;
 use LdapTools\Exception\ConfigurationException;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Operation\Invoker\LdapOperationInvoker;
 use LdapTools\Operation\Invoker\LdapOperationInvokerInterface;
 
@@ -256,7 +257,7 @@ class DomainConfiguration
      * The port number to connect to.
      *
      * @param int $port
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return $this
      */
     public function setPort($port)
@@ -281,7 +282,7 @@ class DomainConfiguration
      * Set the page size for paging operations.
      *
      * @param int $pageSize
-     * @throws \InvalidArgumentException
+     * @throws InvalidArgumentException
      * @return $this
      */
     public function setPageSize($pageSize)
@@ -358,7 +359,7 @@ class DomainConfiguration
     public function setLdapType($ldapType)
     {
         if (!defined('\LdapTools\Connection\LdapConnection::TYPE_'.strtoupper($ldapType))) {
-            throw new \InvalidArgumentException(sprintf('Invalid LDAP type "%s".', $ldapType));
+            throw new InvalidArgumentException(sprintf('Invalid LDAP type "%s".', $ldapType));
         }
         $this->config['ldapType'] = strtolower($ldapType);
 
@@ -594,7 +595,7 @@ class DomainConfiguration
     protected function validateInteger($value, $name)
     {
         if (!filter_var($value, FILTER_VALIDATE_INT)) {
-            throw new \InvalidArgumentException(sprintf("The %s should be an integer.", $name));
+            throw new InvalidArgumentException(sprintf("The %s should be an integer.", $name));
         }
     }
 }

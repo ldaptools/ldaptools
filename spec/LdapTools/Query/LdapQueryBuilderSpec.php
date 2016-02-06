@@ -13,6 +13,7 @@ namespace spec\LdapTools\Query;
 use LdapTools\Configuration;
 use LdapTools\DomainConfiguration;
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -69,7 +70,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_error_when_neither_a_string_or_array_was_passed_to_select()
     {
-        $this->shouldThrow(new \InvalidArgumentException('The attributes to select should either be a string or an array'))
+        $this->shouldThrow(new InvalidArgumentException('The attributes to select should either be a string or an array'))
             ->duringSelect(false);
     }
 

@@ -12,6 +12,7 @@ namespace LdapTools;
 
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -123,7 +124,7 @@ class LdapManager
      *
      * @param string $domain
      * @return $this
-     * @throws \InvalidArgumentException If the domain name is not recognized.
+     * @throws InvalidArgumentException If the domain name is not recognized.
      */
     public function switchDomain($domain)
     {
@@ -176,7 +177,6 @@ class LdapManager
      * Get a LdapQueryBuilder object.
      *
      * @return \LdapTools\Query\LdapQueryBuilder
-     * @throws \InvalidArgumentException When the query type is not recognized.
      */
     public function buildLdapQuery()
     {
@@ -357,7 +357,7 @@ class LdapManager
     protected function validateDomainName($domain)
     {
         if (!array_key_exists($domain, $this->domains)) {
-            throw new \InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
+            throw new InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
         }
     }
 

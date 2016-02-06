@@ -84,7 +84,7 @@ class LdapManagerSpec extends ObjectBehavior
 
     function it_should_error_when_trying_to_get_a_connection_that_doesnt_exist()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGetConnection('foo');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetConnection('foo');
     }
 
     function it_should_return_a_LdapQueryBuilder_when_calling_buildLdapQuery()

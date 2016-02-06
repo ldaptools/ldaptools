@@ -107,7 +107,7 @@ class ConfigurationSpec extends ObjectBehavior
 
     function it_should_throw_InvalidArgumentException_when_calling_getDomainConfiguration_with_an_invalid_name()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGetDomainConfiguration('happyfuntime');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetDomainConfiguration('happyfuntime');
     }
 
     function it_should_return_the_correct_number_of_domains_when_calling_getDomainConfiguration()

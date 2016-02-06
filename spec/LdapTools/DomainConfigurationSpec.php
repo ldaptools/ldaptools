@@ -81,12 +81,12 @@ class DomainConfigurationSpec extends ObjectBehavior
 
     function it_should_allow_a_numeric_string_when_setting_port()
     {
-        $this->shouldNotThrow('\InvalidArgumentException')->duringSetPort('123');
+        $this->shouldNotThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetPort('123');
     }
 
     function it_should_throw_InvalidTypeException_when_setting_port_as_non_int()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringSetPort('test');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetPort('test');
     }
 
     function it_should_return_the_correct_page_size_after_calling_setPageSize()
@@ -103,7 +103,7 @@ class DomainConfigurationSpec extends ObjectBehavior
 
     function it_should_throw_InvalidTypeException_when_setting_page_size_as_non_int()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringSetPageSize('test');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetPageSize('test');
     }
 
     function it_should_return_a_string_when_calling_getSchemaName()
@@ -146,7 +146,7 @@ class DomainConfigurationSpec extends ObjectBehavior
 
     function it_should_error_when_setting_an_unknown_ldap_type()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringSetLdapType('SuperHappyFunTime');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetLdapType('SuperHappyFunTime');
     }
 
     function it_should_return_the_correct_server_selection_type_after_calling_setServerSelection()

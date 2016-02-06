@@ -12,6 +12,7 @@ namespace LdapTools\Query;
 
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Hydrator\OperatorCollectionHydrator;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Operation\QueryOperation;
@@ -190,7 +191,7 @@ class LdapQueryBuilder
     public function select($attributes = [])
     {
         if (!(is_array($attributes) || is_string($attributes))) {
-            throw new \InvalidArgumentException('The attributes to select should either be a string or an array');
+            throw new InvalidArgumentException('The attributes to select should either be a string or an array');
         }
         $this->operation->setAttributes(is_array($attributes) ? $attributes : [ $attributes ]);
 
