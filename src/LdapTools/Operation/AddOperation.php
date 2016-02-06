@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -33,7 +34,7 @@ class AddOperation implements LdapOperationInterface
      * @param string $dn The DN for the LDAP object.
      * @param array $attributes The attributes in [key => value] form for the LDAP object.
      */
-    public function __construct($dn, $attributes = [])
+    public function __construct($dn = null, $attributes = [])
     {
         $this->properties['dn'] = $dn;
         $this->properties['attributes'] = $attributes;
@@ -90,6 +91,10 @@ class AddOperation implements LdapOperationInterface
      */
     public function getArguments()
     {
+        if (is_null($this->properties['dn'])) {
+            throw new InvalidArgumentException('The DN cannot be left null for an LDAP add operation.');
+        }
+
         return [$this->properties['dn'], $this->properties['attributes']];
     }
 

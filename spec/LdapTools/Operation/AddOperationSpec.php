@@ -25,6 +25,13 @@ class AddOperationSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Operation\AddOperation');
     }
 
+    function it_should_be_able_to_be_constructed_with_a_null_dn()
+    {
+        $this->beConstructedWith(null);
+        $this->shouldHaveType('LdapTools\Operation\AddOperation');
+
+    }
+
     function it_should_implement_LdapOperationInterface()
     {
         $this->shouldImplement('\LdapTools\Operation\LdapOperationInterface');
@@ -86,5 +93,11 @@ class AddOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldContain(print_r(['username' => 'foo', 'unicodePwd' => '******'], true));
         $this->setAttributes(['username' => 'foo', 'userPassword' => 'correct horse battery staple']);
         $this->getLogArray()->shouldContain(print_r(['username' => 'foo', 'userPassword' => '******'], true));
+    }
+
+    function it_should_throw_an_invalid_argument_exception_if_the_dn_is_left_null_when_get_arguments_is_called()
+    {
+        $this->beConstructedWith(null);
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetArguments();
     }
 }
