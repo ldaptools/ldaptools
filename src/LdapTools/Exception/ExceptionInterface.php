@@ -11,10 +11,10 @@
 namespace LdapTools\Exception;
 
 /**
- * A general exception type.
+ * Used for type hinting so other exceptions can extend base exceptions, but implement this interface.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-abstract class Exception extends \Exception implements ExceptionInterface
+interface ExceptionInterface
 {
 }
