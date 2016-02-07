@@ -11,6 +11,7 @@
 namespace spec\LdapTools\BatchModify;
 
 use LdapTools\BatchModify\Batch;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Exception\InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -94,5 +95,18 @@ class BatchCollectionSpec extends ObjectBehavior
         $dn = 'cn=foo,dc=foo,dc=bar';
         $this->setDn($dn);
         $this->getDn()->shouldBeEqualTo($dn);
+    }
+
+    function it_should_clone_the_batch_objects_when_cloning_the_collection()
+    {
+        $batch = new Batch(Batch::TYPE['ADD'], 'foo');
+        $batches = new BatchCollection();
+        $batches->add($batch);
+
+        $new = clone $batches;
+        $batch->setAttribute('foobar');
+
+        $this->add($new->get(0));
+        $this->get(0)->getAttribute()->shouldBeEqualTo('foo');
     }
 }
