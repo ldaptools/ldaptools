@@ -10,6 +10,7 @@
 
 namespace LdapTools\Query;
 
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\From;
 use LdapTools\Query\Operator\MatchingRule;
@@ -73,7 +74,7 @@ class OperatorCollection implements \IteratorAggregate
                 }
                 $this->operators['from'][] = $operator;
             } else {
-                throw new \InvalidArgumentException('Unknown operator type.');
+                throw new InvalidArgumentException('Unknown operator type.');
             }
         }
     }

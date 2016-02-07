@@ -11,6 +11,7 @@
 namespace LdapTools\Factory;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Registers and loads requested Attribute Converter objects.
@@ -53,7 +54,7 @@ class AttributeConverterFactory
     public static function get($name)
     {
         if (!isset(self::$converterMap[$name])) {
-            throw new \InvalidArgumentException(sprintf('Attribute converter "%s" is not valid.', $name));
+            throw new InvalidArgumentException(sprintf('Attribute converter "%s" is not valid.', $name));
         }
 
         return self::getInstanceOfConverter($name);
@@ -68,7 +69,7 @@ class AttributeConverterFactory
     public static function register($name, $class)
     {
         if (isset(self::$converterMap[$name])) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('The attribute converter name "%s" is already registered.', $name)
             );
         }

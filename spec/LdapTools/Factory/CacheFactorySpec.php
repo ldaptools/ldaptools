@@ -47,7 +47,7 @@ class CacheFactorySpec extends ObjectBehavior
 
     function it_should_thrown_InvalidArgumentException_when_passing_unknown_cache_types()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGet('foobar', []);
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foobar', []);
     }
 
     public function getMatchers()

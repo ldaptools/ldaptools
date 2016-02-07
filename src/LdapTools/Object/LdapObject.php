@@ -12,6 +12,7 @@ namespace LdapTools\Object;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Represents a LDAP Object.
@@ -142,7 +143,7 @@ class LdapObject
         if ($this->has($attribute)) {
             return array_change_key_case($this->attributes)[strtolower($attribute)];
         } else {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 sprintf('Attribute "%s" is not defined for this LDAP object.', $attribute)
             );
         }
@@ -363,7 +364,7 @@ class LdapObject
     {
         $result = preg_grep("/^$attribute$/i", array_keys($this->attributes));
         if (empty($result)) {
-            throw new \InvalidArgumentException(sprintf('Unable to resolve attribute "%s".', $attribute));
+            throw new InvalidArgumentException(sprintf('Unable to resolve attribute "%s".', $attribute));
         }
 
         return reset($result);

@@ -120,12 +120,12 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGet('foo_bar');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo_bar');
     }
 
     function it_should_throw_InvalidArgumentException_when_the_converter_name_is_already_registered()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringRegister('bool',
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringRegister('bool',
             '\LdapTools\AttributeConverter\ConvertBoolean');
     }
 

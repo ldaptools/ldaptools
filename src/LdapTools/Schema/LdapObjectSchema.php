@@ -11,6 +11,7 @@
 namespace LdapTools\Schema;
 
 use LdapTools\Cache\CacheableItemInterface;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Describes the attributes for a LDAP object from a schema definition.
@@ -190,7 +191,7 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getConverter($attributeName)
     {
         if (!$this->hasConverter($attributeName)) {
-            throw new \InvalidArgumentException(sprintf('No converter exists for attribute "%s".', $attributeName));
+            throw new InvalidArgumentException(sprintf('No converter exists for attribute "%s".', $attributeName));
         }
 
         return array_change_key_case($this->converterMap)[strtolower($attributeName)];

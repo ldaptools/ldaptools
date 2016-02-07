@@ -10,6 +10,7 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\DomainConfiguration;
 use LdapTools\Utilities\Dns;
@@ -92,7 +93,7 @@ class LdapServerPool
     public function setSelectionMethod($method)
     {
         if (!defined('self::SELECT_'.strtoupper($method))) {
-            throw new \InvalidArgumentException(sprintf('Selection method "%s" is unknown.', $method));
+            throw new InvalidArgumentException(sprintf('Selection method "%s" is unknown.', $method));
         }
 
         $this->selectionMethod = strtolower($method);

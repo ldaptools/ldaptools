@@ -10,6 +10,7 @@
 
 namespace LdapTools\Factory;
 
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Hydrator\ArrayHydrator;
 use LdapTools\Hydrator\LdapObjectHydrator;
 
@@ -43,7 +44,7 @@ class HydratorFactory
         } elseif (self::TO_OBJECT == $hydratorType) {
             return new LdapObjectHydrator();
         } else {
-            throw new \InvalidArgumentException(sprintf('Unknown hydrator type "%s".', $hydratorType));
+            throw new InvalidArgumentException(sprintf('Unknown hydrator type "%s".', $hydratorType));
         }
     }
 }

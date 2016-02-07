@@ -54,7 +54,7 @@ class LdapObjectSpec extends ObjectBehavior
 
     function it_should_error_when_getting_an_attribute_that_doesnt_exist()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGetFoo();
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetFoo();
     }
 
     function it_should_return_self_from_a_magic_setter()

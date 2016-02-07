@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\Utilities;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Some common helper LDAP functions.
@@ -110,7 +111,7 @@ class LdapUtilities
         $pieces = ldap_explode_dn($dn, $withAttributes);
 
         if ($pieces === false || !isset($pieces['count']) || $pieces['count'] == 0) {
-            throw new \InvalidArgumentException(sprintf('Unable to parse DN "%s".', $dn));
+            throw new InvalidArgumentException(sprintf('Unable to parse DN "%s".', $dn));
         }
         for ($i = 0; $i < $pieces['count']; $i++) {
             $pieces[$i] = self::unescapeValue($pieces[$i]);
@@ -132,7 +133,7 @@ class LdapUtilities
         foreach ($dn as $index => $piece) {
             $values = explode('=', $piece, 2);
             if (count($values) === 1) {
-                throw new \InvalidArgumentException(sprintf('Unable to parse DN piece "%s".', $values[0]));
+                throw new InvalidArgumentException(sprintf('Unable to parse DN piece "%s".', $values[0]));
             }
             $dn[$index] = $values[0].'='.self::escapeValue($values[1], null, LDAP_ESCAPE_DN);
         }

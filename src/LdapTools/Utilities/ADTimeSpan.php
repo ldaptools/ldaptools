@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\Utilities;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Represents the time format used in password settings objects in Active Directory that are in I8 format.
@@ -234,7 +235,7 @@ class ADTimeSpan
     public static function getInstance($value, $unit)
     {
         if (!array_key_exists($unit, self::UNIT)) {
-            throw new \InvalidArgumentException('Time unit "%s" is not recognized.', $unit);
+            throw new InvalidArgumentException('Time unit "%s" is not recognized.', $unit);
         }
         $setter = 'set'.ucfirst($unit);
 
@@ -268,7 +269,7 @@ class ADTimeSpan
     protected function setAndVerify($value, $interval)
     {
         if (!filter_var($value, FILTER_VALIDATE_INT) && $value != '0') {
-            throw new \InvalidArgumentException(sprintf("The %s should be an integer.", $interval));
+            throw new InvalidArgumentException(sprintf("The %s should be an integer.", $interval));
         }
         $this->$interval = $value;
     }

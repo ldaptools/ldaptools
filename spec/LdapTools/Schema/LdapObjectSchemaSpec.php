@@ -227,4 +227,16 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->isMultivaluedAttribute('FOO')->shouldBeEqualTo(true);
         $this->isMultivaluedAttribute('bar')->shouldBeEqualTo(false);
     }
+
+    function it_should_get_the_converter_for_an_attribute()
+    {
+        $this->setConverterMap(['foo' => 'bar']);
+        $this->getConverter('foo')->shouldBeEqualTo('bar');
+        $this->getConverter('FOO')->shouldBeEqualTo('bar');
+    }
+
+    function it_should_throw_an_error_if_the_converter_doesnt_exist()
+    {
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetConverter('foo');
+    }
 }

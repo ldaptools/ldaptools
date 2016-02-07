@@ -11,6 +11,7 @@
 namespace LdapTools\Factory;
 
 use LdapTools\Configuration;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Schema\Parser\SchemaYamlParser;
 
 /**
@@ -30,7 +31,7 @@ class SchemaParserFactory
         if (self::TYPE_YML == $type) {
             return new SchemaYamlParser($schemaFolder);
         } else {
-            throw new \InvalidArgumentException(sprintf('Unknown cache type "%s".', $type));
+            throw new InvalidArgumentException(sprintf('Unknown cache type "%s".', $type));
         }
     }
 }

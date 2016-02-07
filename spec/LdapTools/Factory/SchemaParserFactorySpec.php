@@ -32,7 +32,7 @@ class SchemaParserFactorySpec extends ObjectBehavior
 
     function it_should_thrown_InvalidArgumentException_when_passing_unknown_parser_types()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGet('foo', 'bar');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo', 'bar');
     }
 
     public function getMatchers()

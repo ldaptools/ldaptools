@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\BatchModify;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Represents a collection of batch statements to be sent to LDAP.
@@ -146,7 +147,7 @@ class BatchCollection implements \IteratorAggregate
     protected function validateBatchIndexExists($index)
     {
         if (!isset($this->batches[$index])) {
-            throw new \InvalidArgumentException(sprintf('Batch index "%s" does not exist.', $index));
+            throw new InvalidArgumentException(sprintf('Batch index "%s" does not exist.', $index));
         }
     }
 }

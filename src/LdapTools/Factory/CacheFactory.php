@@ -14,6 +14,7 @@ use LdapTools\Cache\DoctrineCache;
 use LdapTools\Cache\NoCache;
 use LdapTools\Cache\StashCache;
 use LdapTools\Cache\CacheInterface;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * A factory for retrieving the caching mechanism by its type.
@@ -53,7 +54,7 @@ class CacheFactory
         } elseif (self::TYPE_NONE == $type) {
             $cache = new NoCache();
         } else {
-            throw new \InvalidArgumentException(sprintf('Unknown cache type "%s".', $type));
+            throw new InvalidArgumentException(sprintf('Unknown cache type "%s".', $type));
         }
         $cache->setOptions($options);
 

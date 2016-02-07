@@ -11,6 +11,7 @@
 namespace spec\LdapTools\BatchModify;
 
 use LdapTools\BatchModify\Batch;
+use LdapTools\Exception\InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -78,7 +79,7 @@ class BatchCollectionSpec extends ObjectBehavior
 
     function it_should_error_removing_or_getting_an_index_that_does_not_exist()
     {
-        $exception = new \InvalidArgumentException('Batch index "0" does not exist.');
+        $exception = new InvalidArgumentException('Batch index "0" does not exist.');
         $this->shouldThrow($exception)->duringGet(0);
         $this->shouldThrow($exception)->duringRemove(0);
     }

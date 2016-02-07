@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\BatchModify;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Represents a batch action.
@@ -130,7 +131,7 @@ class Batch
     public function setModType($modtype)
     {
         if (!in_array($modtype, self::TYPE)) {
-            throw new \InvalidArgumentException(sprintf('Invalid batch action type: %s', $modtype));
+            throw new InvalidArgumentException(sprintf('Invalid batch action type: %s', $modtype));
         }
         $this->modtype = $modtype;
     }

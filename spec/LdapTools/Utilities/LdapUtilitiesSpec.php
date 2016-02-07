@@ -75,7 +75,7 @@ class LdapUtilitiesSpec extends ObjectBehavior
 
     function it_should_throw_an_error_on_an_invalid_dn()
     {
-        $this->shouldThrow('\InvalidArgumentException')->during('explodeDn', ['foo-bar']);
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->during('explodeDn', ['foo-bar']);
     }
 
     function it_should_implode_a_dn_array_to_a_string_dn()
@@ -90,7 +90,7 @@ class LdapUtilitiesSpec extends ObjectBehavior
 
     function it_should_throw_an_error_when_imploding_a_DN_in_invalid_array_form()
     {
-        $this->shouldThrow('\InvalidArgumentException')->during('implodeDn', [['foo', 'bar']]);
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->during('implodeDn', [['foo', 'bar']]);
     }
 
     function it_should_encode_values_to_the_desired_type()

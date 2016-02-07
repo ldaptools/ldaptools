@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\BatchModify;
 
+use LdapTools\Exception\InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 use LdapTools\BatchModify\Batch;
@@ -75,7 +76,7 @@ class BatchSpec extends ObjectBehavior
 
     function it_should_error_when_trying_to_use_an_invalid_batch_mod_type()
     {
-        $exception = new \InvalidArgumentException("Invalid batch action type: 9001");
+        $exception = new InvalidArgumentException("Invalid batch action type: 9001");
         $this->shouldThrow($exception)->duringSetModType(9001);
         $this->shouldThrow($exception)->during('__construct',[9001,'foo','bar']);
 

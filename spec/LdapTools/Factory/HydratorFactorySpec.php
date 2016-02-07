@@ -20,6 +20,6 @@ class HydratorFactorySpec extends ObjectBehavior
 
     function it_should_throw_InvalidArgumentException_when_calling_get_with_an_invalid_hydrator()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringGet('foo');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo');
     }
 }

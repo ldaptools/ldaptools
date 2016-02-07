@@ -55,7 +55,7 @@ class LdapServerPoolSpec extends ObjectBehavior
 
     function it_should_throw_an_error_when_calling_setting_an_invalid_selection_method()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringSetSelectionMethod('foo');
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetSelectionMethod('foo');
     }
 
     function it_should_use_the_server_array_as_is_when_using_the_method_order()
