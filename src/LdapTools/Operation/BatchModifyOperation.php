@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -31,9 +32,9 @@ class BatchModifyOperation implements LdapOperationInterface
 
     /**
      * @param string $dn The DN of the LDAP object to be modified.
-     * @param array|null $batch The batch modification array structure.
+     * @param BatchCollection|null $batch A BatchCollection object.
      */
-    public function __construct($dn, array $batch = null)
+    public function __construct($dn, BatchCollection $batch = null)
     {
         $this->properties['dn'] = $dn;
         $this->properties['batch'] = $batch;
@@ -65,9 +66,9 @@ class BatchModifyOperation implements LdapOperationInterface
     /**
      * The batch modifications array for a modify operation.
      *
-     * @return array|null
+     * @return BatchCollection|null
      */
-    public function getBatch()
+    public function getBatchCollection()
     {
         return $this->properties['batch'];
     }
@@ -75,10 +76,10 @@ class BatchModifyOperation implements LdapOperationInterface
     /**
      * Set the batch modifications array for the operation.
      *
-     * @param array $batch
+     * @param BatchCollection $batch
      * @return $this
      */
-    public function setBatch(array $batch)
+    public function setBatchCollection(BatchCollection $batch)
     {
         $this->properties['batch'] = $batch;
 
@@ -98,9 +99,10 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getArguments()
     {
+
         return [
             $this->properties['dn'],
-            $this->properties['batch'],
+            $this->getBatchArray(),
         ];
     }
 
@@ -117,11 +119,25 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        $batch = is_array($this->properties['batch']) ? LdapUtilities::maskBatchArray($this->properties['batch']) : $this->properties['batch'];
+        $batch = LdapUtilities::maskBatchArray($this->getBatchArray());
 
         return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
             'Batch' => print_r($batch, true),
         ]);
+    }
+
+    /**
+     * @return array
+     */
+    protected function getBatchArray()
+    {
+        $batch = [];
+
+        if (!is_null($this->properties['batch'])) {
+            $batch = $this->properties['batch']->getBatchArray();
+        }
+
+        return $batch;
     }
 }

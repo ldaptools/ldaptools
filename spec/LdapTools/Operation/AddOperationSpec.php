@@ -100,4 +100,10 @@ class AddOperationSpec extends ObjectBehavior
         $this->beConstructedWith(null);
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetArguments();
     }
+
+    function it_should_set_a_location()
+    {
+        $this->setLocation('dc=foo,dc=bar');
+        $this->getLocation()->shouldBeEqualTo('dc=foo,dc=bar');
+    }
 }

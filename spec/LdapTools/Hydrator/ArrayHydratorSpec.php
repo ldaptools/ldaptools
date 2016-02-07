@@ -86,6 +86,15 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->shouldImplement('\LdapTools\Hydrator\HydratorInterface');
     }
 
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_be_able_to_be_constructed_with_a_ldap_connection($connection)
+    {
+        $this->beConstructedWith($connection);
+        $this->shouldHaveType('LdapTools\Hydrator\ArrayHydrator');
+    }
+
     function it_should_set_selected_attributes_when_calling_setSelectedAttributes()
     {
         $attributes = ['foo', 'bar'];
@@ -93,11 +102,11 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->getSelectedAttributes()->shouldBeEqualTo($attributes);
     }
 
-    function it_should_set_LdapObjectSchemas_when_calling_setLdapObjectSchemas()
+    function it_should_set_LdapObjectSchemas_when_calling_setLdapObjectSchema()
     {
-        $schemas = [ new LdapObjectSchema('foo', 'bar') ];
-        $this->setLdapObjectSchemas(...$schemas);
-        $this->getLdapObjectSchemas()->shouldBeEqualTo($schemas);
+        $schema = new LdapObjectSchema('foo', 'bar');
+        $this->setLdapObjectSchema($schema);
+        $this->getLdapObjectSchema()->shouldBeEqualTo($schema);
     }
 
     function it_should_return_a_single_array_with_keys_when_calling_hydrateEntryFromLdap()
@@ -115,7 +124,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn', 'created' => 'whenCreated', 'createdInt' => 'whenCreated']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName', 'created', 'createdInt']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKeys(['created', 'createdInt']);
@@ -126,7 +135,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn']);
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->setSelectedAttributes(['givenName', 'lastName']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKey('givenName');
     }
@@ -135,7 +144,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKey('givenName');
@@ -152,7 +161,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn', 'created' => 'whenCreated']);
         $schema->setConverterMap(['created' => 'generalized_time']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName', 'created']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKeyWithDateTime('created');
@@ -163,7 +172,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn', 'created' => 'whenCreated', 'createdInt' => 'whenCreated']);
         $schema->setConverterMap(['created' => 'generalized_time', 'createdInt' => 'int']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName', 'created', 'createdInt']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKeyWithDateTime('created');
@@ -174,7 +183,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap(['firstName' => 'givenName', 'lastName' => 'sn']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $this->setSelectedAttributes(['givenName', 'lastName']);
         $this->hydrateFromLdap($this->ldapEntries[0])->shouldHaveKey('dn');
@@ -184,7 +193,7 @@ class ArrayHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->hydrateToLdap($this->objectToLdap)->shouldBeArray();
     }
 
@@ -198,7 +207,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setRequiredAttributes(['foo']);
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->shouldThrow('\LogicException')->duringHydrateToLdap($this->objectToLdap);
     }
 
@@ -211,7 +220,7 @@ class ArrayHydratorSpec extends ObjectBehavior
             'enabled' => false,
         ]);
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->setParameter('whoyougonnacall', 'ghostbusters.local');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKeyWithValue('phoneNumber', '555-2368');
         $this->hydrateToLdap($this->objectToLdap)->shouldNotContain('Egon.Spengler@ghostbusters.local');
@@ -228,7 +237,7 @@ class ArrayHydratorSpec extends ObjectBehavior
             'name' => 'cn'
         ]);
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKey('givenName');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKey('sn');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKey('mail');
@@ -245,7 +254,7 @@ class ArrayHydratorSpec extends ObjectBehavior
             'name' => 'cn'
         ]);
 
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $this->setParameter('_domain_', 'foo.bar');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKeyWithValue('givenName', 'Egon');
         $this->hydrateToLdap($this->objectToLdap)->shouldHaveKeyWithValue('sn', 'Spengler');
@@ -258,7 +267,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([ 'foo' => 'bar' ]);
         $schema->setConverterMap(['foo' => 'bool']);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
         $attributes = $this->objectToLdap;
         $attributes['foo'] = true;
 

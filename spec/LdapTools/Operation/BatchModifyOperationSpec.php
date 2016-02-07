@@ -10,6 +10,8 @@
 
 namespace spec\LdapTools\Operation;
 
+use LdapTools\BatchModify\Batch;
+use LdapTools\BatchModify\BatchCollection;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -30,17 +32,13 @@ class BatchModifyOperationSpec extends ObjectBehavior
         $this->shouldImplement('\LdapTools\Operation\LdapOperationInterface');
     }
 
-    function it_should_set_the_batch_modifications_for_the_batch_operation()
+    function it_should_set_the_batch_collection_for_the_batch_operation()
     {
-        $batch = [
-            [
-                "attrib"  => "telephoneNumber",
-                "modtype" => LDAP_MODIFY_BATCH_ADD,
-                "values"  => ["+1 555 555 1717"],
-            ],
-        ];
-        $this->setBatch($batch);
-        $this->getBatch()->shouldBeEqualTo($batch);
+        $batch = new BatchCollection();
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'telephoneNumber',"+1 555 555 1717"));
+
+        $this->setBatchCollection($batch);
+        $this->getBatchCollection()->shouldBeEqualTo($batch);
     }
 
     function it_should_set_the_DN_for_the_add_operation()
@@ -53,7 +51,7 @@ class BatchModifyOperationSpec extends ObjectBehavior
     function it_should_chain_the_setters()
     {
         $this->setDn('foo')->shouldReturnAnInstanceOf('\LdapTools\Operation\BatchModifyOperation');
-        $this->setBatch(['foo' => 'bar'])->shouldReturnAnInstanceOf('\LdapTools\Operation\BatchModifyOperation');
+        $this->setBatchCollection(new BatchCollection())->shouldReturnAnInstanceOf('\LdapTools\Operation\BatchModifyOperation');
     }
 
     function it_should_get_the_name_of_the_operation()
@@ -68,12 +66,14 @@ class BatchModifyOperationSpec extends ObjectBehavior
 
     function it_should_return_the_arguments_for_the_ldap_function_in_the_correct_order()
     {
+        $batch = new BatchCollection();
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'foo', 'bar'));
         $args = [
             'cn=foo,dc=example,dc=local',
-            ['foo' => 'bar'],
+            $batch->getBatchArray(),
         ];
         $this->setDn($args[0]);
-        $this->setBatch($args[1]);
+        $this->setBatchCollection($batch);
         $this->getArguments()->shouldBeEqualTo($args);
     }
 
@@ -88,28 +88,16 @@ class BatchModifyOperationSpec extends ObjectBehavior
 
     function it_should_mask_password_values_in_the_log_formatted_array()
     {
-        $batch = [
-            [
-                "attrib"  => "unicodePwd",
-                "modtype" => LDAP_MODIFY_BATCH_REMOVE,
-                "values"  => ["password"],
-            ],
-            [
-                "attrib"  => "userPassword",
-                "modtype" => LDAP_MODIFY_BATCH_ADD,
-                "values"  => ["correct horse battery staple"],
-            ],
-            [
-                "attrib"  => "givenName",
-                "modtype" => LDAP_MODIFY_BATCH_REPLACE,
-                "values"  => ["Jack"],
-            ],
-        ];
+        $batch = new BatchCollection();
+        $batch->add(new Batch(Batch::TYPE['REMOVE'], 'unicodePwd', 'password'));
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'userPassword', 'correct horse battery staple'));
+        $batch->add(new Batch(Batch::TYPE['REPLACE'], 'givenName', 'Jack'));
 
-        $this->setBatch($batch);
-        $batch[0]['values'] = ['******'];
-        $batch[1]['values'] = ['******'];
+        $this->setBatchCollection($batch);
+        $logArray = $batch->getBatchArray();
+        $logArray[0]['values'] = ['******'];
+        $logArray[1]['values'] = ['******'];
 
-        $this->getLogArray()->shouldContain(print_r($batch, true));
+        $this->getLogArray()->shouldContain(print_r($logArray, true));
     }
 }

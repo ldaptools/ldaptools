@@ -26,14 +26,13 @@ class LdapObjectHydrator extends ArrayHydrator
     public function hydrateFromLdap(array $entry)
     {
         $entry = parent::hydrateFromLdap($entry);
-        $schema = empty($this->schemas) ? null : $this->getSchema();
-        $class = $schema ? $schema->getObjectClass() : [];
+        $class = $this->schema ? $this->schema->getObjectClass() : [];
 
         return new LdapObject(
             $entry,
             $class,
-            $schema ? $schema->getObjectCategory() : '',
-            $type = $schema ? $schema->getObjectType() : ''
+            $this->schema ? $this->schema->getObjectCategory() : '',
+            $type = $this->schema ? $this->schema->getObjectType() : ''
         );
     }
 
@@ -56,7 +55,7 @@ class LdapObjectHydrator extends ArrayHydrator
         if (!($ldapObject instanceof LdapObject)) {
             throw new \InvalidArgumentException('Expects a LdapObject instance to convert batch modifications to LDAP.');
         }
-        if (!$this->schemas) {
+        if (!$this->schema) {
             return $ldapObject->getBatchCollection()->getBatchArray();
         }
 
@@ -64,7 +63,7 @@ class LdapObjectHydrator extends ArrayHydrator
         foreach ($batches as $batch) {
             /** @var \LdapTools\BatchModify\Batch $batch */
             $batch->setAttribute(
-                $this->getSchema()->getAttributeToLdap($batch->getAttribute())
+                $this->schema->getAttributeToLdap($batch->getAttribute())
             );
         }
 

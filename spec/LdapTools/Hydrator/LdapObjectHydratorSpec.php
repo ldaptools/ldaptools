@@ -129,7 +129,7 @@ class LdapObjectHydratorSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([ 'firstName' => 'givenName','lastName' => 'sn', 'emailAddress' => 'mail', 'username' => 'sAMAccountName' ]);
-        $this->setLdapObjectSchemas($schema);
+        $this->setLdapObjectSchema($schema);
 
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');

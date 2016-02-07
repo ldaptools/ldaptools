@@ -19,8 +19,9 @@ use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Event\LdapObjectMoveEvent;
-use LdapTools\Factory\HydratorFactory;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\LdapObjectSchemaFactory;
+use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\RenameOperation;
@@ -44,11 +45,6 @@ class LdapObjectManager
     protected $schemaFactory;
 
     /**
-     * @var HydratorFactory
-     */
-    protected $hydratorFactory;
-
-    /**
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
@@ -60,7 +56,7 @@ class LdapObjectManager
      */
     public function __construct(LdapConnectionInterface $connection, LdapObjectSchemaFactory $schemaFactory, EventDispatcherInterface $dispatcher)
     {
-        $this->hydratorFactory = new HydratorFactory();
+        $this->hydrator = new OperationHydrator($connection);
         $this->schemaFactory = $schemaFactory;
         $this->connection = $connection;
         $this->dispatcher = $dispatcher;
@@ -79,7 +75,8 @@ class LdapObjectManager
         $this->dispatcher->dispatch(new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject));
 
         $this->validateObject($ldapObject);
-        $operation = new BatchModifyOperation($ldapObject->get('dn'), $this->getLdapObjectBatchArray($ldapObject));
+        $operation = new BatchModifyOperation($ldapObject->get('dn'), $ldapObject->getBatchCollection());
+        $this->hydrateOperation($operation, $ldapObject->getType());
         $this->connection->execute($operation);
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
 
@@ -143,27 +140,25 @@ class LdapObjectManager
     protected function validateObject(LdapObject $ldapObject)
     {
         if (!$ldapObject->has('dn')) {
-            throw new \InvalidArgumentException('To persist/delete/move a LDAP object it must have the DN attribute.');
+            throw new InvalidArgumentException('To persist/delete/move a LDAP object it must have the DN attribute.');
         }
     }
 
     /**
      * Get the batch modification array that ldap_modify_batch expects.
      *
-     * @param LdapObject $ldapObject
-     * @return array
+     * @param BatchModifyOperation $operation
+     * @param string $type
      */
-    protected function getLdapObjectBatchArray(LdapObject $ldapObject)
+    protected function hydrateOperation(BatchModifyOperation $operation, $type)
     {
-        $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_OBJECT);
-        $hydrator->setLdapConnection($this->connection);
-        $hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-
-        if ($ldapObject->getType()) {
-            $schema = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $ldapObject->getType());
-            $hydrator->setLdapObjectSchemas($schema);
+        $this->hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        if ($type) {
+            $this->hydrator->setLdapObjectSchema($this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $type));
         }
-
-        return $hydrator->hydrateToLdap($ldapObject);
+        $this->hydrator->hydrateToLdap($operation);
+        if ($type) {
+            $this->hydrator->setLdapObjectSchema(null);
+        }
     }
 }

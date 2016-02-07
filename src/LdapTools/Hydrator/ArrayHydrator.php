@@ -27,9 +27,9 @@ use LdapTools\Schema\LdapObjectSchema;
 class ArrayHydrator implements HydratorInterface
 {
     /**
-     * @var LdapObjectSchema[]
+     * @var LdapObjectSchema
      */
-    protected $schemas = [];
+    protected $schema;
 
     /**
      * @var array The attributes selected for in the query.
@@ -55,6 +55,14 @@ class ArrayHydrator implements HydratorInterface
      * @var array The attributes to order by.
      */
     protected $orderBy = [];
+
+    /**
+     * @param LdapConnectionInterface|null $connection
+     */
+    public function __construct(LdapConnectionInterface $connection = null)
+    {
+        $this->connection = $connection;
+    }
 
     /**
      * {@inheritdoc}
@@ -88,17 +96,17 @@ class ArrayHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setLdapObjectSchemas(LdapObjectSchema ...$ldapObjectSchema)
+    public function setLdapObjectSchema(LdapObjectSchema $schema = null)
     {
-        $this->schemas = $ldapObjectSchema;
+        $this->schema = $schema;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getLdapObjectSchemas()
+    public function getLdapObjectSchema()
     {
-        return $this->schemas;
+        return $this->schema;
     }
 
     /**
@@ -181,7 +189,7 @@ class ArrayHydrator implements HydratorInterface
     /**
      * {@inheritdoc}
      */
-    public function setLdapConnection(LdapConnectionInterface $connection)
+    public function setLdapConnection(LdapConnectionInterface $connection = null)
     {
         $this->connection = $connection;
     }
@@ -196,7 +204,7 @@ class ArrayHydrator implements HydratorInterface
     protected function sortResults(array $results)
     {
         $orderBy = [];
-        if (!empty($this->schemas) && $this->selectedAttributes !== ['*']) {
+        if ($this->schema && $this->selectedAttributes !== ['*']) {
             // Ignore case differences to ease later comparisons.
             foreach ($this->orderBy as $attribute => $direction) {
                 $orderBy[AttributeNameResolver::getKeyNameCaseInsensitive($attribute, $this->selectedAttributes)] = $direction;
@@ -240,7 +248,7 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function convertNamesFromLdap(array $entry)
     {
-        return (new AttributeNameResolver(reset($this->schemas) ?: null))->fromLdap($entry, $this->selectedAttributes);
+        return (new AttributeNameResolver($this->schema))->fromLdap($entry, $this->selectedAttributes);
     }
 
     /**
@@ -251,11 +259,11 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function convertValuesFromLdap(array $entry)
     {
-        if (empty($this->schemas)) {
+        if (!$this->schema) {
             return $entry;
         }
         $valueResolver = BaseValueResolver::getInstance(
-            $this->getSchema(),
+            $this->schema,
             $entry,
             $this->type
         );
@@ -272,12 +280,13 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function mergeDefaultAttributes(array $attributes)
     {
-        if (!empty($this->schemas) && !empty($this->getSchema()->getDefaultValues())) {
-            $attributes = array_merge($this->getSchema()->getDefaultValues(), $attributes);
+        if ($this->schema && !empty($this->schema->getDefaultValues())) {
+            $attributes = array_merge($this->schema->getDefaultValues(), $attributes);
         }
 
         return $attributes;
     }
+
 
     /**
      * Checks to make sure all required attributes are present.
@@ -286,12 +295,12 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function validateAttributesToLdap(array $attributes)
     {
-        if (empty($this->schemas)) {
+        if (!$this->schema) {
             return;
         }
         $missing = [];
 
-        foreach ($this->getSchema()->getRequiredAttributes() as $attribute) {
+        foreach ($this->schema->getRequiredAttributes() as $attribute) {
             if (!array_key_exists(strtolower($attribute), array_change_key_case($attributes))) {
                 $missing[] = $attribute;
             }
@@ -314,11 +323,11 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function convertValuesToLdap($values, $dn = null)
     {
-        if (empty($this->schemas)) {
+        if (!$this->schema) {
             return $values;
         }
         $valueResolver = BaseValueResolver::getInstance(
-            $this->getSchema(),
+            $this->schema,
             $values,
             $this->type
         );
@@ -335,19 +344,7 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function convertNamesToLdap(array $attributes)
     {
-        return empty($this->schemas) ? $attributes : (new AttributeNameResolver(reset($this->schemas)))->toLdap($attributes);
-    }
-
-    /**
-     * @return LdapObjectSchema
-     */
-    protected function getSchema()
-    {
-        if (1 == count($this->schemas)) {
-            return $this->schemas[0];
-        } else {
-            throw new \RuntimeException('Using only one LDAP object type is currently supported.');
-        }
+        return !$this->schema ? $attributes : (new AttributeNameResolver($this->schema))->toLdap($attributes);
     }
 
     /**

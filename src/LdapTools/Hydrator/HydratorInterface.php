@@ -45,18 +45,18 @@ interface HydratorInterface
     public function hydrateAllFromLdap(array $entries);
 
     /**
-     * Set the LdapObjectSchema objects needed to attribute/value conversion.
+     * Set the LdapObjectSchema object needed for attribute/value conversion.
      *
-     * @param LdapObjectSchema ...$ldapObjectSchema
+     * @param LdapObjectSchema|null $schema
      */
-    public function setLdapObjectSchemas(LdapObjectSchema ...$ldapObjectSchema);
+    public function setLdapObjectSchema(LdapObjectSchema $schema = null);
 
     /**
-     * Get the LdapObjectSchema objects that have been set.
+     * Get the LdapObjectSchema that has been set.
      *
      * @return array An array of LdapObjectSchema objects.
      */
-    public function getLdapObjectSchemas();
+    public function getLdapObjectSchema();
 
     /**
      * If this query is based off a LdapObjectSchema then include the attributes as they were named in the select
@@ -77,9 +77,9 @@ interface HydratorInterface
     /**
      * Set the LDAP connection for the context of this hydration.
      *
-     * @param LdapConnectionInterface $connection
+     * @param LdapConnectionInterface|null $connection
      */
-    public function setLdapConnection(LdapConnectionInterface $connection);
+    public function setLdapConnection(LdapConnectionInterface $connection = null);
 
     /**
      * Set the LDAP operation type that is requesting this hydration.

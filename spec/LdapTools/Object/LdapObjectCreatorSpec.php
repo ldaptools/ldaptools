@@ -30,9 +30,9 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         'givenName' => 'somedude',
         'userPrincipalName' => 'somedude@example.com',
         'objectclass' => ['top', 'person', 'organizationalPerson', 'user'],
+        'userAccountControl' => '512',
         'sAMAccountName' => 'somedude',
         'unicodePwd' => null,
-        'userAccountControl' => '512',
     ];
 
     /**
@@ -134,7 +134,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     function it_should_throw_an_exception_when_passing_an_invalid_object_to_create()
     {
-        $this->shouldThrow('\InvalidArgumentException')->duringCreate(new DomainConfiguration('foo.bar'));
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringCreate(new DomainConfiguration('foo.bar'));
     }
 
     function it_should_throw_an_exception_when_passing_an_unknown_ldap_object_type_to_create()
@@ -144,6 +144,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     function it_should_set_parameters_for_the_attributes_sent_to_ldap()
     {
+        $this->addOperation->setLocation('dc=foo,dc=bar');
         $this->connection->execute($this->addOperation)->willReturn(true);
 
         $this->createUser()
@@ -173,7 +174,8 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $attributes = $this->attributes;
         $attributes['cn'] = 'foo=,bar';
-        $operation = (new AddOperation('cn=foo\\3d\\2cbar,dc=foo,dc=bar', $attributes));
+        $operation = new AddOperation('cn=foo\\3d\\2cbar,dc=foo,dc=bar', $attributes);
+        $operation->setLocation('dc=foo,dc=bar');
         $this->connection->execute($operation)->willReturn(true);
 
         $this->config->setSchemaName('ad');
@@ -195,6 +197,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=foo,ou=bar,dc=example,dc=local');
+        $operation->setLocation('ou=foo,ou=bar,dc=example,dc=local');
         $this->connection->execute($operation)->willReturn(true);
 
         $this->createUser()
@@ -206,6 +209,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
+        $operation->setLocation('ou=employees,dc=example,dc=local');
         $this->connection->execute($operation)->willReturn(true);
 
         $this->createUser()
@@ -218,6 +222,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     {
         $operation = clone $this->addOperation;
         $operation->setDn("cn=somedude,ou=Sales,dc=example,dc=com");
+        $operation->setLocation('%SalesOU%,%_defaultnamingcontext_%');
         $this->connection->execute($operation)->willReturn(true);
 
         $this->config->setSchemaName('ad');
@@ -237,6 +242,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
      */
     function it_should_call_creation_events_when_creating_a_ldap_object($dispatcher)
     {
+        $this->addOperation->setLocation('dc=foo,dc=bar');
         $this->connection->execute($this->addOperation)->willReturn(true);
 
         $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
@@ -265,6 +271,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     function it_should_allow_a_ldap_server_to_be_set()
     {
         $operation = clone $this->addOperation;
+        $operation->setLocation('ou=employees,dc=example,dc=local');
         $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
         $operation->setServer('foo');
         $this->connection->execute($operation)->willReturn(true);

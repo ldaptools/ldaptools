@@ -2,6 +2,8 @@
 
 namespace spec\LdapTools\Object;
 
+use LdapTools\BatchModify\Batch;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
@@ -101,30 +103,16 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_update_a_ldap_object_using_batch_modify()
     {
-        $batch = [
-            [
-                'attrib' => 'givenName',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => ['Chad'],
-            ],
-            [
-                'attrib' => 'sn',
-                'modtype' => LDAP_MODIFY_BATCH_ADD,
-                'values' => ['Sikorra'],
-            ],
-            [
-                'attrib' => 'sAMAccountName',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE,
-                'values' => ['csikorra'],
-            ],
-            [
-                'attrib' => 'mail',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
-            ],
-        ];
-        $this->connection->execute(new BatchModifyOperation('cn=foo,dc=foo,dc=bar', $batch))->willReturn(null);
+        $dn = 'cn=foo,dc=foo,dc=bar';
+        $batch = new BatchCollection($dn);
+        $batch->add(new Batch(Batch::TYPE['REPLACE'], 'givenName', 'Chad'));
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'sn', 'Sikorra'));
+        $batch->add(new Batch(Batch::TYPE['REMOVE'], 'sAMAccountName', 'csikorra'));
+        $batch->add(new Batch(Batch::TYPE['REMOVE_ALL'], 'mail'));
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $this->connection->execute(new BatchModifyOperation($dn, $batch))->willReturn(null);
+
+        $ldapObject = new LdapObject(['dn' => $dn], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');
         $ldapObject->add('lastName', 'Sikorra');
         $ldapObject->remove('username', 'csikorra');
@@ -225,31 +213,17 @@ class LdapObjectManagerSpec extends ObjectBehavior
      */
     function it_should_call_the_event_dispatcher_modify_events_when_persisting_an_object($dispatcher)
     {
-        $batch = [
-            [
-                'attrib' => 'givenName',
-                'modtype' => LDAP_MODIFY_BATCH_REPLACE,
-                'values' => ['Chad'],
-            ],
-            [
-                'attrib' => 'sn',
-                'modtype' => LDAP_MODIFY_BATCH_ADD,
-                'values' => ['Sikorra'],
-            ],
-            [
-                'attrib' => 'sAMAccountName',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE,
-                'values' => ['csikorra'],
-            ],
-            [
-                'attrib' => 'mail',
-                'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
-            ],
-        ];
-        $this->connection->execute(new BatchModifyOperation('cn=foo,dc=foo,dc=bar', $batch))->willReturn(null);
+        $dn = 'cn=foo,dc=foo,dc=bar';
+        $batch = new BatchCollection($dn);
+        $batch->add(new Batch(Batch::TYPE['REPLACE'], 'givenName', 'Chad'));
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'sn', 'Sikorra'));
+        $batch->add(new Batch(Batch::TYPE['REMOVE'], 'sAMAccountName', 'csikorra'));
+        $batch->add(new Batch(Batch::TYPE['REMOVE_ALL'], 'mail'));
+
+        $this->connection->execute(new BatchModifyOperation($dn, $batch))->willReturn(null);
         $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => $dn], [], 'user', 'user');
         $ldapObject->set('firstName', 'Chad');
         $ldapObject->add('lastName', 'Sikorra');
         $ldapObject->remove('username', 'csikorra');
@@ -289,10 +263,13 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_persist_an_ldap_object_that_has_no_schema_type()
     {
-        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], ['user'], 'user', '');
+        $dn = 'cn=user,dc=foo,dc=bar';
+        $ldapObject = new LdapObject(['dn' => $dn], ['user'], 'user', '');
         $ldapObject->set('foo', 'bar');
+        $batch = new BatchCollection($dn);
+        $batch->add(new Batch(Batch::TYPE['REPLACE'],'foo','bar'));
 
-        $this->connection->execute(new BatchModifyOperation("cn=user,dc=foo,dc=bar", [["attrib" => "foo", "modtype" => 3, "values" => ["bar"]]]))->shouldBeCalled();
+        $this->connection->execute(new BatchModifyOperation($dn, $batch))->shouldBeCalled();
         $this->persist($ldapObject);
     }
 }

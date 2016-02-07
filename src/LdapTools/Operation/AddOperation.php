@@ -27,6 +27,7 @@ class AddOperation implements LdapOperationInterface
      */
     protected $properties = [
         'dn' => null,
+        'location' => null,
         'attributes' => [],
     ];
 
@@ -61,6 +62,31 @@ class AddOperation implements LdapOperationInterface
         $this->properties['attributes'] = $attributes;
 
         return $this;
+    }
+
+    /**
+     * Set the location where the LDAP object should be created (ie. OU/container). This is only valid when the operation
+     * is hydrated.
+     *
+     * @param string $location
+     * @return $this
+     */
+    public function setLocation($location)
+    {
+        $this->properties['location'] = $location;
+
+        return $this;
+    }
+
+    /**
+     * Get the location where the LDAP object should be created (ie. OU/container). This is only valid when the operation
+     * is hydrated.
+     *
+     * @return string|null
+     */
+    public function getLocation()
+    {
+        return $this->properties['location'];
     }
 
     /**

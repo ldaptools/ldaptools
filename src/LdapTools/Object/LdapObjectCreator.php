@@ -15,12 +15,12 @@ use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectCreationEvent;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\LdapObjectSchemaFactory;
-use LdapTools\Factory\HydratorFactory;
+use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
-use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Allows for easy creation of LDAP objects.
@@ -43,11 +43,6 @@ class LdapObjectCreator
      * @var EventDispatcherInterface
      */
     protected $dispatcher;
-
-    /**
-     * @var HydratorFactory
-     */
-    protected $hydratorFactory;
 
     /**
      * @var LdapObjectSchema
@@ -80,6 +75,11 @@ class LdapObjectCreator
     protected $server;
 
     /**
+     * @var OperationHydrator
+     */
+    protected $hydrator;
+
+    /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
      * @param EventDispatcherInterface $dispatcher
@@ -89,7 +89,7 @@ class LdapObjectCreator
         $this->connection = $connection;
         $this->schemaFactory = $schemaFactory;
         $this->dispatcher = $dispatcher;
-        $this->hydratorFactory = new HydratorFactory();
+        $this->hydrator = new OperationHydrator();
     }
 
     /**
@@ -101,7 +101,7 @@ class LdapObjectCreator
     public function create($type)
     {
         if (!is_string($type) && !($type instanceof LdapObjectSchema)) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'You must either pass the schema object type as a string to this method, or pass the schema types '
                 . 'LdapObjectSchema to this method.'
             );
@@ -249,79 +249,29 @@ class LdapObjectCreator
     public function execute()
     {
         $this->triggerBeforeCreationEvent();
-        $hydrator = $this->hydratorFactory->get(HydratorFactory::TO_ARRAY);
-        foreach ($this->getAllParameters() as $parameter => $value) {
-            $hydrator->setParameter($parameter, $value);
-        }
-
-        if (!empty($this->schema)) {
-            $hydrator->setLdapObjectSchemas($this->schema);
-        }
-        $hydrator->setLdapConnection($this->connection);
-        $hydrator->setOperationType(AttributeConverterInterface::TYPE_CREATE);
-        $attributes = $hydrator->hydrateToLdap($this->attributes);
-
-        $dn = $this->getDnToUse($attributes);
-        $this->connection->execute((new AddOperation($dn, $attributes))->setServer($this->server));
-        $this->triggerAfterCreationEvent($dn);
+        $operation = $this->getAddOperation()->setServer($this->server);
+        $this->connection->execute($operation);
+        $this->triggerAfterCreationEvent($operation);
     }
 
     /**
-     * Builds the DN based off of the "name" attribute. The name attribute should be mapped to the "cn" attribute in
-     * pretty much all cases except for creating an OU object. Then the "name" attribute should be mapped to "ou".
+     * Get the add operation and take care of the hydration process.
      *
-     * @param array $attributes
-     * @return string
+     * @return AddOperation
      */
-    protected function getDnToUse(array $attributes)
+    protected function getAddOperation()
     {
-        // If the DN was explicitly set, just return it.
-        if ($this->dn) {
-            return $this->dn;
-        } elseif (!$this->schema) {
-            throw new \LogicException("You must explicitly set the DN or specify a schema type.");
-        } elseif (!$this->schema->hasAttribute('name')) {
-            throw new \LogicException(
-                'To create an object you must specify the name attribute in the schema. That attribute should typically'
-                .' map to the "cn" attribute, as it will use that as the base of the distinguished name.'
-            );
-        } elseif (empty($this->container)) {
-            throw new \LogicException('You must specify a container or OU to place this LDAP object in.');
+        $operation = new AddOperation($this->dn, $this->attributes);
+        $operation->setLocation($this->container);
+
+        foreach ($this->parameters as $parameter => $value) {
+            $this->hydrator->setParameter($parameter, $value);
         }
-        $attribute = $this->schema->getAttributeToLdap('name');
+        $this->hydrator->setLdapObjectSchema($this->schema);
+        $this->hydrator->setLdapConnection($this->connection);
+        $this->hydrator->setOperationType(AttributeConverterInterface::TYPE_CREATE);
 
-        return $attribute.'='.LdapUtilities::escapeValue($attributes[$attribute], null, LDAP_ESCAPE_DN).','.$this->getContainerValue();
-    }
-
-    /**
-     * Merges the explicitly set parameters with the default ones.
-     *
-     * @return array
-     */
-    protected function getAllParameters()
-    {
-        $parameters = $this->parameters;
-        $parameters['_domainname_'] = $this->connection->getConfig()->getDomainName();
-
-        $rootDse = $this->connection->getRootDse();
-        // Would this ever not be true? I'm unable to find any RFCs specifically regarding Root DSE structure.
-        if ($rootDse->has('defaultNamingContext')) {
-            $parameters['_defaultnamingcontext_'] = $rootDse->get('defaultNamingContext');
-        }
-
-        return $parameters;
-    }
-
-    /**
-     * Get the container to use while resolving any parameters it might have.
-     *
-     * @return string
-     */
-    protected function getContainerValue()
-    {
-        $resolver = new ParameterResolver(['container' => $this->container], $this->getAllParameters());
-
-        return $resolver->resolve()['container'];
+        return $this->hydrator->hydrateToLdap($operation);
     }
 
     /**
@@ -344,14 +294,14 @@ class LdapObjectCreator
     /**
      * Trigger a LDAP object after creation event.
      *
-     * @param string $dn The final DN of the created object.
+     * @param AddOperation $operation
      */
-    protected function triggerAfterCreationEvent($dn)
+    protected function triggerAfterCreationEvent(AddOperation $operation)
     {
         $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE);
-        $event->setData((new ParameterResolver($this->attributes, $this->getAllParameters()))->resolve());
-        $event->setContainer($this->getContainerValue());
-        $event->setDn($dn);
+        $event->setData((new ParameterResolver($this->attributes, $this->hydrator->getParameters()))->resolve());
+        $event->setContainer($operation->getLocation());
+        $event->setDn($operation->getDn());
 
         $this->dispatcher->dispatch($event);
     }
