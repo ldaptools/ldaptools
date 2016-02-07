@@ -36,7 +36,7 @@ interface AttributeConverterInterface
     const TYPE_MODIFY = 3;
 
     /**
-     * The process request the attribute conversion is creating a LDAP entry.
+     * The process requesting the attribute conversion is creating a LDAP entry.
      */
     const TYPE_CREATE = 4;
 
