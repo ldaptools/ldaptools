@@ -119,6 +119,45 @@ class ParameterResolverSpec extends ObjectBehavior
         $this->resolve()->shouldHaveKeyWithValue('city', 'Hill Valley');
     }
 
+    function it_should_handle_an_attribute_value_as_an_array()
+    {
+        $attributes = [
+            'displayName' => '%lastname%, %firstname% as %username%',
+            'firstName' => ['%foo%'],
+            'lastName' => '%bar%',
+            'username' => '%city%',
+            'city' => 'Hill Valley',
+            'foobar' => ['%foo%', '%bar%', 'bleh']
+        ];
+        $parameters = [
+            'foo' => 'Emmett',
+            'bar' => 'Brown',
+        ];
+        $this->beConstructedWith($attributes, $parameters);
+
+        $this->resolve()->shouldHaveKeyWithValue('displayName', 'Brown, Emmett as Hill Valley');
+        $this->resolve()->shouldHaveKeyWithValue('firstName', ['Emmett']);
+        $this->resolve()->shouldHaveKeyWithValue('lastName', 'Brown');
+        $this->resolve()->shouldHaveKeyWithValue('username', 'Hill Valley');
+        $this->resolve()->shouldHaveKeyWithValue('city', 'Hill Valley');
+        $this->resolve()->shouldHaveKeyWithValue('foobar', ['Emmett', 'Brown', 'bleh']);
+    }
+
+    function it_should_throw_an_exception_when_trying_to_use_a_multivalued_attribute_as_a_parameter()
+    {
+        $attributes = [
+            'displayName' => '%firstname%',
+            'firstName' => ['%foo%', '%bar%'],
+        ];
+        $parameters = [
+            'foo' => 'Emmett',
+            'bar' => 'Brown',
+        ];
+        $this->beConstructedWith($attributes, $parameters);
+
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringResolve();
+    }
+
     public function getMatchers()
     {
         return [

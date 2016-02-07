@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\Resolver;
+use LdapTools\Exception\InvalidArgumentException;
 
 /**
  * Iterates over the attributes to process and replace parameter values in the required order based on dependencies.
@@ -187,16 +188,19 @@ class ParameterResolver
     /**
      * Given an attribute value get all parameters it expects.
      *
-     * @param string $value
+     * @param string|array $value
      * @return array
      */
     protected function getParametersInValue($value)
     {
         $parameters = [];
         $regex = '/'.self::PARAM_MARKER.'(.*?)'.self::PARAM_MARKER.'/';
+        $value = is_array($value) ? $value : [$value];
 
-        if (preg_match_all($regex, $value, $matches) && isset($matches[1])) {
-            $parameters = $matches[1];
+        foreach ($value as $attrValue) {
+            if (preg_match_all($regex, $attrValue, $matches) && isset($matches[1])) {
+                $parameters = array_merge($parameters, $matches[1]);
+            }
         }
 
         return $parameters;
@@ -227,23 +231,35 @@ class ParameterResolver
      * takes the value either explicitly set or of the other attribute and replaces it within the original attribute.
      *
      * @param array $parameters All of the parameters found within the value.
-     * @param string $original The original value for the attribute, containing the parameters.
+     * @param array|string $original The original value for the attribute, containing the parameters.
      * @param array $attributes  All of the attributes being sent to LDAP.
      * @return string The attribute value after the passed parameters have been set.
      */
     protected function getValueForParameters(array $parameters, $original, array $attributes)
     {
-        foreach ($parameters as $parameter) {
-            $value = '';
-            // Explicitly set parameters values will take precedence
-            if (array_key_exists(strtolower($parameter), array_change_key_case($this->parameters))) {
-                $value = array_change_key_case($this->parameters)[strtolower($parameter)];
-            } elseif (array_key_exists(strtolower($parameter), array_change_key_case($attributes))) {
-                $value = array_change_key_case($attributes)[strtolower($parameter)];
+        $wasArray = is_array($original);
+        $original = $wasArray ? $original : [$original];
+
+        foreach (array_keys($original) as $index) {
+            foreach ($parameters as $parameter) {
+                $value = '';
+                // Explicitly set parameters values will take precedence
+                if (array_key_exists(strtolower($parameter), array_change_key_case($this->parameters))) {
+                    $value = array_change_key_case($this->parameters)[strtolower($parameter)];
+                } elseif (array_key_exists(strtolower($parameter), array_change_key_case($attributes))) {
+                    $value = array_change_key_case($attributes)[strtolower($parameter)];
+                }
+                if (is_array($value) && count($value) !== 1) {
+                    throw new InvalidArgumentException(sprintf(
+                        'Cannot use a multi-valued attribute "%s" as a parameter.',
+                        $parameter
+                    ));
+                }
+                $value = is_array($value) && count($value) == 1 ? reset($value) : $value;
+                $original[$index] = preg_replace("/" . self::PARAM_MARKER . $parameter . self::PARAM_MARKER . "/", $value, $original[$index]);
             }
-            $original = preg_replace("/".self::PARAM_MARKER.$parameter.self::PARAM_MARKER."/", $value, $original);
         }
 
-        return $original;
+        return $wasArray ? $original : $original[0];
     }
 }
