@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\Resolver;
+
 use LdapTools\Exception\InvalidArgumentException;
 
 /**

@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\BatchModify;
+
 use LdapTools\Exception\InvalidArgumentException;
 
 /**

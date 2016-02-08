@@ -99,7 +99,6 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getArguments()
     {
-
         return [
             $this->properties['dn'],
             $this->getBatchArray(),

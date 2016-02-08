@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\BatchModify;
+
 use LdapTools\Exception\InvalidArgumentException;
 
 /**
@@ -142,7 +143,8 @@ class BatchCollection implements \IteratorAggregate
     /**
      * When a batch collection is cloned, we want to make sure the batch objects are cloned as well.
      */
-    public function __clone() {
+    public function __clone()
+    {
         foreach ($this->batches as $i =>$batch) {
             $this->batches[$i] = clone $batch;
         }
