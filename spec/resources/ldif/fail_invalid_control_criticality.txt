@@ -1,0 +1,4 @@
+dn: cn=Robert Jensen, ou=Marketing, dc=airius, dc=com
+changetype: add
+control: 1.2.840.113556.1.4.805 foo
+cn: foobar

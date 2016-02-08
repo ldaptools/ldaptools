@@ -197,6 +197,7 @@ $ldapObject->createOU()
 * [Building LDAP Queries](tutorials/Building-LDAP-Queries.md)
 * [Creating LDAP Objects](tutorials/Creating-LDAP-Objects.md)
 * [Modifying LDAP Objects](tutorials/Modifying-LDAP-Objects.md)
+* [LDIF files](/docs/en/tutorials/LDIF-Files.md)
 * [Default Schema Attributes](reference/Default-Schema-Attributes.md)
 * [The Event System](reference/Events.md)
 

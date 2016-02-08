@@ -1,0 +1,5 @@
+dn: ou=PD Accountants, ou=Product Development, dc=airius, dc=com
+changetype: moddn
+newrdn: ou=Product Development Accountants
+deleteoldrdn: false
+newsuperior: ou=Accounting, dc=airius, dc=com

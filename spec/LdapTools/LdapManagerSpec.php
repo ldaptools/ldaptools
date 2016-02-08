@@ -253,4 +253,9 @@ class LdapManagerSpec extends ObjectBehavior
 
         $this->delete($ldapObject, true);
     }
+
+    function it_should_get_a_ldif_object()
+    {
+        $this->createLdif()->shouldReturnAnInstanceOf('\LdapTools\Ldif\Ldif');
+    }
 }

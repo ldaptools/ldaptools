@@ -17,6 +17,7 @@ use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Factory\SchemaParserFactory;
+use LdapTools\Ldif\Ldif;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCreator;
 use LdapTools\Object\LdapObjectManager;
@@ -195,6 +196,16 @@ class LdapManager
             $this->getSchemaFactory(),
             $this->config->getEventDispatcher()
         );
+    }
+
+    /**
+     * Get a LDIF object to help build a LDIF file.
+     *
+     * @return Ldif
+     */
+    public function createLdif()
+    {
+        return new Ldif($this->getConnection(), $this->getSchemaFactory());
     }
 
     /**
