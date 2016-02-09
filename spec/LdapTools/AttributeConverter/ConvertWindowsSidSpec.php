@@ -19,6 +19,20 @@ class ConvertWindowsSidSpec extends ObjectBehavior
 
     protected $sidString = 'S-1-5-21-1004336348-1177238915-682003330-512';
 
+    /**
+     * @var string Builtin Administrators group
+     */
+    protected $sidBuiltinString = 'S-1-5-32-544';
+
+    protected $sidBuiltinHex = '\01\02\00\00\00\00\00\05\20\00\00\00\20\02\00\00';
+
+    /**
+     * @var string Nobody
+     */
+    protected $sidNobodyString = 'S-1-0-0';
+
+    protected $sidNobodyHex = '\01\01\00\00\00\00\00\00\00\00\00\00';
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\AttributeConverter\ConvertWindowsSid');
@@ -37,5 +51,17 @@ class ConvertWindowsSidSpec extends ObjectBehavior
     function it_should_return_a_string_sid_when_calling_fromLdap()
     {
         $this->fromLdap(pack('H*', str_replace('\\', '', $this->sidHex)))->shouldBeEqualTo($this->sidString);
+    }
+
+    function it_should_return_a_searchable_hex_sid_for_well_known_sids_when_calling_toLdap()
+    {
+        $this->toLdap($this->sidBuiltinString)->shouldBeEqualTo($this->sidBuiltinHex);
+        $this->toLdap($this->sidNobodyString)->shouldBeEqualTo($this->sidNobodyHex);
+    }
+
+    function it_should_return_a_string_sid_for_well_known_sids_when_calling_fromLdap()
+    {
+        $this->fromLdap(pack('H*', str_replace('\\', '', $this->sidBuiltinHex)))->shouldBeEqualTo($this->sidBuiltinString);
+        $this->fromLdap(pack('H*', str_replace('\\', '', $this->sidNobodyHex)))->shouldBeEqualTo($this->sidNobodyString);
     }
 }

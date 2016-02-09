@@ -30,10 +30,11 @@ class ConvertWindowsSid implements AttributeConverterInterface
 
         $revLevel = array_shift($sid);
         $authIdent = array_shift($sid);
+        $subAuthCount = count($sid);
         $id = array_shift($sid);
 
         $sidHex = str_pad(dechex($revLevel), 2, '0', STR_PAD_LEFT);
-        $sidHex .= str_pad(dechex($authIdent), 2, '0', STR_PAD_LEFT);
+        $sidHex .= str_pad(dechex($subAuthCount), 2, '0', STR_PAD_LEFT);
         $sidHex .= str_pad(dechex($authIdent), 12, '0', STR_PAD_LEFT);
         $sidHex .= str_pad(dechex($id), 8, '0', STR_PAD_RIGHT);
 
