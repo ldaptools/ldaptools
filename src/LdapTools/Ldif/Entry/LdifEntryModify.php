@@ -57,6 +57,9 @@ class LdifEntryModify implements LdifEntryInterface, SchemaAwareInterface, LdapA
      */
     protected $batches;
 
+    /**
+     * @var array Map the batch object types to the directives they relate to as a LDIF entry.
+     */
     protected $batchMap = [
         Batch::TYPE['ADD'] => self::DIRECTIVE_ADD,
         Batch::TYPE['REMOVE_ALL'] => self::DIRECTIVE_DELETE,
@@ -103,6 +106,8 @@ class LdifEntryModify implements LdifEntryInterface, SchemaAwareInterface, LdapA
     }
 
     /**
+     * Replace the current attribute value.
+     *
      * @param string $attribute
      * @param string|array $value
      * @return $this

@@ -82,7 +82,7 @@ class LdifEntryBuilder
     }
 
     /**
-     * Create a LDIF entry to Move a LDAP object to a new OU/container.
+     * Create a LDIF entry to move a LDAP object to a new OU/container.
      *
      * @param string $dn The DN for the LDAP object to move.
      * @param string $newLocation The DN of the new location.

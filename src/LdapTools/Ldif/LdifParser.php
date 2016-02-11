@@ -317,7 +317,7 @@ class LdifParser
     }
 
     /**
-     * Check if we are the end of the LDIF string.
+     * Check if we are at the end of the LDIF string.
      *
      * @return bool
      */
@@ -326,6 +326,11 @@ class LdifParser
         return $this->currentLine() === false;
     }
 
+    /**
+     * Check if we are at the end of a LDIF entry.
+     *
+     * @return bool
+     */
     protected function isEndOfEntry()
     {
         return $this->currentLine() === '';
@@ -589,7 +594,7 @@ class LdifParser
     }
 
     /**
-     * Covert an expected string "true" or "false" to bool.
+     * Convert an expected string "true" or "false" to bool.
      *
      * @param string $value
      * @return bool
