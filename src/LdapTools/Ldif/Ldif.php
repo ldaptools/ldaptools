@@ -99,6 +99,9 @@ class Ldif
     protected $connection;
 
 
+    /**
+     * @var OperationHydrator
+     */
     protected $hydrator;
 
     /**
@@ -172,6 +175,8 @@ class Ldif
     }
 
     /**
+     * Add one or more LDIF entry objects.
+     *
      * @param LdifEntryInterface[] ...$entries
      * @return $this
      */
