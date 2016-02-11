@@ -31,11 +31,6 @@ class StashCache implements CacheInterface
     protected $pool;
 
     /**
-     * @var FileSystem The Stash driver.
-     */
-    protected $driver;
-
-    /**
      * @var string The prefix to the cache.
      */
     protected $cachePrefix = '/ldaptools';
@@ -47,9 +42,7 @@ class StashCache implements CacheInterface
 
     public function __construct()
     {
-        $this->driver = new FileSystem();
-        $this->setCacheFolder(sys_get_temp_dir().'/ldaptools');
-        $this->pool = new Pool($this->driver);
+        $this->setCacheFolder(sys_get_temp_dir().$this->cachePrefix);
     }
 
     /**
@@ -98,7 +91,6 @@ class StashCache implements CacheInterface
     public function setCacheFolder($folder)
     {
         $this->cacheFolder = $folder;
-        $this->driver->setOptions(['path' => $folder]);
     }
 
     /**
@@ -147,7 +139,7 @@ class StashCache implements CacheInterface
 
         if ($item->isMiss()) {
             $item->lock();
-            $item->set($cacheableItem);
+            $this->getPool()->save($item->set($cacheableItem));
         } else {
             $cacheableItem = $data;
         }
@@ -160,7 +152,7 @@ class StashCache implements CacheInterface
      */
     public function delete($type, $name)
     {
-        return $this->pool->getItem($this->getCachePath($type, $name))->clear();
+        return $this->getPool()->getItem($this->getCachePath($type, $name))->clear();
     }
 
     /**
@@ -168,7 +160,7 @@ class StashCache implements CacheInterface
      */
     public function deleteAll()
     {
-        return $this->pool->flush();
+        return $this->getPool()->clear();
     }
 
     /**
@@ -208,6 +200,18 @@ class StashCache implements CacheInterface
      */
     protected function getCacheItem($itemType, $itemName)
     {
-        return $this->pool->getItem($this->getCachePath($itemType, $itemName));
+        return $this->getPool()->getItem($this->getCachePath($itemType, $itemName));
+    }
+
+    /**
+     * @return Pool
+     */
+    protected function getPool()
+    {
+        if (!$this->pool) {
+            $this->pool = new Pool(new Filesystem(['path' => $this->cacheFolder]));
+        }
+
+        return $this->pool;
     }
 }
