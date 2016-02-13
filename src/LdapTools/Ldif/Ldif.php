@@ -74,11 +74,6 @@ class Ldif
     protected $version = 1;
 
     /**
-     * @var string[] Any comments located at the top of the LDIF file.
-     */
-    protected $comments = [];
-
-    /**
      * @var LdifEntryInterface[]
      */
     protected $entries = [];
@@ -97,7 +92,6 @@ class Ldif
      * @var LdapConnectionInterface|null
      */
     protected $connection;
-
 
     /**
      * @var OperationHydrator
