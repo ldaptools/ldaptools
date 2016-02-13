@@ -10,6 +10,8 @@
 
 namespace LdapTools\Operation\Invoker;
 
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapOperationEvent;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Log\LogOperation;
 use LdapTools\Operation\AuthenticationOperation;
@@ -39,6 +41,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     public function execute(LdapOperationInterface $operation)
     {
+        $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_BEFORE, $operation, $this->connection));
         $log = $this->getLogObject($operation);
         $state = new ConnectionState($this->connection);
 
@@ -58,6 +61,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->logEnd($log);
             $this->resetLdapControls($operation);
             $this->switchServerIfNeeded($this->connection->getServer(), $state->getLastServer(), $operation);
+            $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_AFTER, $operation, $this->connection));
         }
     }
 

@@ -95,6 +95,8 @@ are located in the `LdapTools\Event` namespace.
 | ldap.schema.load | `LDAP_SCHEMA_LOAD` | `LdapObjectSchemaEvent` | Triggered when a LDAP object type schema is parsed, loaded, and before it gets cached. This allows you to modify the schema without creating your own file. |
 | ldap.authentication.before | `LDAP_AUTHENTICATION_BEFORE` | `LdapAuthenticationEvent` | Triggered before an LDAP authentication operation. Allows you to get the operation details before it is sent. |
 | ldap.authentication.after | `LDAP_AUTHENTICATION_AFTER` | `LdapAuthenticationEvent` | Triggered after an LDAP authentication operation. Allows you to get the result and any error messages/codes. |
+| ldap.operation.execute.before | `LDAP_OPERATION_EXECUTE_BEFORE` | `LdapOperationEvent` | Triggered before any LDAP operation is executed. Allows getting the operation and connection prior to execution. |
+| ldap.operation.execute.after | `LDAP_OPERATION_EXECUTE_AFTER` | `LdapOperationEvent` | Triggered after any LDAP operation is executed. Allows getting the operation and connection after execution. |
 
 ## The LDAP Object Creation Event
 ---------------------------------
@@ -224,6 +226,29 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_AUTHENTICATION_AFTER, funct
     }
 });
 ```
+
+## The LDAP Operation Event
+--------------------------------
+
+The LDAP operation event lets you get the operation object with `getOperation()` and the LDAP connection object by
+calling `getConnection`. This allows you to take custom action against any LDAP operation before and after it is 
+executed (add, delete, modify, query, etc). You can also modify parts of the operation object before it is actually 
+executed.
+ 
+```php
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapOperationEvent;
+use LdapTools\Operation\DeleteOperation;
+ 
+$ldap->getEventDispatcher()->addListener(Event::LDAP_OPERATION_EXECUTE_BEFORE, function(LdapOperationEvent $event) {
+    $operation = $event->getOperation();
+    $connection = $event->getConnection();
+    
+    if ($operation instanceof DeleteOperation) {
+        // ...
+    }
+});
+``` 
  
 ## Using a Custom/Specific Event Dispatcher
 -------------------------------------------

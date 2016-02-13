@@ -13,6 +13,7 @@ namespace spec\LdapTools\Operation\Invoker;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
+use LdapTools\Event\Event;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\Handler\QueryOperationHandler;
@@ -200,6 +201,16 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->connection->setControl($reset)->shouldBeCalled();
 
         $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    function it_should_trigger_an_event_before_and_after_operation_execution()
+    {
+        $operation = new DeleteOperation('dc=foo,dc=bar');
+
+        $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_BEFORE))->shouldBeCalled();
+        $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_AFTER))->shouldBeCalled();
+
         $this->execute($operation);
     }
 }
