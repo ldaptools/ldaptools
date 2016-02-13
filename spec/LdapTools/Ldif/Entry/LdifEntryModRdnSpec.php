@@ -81,4 +81,15 @@ class LdifEntryModRdnSpec extends ObjectBehavior
         $ldif = "dn: dc=foo,dc=bar\r\nchangetype: modrdn\r\nnewrdn: cn=foobar\r\nnewsuperior: ou=foo,dc=foo,dc=bar\r\ndeleteoldrdn: 1\r\n";
         $this->toString()->shouldBeEqualTo($ldif);
     }
+
+    function it_should_add_a_comment()
+    {
+        $this->addComment('test')->shouldReturnAnInstanceOf('LdapTools\Ldif\Entry\LdifEntryModRdn');
+        $this->getComments()->shouldHaveCount(1);
+
+        $this->addComment('foo', 'bar');
+        $this->getComments()->shouldHaveCount(3);
+
+        $this->getComments()->shouldBeEqualTo(['test', 'foo', 'bar']);
+    }
 }

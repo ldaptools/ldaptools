@@ -57,4 +57,15 @@ class LdifEntryDeleteSpec extends ObjectBehavior
         $ldif = "dn: dc=foo,dc=bar\r\nchangetype: delete\r\n";
         $this->toString()->shouldBeEqualTo($ldif);
     }
+
+    function it_should_add_a_comment()
+    {
+        $this->addComment('test')->shouldReturnAnInstanceOf('LdapTools\Ldif\Entry\LdifEntryDelete');
+        $this->getComments()->shouldHaveCount(1);
+
+        $this->addComment('foo', 'bar');
+        $this->getComments()->shouldHaveCount(3);
+
+        $this->getComments()->shouldBeEqualTo(['test', 'foo', 'bar']);
+    }
 }

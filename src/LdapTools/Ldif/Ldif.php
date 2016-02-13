@@ -117,31 +117,6 @@ class Ldif
     }
 
     /**
-     * Add a comment to the top of the LDIF.
-     *
-     * @param string ...$comments
-     * @return $this
-     */
-    public function addComment(...$comments)
-    {
-        foreach ($comments as $comment) {
-            $this->comments[] = $comment;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Get all the comments for the LDIF.
-     *
-     * @return string[]
-     */
-    public function getComments()
-    {
-        return $this->comments;
-    }
-
-    /**
      * Set the LDIF version.
      *
      * @param int $version

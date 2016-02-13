@@ -25,12 +25,14 @@ trait LdifStringBuilderTrait
     /**
      * Add a comment to be associated with this entry.
      *
-     * @param string $comment
+     * @param string ...$comments
      * @return $this
      */
-    public function addComment($comment)
+    public function addComment(...$comments)
     {
-        $this->comments[] = $comment;
+        foreach ($comments as $comment) {
+            $this->comments[] = $comment;
+        }
 
         return $this;
     }

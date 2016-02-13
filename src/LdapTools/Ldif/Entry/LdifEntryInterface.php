@@ -50,10 +50,10 @@ interface LdifEntryInterface
     /**
      * Add a comment to the entry.
      *
-     * @param string $comment
+     * @param string ...$comments
      * @return $this
      */
-    public function addComment($comment);
+    public function addComment(...$comments);
 
     /**
      * Get the comments for the entry.
