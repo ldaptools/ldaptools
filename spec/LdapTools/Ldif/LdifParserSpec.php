@@ -41,6 +41,8 @@ class LdifParserSpec extends ObjectBehavior
             'description' => "Babs is a big sailing fan, and travels extensively in search of perfect sailing conditions.",
             'title' => 'Product Manager, Rod and Reel Division',
         ]);
+        $add1->addComment('implicit add example');
+
         $add2 = new LdifEntryAdd('cn=Fiona Jensen, ou=Marketing, dc=airius, dc=com', [
             'objectclass' => ['top', 'person', 'organizationalPerson'],
             'cn' => 'Fiona Jensen',
@@ -48,20 +50,34 @@ class LdifParserSpec extends ObjectBehavior
             'uid' => 'fiona',
             'telephonenumber' => '+1 408 555 1212',
         ]);
+        $add2->addComment('explicit add example', 'cn=Fiona Jensen, ou=Marketing, dc=airius, dc=com');
+
         $delete1 = new LdifEntryDelete('cn=Robert Jensen, ou=Marketing, dc=airius, dc=com');
+        $delete1->addComment('delete example');
+
         $modrdn = new LdifEntryModRdn('cn=Paul Jensen, ou=Product Development, dc=airius, dc=com', null, 'cn=Paula Jensen', true);
+        $modrdn->addComment('using a modrdn');
+
         $moddn = new LdifEntryModDn('ou=PD Accountants, ou=Product Development, dc=airius, dc=com', 'ou=Accounting, dc=airius, dc=com', 'ou=Product Development Accountants', false);
+        $moddn->addComment('using a moddn');
+
         $modify1 = new LdifEntryModify('cn=Paula Jensen, ou=Product Development, dc=airius, dc=com');
         $modify1->add('postaladdress', '123 Anystreet $ Sunnyvale, CA $ 94086');
         $modify1->reset('description');
         $modify1->replace('telephonenumber', ['+1 408 555 1234', '+1 408 555 5678']);
         $modify1->delete('facsimiletelephonenumber', '+1 408 555 9876');
+        $modify1->addComment('modifying an entry');
+
         $modify2 = new LdifEntryModify('cn=Ingrid Jensen, ou=Product Support, dc=airius, dc=com');
         $modify2->replace('postaladdress', []);
         $modify2->reset('description');
+        $modify2->addComment('a replace and delete');
+
         $delete2 = new LdifEntryDelete('ou=Product Development, dc=airius, dc=com');
         $delete2->addControl((new LdapControl('1.2.840.113556.1.4.805'))->setCriticality(true));
+        $delete2->addComment('Delete with a LDAP control');
 
+        $this->parse($ldif)->getComments()->shouldBeEqualTo(['A sample LDIF with entries from the RFC: https://www.ietf.org/rfc/rfc2849.txt']);
         $this->parse($ldif)->getEntries()->shouldHaveCount(8);
         $this->parse($ldif)->getEntries()->shouldHaveIndexWithValue(0, $add1);
         $this->parse($ldif)->getEntries()->shouldHaveIndexWithValue(1, $add2);

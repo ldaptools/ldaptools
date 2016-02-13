@@ -80,6 +80,11 @@ class LdifParser
      */
     protected $lines;
 
+    /**
+     * @var string[] Any comments pending for the next entry in the LDIF.
+     */
+    protected $commentQueue = [];
+
     public function __construct()
     {
         $this->urlLoaders[UrlLoaderInterface::TYPE_FILE] = new BaseUrlLoader();
@@ -100,11 +105,11 @@ class LdifParser
 
         $this->setup($ldif);
         while (!$this->isEndOfLdif()) {
-            if ($this->isStartOfEntry()) {
-                $ldifObject->addEntry($this->parseEntry());
-            } elseif ($this->isComment()) {
-                $ldifObject->addComment(substr($this->currentLine(), 1));
+            if ($this->isComment()) {
+                $this->addCommentToQueueOrLdif($ldifObject);
                 $this->nextLine();
+            } elseif ($this->isStartOfEntry()) {
+                $ldifObject->addEntry($this->parseEntry());
             } elseif ($this->startsWith(Ldif::DIRECTIVE_VERSION.Ldif::KEY_VALUE_SEPARATOR)) {
                 $this->setLdifVersion($ldifObject, $this->getKeyAndValue($this->currentLine())[1]);
                 $this->nextLine();
@@ -178,6 +183,11 @@ class LdifParser
     protected function parseEntry()
     {
         $entry = $this->parseCommonDirectives($this->getKeyAndValue($this->currentLine())[1]);
+
+        if (!empty($this->commentQueue)) {
+            $entry->addComment(...$this->commentQueue);
+            $this->commentQueue = [];
+        }
 
         // Nothing further to do with a simple deletion...
         if ($entry instanceof LdifEntryDelete) {
@@ -634,5 +644,34 @@ class LdifParser
     protected function throwException($message)
     {
         throw new LdifParserException($message, $this->currentLine(), $this->line + 1);
+    }
+
+    /**
+     * Determine whether the comment should be added to the LDIF itself, or if it's a comment for an entry within the
+     * LDIF. If it's for an entry in the LDIF, then we make the assumption that we an empty line separates comments
+     * between the LDIF comments overall and the start of a comment for an entry. This seems like the most reasonable
+     * way to do it, though it still may not be perfect.
+     *
+     * @param \LdapTools\Ldif\Ldif $ldif
+     */
+    protected function addCommentToQueueOrLdif(Ldif $ldif)
+    {
+        $comment = substr($this->currentLine(), 1);
+
+        // Remove the single space from the start of a comment, but leave the others intact.
+        if ($this->startsWith(' ', $comment)) {
+            $comment = substr($comment, 1);
+        }
+
+        // If we already have an entry added to LDIF, then the comment should go in the queue for the next entry.
+        if (count($ldif->getEntries()) > 0) {
+            $this->commentQueue[] = $comment;
+        // Check the section of the LDIF to look for an empty line. If so, assume it's for a future entry.
+        } elseif (array_search('', array_slice($this->lines, 0, $this->line))) {
+            $this->commentQueue[] = $comment;
+        // No empty lines and we have not reached an entry yet, so this should be a comment for the LDIF overall.
+        } else {
+            $ldif->addComment($comment);
+        }
     }
 }
