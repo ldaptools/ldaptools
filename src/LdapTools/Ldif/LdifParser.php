@@ -116,7 +116,7 @@ class LdifParser
             } elseif ($this->isEndOfEntry()) {
                 $this->nextLine();
             } else {
-                $this->throwException(sprintf('Unexpected line in LDIF'));
+                $this->throwException('Unexpected line in LDIF');
             }
         }
         $this->cleanup();
