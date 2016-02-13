@@ -1,6 +1,17 @@
 CHANGELOG
 =========
 
+0.18.0 (2016-02-13)
+-------------------
+  * Allow LDAP controls to be set per operation.
+  * Add an option to recursively delete a LDAP object.
+  * Add a LDIF parser/creator. Supports URL loading, operation controls, and is schema aware.
+  * Add an event to trigger before/after any LDAP operation.
+  * Fix SID string to hex conversion with sub authority counts.
+  * Fix parameter resolving for multi-valued attributes on LDAP object creation.
+  * Throw LdapTools specific Invalid Argument Exceptions.
+  * Make the Stash Cache type compatible with recent changes.
+
 0.17.0 (2015-12-25)
 ------------------
   * Added a method to retrieve the event dispatcher from the LdapManager.
