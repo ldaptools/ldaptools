@@ -50,6 +50,19 @@ objects:
         repository: '\My\Custom\Repository'
 ```
 
+#### include
+--------------------
+
+By using this option you can specify additional schema files to include within the current schema file. This way you can
+logically separate your schema files and include them as needed.
+
+```yaml
+# Includes a schema named 'custom'. This needs to exist within the schema folder you defined in your config settings.
+include: custom
+objects:
+    # Include any additional schema object definitions ...
+```
+
 ### Schema Object Configuration Options
 ---------------------------------------
 

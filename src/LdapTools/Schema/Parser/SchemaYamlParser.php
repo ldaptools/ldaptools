@@ -240,6 +240,33 @@ class SchemaYamlParser implements SchemaParserInterface
                 throw new SchemaParserException(sprintf('Error in configuration file: %s', $e->getMessage()));
             }
             $this->mergeDefaultSchemaFile($schemaName);
+            $this->mergeIncludedSchemas($schemaName);
+        }
+    }
+
+    /**
+     * If the 'include' directive is used, then merge the specified schemas into the current one.
+     *
+     * @param string $schemaName
+     * @throws SchemaParserException
+     */
+    protected function mergeIncludedSchemas($schemaName)
+    {
+        if (!isset($this->schemas[$this->schemaFolder][$schemaName]['include'])) {
+            return;
+        }
+        $includes = $this->schemas[$this->schemaFolder][$schemaName]['include'];
+
+        if (!is_array($includes)) {
+            $includes = [$includes];
+        }
+
+        foreach ($includes as $schema) {
+            $this->parseSchemaNameToArray($schema);
+            $this->schemas[$this->schemaFolder][$schemaName] = array_merge_recursive(
+                $this->schemas[$this->schemaFolder][$schemaName],
+                $this->schemas[$this->schemaFolder][$schema]
+            );
         }
     }
 
