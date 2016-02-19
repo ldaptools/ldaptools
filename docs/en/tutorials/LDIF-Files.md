@@ -65,12 +65,19 @@ You can easily construct LDIF files by using a few classes. The easiest way to c
 of your LDAP manager object:
 
 ```php
+use LdapTools\Object\LdapObjectType;
+
 // Assuming $ldap is your LdapManager instance. 
 // The 'add' and 'modify' LDIF entries are schema aware when you constructed using your LdapManager...
 $ldif = $ldap->createLdif();
 
+$userEntry = $ldif->entry()->add()
+    ->setType(LdapObjectType::USER)
+    ->setAttributes(['username' => 'Jimmy', 'password' => '12345'])
+    ->setLocation('ou=employees,dc=example,dc=local');
+
 $ldif->addEntry(
-    $ldif->entry()->add()->setAttributes(['username' => 'Jimmy', 'password' => '12345'])->setLocation('ou=employees,dc=example,dc=local'),
+    $userEntry,
     $ldif->entry()->delete('cn=Some User,dc=foo,dc=bar'),
     $ldif->entry()->move('cn=Frank,dc=foo,dc=bar', 'ou=Employees,dc=foo,dc=bar')
 );
