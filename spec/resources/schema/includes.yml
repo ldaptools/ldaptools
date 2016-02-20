@@ -5,3 +5,8 @@ objects:
         class: bar
         attributes:
             name: cn
+    user:
+        type: user
+        class: foobar
+        attributes:
+            name: cn

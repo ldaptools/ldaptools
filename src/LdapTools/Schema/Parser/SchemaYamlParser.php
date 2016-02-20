@@ -263,9 +263,9 @@ class SchemaYamlParser implements SchemaParserInterface
 
         foreach ($includes as $schema) {
             $this->parseSchemaNameToArray($schema);
-            $this->schemas[$this->schemaFolder][$schemaName] = array_merge_recursive(
-                $this->schemas[$this->schemaFolder][$schemaName],
-                $this->schemas[$this->schemaFolder][$schema]
+            $this->schemas[$this->schemaFolder][$schemaName]['objects'] = array_merge(
+                $this->schemas[$this->schemaFolder][$schemaName]['objects'],
+                $this->schemas[$this->schemaFolder][$schema]['objects']
             );
         }
     }

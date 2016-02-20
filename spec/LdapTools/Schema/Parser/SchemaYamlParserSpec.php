@@ -236,7 +236,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('includes', 'user')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
+        $this->parse('includes', 'user')->getObjectClass()->shouldBeEqualTo(['user']);
         $this->parse('includes', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
