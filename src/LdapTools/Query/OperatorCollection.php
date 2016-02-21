@@ -190,6 +190,26 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
+     * Get the LDAP filter string representation of all the operators in the collection.
+     *
+     * @return string
+     */
+    public function toLdapFilter()
+    {
+        $filters = [];
+        foreach ($this->toArray() as $operator) {
+            $filters[] = $operator->getLdapFilter();
+        }
+        $filter = implode('', $filters);
+
+        if (1 < count($this->toArray())) {
+            $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
+        }
+
+        return $filter;
+    }
+
+    /**
      * Merges all the Operators into one large array in a specific order. Before doing so, it will apply any schemas
      * that exist.
      *

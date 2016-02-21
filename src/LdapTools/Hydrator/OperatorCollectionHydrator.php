@@ -65,7 +65,7 @@ class OperatorCollectionHydrator
             }
         }
 
-        return $this->buildLdapFilter($collection);
+        return $collection->toLdapFilter();
     }
 
     /**
@@ -114,27 +114,6 @@ class OperatorCollectionHydrator
         $converter->setAttribute($attribute);
 
         return $converter;
-    }
-
-    /**
-     * Get the string LDAP filter from all of the combined operators.
-     *
-     * @param OperatorCollection $collection
-     * @return string
-     */
-    protected function buildLdapFilter(OperatorCollection $collection)
-    {
-        $filters = [];
-        foreach ($collection->toArray() as $operator) {
-            $filters[] = $operator->getLdapFilter();
-        }
-        $filter = implode('', $filters);
-
-        if (1 < count($collection->toArray())) {
-            $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
-        }
-
-        return $filter;
     }
 
     /**

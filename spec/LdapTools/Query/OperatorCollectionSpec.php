@@ -119,6 +119,15 @@ class OperatorCollectionSpec extends ObjectBehavior
         );
     }
 
+    function it_should_get_the_ldap_filter_for_the_operators()
+    {
+        $this->add(new Comparison('foo', Comparison::EQ, 'bar'));
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=bar)');
+
+        $this->add(new bNot(new Comparison('bar', Comparison::EQ, 'foo')));
+        $this->toLdapFilter()->shouldBeEqualTo('(&(!(bar=foo))(foo=bar))');
+    }
+
     public function getMatchers()
     {
         return [
