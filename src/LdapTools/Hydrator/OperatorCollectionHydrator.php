@@ -13,7 +13,6 @@ namespace LdapTools\Hydrator;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
-use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\BaseOperator;
 use LdapTools\Query\Operator\ContainsOperatorsInterface;
 use LdapTools\Query\OperatorCollection;
