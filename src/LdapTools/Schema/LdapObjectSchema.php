@@ -86,6 +86,11 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $multivaluedAttributes = [];
 
     /**
+     * @var string The BaseDN used for queries against this schema type.
+     */
+    protected $baseDn;
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -401,6 +406,26 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getDefaultContainer()
     {
         return $this->defaultContainer;
+    }
+
+    /**
+     * Set the BaseDN used for queries against this schema type.
+     *
+     * @param string $baseDn
+     */
+    public function setBaseDn($baseDn)
+    {
+        $this->baseDn = $baseDn;
+    }
+
+    /**
+     * Get the BaseDN used for queries against this schema type.
+     *
+     * @return string
+     */
+    public function getBaseDn()
+    {
+        return $this->baseDn;
     }
 
     /**

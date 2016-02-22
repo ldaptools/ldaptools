@@ -50,6 +50,7 @@ class SchemaYamlParser implements SchemaParserInterface
         'default_container' => 'setDefaultContainer',
         'converter_options' => 'setConverterOptions',
         'multivalued_attributes' => 'setMultivaluedAttributes',
+        'base_dn' => 'setBaseDn',
     ];
 
     /**

@@ -17,6 +17,7 @@ use LdapTools\Exception\EmptyResultException;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Exception\MultiResultException;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
@@ -197,8 +198,10 @@ class LdapQuery
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $hydrator->setOrderBy($this->orderBy);
 
+        $opHydrator = new OperationHydrator($this->ldap);
+        $opHydrator->setLdapObjectSchema(empty($this->schemas) ? null : $this->schemas[0]);
         $this->operation->setAttributes($attributes);
-        $results = $hydrator->hydrateAllFromLdap($this->ldap->execute($this->operation));
+        $results = $hydrator->hydrateAllFromLdap($this->ldap->execute($opHydrator->hydrateToLdap($this->operation)));
         $this->operation->setAttributes($operatorAttributes);
 
         return $results;

@@ -239,4 +239,11 @@ class LdapObjectSchemaSpec extends ObjectBehavior
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetConverter('foo');
     }
+
+    function it_should_set_the_base_dn()
+    {
+        $this->getBaseDn()->shouldBeNull();
+        $this->setBaseDn('dc=foo,dc=bar');
+        $this->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
+    }
 }

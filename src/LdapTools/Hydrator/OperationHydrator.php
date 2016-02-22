@@ -14,6 +14,7 @@ use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\LdapOperationInterface;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -46,6 +47,8 @@ class OperationHydrator extends ArrayHydrator
             $this->hydrateModifyOperation($operation);
         } elseif ($operation instanceof AddOperation) {
             $this->hydrateAddOperation($operation);
+        } elseif ($operation instanceof QueryOperation) {
+            $this->hydrateQueryOperation($operation);
         }
 
         return $operation;
@@ -77,6 +80,23 @@ class OperationHydrator extends ArrayHydrator
         $this->setDefaultParameters();
         $operation->setAttributes(parent::hydrateToLdap($operation->getAttributes()));
         $this->setDnToUse($operation);
+    }
+
+    /**
+     * @param QueryOperation $operation
+     */
+    protected function hydrateQueryOperation(QueryOperation $operation)
+    {
+        // Only want it set if it wasn't explicitly set...
+        if (is_null($operation->getBaseDn())) {
+            $operation->setBaseDn($this->schema->getBaseDn());
+        }
+
+        // Empty check instead of null due to the way the BaseDN is set for a RootDSE query...
+        if (!empty($operation->getBaseDn())) {
+            $this->setDefaultParameters();
+            $operation->setBaseDn($this->resolveParameters(['baseDn' => $operation->getBaseDn()])['baseDn']);
+        }
     }
 
     /**
@@ -123,12 +143,15 @@ class OperationHydrator extends ArrayHydrator
         if (!$this->connection) {
             return;
         }
-
         $this->parameters['_domainname_'] = $this->connection->getConfig()->getDomainName();
         $rootDse = $this->connection->getRootDse();
+
         // Would this ever not be true? I'm unable to find any RFCs specifically regarding Root DSE structure.
         if ($rootDse->has('defaultNamingContext')) {
             $this->parameters['_defaultnamingcontext_'] = $rootDse->get('defaultNamingContext');
+        }
+        if ($rootDse->has('configurationNamingContext')) {
+            $this->parameters['_configurationnamingcontext_'] = $rootDse->get('configurationNamingContext');
         }
     }
 }

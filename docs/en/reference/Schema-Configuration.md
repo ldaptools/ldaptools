@@ -195,6 +195,17 @@ placed by default when created.
 ```
 
 --------------------
+#### base_dn
+
+This should be a string in DN format that represents the OU/container where the base of a LDAP query for this LDAP type
+should start. It also accepts parameter names for the defaultNamingContext and the configurationNamingContext.
+
+```yaml
+    # All LDAP objects under this path will be queried for the type.
+    base_dn: 'OU=OU=Employees,DC=example,DC=local'
+```
+
+--------------------
 #### extends
 
 By using this option you can explicitly state to make a object type extend another object and inherit everything it

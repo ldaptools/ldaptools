@@ -151,6 +151,15 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
     }
 
+    function it_should_parse_the_base_dn_for_an_object()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'user')
+            ->getBaseDn()
+            ->shouldBeEqualTo('ou=bar,dc=example,dc=local');
+    }
+
     function it_should_parse_a_schema_that_extends_a_default_schema()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');

@@ -13,6 +13,7 @@ namespace spec\LdapTools\Query;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -85,10 +86,18 @@ class LdapQuerySpec extends ObjectBehavior
      */
     function let($ldap)
     {
+        $attribbutes = [
+            'defaultNamingContext' => 'dc=example,dc=local',
+            'configurationNamingContext' => 'cn=Configuration,dc=example,dc=local',
+        ];
+        $rootDse = new LdapObject($attribbutes);
+
         $this->operation = new QueryOperation();
         $this->operation->setAttributes(["cn", "givenName", "foo"]);
         $ldap->execute($this->operation)
             ->willReturn($this->ldapEntries);
+        $ldap->getRootDse()->willReturn($rootDse);
+
         $this->beConstructedWith($ldap);
         $this->setQueryOperation($this->operation);
         $ldap->getConfig()->willReturn(new DomainConfiguration('example.local'));
@@ -379,6 +388,41 @@ class LdapQuerySpec extends ObjectBehavior
         $this->operation->setBaseDn('dc=foo,dc=bar');
         $this->setLdapObjectSchemas($schema);
         $this->getResult()->first()->toArray()->shouldHaveKeys($attributes);
+    }
+
+
+    function it_should_set_a_base_dn_from_the_schema_if_specified()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectClass('foo');
+        $schema->setBaseDn('ou=employees,dc=example,dc=local');
+        $this->setLdapObjectSchemas($schema);
+
+        $this->execute();
+        $this->getQueryOperation()->getBaseDn()->shouldBeEqualTo('ou=employees,dc=example,dc=local');
+    }
+
+    function it_should_honor_an_explicitly_set_dn_over_one_from_the_schema_if_specified()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setObjectClass('foo');
+        $schema->setBaseDn('ou=employees,dc=example,dc=local');
+        $this->setLdapObjectSchemas($schema);
+
+        $this->operation->setBaseDn('dc=foo,dc=bar');
+        $this->execute();
+        $this->getQueryOperation()->getBaseDn()->shouldNotBeEqualTo('ou=employees,dc=example,dc=local');
+    }
+
+    function it_should_resolve_base_dn_parameters_when_querying_ldap()
+    {
+        $schema = new LdapObjectSchema('ad', 'user');
+        $schema->setBaseDn('%_configurationnamingcontext_%');
+        $this->setLdapObjectSchemas($schema);
+
+        $this->operation->setBaseDn('%_configurationnamingcontext_%');
+        $this->execute();
+        $this->getQueryOperation()->getBaseDn()->shouldBeEqualTo('cn=Configuration,dc=example,dc=local');
     }
 
     public function getMatchers()
