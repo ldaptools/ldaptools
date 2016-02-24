@@ -101,7 +101,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `fromLdap`: Takes the RID of a group and returns the group's name.
 
 #### *functional_level*
-  * `fromLdap`: Takes an Active Directory functional level as an int and converts it to a human readable form.
-  
   * `toLdap`: This should not be used. You should only read the value from LDAP.
- 
+  
+  * `fromLdap`: Takes an Active Directory functional level as an int and converts it to a human readable form.
+
+#### *gpoptions*
+  * `toLdap`: Takes a bool and converts it to a string int to represent whether inheritance is blocked on an OU. 
+  
+  * `fromLdap`: Takes a gpOptions value and converts it to a bool for whether GPO inheritance is set to be blocked.

@@ -43,6 +43,7 @@ class AttributeConverterFactory
         'primary_group' => '\LdapTools\AttributeConverter\ConvertPrimaryGroup',
         'functional_level' => '\LdapTools\AttributeConverter\ConvertFunctionalLevel',
         'ad_time_span' => '\LdapTools\AttributeConverter\ConvertADTimeSpan',
+        'gpoptions' => '\LdapTools\AttributeConverter\ConvertGpOptions',
     ];
 
     /**

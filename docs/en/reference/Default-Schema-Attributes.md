@@ -186,6 +186,7 @@ These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
 | dn | dn | string |
 | gpoLinks | gPLink | array |
 | guid | objectGuid | string |
+| inheritanceBlocked | gpOptions | bool |
 | modified | whenModified | `\DateTime` |
 | name | ou | string |
 | sid | objectSid | string |

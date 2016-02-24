@@ -108,6 +108,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('primary_group')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertPrimaryGroup');
     }
 
+    function it_should_return_ConvertGpOptions_when_calling_get_with_gpoptions()
+    {
+        $this::get('gpoptions')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGpOptions');
+    }
+
     function it_should_return_ConvertFunctionalLevel_when_calling_get_with_functional_level()
     {
         $this::get('functional_level')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertFunctionalLevel');

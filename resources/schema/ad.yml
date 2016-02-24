@@ -435,6 +435,7 @@ objects:
                  - 'created'
                  - 'modified'
              gpo_link: [ gpoLinks ]
+             gpoptions: inheritanceBlocked
         attributes:
             city: l
             country: c
@@ -443,6 +444,7 @@ objects:
             dn: distinguishedName
             gpoLinks: gPLink
             guid: objectGuid
+            inheritanceBlocked: gpOptions
             modified: whenChanged
             name: ou
             sid: objectSid
