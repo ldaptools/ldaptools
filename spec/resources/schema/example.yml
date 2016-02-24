@@ -181,6 +181,7 @@ objects:
             - 'username'
             - 'password'
         default_container: 'ou=foo,ou=bar,dc=example,dc=local'
+        base_dn: 'ou=bar,dc=example,dc=local'
     group:
         type: group
         class: group
