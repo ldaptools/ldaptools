@@ -253,22 +253,33 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     protected function mergeIncludedSchemas($schemaName)
     {
-        if (!isset($this->schemas[$this->schemaFolder][$schemaName]['include'])) {
-            return;
-        }
-        $includes = $this->schemas[$this->schemaFolder][$schemaName]['include'];
+        $include = ['include' => [], 'include_default' => []];
 
-        if (!is_array($includes)) {
-            $includes = [$includes];
+        foreach (array_keys($include) as $key) {
+            if (isset($this->schemas[$this->schemaFolder][$schemaName][$key])) {
+                $include[$key] = $this->schemas[$this->schemaFolder][$schemaName][$key];
+                $include[$key] = is_array($include[$key]) ? $include[$key] : [$include[$key]];
+            }
         }
 
-        foreach ($includes as $schema) {
+        foreach ($include['include'] as $schema) {
             $this->parseSchemaNameToArray($schema);
             $this->schemas[$this->schemaFolder][$schemaName]['objects'] = array_merge(
                 $this->schemas[$this->schemaFolder][$schemaName]['objects'],
                 $this->schemas[$this->schemaFolder][$schema]['objects']
             );
         }
+
+        $folder = $this->schemaFolder;
+        $this->schemaFolder = $this->defaultSchemaFolder;
+        foreach ($include['include_default'] as $schema) {
+            $this->parseSchemaNameToArray($schema);
+            $this->schemas[$folder][$schemaName]['objects'] = array_merge(
+                $this->schemas[$folder][$schemaName]['objects'],
+                $this->schemas[$this->schemaFolder][$schema]['objects']
+            );
+        }
+        $this->schemaFolder = $folder;
     }
 
     /**

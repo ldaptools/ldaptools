@@ -54,11 +54,25 @@ objects:
 --------------------
 
 By using this option you can specify additional schema files to include within the current schema file. This way you can
-logically separate your schema files and include them as needed.
+logically separate your schema files and include them as needed. Note that the schema needs to exist within the folder
+path you defined for your schema in the configuration.
 
 ```yaml
 # Includes a schema named 'custom'. This needs to exist within the schema folder you defined in your config settings.
 include: custom
+objects:
+    # Include any additional schema object definitions ...
+```
+
+#### include_default
+--------------------
+
+By using this option you can specify additional schema files to include within the current schema file that exist within
+the default schema folder. The only valid schema names for this are those that are included within this libraries default
+schema folder.
+
+```yaml
+include: exchange
 objects:
     # Include any additional schema object definitions ...
 ```

@@ -249,6 +249,14 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('includes', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
+    function it_should_parse_a_schema_that_includes_additional_default_schema_files()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('includes_default', 'user')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
+        $this->parse('includes_default', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
+    }
+
     function getMatchers()
     {
         return [

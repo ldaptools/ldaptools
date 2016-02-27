@@ -1,0 +1,7 @@
+include_default: ad
+objects:
+    foo:
+        type: foo
+        attributes:
+            foo: bar
+        category: 'foobar'
