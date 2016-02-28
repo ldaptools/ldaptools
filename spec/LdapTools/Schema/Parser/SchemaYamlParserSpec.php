@@ -51,7 +51,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $domain = new DomainConfiguration('example.com');
         $domain->setLdapType('ad');
 
-        $this->shouldThrow(new SchemaParserException('Cannot read schema file: '.$fakePath.'/ad.yml'))->duringParse(
+        $this->shouldThrow(new SchemaParserException('Cannot find schema for "ad" in "'.$fakePath.'"'))->duringParse(
             $domain->getLdapType(),
             'user'
         );
@@ -255,6 +255,13 @@ class SchemaYamlParserSpec extends ObjectBehavior
 
         $this->parse('includes_default', 'user')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
         $this->parse('includes_default', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
+    }
+
+    function it_should_be_able_to_load_a_file_with_a_YAML_extension()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('extension', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
     function getMatchers()

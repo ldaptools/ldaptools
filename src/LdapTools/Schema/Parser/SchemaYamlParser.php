@@ -71,10 +71,7 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     public function getSchemaModificationTime($schemaName)
     {
-        $file = $this->schemaFolder.'/'.$schemaName.'.yml';
-        $this->validateFileCanBeRead($file);
-
-        return new \DateTime('@'.filemtime($file));
+        return new \DateTime('@'.filemtime($this->getSchemaFileName($this->schemaFolder, $schemaName)));
     }
 
     /**
@@ -109,19 +106,6 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         return $ldapObjectSchemas;
-    }
-
-    /**
-     * Make sure a file is readable.
-     *
-     * @param string $file
-     * @throws SchemaParserException
-     */
-    protected function validateFileCanBeRead($file)
-    {
-        if (!is_readable($file)) {
-            throw new SchemaParserException(sprintf("Cannot read schema file: %s", $file));
-        }
     }
 
     /**
@@ -232,9 +216,7 @@ class SchemaYamlParser implements SchemaParserInterface
     protected function parseSchemaNameToArray($schemaName)
     {
         if (!isset($this->schemas[$this->schemaFolder][$schemaName])) {
-            $file = $this->schemaFolder . '/' . $schemaName . '.yml';
-            $this->validateFileCanBeRead($file);
-
+            $file = $this->getSchemaFileName($this->schemaFolder, $schemaName);
             try {
                 $this->schemas[$this->schemaFolder][$schemaName] = Yaml::parse(file_get_contents($file));
             } catch (ParseException $e) {
@@ -376,5 +358,31 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         return $parent;
+    }
+
+    /**
+     * Check for a YML file of the specified schema name and return the full path.
+     *
+     * @param string $folder
+     * @param string $schema
+     * @return string
+     * @throws SchemaParserException
+     */
+    protected function getSchemaFileName($folder, $schema)
+    {
+        $file = null;
+
+        foreach (['yml', 'yaml'] as $ext) {
+            $fileCheck = $folder.'/'.$schema.'.'.$ext;
+            if (is_readable($fileCheck)) {
+                $file = $fileCheck;
+            }
+        }
+
+        if (is_null($file)) {
+            throw new SchemaParserException(sprintf('Cannot find schema for "%s" in "%s"', $schema, $folder));
+        }
+
+        return $file;
     }
 }

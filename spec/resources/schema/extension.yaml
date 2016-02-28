@@ -1,0 +1,7 @@
+# Used to make sure the parser will load a file ending with YAML.
+objects:
+    foo:
+        type: foo
+        attributes:
+            foo: bar
+        category: 'foobar'
