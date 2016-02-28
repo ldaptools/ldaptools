@@ -376,6 +376,7 @@ class SchemaYamlParser implements SchemaParserInterface
             $fileCheck = $folder.'/'.$schema.'.'.$ext;
             if (is_readable($fileCheck)) {
                 $file = $fileCheck;
+                break;
             }
         }
 
