@@ -7,6 +7,7 @@ takes care of escaping all values passed to it when generating the filter.
 
 * [LdapQueryBuilder Methods](#ldapquerybuilder-methods)
 * [Filter Method Shortcuts](#filter-method-shortcuts)
+* [Retrieving Query Results](#LdapQuery-Methods-to-Retrieve-LDAP-Results)
 
 ## Generating LDAP Filters Without LdapManager
 -----------------------
@@ -21,7 +22,7 @@ $lqb = new LdapQueryBuilder();
 
 $filter = $lqb->select('givenName', 'sn', 'l')
     ->where(['objectClass' => 'user'])
-    ->andWhere($lqb->filter->like('sAMAccountName','*smith'))
+    ->andWhere($lqb->filter()->like('sAMAccountName','*smith'))
     ->getLdapFilter();
     
 echo "LDAP Filter: ".$filter.PHP_EOL;
@@ -98,7 +99,7 @@ $lqb->select(['givenName', 'l', 'objectSid', 'sid']);
 
 The `from` method requires an argument for the LDAP type. This type must be defined in your LDAP schema. Common types
 that are in the schema by default include: `user`, `group`, `contact`, `computer`, `ou`. These types are defined as constants
-in the `\LdapTools\Object\LdapObjectTypes` class. Using this method makes the query aware of the attribute name mapping
+in the `\LdapTools\Object\LdapObjectType` class. Using this method makes the query aware of the attribute name mapping
 and converters defined for the type.
 
 ```php
@@ -152,14 +153,14 @@ and values that must be met, or any number of filter operator statements.
 $lqb->where(['firstName' => 'Timmy', 'state' => 'Wyoming']);
 
 // Pass filter operator statements instead. It will take care of attribute value conversions as well.
-$lqb->where($lqb->filter->gte('created', new \DateTime('5-4-2000'));
+$lqb->where($lqb->filter()->gte('created', new \DateTime('5-4-2000'));
 
 // A more complex series of statements
 $lqb->where(
-    $lqb->filter->neq('firstName', 'Jimbo'),
-    $lqb->filter->bOr(
-        $lqb->filter->eq('lastName', 'Dodgson'), 
-        $lqb->filter->eq('lastName', 'Venkman')
+    $lqb->filter()->neq('firstName', 'Jimbo'),
+    $lqb->filter()->bOr(
+        $lqb->filter()->eq('lastName', 'Dodgson'), 
+        $lqb->filter()->eq('lastName', 'Venkman')
     )
 );
 ```
@@ -193,7 +194,8 @@ connection switches back to the LDAP server it was originally connected to.
 #### setBaseDn($baseDn)
 
 This method sets the base DN (distinguished name) for the query. That means that any LDAP object at or below this point
-in the directory will be queried for. This will default to whatever you set in the domain configuration for the
+in the directory will be queried for. This will default first to a `base_dn` set in the schema for the object type you
+ are searching for and if that is not set it will default to whatever you set in the domain configuration for the
 `base_dn` value.
 
 ```php
@@ -416,9 +418,9 @@ $lqb->where(new bOr(
 Instead you can write:
 
 ```php
-$lqb->where($lqb->filter->or(
-    $lqb->filter->eq('firstName', 'Bill'),
-    $lqb->filter->eq('firstName', 'Egon')
+$lqb->where($lqb->filter()->or(
+    $lqb->filter()->eq('firstName', 'Bill'),
+    $lqb->filter()->eq('firstName', 'Egon')
 ));
 ```
 
