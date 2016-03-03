@@ -59,6 +59,14 @@ class Ldif
     const URL = '<';
 
     /**
+     * Possible line endings to use.
+     */
+    const LINE_ENDING = [
+        'WINDOWS' => "\r\n",
+        'UNIX' => "\n",
+    ];
+
+    /**
      * Represents the separator for the tokens of LDIF data.
      */
     const ENTRY_SEPARATOR = "\r\n";
@@ -181,7 +189,7 @@ class Ldif
         }
         foreach ($this->entries as $entry) {
             $this->setupEntry($entry);
-            $ldif .= self::ENTRY_SEPARATOR.$entry->toString();
+            $ldif .= $this->lineEnding.$entry->toString();
         }
 
         return $ldif;
@@ -215,6 +223,7 @@ class Ldif
         if ($entry instanceof LdapAwareInterface) {
             $entry->setLdapConnection($this->connection);
         }
+        $entry->setLineEnding($this->lineEnding);
     }
 
     /**

@@ -108,6 +108,21 @@ interface LdifEntryInterface
     public function getType();
 
     /**
+     * Set the line ending to be used. See the Ldif::LINE_ENDING constant for values.
+     *
+     * @param string $lineEnding
+     * @return $this
+     */
+    public function setLineEnding($lineEnding);
+
+    /**
+     * Get the line ending that will be used.
+     *
+     * @return string
+     */
+    public function getLineEnding();
+
+    /**
      * Get the string representation of the LDIF entry.
      *
      * @return string

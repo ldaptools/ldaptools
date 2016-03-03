@@ -13,6 +13,7 @@ namespace spec\LdapTools\Ldif;
 use LdapTools\Ldif\Entry\LdifEntryAdd;
 use LdapTools\Ldif\Entry\LdifEntryDelete;
 use LdapTools\Ldif\Entry\LdifEntryModify;
+use LdapTools\Ldif\Ldif;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -85,5 +86,32 @@ class LdifSpec extends ObjectBehavior
         $this->addEntry($delete, $add);
 
         $this->toOperations()->shouldBeLike([$delete->toOperation(), $add->toOperation()]);
+    }
+
+    function it_should_set_the_line_endings_for_the_ldif_string()
+    {
+        $delete = new LdifEntryDelete('dc=foo,dc=bar');
+        $add = new LdifEntryAdd('dc=foo,dc=bar', ['foo' => 'bar']);
+        $this->addEntry($delete, $add);
+        $this->addComment('foo');
+        $this->setLineEnding(Ldif::LINE_ENDING['UNIX']);
+
+        $ldif =
+            "# foo\n"
+            . "version: 1\n"
+            . "\n"
+            . "dn: dc=foo,dc=bar\n"
+            . "changetype: delete\n"
+            . "\n"
+            . "dn: dc=foo,dc=bar\n"
+            . "changetype: add\n"
+            . "foo: bar\n";
+
+        $this->toString()->shouldBeEqualTo($ldif);
+    }
+
+    function it_should_throw_an_exception_on_an_invalid_line_ending_type()
+    {
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetLineEnding('foo');
     }
 }

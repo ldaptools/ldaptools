@@ -10,6 +10,8 @@
 
 namespace LdapTools\Ldif;
 
+use LdapTools\Exception\InvalidArgumentException;
+
 /**
  * Common methods/properties used to construct LDIF entries.
  *
@@ -21,6 +23,11 @@ trait LdifStringBuilderTrait
      * @var string[] Any comments associated with the entry.
      */
     protected $comments = [];
+
+    /**
+     * @var string The line ending to use.
+     */
+    protected $lineEnding = Ldif::LINE_ENDING['WINDOWS'];
 
     /**
      * Add a comment to be associated with this entry.
@@ -48,6 +55,32 @@ trait LdifStringBuilderTrait
     }
 
     /**
+     * Set the line ending to be used. See the Ldif::LINE_ENDING constant for values.
+     *
+     * @param string $lineEnding
+     * @return $this
+     */
+    public function setLineEnding($lineEnding)
+    {
+        if (!in_array($lineEnding, Ldif::LINE_ENDING)) {
+            throw new InvalidArgumentException('The line ending specified is invalid');
+        }
+        $this->lineEnding = $lineEnding;
+
+        return $this;
+    }
+
+    /**
+     * Get the line ending that will be used.
+     *
+     * @return string
+     */
+    public function getLineEnding()
+    {
+        return $this->lineEnding;
+    }
+
+    /**
      * Add any specified comments to the generated LDIF.
      *
      * @param string $ldif
@@ -56,7 +89,7 @@ trait LdifStringBuilderTrait
     protected function addCommentsToString($ldif)
     {
         foreach ($this->comments as $comment) {
-            $ldif .= Ldif::COMMENT.' '.$comment.Ldif::ENTRY_SEPARATOR;
+            $ldif .= Ldif::COMMENT.' '.$comment.$this->lineEnding;
         }
 
         return $ldif;
@@ -79,6 +112,6 @@ trait LdifStringBuilderTrait
             $value = base64_encode($value);
         }
 
-        return $directive.$separator.' '.$value.Ldif::ENTRY_SEPARATOR;
+        return $directive.$separator.' '.$value.$this->lineEnding;
     }
 }

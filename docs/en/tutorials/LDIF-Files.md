@@ -291,3 +291,19 @@ $ldif->addEntry($ldif->entry()->move('cn=jill,dc=example,dc=local', 'ou=employee
 // Modify the DN of an LDAP object...
 $ldif->addEntry($ldif->entry()->moddn('cn=jill,ou=employees,dc=example,dc=local')->setNewRdn('cn=jill'));
 ```
+
+### LDIF Line Endings
+
+By default when you call `toString()` on an LDIF object all of the line endings will be in Windows format (CRLF). If you
+want to use Unix/Linux format (LF) you can use the `setLineEnding()` method:
+
+```php
+use LdapTools\Ldif\Ldif;
+
+$ldif = $ldap->createLdif();
+
+$ldif->setLineEnding(Ldif::LINE_ENDING['UNIX']);
+```
+
+This is mostly useful for compatibility purposes. Some utilities consuming the LDIF file may be expecting a certain line
+ending in order to work correctly.
