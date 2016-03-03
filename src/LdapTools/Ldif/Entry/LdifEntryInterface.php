@@ -11,9 +11,7 @@
 namespace LdapTools\Ldif\Entry;
 
 use LdapTools\Connection\LdapControl;
-use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Operation\LdapOperationInterface;
-use LdapTools\Schema\LdapObjectSchema;
 
 /**
  * The interface for a LDIF entry.
