@@ -2,8 +2,8 @@
 ---------
 
 Logging is available for the following LDAP operations performed by the connection class: add, modify, delete, move, and
-rename. To enable logging you must pass a class to the constructor of the LdapManager or LdapConnection upon instantiation.
-The only requirement for the class is that it implements `\LdapTools\Log\LdapLoggerInterface`.
+rename. To enable logging you must pass a logger to the `setLogger($logger)` method of the main `\LdapTools\Configuration`
+class. The only requirement for the class is that it implements `\LdapTools\Log\LdapLoggerInterface`.
  
 ## Enabling Logging for the LdapManager
 ---------------------------------------
