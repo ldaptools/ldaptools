@@ -31,6 +31,8 @@ cn: Fiona Jensen
 sn: Jensen
 uid: fiona
 telephonenumber: +1 408 555 1212
+description:: VGhpcyBkZXNjcmlwdGlvbiB3aWxsIHNwcmVhZCBhY3Jvc3MgbXVsdGlwb
+ GUgbGluZXMu
 
 # delete example
 dn: cn=Robert Jensen, ou=Marketing, dc=airius, dc=com

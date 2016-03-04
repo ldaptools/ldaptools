@@ -405,17 +405,16 @@ class LdifParser
 
         // Base64 encoded format...
         if ($this->startsWith(Ldif::KEY_VALUE_SEPARATOR, substr($line, $position + 1))) {
-            $value = base64_decode(ltrim(substr($line, $position + 2), ' '));
+            $value = base64_decode($this->getContinuedValues(ltrim(substr($line, $position + 2), ' ')));
         // The value needs to be retrieved from a URL...
         } elseif ($this->startsWith(Ldif::URL, substr($line, $position + 1))) {
             // Start the position after the URL indicator and remove any spaces.
-            $value = $this->getValueFromUrl(ltrim(substr($line, $position + 2), ' '));
+            $value = $this->getValueFromUrl($this->getContinuedValues(ltrim(substr($line, $position + 2), ' ')));
         // Just a typical value format...
         } else {
             // A space at the start of the value should be ignored. A value beginning with a space should be base64 encoded.
-            $value = ltrim(substr($line, $position + 1), " ");
+            $value = $this->getContinuedValues(ltrim(substr($line, $position + 1), " "));
         }
-        $value = $this->getContinuedValues($value);
 
         return [$key, $value];
     }

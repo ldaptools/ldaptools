@@ -50,6 +50,7 @@ class LdifParserSpec extends ObjectBehavior
             'sn' => 'Jensen',
             'uid' => 'fiona',
             'telephonenumber' => '+1 408 555 1212',
+            'description' => 'This description will spread across multiple lines.',
         ]);
         $add2->addComment('explicit add example', 'cn=Fiona Jensen, ou=Marketing, dc=airius, dc=com');
 
