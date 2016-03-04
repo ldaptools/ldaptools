@@ -1,7 +1,11 @@
 # A sample LDIF with entries from the RFC: https://www.ietf.org/rfc/rfc2849.txt
+# This line should be concaten
+ ated as a single comment.
 version: 1
 
 # implicit add example
+# With a continued
+  comment included
 dn:cn=Barbara Jensen, ou=Product Development, dc=airius, dc=com
 objectclass:top
 objectclass:person

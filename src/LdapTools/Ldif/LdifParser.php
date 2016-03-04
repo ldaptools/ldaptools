@@ -415,12 +415,24 @@ class LdifParser
             // A space at the start of the value should be ignored. A value beginning with a space should be base64 encoded.
             $value = ltrim(substr($line, $position + 1), " ");
         }
+        $value = $this->getContinuedValues($value);
 
+        return [$key, $value];
+    }
+
+    /**
+     * Check for any continued values and concatenate them into one.
+     *
+     * @param $value
+     * @return string
+     */
+    protected function getContinuedValues($value)
+    {
         while ($this->isContinuedValue($this->nextLine(false))) {
             $value .= substr($this->nextLine(), 1);
         }
 
-        return [$key, $value];
+        return $value;
     }
 
     /**
@@ -656,7 +668,7 @@ class LdifParser
      */
     protected function addCommentToQueueOrLdif(Ldif $ldif)
     {
-        $comment = substr($this->currentLine(), 1);
+        $comment = $this->getContinuedValues(substr($this->currentLine(), 1));
 
         // Remove the single space from the start of a comment, but leave the others intact.
         if ($this->startsWith(' ', $comment)) {

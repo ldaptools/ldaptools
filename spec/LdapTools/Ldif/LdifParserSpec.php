@@ -42,6 +42,7 @@ class LdifParserSpec extends ObjectBehavior
             'title' => 'Product Manager, Rod and Reel Division',
         ]);
         $add1->addComment('implicit add example');
+        $add1->addComment('With a continued comment included');
 
         $add2 = new LdifEntryAdd('cn=Fiona Jensen, ou=Marketing, dc=airius, dc=com', [
             'objectclass' => ['top', 'person', 'organizationalPerson'],
@@ -77,7 +78,7 @@ class LdifParserSpec extends ObjectBehavior
         $delete2->addControl((new LdapControl('1.2.840.113556.1.4.805'))->setCriticality(true));
         $delete2->addComment('Delete with a LDAP control');
 
-        $this->parse($ldif)->getComments()->shouldBeEqualTo(['A sample LDIF with entries from the RFC: https://www.ietf.org/rfc/rfc2849.txt']);
+        $this->parse($ldif)->getComments()->shouldBeEqualTo(['A sample LDIF with entries from the RFC: https://www.ietf.org/rfc/rfc2849.txt', 'This line should be concatenated as a single comment.']);
         $this->parse($ldif)->getEntries()->shouldHaveCount(8);
         $this->parse($ldif)->getEntries()->shouldHaveIndexWithValue(0, $add1);
         $this->parse($ldif)->getEntries()->shouldHaveIndexWithValue(1, $add2);
