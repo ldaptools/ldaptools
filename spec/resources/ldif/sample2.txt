@@ -1,0 +1,7 @@
+# Make sure empty values are allowed (for example, the RootDSE)
+version: 1
+
+dn:
+objectClass: top
+objectClass: OpenLDAProotDSE
+structuralObjectClass: OpenLDAProotDSE

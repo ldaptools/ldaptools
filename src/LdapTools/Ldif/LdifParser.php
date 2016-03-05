@@ -384,20 +384,11 @@ class LdifParser
      */
     protected function getKeyAndValue($line)
     {
-        $length = strlen($line);
         $position = strpos($line, Ldif::KEY_VALUE_SEPARATOR);
 
         // There must be a key/value separator ':' present in the line, and it cannot be the first value
         if ($position === false || $position === 0) {
             $this->throwException('Expecting a LDIF directive');
-        }
-
-        // There must be an actual value following the separator
-        if ($length === $position + 1) {
-            $this->throwException(sprintf(
-                'There must be a value following the separator "%s", but there is none',
-                Ldif::KEY_VALUE_SEPARATOR
-            ));
         }
 
         // This accounts for double '::' base64 format.

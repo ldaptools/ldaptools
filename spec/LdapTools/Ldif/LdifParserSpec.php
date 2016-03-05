@@ -18,6 +18,7 @@ use LdapTools\Ldif\Entry\LdifEntryModDn;
 use LdapTools\Ldif\Entry\LdifEntryModify;
 use LdapTools\Ldif\Entry\LdifEntryModRdn;
 use LdapTools\Ldif\UrlLoader\BaseUrlLoader;
+use LdapTools\Operation\AddOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -192,6 +193,14 @@ class LdifParserSpec extends ObjectBehavior
         $e = new LdifParserException('Expected "0" or "1" but got: false on line number 4 near "deleteoldrdn: false"');
 
         $this->shouldThrow($e)->duringParse($ldif);
+    }
+
+    function it_should_parse_an_ldif_with_an_empty_value()
+    {
+        $ldif = file_get_contents(__DIR__.'/../../resources/ldif/sample2.txt');
+        $add = new AddOperation('',['objectClass' => ['top', 'OpenLDAProotDSE'], 'structuralObjectClass' => ['OpenLDAProotDSE']]);
+
+        $this->parse($ldif)->toOperations()->shouldBeLike([$add]);
     }
 
     public function getMatchers()
