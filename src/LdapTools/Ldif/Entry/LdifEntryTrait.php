@@ -128,9 +128,9 @@ trait LdifEntryTrait
     protected function getCommonString($dn = null)
     {
         $dn = $dn ?: $this->dn;
-        $ldif = $this->getLdifLine(Ldif::DIRECTIVE_DN, $dn);
+        $ldif = $this->addCommentsToString('');
+        $ldif .= $this->getLdifLine(Ldif::DIRECTIVE_DN, $dn);
         $ldif = $this->addControlsToString($ldif);
-        $ldif = $this->addCommentsToString($ldif);
         $ldif .= $this->getLdifLine(Ldif::DIRECTIVE_CHANGETYPE, $this->changeType);
 
         return $ldif;

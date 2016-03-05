@@ -54,7 +54,11 @@ class LdifEntryDeleteSpec extends ObjectBehavior
 
     function it_should_get_the_ldif_string_for_the_entry()
     {
-        $ldif = "dn: dc=foo,dc=bar\r\nchangetype: delete\r\n";
+        $ldif =
+            "# Delete example.\r\n"
+            ."dn: dc=foo,dc=bar\r\n"
+            ."changetype: delete\r\n";
+        $this->addComment('Delete example.');
         $this->toString()->shouldBeEqualTo($ldif);
     }
 

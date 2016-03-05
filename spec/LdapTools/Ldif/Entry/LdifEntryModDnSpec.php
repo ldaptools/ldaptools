@@ -78,7 +78,15 @@ class LdifEntryModDnSpec extends ObjectBehavior
         $deleteOldRdn = false;
         $this->beConstructedWith('dc=foo,dc=bar', $newLocation, $newRdn, $deleteOldRdn);
 
-        $ldif = "dn: dc=foo,dc=bar\r\nchangetype: moddn\r\nnewrdn: cn=foobar\r\nnewsuperior: ou=foo,dc=foo,dc=bar\r\ndeleteoldrdn: 0\r\n";
+        $ldif =
+             "# Modify DN example.\r\n"
+            ."dn: dc=foo,dc=bar\r\n"
+            ."changetype: moddn\r\n"
+            ."newrdn: cn=foobar\r\n"
+            ."newsuperior: ou=foo,dc=foo,dc=bar\r\n"
+            ."deleteoldrdn: 0\r\n";
+
+        $this->addComment('Modify DN example.');
         $this->toString()->shouldBeEqualTo($ldif);
     }
 

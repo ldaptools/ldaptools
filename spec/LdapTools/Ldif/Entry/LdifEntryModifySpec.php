@@ -87,13 +87,16 @@ class LdifEntryModifySpec extends ObjectBehavior
 
     function it_should_get_the_ldif_string_representation()
     {
+        $this->addComment("Modify entry example.");
         $this->add('phone', '555-5555');
         $this->reset('sn');
         $this->replace('givenName','foo');
         $this->delete('fax', '123-4567');
         $this->add('address', ['123 fake st', '456 real st']);
 
-        $ldif = "dn: dc=foo,dc=bar\r\n"
+        $ldif =
+             "# Modify entry example.\r\n"
+            . "dn: dc=foo,dc=bar\r\n"
             . "changetype: modify\r\n"
             . "add: phone\r\n"
             . "phone: 555-5555\r\n"

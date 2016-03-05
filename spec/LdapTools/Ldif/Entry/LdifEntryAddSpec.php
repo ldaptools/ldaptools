@@ -100,9 +100,11 @@ class LdifEntryAddSpec extends ObjectBehavior
             'description' => ' space',
         ];
         $this->setAttributes($attributes);
+        $this->addComment('Add example.');
 
         $ldif =
-             "dn: dc=foo,dc=bar\r\n"
+             "# Add example.\r\n"
+            ."dn: dc=foo,dc=bar\r\n"
             ."changetype: add\r\n"
             ."givenName: foo\r\n"
             ."sn: bar\r\n"
