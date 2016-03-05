@@ -25,6 +25,16 @@ trait LdifStringBuilderTrait
     protected $comments = [];
 
     /**
+     * @var int The max length for a line before it is folded (if line folding is enabled).
+     */
+    protected $maxLineLength = 76;
+
+    /**
+     * @var bool Whether or not a value should be folded (continued on the next line) if it goes past $maxLineLength
+     */
+    protected $lineFolding = false;
+
+    /**
      * @var string The line ending to use.
      */
     protected $lineEnding = Ldif::LINE_ENDING['WINDOWS'];
@@ -81,6 +91,52 @@ trait LdifStringBuilderTrait
     }
 
     /**
+     * Set whether or not lines exceeding a certain length should be folded (continued on the next line)
+     *
+     * @param bool $lineFolding
+     * @return $this
+     */
+    public function setLineFolding($lineFolding)
+    {
+        $this->lineFolding = (bool) $lineFolding;
+
+        return $this;
+    }
+
+    /**
+     * Get whether or not lines exceeding a certain length should be folded (continued on the next line)
+     *
+     * @return bool
+     */
+    public function getLineFolding()
+    {
+        return $this->lineFolding;
+    }
+
+    /**
+     * Set the max length for a line before the value is folded (continued on the next line).
+     *
+     * @param int $length
+     * @return $this
+     */
+    public function setMaxLineLength($length)
+    {
+        $this->maxLineLength = $length;
+
+        return $this;
+    }
+
+    /**
+     * Get the max length for a line before the value is folded (continued on the next line).
+     *
+     * @return int
+     */
+    public function getMaxLineLength()
+    {
+        return $this->maxLineLength;
+    }
+
+    /**
      * Add any specified comments to the generated LDIF.
      *
      * @param string $ldif
@@ -89,7 +145,7 @@ trait LdifStringBuilderTrait
     protected function addCommentsToString($ldif)
     {
         foreach ($this->comments as $comment) {
-            $ldif .= Ldif::COMMENT.' '.$comment.$this->lineEnding;
+            $ldif .= Ldif::COMMENT.' '.$this->getValueForLine($comment).$this->lineEnding;
         }
 
         return $ldif;
@@ -112,6 +168,28 @@ trait LdifStringBuilderTrait
             $value = base64_encode($value);
         }
 
-        return $directive.$separator.' '.$value.$this->lineEnding;
+        return $directive.$separator.' '.$this->getValueForLine($value).$this->lineEnding;
+    }
+
+    /**
+     * Gets the value for the line while taking into account any line folding set.
+     *
+     * @param $value
+     * @return string
+     */
+    protected function getValueForLine($value)
+    {
+        /**
+         * Is this the correct way to do line folding? If a folded line starts/ends with a space should the value,
+         * and this every line, be base64 encoded? Reading the RFC this does not seem clear.
+         */
+        if ($this->lineFolding) {
+            $value = implode(
+                $this->lineEnding." ",
+                str_split($value, $this->maxLineLength)
+            );
+        }
+
+        return $value;
     }
 }

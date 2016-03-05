@@ -123,6 +123,36 @@ interface LdifEntryInterface
     public function getLineEnding();
 
     /**
+     * Set whether line folding should be used (lines exceeding $maxLineLength will be continued on the next line).
+     *
+     * @param bool $lineFolding
+     * @return $this
+     */
+    public function setLineFolding($lineFolding);
+
+    /**
+     * Get whether line folding should be used (lines exceeding $maxLineLength will be continued on the next line).
+     *
+     * @return bool
+     */
+    public function getLineFolding();
+
+    /**
+     * Set the max length of a line when line folding is in use.
+     *
+     * @param int $maxLineLength
+     * @return $this
+     */
+    public function setMaxLineLength($maxLineLength);
+
+    /**
+     * Get the max length of a line when line folding is in use.
+     *
+     * @return int
+     */
+    public function getMaxLineLength();
+
+    /**
      * Get the string representation of the LDIF entry.
      *
      * @return string

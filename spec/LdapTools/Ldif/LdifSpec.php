@@ -114,4 +114,45 @@ class LdifSpec extends ObjectBehavior
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringSetLineEnding('foo');
     }
+
+    function it_should_have_a_line_folding_set_to_false_by_default_with_a_length_of_76()
+    {
+        $this->getLineFolding()->shouldBeEqualTo(false);
+        $this->getMaxLineLength(76);
+    }
+
+    function it_should_fold_long_lines_when_specified()
+    {
+        $dn = 'cn=foo,dc=example,dc=local';
+        $description = 'This is a long line that will go over the 76 char limit and then be continued on the next line. We dont need no stinking wordwrap.';
+        $givenName = 'foo';
+        $comment = 'This is an LDIF file with some really long lines just to test some folded lines so they show up on the next.';
+        $comment1 = 'An example comment.';
+        $comment2 = 'This comment will go past the line length and should also be split onto the next line.';
+
+        $add = new LdifEntryAdd($dn, [
+            'description' => $description,
+            'givenName' => $givenName,
+        ]);
+        $add->addComment($comment1, $comment2);
+        $this->addEntry($add);
+        $this->addComment($comment);
+
+        $ldif =
+            "# This is an LDIF file with some really long lines just to test some folded li\r\n"
+            . " nes so they show up on the next.\r\n"
+            . "version: 1\r\n"
+            . "\r\n"
+            . "# $comment1\r\n"
+            . "# This comment will go past the line length and should also be split onto the \r\n"
+            . " next line.\r\n"
+            . "dn: cn=foo,dc=example,dc=local\r\n"
+            . "changetype: add\r\n"
+            . "description: This is a long line that will go over the 76 char limit and then be continue\r\n"
+            . " d on the next line. We dont need no stinking wordwrap.\r\n"
+            . "givenName: $givenName\r\n";
+
+        $this->setLineFolding(true);
+        $this->toString()->shouldBeEqualTo($ldif);
+    }
 }

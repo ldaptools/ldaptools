@@ -307,3 +307,20 @@ $ldif->setLineEnding(Ldif::LINE_ENDING['UNIX']);
 
 This is mostly useful for compatibility purposes. Some utilities consuming the LDIF file may be expecting a certain line
 ending in order to work correctly.
+
+### Line Folding and Max Line Length
+
+By default when you call `toString()` on an LDIF object it will not fold any lines regardless of how long they are. If
+you would like for the long lines to be folded and continued on the next line after a certain length (to improve the
+readability of the file) you can use the `setLineFolding(true)` and `setMaxLineLength($length)` methods:
+ 
+```php
+use LdapTools\Ldif\Ldif;
+
+$ldif = $ldap->createLdif();
+
+# Long line (including comments) will be broken into smaller chunks now...
+$ldif->setLineFolding(true);
+# Unless this is explicitly set, the max line length is 76 by default.
+$ldif->setMaxLineLength(100);
+``` 

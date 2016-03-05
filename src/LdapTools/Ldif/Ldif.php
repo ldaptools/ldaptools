@@ -224,6 +224,8 @@ class Ldif
             $entry->setLdapConnection($this->connection);
         }
         $entry->setLineEnding($this->lineEnding);
+        $entry->setLineFolding($this->lineFolding);
+        $entry->setMaxLineLength($this->maxLineLength);
     }
 
     /**
