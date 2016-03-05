@@ -8,7 +8,7 @@ object-oriented way and then output the result to a LDIF string.
 
 ## LDIF Parsing
 
-To parse a LDIF file you can pass the contents of it to the parser then do what to need with the LDIF object returned:
+To parse a LDIF file you can pass the contents of it to the parser then do what you need with the LDIF object returned:
 
 ```php
 use LdapTools\Ldif\LdifParser;
