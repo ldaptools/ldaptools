@@ -66,8 +66,6 @@ only supported there.
 
 ### All Groups a User Belongs to Recursively
 
-**Note**: Recursive searches only work in AD (as it supports `MATCHING_RULE_IN_CHAIN`).
-
 ```php
 $query = $ldap->buildLdapQuery();
 
@@ -79,8 +77,6 @@ $groups = $query->fromGroups()
 ```
 
 ### All Users that Belong to a Group Recursively
-
-**Note**: Recursive searches only work in AD (as it supports `MATCHING_RULE_IN_CHAIN`).
 
 ```php
 $query = $ldap->buildLdapQuery();
@@ -94,8 +90,6 @@ $users = $query->fromUsers()
 
 ### All Disabled User Accounts
 
-**Note**: This query method only works in AD, as it uses the `userAccountControl` flags.
-
 ```php
 $query = $ldap->buildLdapQuery();
 
@@ -106,8 +100,6 @@ $users = $query->fromUsers()
 ```
 
 ### All Locked User Accounts
-
-**Note**: This query method only works in AD, as it uses the `userAccountControl` flags.
 
 ```php
 $query = $ldap->buildLdapQuery();
@@ -120,8 +112,6 @@ $users = $query->fromUsers()
 
 ### All Active User Accounts with Exchange Mailboxes
 
-**Note**: This query method is only valid in an AD environment using Exchange.
-
 ```php
 $query = $ldap->buildLdapQuery();
 
@@ -133,8 +123,6 @@ $users = $query->fromUsers()
 ```
 
 ### All Active User Accounts With Passwords That Must Change on Next Login
-
-**Note**: This query method only works in AD, as it uses the `userAccountControl` flags.
 
 ```php
 $query = $ldap->buildLdapQuery();
