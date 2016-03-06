@@ -43,7 +43,8 @@ $ldap = new LdapManager($config);
 ## Searching LDAP
 
 With the `LdapManager` up and going you can now easily build LDAP queries without having to remember all the special 
-syntax for LDAP filters. All values are also automatically escaped.
+syntax for LDAP filters. All values are also automatically escaped. Check the [tutorial](tutorials/Building-LDAP-Queries.md) for all
+available methods and the [cookbook](cookbook/Common-LDAP-Queries.md) for more query examples.
 
 ```php
 // Get an instance of the query...
