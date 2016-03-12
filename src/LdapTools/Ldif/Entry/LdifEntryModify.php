@@ -195,7 +195,8 @@ class LdifEntryModify implements LdifEntryInterface, SchemaAwareInterface, LdapA
             if (strtolower($batch->getAttribute()) !== 'unicodepwd') {
                 continue;
             }
-            $batch->setValues(base64_encode(reset($batch->getValues())));
+            $values = $batch->getValues();
+            $batch->setValues(base64_encode(reset($values)));
         }
     }
 }
