@@ -95,9 +95,6 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_lookup_servers_via_dns_if_no_servers_are_defined($tcp, $dns)
     {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy related issue?");
-        };
         $tcp->connect('foo.example.com', 389)->willReturn(false);
         $tcp->connect('bar.example.com', 389)->willReturn(true);
         $tcp->close()->willReturn(null);
@@ -147,9 +144,6 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_throw_an_error_when_no_servers_are_returned_from_dns($tcp, $dns)
     {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy related issue?");
-        };
         $e = new LdapConnectionException('No LDAP servers found via DNS for "example.com".');
         $dns->getRecord("_ldap._tcp.example.com", DNS_SRV)->willReturn(false);
         $config = new DomainConfiguration('example.com');

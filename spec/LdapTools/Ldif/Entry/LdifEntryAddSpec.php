@@ -118,9 +118,6 @@ class LdifEntryAddSpec extends ObjectBehavior
      */
     function it_should_get_the_ldif_representation_in_the_context_of_a_type_and_schema($connection, $rootdse)
     {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy bug.");
-        };
         $domain = new DomainConfiguration('example.local');
         $domain->setUseTls(true);
         $connection->getConfig()->willReturn($domain);

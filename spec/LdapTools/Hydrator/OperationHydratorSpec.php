@@ -43,10 +43,6 @@ class OperationHydratorSpec extends ObjectBehavior
      */
     function let($connection, $rootdse)
     {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy bug.");
-        };
-
         $domain = new DomainConfiguration('example.local');
         $domain->setUseTls(true);
         $connection->getConfig()->willReturn($domain);

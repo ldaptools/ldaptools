@@ -103,14 +103,6 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->toArray()->shouldHaveLastItemAs('\LdapTools\Query\Operator\MatchingRule');
     }
 
-    public function it_should_throw_an_exception_when_adding_non_operators()
-    {
-        if (version_compare(PHP_VERSION, '7.0', '>=')) {
-            throw new SkippingException("This spec currently doesn't work on PHP >= 7. Prophecy related issue?");
-        };
-        $this->shouldThrow('\Exception')->duringAdd('foobar');
-    }
-
     public function it_should_throw_an_LdapQueryException_when_adding_more_than_one_From_operator()
     {
         $this->add(new From(new Comparison('objectclass', Comparison::EQ, 'foobar')));
