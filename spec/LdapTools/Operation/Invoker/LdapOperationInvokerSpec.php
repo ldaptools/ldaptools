@@ -80,6 +80,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $handler->execute($operation)->shouldBeCalled();
         $operation->getServer()->willReturn('foo');
         $operation->getControls()->willReturn([]);
+        $operation->getChildOperations()->willReturn([]);
 
         // This should not be called unless a control is explicitly set
         $this->connection->setControl(Argument::any())->shouldNotBeCalled();
@@ -211,6 +212,35 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_BEFORE))->shouldBeCalled();
         $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_AFTER))->shouldBeCalled();
 
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     * @param \LdapTools\Operation\DeleteOperation $operation
+     * @param \LdapTools\Operation\AddOperation $childOperation
+     */
+    function it_should_execute_all_child_operations($handler, $operation, $childOperation)
+    {
+        $handler->supports($operation)->willReturn(true);
+        $handler->supports($childOperation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->setOperationDefaults($childOperation)->shouldBeCalled();
+
+        $handler->execute($operation)->shouldBeCalled();
+        $handler->execute($childOperation)->shouldBeCalled();
+
+        $operation->getServer()->willReturn('foo');
+        $operation->getControls()->willReturn([]);
+        $operation->getChildOperations()->willReturn([$childOperation]);
+
+        $childOperation->getServer()->willReturn('foo');
+        $childOperation->getControls()->willReturn([]);
+        $childOperation->getChildOperations()->willReturn([]);
+
+        $this->addHandler($handler);
         $this->execute($operation);
     }
 }

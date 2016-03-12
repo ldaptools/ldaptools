@@ -30,6 +30,11 @@ trait LdapOperationTrait
     protected $controls = [];
 
     /**
+     * @var LdapOperationInterface[]
+     */
+    protected $childOperations = [];
+
+    /**
      * Set the LDAP server that should be used for the operation.
      *
      * @param string|null $server
@@ -73,6 +78,31 @@ trait LdapOperationTrait
         $this->controls[] = $control;
 
         return $this;
+    }
+
+    /**
+     * Add a child operation that should be executed before this operation.
+     *
+     * @param LdapOperationInterface[] ...$operation
+     * @return $this
+     */
+    public function addChildOperation(LdapOperationInterface ...$operations)
+    {
+        foreach ($operations as $operation) {
+            $this->childOperations[] = $operation;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get child operations that should be executed before this operation.
+     *
+     * @return LdapOperationInterface[]
+     */
+    public function getChildOperations()
+    {
+        return $this->childOperations;
     }
 
     /**

@@ -76,4 +76,19 @@ interface LdapOperationInterface
      * @return array
      */
     public function getLogArray();
+
+    /**
+     * Add a child operation that should be executed before this operation.
+     *
+     * @param LdapOperationInterface[] ...$operation
+     * @return $this
+     */
+    public function addChildOperation(LdapOperationInterface ...$operation);
+
+    /**
+     * Get child operations that should be executed before this operation.
+     *
+     * @return LdapOperationInterface[]
+     */
+    public function getChildOperations();
 }

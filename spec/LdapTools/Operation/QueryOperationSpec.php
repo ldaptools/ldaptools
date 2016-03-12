@@ -10,7 +10,10 @@
 
 namespace spec\LdapTools\Operation;
 
+use LdapTools\Operation\AddOperation;
+use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
+use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -127,5 +130,16 @@ class QueryOperationSpec extends ObjectBehavior
 
         $this->getFilter()->shouldBeEqualTo('foo');
         $this->getAttributes()->shouldBeEqualTo(['bar']);
+    }
+
+    function it_should_add_child_operations()
+    {
+        $operation1 = new AddOperation('cn=foo,dc=bar,dc=foo');
+        $operation2 = new DeleteOperation('cn=foo,dc=bar,dc=foo');
+        $operation3 = new RenameOperation('cn=foo,dc=bar,dc=foo');
+
+        $this->addChildOperation($operation1);
+        $this->addChildOperation($operation2, $operation3);
+        $this->getChildOperations()->shouldBeEqualTo([$operation1, $operation2, $operation3]);
     }
 }
