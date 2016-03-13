@@ -80,7 +80,8 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $handler->execute($operation)->shouldBeCalled();
         $operation->getServer()->willReturn('foo');
         $operation->getControls()->willReturn([]);
-        $operation->getChildOperations()->willReturn([]);
+        $operation->getPreOperations()->willReturn([]);
+        $operation->getPostOperations()->willReturn([]);
 
         // This should not be called unless a control is explicitly set
         $this->connection->setControl(Argument::any())->shouldNotBeCalled();
@@ -218,27 +219,37 @@ class LdapOperationInvokerSpec extends ObjectBehavior
     /**
      * @param \LdapTools\Operation\Handler\OperationHandler $handler
      * @param \LdapTools\Operation\DeleteOperation $operation
-     * @param \LdapTools\Operation\AddOperation $childOperation
+     * @param \LdapTools\Operation\AddOperation $preOperation
+     * @param \LdapTools\Operation\AddOperation $postOperation
      */
-    function it_should_execute_all_child_operations($handler, $operation, $childOperation)
+    function it_should_execute_all_child_operations($handler, $operation, $preOperation, $postOperation)
     {
         $handler->supports($operation)->willReturn(true);
-        $handler->supports($childOperation)->willReturn(true);
+        $handler->supports($preOperation)->willReturn(true);
+        $handler->supports($postOperation)->willReturn(true);
+
         $handler->setConnection($this->connection)->shouldBeCalled();
         $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+
         $handler->setOperationDefaults($operation)->shouldBeCalled();
-        $handler->setOperationDefaults($childOperation)->shouldBeCalled();
+        $handler->setOperationDefaults($preOperation)->shouldBeCalled();
+        $handler->setOperationDefaults($postOperation)->shouldBeCalled();
 
         $handler->execute($operation)->shouldBeCalled();
-        $handler->execute($childOperation)->shouldBeCalled();
+        $handler->execute($preOperation)->shouldBeCalled();
+        $handler->execute($postOperation)->shouldBeCalled();
 
         $operation->getServer()->willReturn('foo');
         $operation->getControls()->willReturn([]);
-        $operation->getChildOperations()->willReturn([$childOperation]);
+        $operation->getPreOperations()->willReturn([$preOperation]);
+        $operation->getPostOperations()->willReturn([$postOperation]);
 
-        $childOperation->getServer()->willReturn('foo');
-        $childOperation->getControls()->willReturn([]);
-        $childOperation->getChildOperations()->willReturn([]);
+        foreach ([$preOperation, $postOperation] as $op) {
+            $op->getServer()->willReturn('foo');
+            $op->getControls()->willReturn([]);
+            $op->getPreOperations()->willReturn([]);
+            $op->getPostOperations()->willReturn([]);
+        }
 
         $this->addHandler($handler);
         $this->execute($operation);

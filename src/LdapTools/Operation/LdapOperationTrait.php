@@ -32,7 +32,12 @@ trait LdapOperationTrait
     /**
      * @var LdapOperationInterface[]
      */
-    protected $childOperations = [];
+    protected $preOperations = [];
+
+    /**
+     * @var LdapOperationInterface[]
+     */
+    protected $postOperations = [];
 
     /**
      * Set the LDAP server that should be used for the operation.
@@ -81,28 +86,53 @@ trait LdapOperationTrait
     }
 
     /**
-     * Add a child operation that should be executed before this operation.
+     * Add an operation that should be executed before this operation.
      *
      * @param LdapOperationInterface[] ...$operation
      * @return $this
      */
-    public function addChildOperation(LdapOperationInterface ...$operations)
+    public function addPreOperation(LdapOperationInterface ...$operations)
     {
         foreach ($operations as $operation) {
-            $this->childOperations[] = $operation;
+            $this->preOperations[] = $operation;
         }
 
         return $this;
     }
 
     /**
-     * Get child operations that should be executed before this operation.
+     * Get operations that should be executed before this operation.
      *
      * @return LdapOperationInterface[]
      */
-    public function getChildOperations()
+    public function getPreOperations()
     {
-        return $this->childOperations;
+        return $this->preOperations;
+    }
+
+    /**
+     * Add an operation that should be executed after this operation.
+     *
+     * @param LdapOperationInterface[] ...$operation
+     * @return $this
+     */
+    public function addPostOperation(LdapOperationInterface ...$operations)
+    {
+        foreach ($operations as $operation) {
+            $this->postOperations[] = $operation;
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get operations that should be executed after this operation.
+     *
+     * @return LdapOperationInterface[]
+     */
+    public function getPostOperations()
+    {
+        return $this->postOperations;
     }
 
     /**

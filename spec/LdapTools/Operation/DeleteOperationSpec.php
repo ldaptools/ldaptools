@@ -70,14 +70,25 @@ class DeleteOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Controls');
     }
 
-    function it_should_add_child_operations()
+    function it_should_add_pre_operations()
     {
         $operation1 = new AddOperation('cn=foo,dc=bar,dc=foo');
         $operation2 = new DeleteOperation('cn=foo,dc=bar,dc=foo');
         $operation3 = new RenameOperation('cn=foo,dc=bar,dc=foo');
 
-        $this->addChildOperation($operation1);
-        $this->addChildOperation($operation2, $operation3);
-        $this->getChildOperations()->shouldBeEqualTo([$operation1, $operation2, $operation3]);
+        $this->addPreOperation($operation1);
+        $this->addPreOperation($operation2, $operation3);
+        $this->getPreOperations()->shouldBeEqualTo([$operation1, $operation2, $operation3]);
+    }
+
+    function it_should_add_post_operations()
+    {
+        $operation1 = new AddOperation('cn=foo,dc=bar,dc=foo');
+        $operation2 = new DeleteOperation('cn=foo,dc=bar,dc=foo');
+        $operation3 = new RenameOperation('cn=foo,dc=bar,dc=foo');
+
+        $this->addPostOperation($operation1);
+        $this->addPostOperation($operation2, $operation3);
+        $this->getPostOperations()->shouldBeEqualTo([$operation1, $operation2, $operation3]);
     }
 }

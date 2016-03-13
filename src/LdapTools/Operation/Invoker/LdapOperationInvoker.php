@@ -41,15 +41,19 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     public function execute(LdapOperationInterface $operation)
     {
-        foreach ($operation->getChildOperations() as $childOperation) {
-            $this->execute($childOperation);
+        foreach ($operation->getPreOperations() as $preOperation) {
+            $this->execute($preOperation);
         }
 
         $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_BEFORE, $operation, $this->connection));
-        $log = $this->getLogObject($operation);
         $state = new ConnectionState($this->connection);
+        $result = $this->executeOperation($operation, $state, $this->getLogObject($operation));
 
-        return $this->executeOperation($operation, $state, $log);
+        foreach ($operation->getPostOperations() as $postOperation) {
+            $this->execute($postOperation);
+        }
+
+        return $result;
     }
 
     /**
