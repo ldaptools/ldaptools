@@ -68,7 +68,7 @@ class Batch
             'modtype' => $this->modtype,
         ];
         if (!($this->modtype === LDAP_MODIFY_BATCH_REMOVE_ALL)) {
-            $batch['values'] = $this->values;
+            $batch['values'] = $this->resolve($this->values);
         }
 
         return $batch;
@@ -186,5 +186,22 @@ class Batch
     protected function isType($type)
     {
         return ($this->modtype === self::TYPE[$type]);
+    }
+
+    /**
+     * Allows for an anonymous function to produce the final value.
+     * 
+     * @param array $values
+     * @return array
+     */
+    protected function resolve(array $values)
+    {
+        foreach ($values as $i => $value) {
+            if ($value instanceof \Closure) {
+                $values[$i] = call_user_func($value);
+            }
+        }
+        
+        return $values;
     }
 }

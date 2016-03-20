@@ -93,4 +93,15 @@ class BatchSpec extends ObjectBehavior
         $this->setModType(Batch::TYPE['ADD']);
         $this->isTypeAdd()->shouldBeEqualTo(true);
     }
+
+    function it_should_let_a_value_be_determined_by_a_closure()
+    {
+        $foo = function() { return 'foo'; };
+        $this->setValues($foo);
+        $this->toArray()->shouldBeEqualTo([
+            'attrib' => 'foo',
+            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+            'values' => ['foo']
+        ]);
+    }
 }
