@@ -67,14 +67,16 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
      */
     protected function createOperationsFromValues(array $values)
     {
-        if ($this->getOperationType() == self::TYPE_MODIFY && $this->getBatch()->isTypeRemoveAll()) {
-            $values = $this->getCurrentLdapAttributeValue($this->getOptionsArray()['from_attribute']);
-            $values = is_null($values) ? [] : $values;
-            $values = is_array($values)  ? $values : [$values];
+        // In the case of a 'set' or 'reset' operation all current group membership should be removed.
+        if ($this->shouldRemoveCurrentGroups()) {
+            $this->removeCurrentGroups();
         }
-
-        foreach ($values as $value) {
-            $this->addOperation($this->getDnFromValue($value));
+        // Only if this is not a reset operation, otherwise there is nothing left to do.
+        if (!($this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY && $this->getBatch()->isTypeRemoveAll())) {
+            $batchType = $this->getBatchTypeForOperation();
+            foreach ($values as $value) {
+                $this->addOperation($this->getDnFromValue($value), $batchType);
+            }
         }
     }
 
@@ -82,15 +84,12 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
      * Add the correct operation for the action as a post operation to the current operation.
      *
      * @param string $dn
+     * @param int $batchType
      * @throws \LdapTools\Exception\AttributeConverterException
      */
-    protected function addOperation($dn)
+    protected function addOperation($dn, $batchType)
     {
         $collection = new BatchCollection($dn);
-        $action = Batch::TYPE['ADD'];
-        if ($this->getOperationType() == self::TYPE_MODIFY && ($this->getBatch()->isTypeRemove() || $this->getBatch()->isTypeRemoveAll())) {
-            $action = Batch::TYPE['REMOVE'];
-        }
 
         $valueDn = $this->getDn();
         // The DN is unknown in the case of an add, as value/parameter resolution most occur first. If there is a better
@@ -103,8 +102,51 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
             };
         }
 
-        $collection->add(new Batch($action, $this->getOptionsArray()['to_attribute'], $valueDn));
+        $collection->add(new Batch($batchType, $this->getOptionsArray()['to_attribute'], $valueDn));
         $operation = new BatchModifyOperation($dn, $collection);
         $this->operation->addPostOperation($operation);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function shouldRemoveCurrentGroups()
+    {
+        return $this->getOperationType() == self::TYPE_MODIFY 
+            && ($this->getBatch()->isTypeRemoveAll() || $this->getBatch()->isTypeReplace());
+    }
+
+    /**
+     * Gets the current group membership and generates operations to remove them all.
+     * 
+     * @throws \LdapTools\Exception\AttributeConverterException
+     */
+    protected function removeCurrentGroups()
+    {
+        $valuesToRemove = $this->getCurrentLdapAttributeValue($this->getOptionsArray()['from_attribute']);
+        $valuesToRemove = is_null($valuesToRemove) ? [] : $valuesToRemove;
+        $valuesToRemove = is_array($valuesToRemove)  ? $valuesToRemove : [$valuesToRemove];
+
+        foreach ($valuesToRemove as $value) {
+            $this->addOperation($this->getDnFromValue($value), Batch::TYPE['REMOVE']);
+        }
+    }
+
+    /**
+     * Get the batch type for the operation that was specified.
+     * 
+     * @return int
+     */
+    protected function getBatchTypeForOperation()
+    {
+        // If it was a batch reset we wouldn't be this far. So only check for a remove. If it isn't a remove then the
+        // only other action it could be is an add (creating a new LDAP entry, adding to existing, or setting existing)
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY && $this->getBatch()->isTypeRemove()) {
+            $batchType = Batch::TYPE['REMOVE'];
+        } else {
+            $batchType = Batch::TYPE['ADD'];
+        }
+        
+        return $batchType;
     }
 }

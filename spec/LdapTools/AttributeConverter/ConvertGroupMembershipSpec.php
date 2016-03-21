@@ -432,4 +432,57 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         
         $this->toLdap([null]);
     }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Operation\LdapOperationInterface $operation
+     */
+    function it_should_generate_operations_to_remove_all_current_groups_and_add_new_ones_on_a_modify_set_operation($connection, $operation)
+    {
+        $group1 = 'cn=foo,dc=example,dc=local';
+        $group2 = 'cn=bar,dc=example,dc=local';
+        $batch = new Batch(Batch::TYPE['REPLACE'], 'groups', [$group1, $group2]);
+        
+        $dn = 'cn=foo,dc=foo,dc=bar';
+        $this->setOptions(['groups' => [
+            'to_attribute' => 'member',
+            'from_attribute' => 'memberOf',
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+        ]]);
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
+        $this->setOperation($operation);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('groups');
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        $this->setDn($dn);
+        $this->setBatch($batch);
+
+        $connection->execute(Argument::any())->shouldBeCalled()->willReturn($this->expectedResult);
+        foreach ($this->expectedResult[0]['memberOf'] as $groupDn) {
+            if (!is_string($groupDn)) {
+                continue;
+            }
+            $operation->addPostOperation(Argument::that(function($op) use ($dn, $groupDn) {
+                $batches = [new Batch(Batch::TYPE['REMOVE'], 'member', [$dn])];
+
+                return $op instanceof BatchModifyOperation
+                && $op->getBatchCollection()->toArray() == $batches
+                && $op->getBatchCollection()->getDn() == $groupDn;
+            }))->shouldBeCalled();
+        }
+        foreach ([$group1, $group2] as $groupDn) {
+            $operation->addPostOperation(Argument::that(function($op) use ($dn, $groupDn) {
+                $batches = [new Batch(Batch::TYPE['ADD'], 'member', [$dn])];
+
+                return $op instanceof BatchModifyOperation
+                    && $op->getBatchCollection()->toArray() == $batches
+                    && $op->getBatchCollection()->getDn() == $groupDn;
+            }))->shouldBeCalled();
+        }
+
+        $this->toLdap([$group1, $group2]);
+    }
 }
