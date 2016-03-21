@@ -12,6 +12,7 @@ namespace LdapTools\Utilities;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -22,7 +23,7 @@ use LdapTools\Query\LdapQueryBuilder;
 trait ConverterUtilitiesTrait
 {
     /**
-     * {@inheritdoc}
+     * @return string
      */
     abstract public function getAttribute();
 
@@ -32,27 +33,27 @@ trait ConverterUtilitiesTrait
     abstract public function getBatch();
 
     /**
-     * {@inheritdoc}
+     * @return string|null
      */
     abstract public function getDn();
 
     /**
-     * {@inheritdoc}
+     * @return mixed
      */
     abstract public function getLastValue();
 
     /**
-     * {@inheritdoc}
+     * @param mixed
      */
     abstract public function setLastValue($value);
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     abstract public function getOperationType();
 
     /**
-     * {@inheritdoc}
+     * @return LdapConnectionInterface|null
      */
     abstract public function getLdapConnection();
 
