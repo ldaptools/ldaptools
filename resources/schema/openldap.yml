@@ -4,11 +4,21 @@ objects:
         type: user
         # The LDAP objectClass
         class: inetOrgPerson
+        converter_options:
+            group_membership:
+                groups:
+                    to_attribute: uniqueMember
+                    from_attribute: memberOf
+                    attribute: cn
+                    filter:
+                        objectClass: groupOfUniqueNames
         # These are converters to be applied for going both to and from LDAP.
         converters:
              generalized_time:
                  - 'created'
                  - 'modified'
+             group_membership:
+                 - 'groups'
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             cellPhone: mobile
@@ -25,6 +35,7 @@ objects:
             employeeNumber: employeeNumber
             fax: fax
             firstName: givenName
+            groups: memberOf
             homeDirectory: homeDirectory
             homePhone: homePhone
             initials: initials
@@ -45,6 +56,8 @@ objects:
             - 'lastName'
             - 'emailAddress'
             - 'dn'
+        multivalued_attributes:
+            - 'groups'
     group:
         type: group
         class: groupOfUniqueNames

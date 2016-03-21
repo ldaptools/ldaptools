@@ -11,9 +11,12 @@
 namespace spec\LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\Batch;
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
+use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -66,12 +69,14 @@ class BatchValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'pwdLastSet',
             'passwordNeverExpires' => 'userAccountControl',
             'trustedForAllDelegation' => 'userAccountControl',
+            'groups' => 'memberOf',
         ]);
         $schema->setConverterMap([
             'disabled' => 'user_account_control',
             'passwordMustChange' => 'password_must_change',
             'trustedForAllDelegation' => 'user_account_control',
             'passwordNeverExpires' => 'user_account_control',
+            'groups' => 'group_membership',
         ]);
         $schema->setConverterOptions([
             'user_account_control' => [
@@ -83,7 +88,17 @@ class BatchValueResolverSpec extends ObjectBehavior
                     'passwordIsReversible' => '128',
                 ],
                 'defaultValue' => '512',
-            ]
+            ],
+            'group_membership' => [
+                'groups' => [
+                    'to_attribute' => 'member',
+                    'from_attribute' => 'memberOf',
+                    'attribute' => 'sAMAccountName',
+                    'filter' => [
+                        'objectClass' => 'group',
+                    ],
+                ],
+            ],
         ]);
         $this->expectedSearch = (new QueryOperation())
             ->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')
@@ -171,5 +186,22 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $this->shouldThrow(new \LogicException('Unable to modify "trustedForAllDelegation". The "ADD" action is not allowed.'))->duringToLdap();
+    }
+    
+    function it_should_remove_batches_when_specified_by_a_converter_implementing_OperationGeneratorInterface()
+    {
+        $dn = 'cn=Chad,dc=foo,dc=bar';
+        $batch = new BatchCollection($dn);
+        $operation = new BatchModifyOperation($dn);
+        $batch->add(new Batch(Batch::TYPE['ADD'], 'groups', ['cn=foo,dc=example,dc=local', 'cn=bar,dc=foo,dc=bar']));
+        $batch->add(new Batch(Batch::TYPE['REMOVE'], 'groups', ['cn=foo,dc=example,dc=local', 'cn=foobar,dc=foo,dc=bar']));
+        
+        $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
+        
+        $this->setLdapConnection($this->connection);
+        $this->setDn($dn);
+        $this->setOperation($operation);
+        
+        $this->toLdap()->toArray()->shouldHaveCount(0);
     }
 }

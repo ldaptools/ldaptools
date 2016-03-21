@@ -123,6 +123,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('ad_time_span')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertADTimeSpan');
     }
 
+    function it_should_return_a_group_membership_converter()
+    {
+        $this::get('group_membership')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGroupMembership');
+    }
+    
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo_bar');

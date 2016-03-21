@@ -240,6 +240,7 @@ These are typical LDAP user objects (`objectClass=inetOrgPerson`).
 | employeeNumber | employeeNumber | int |
 | fax | facsimileTelephoneNumber | string |
 | firstName | givenName | string |
+| groups | memberOf | array |
 | homeDirectory | homeDirectory | string |
 | homePhone | homePhone | string |
 | initials | initials | string |

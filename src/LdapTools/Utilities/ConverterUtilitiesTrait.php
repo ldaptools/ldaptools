@@ -11,6 +11,7 @@
 namespace LdapTools\Utilities;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\BatchModify\Batch;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -26,7 +27,7 @@ trait ConverterUtilitiesTrait
     abstract public function getAttribute();
 
     /**
-     * {@inheritdoc}
+     * @return Batch|null
      */
     abstract public function getBatch();
 

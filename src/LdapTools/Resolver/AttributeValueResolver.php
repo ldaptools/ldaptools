@@ -96,18 +96,19 @@ class AttributeValueResolver extends BaseValueResolver
             }
         }
 
-        return $this->removeAggregatedValues($attributes);
+        return $this->removeValuesFromEntry($attributes, array_merge($this->aggregated, $this->remove));
     }
 
     /**
-     * Cleans up the entry/batch array by removing any values that were aggregated into one.
+     * Cleans up the entry/batch array by removing any values that are specified.
      *
      * @param array $entry
+     * @param array $values
      * @return array
      */
-    protected function removeAggregatedValues(array $entry)
+    protected function removeValuesFromEntry(array $entry, $values)
     {
-        foreach ($this->converted as $value) {
+        foreach ($values as $value) {
             if (isset($entry[$value])) {
                 unset($entry[$value]);
             }

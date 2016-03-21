@@ -15,6 +15,7 @@ use LdapTools\Event\LdapOperationEvent;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Log\LogOperation;
 use LdapTools\Operation\AuthenticationOperation;
+use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\Handler\AuthenticationOperationHandler;
 use LdapTools\Operation\Handler\OperationHandler;
 use LdapTools\Operation\Handler\QueryOperationHandler;
@@ -41,13 +42,17 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     public function execute(LdapOperationInterface $operation)
     {
+        $result = true;
+
         foreach ($operation->getPreOperations() as $preOperation) {
             $this->execute($preOperation);
         }
 
-        $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_BEFORE, $operation, $this->connection));
-        $state = new ConnectionState($this->connection);
-        $result = $this->executeOperation($operation, $state, $this->getLogObject($operation));
+        if (!$this->shouldSkipOperation($operation)) {
+            $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_BEFORE, $operation, $this->connection));
+            $state = new ConnectionState($this->connection);
+            $result = $this->executeOperation($operation, $state, $this->getLogObject($operation));
+        }
 
         foreach ($operation->getPostOperations() as $postOperation) {
             $this->execute($postOperation);
@@ -178,5 +183,20 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $reset->setValue(false);
             $this->connection->setControl($reset);
         }
+    }
+
+
+    /**
+     * It's possible we need to skip an operation. For example, if a batch operation was only for attribute values that
+     * were converted into other operations (such as a modification where only operation generator converters are used).
+     * In that case the resulting batch operation will be empty but will have generated post/pre operations for it still.
+     * The most common scenario is group membership only changes.
+     *
+     * @param LdapOperationInterface $operation
+     * @return bool
+     */
+    protected function shouldSkipOperation(LdapOperationInterface $operation)
+    {
+        return $operation instanceof BatchModifyOperation && empty($operation->getBatchCollection()->toArray());
     }
 }

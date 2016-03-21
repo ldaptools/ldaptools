@@ -15,6 +15,7 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Operation\QueryOperation;
+use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -23,10 +24,17 @@ use LdapTools\Utilities\LdapUtilities;
 class OperationHydrator extends ArrayHydrator
 {
     /**
+     * @var LdapOperationInterface
+     */
+    protected $operation;
+    
+    /**
      * {@inheritdoc}
      */
     public function hydrateToLdap($operation, $dn = null)
     {
+        $this->operation = $operation;
+        
         if (!($operation instanceof LdapOperationInterface)) {
             throw new InvalidArgumentException('Expects an instance of LdapOperationInterface to convert to LDAP.');
         }
@@ -153,5 +161,14 @@ class OperationHydrator extends ArrayHydrator
         if ($rootDse->has('configurationNamingContext')) {
             $this->parameters['_configurationnamingcontext_'] = $rootDse->get('configurationNamingContext');
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function configureValueResolver(BaseValueResolver $valueResolver, $dn = null)
+    {
+        parent::configureValueResolver($valueResolver, $dn);
+        $valueResolver->setOperation($this->operation);
     }
 }

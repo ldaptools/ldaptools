@@ -10,11 +10,13 @@
 
 namespace spec\LdapTools\Operation\Invoker;
 
+use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Operation\AuthenticationOperation;
+use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\Handler\QueryOperationHandler;
 use PhpSpec\ObjectBehavior;
@@ -251,6 +253,18 @@ class LdapOperationInvokerSpec extends ObjectBehavior
             $op->getPostOperations()->willReturn([]);
         }
 
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_skip_batch_operations_that_are_empty($handler)
+    {
+        $operation = new BatchModifyOperation('dc=foo,dc=bar', new BatchCollection());
+        $handler->execute($operation)->shouldNotBeCalled(true);
+        
         $this->addHandler($handler);
         $this->execute($operation);
     }

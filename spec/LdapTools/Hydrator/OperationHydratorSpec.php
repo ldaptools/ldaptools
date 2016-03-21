@@ -69,6 +69,7 @@ class OperationHydratorSpec extends ObjectBehavior
         $operation->setAttributes([
             'username' => 'John',
             'password' => '12345',
+            'groups' => 'cn=foo,dc=example,dc=local',
         ]);
         $operation->setLocation('ou=employees,dc=example,dc=local');
 
@@ -87,10 +88,12 @@ class OperationHydratorSpec extends ObjectBehavior
             'unicodePwd' => (new EncodeWindowsPassword())->toLdap('12345'),
             'userAccountControl' => "512",
         ];
-        $original = clone $operation;
+        $original1 = clone $operation;
+        $original2 = clone $operation;
 
         $this->hydrateToLdap($operation)->getAttributes()->shouldBeEqualTo($expected);
-        $this->hydrateToLdap($original)->getDn()->shouldBeEqualTo('cn=John,ou=employees,dc=example,dc=local');
+        $this->hydrateToLdap($original2)->getPostOperations()->shouldHaveCount(1);
+        $this->hydrateToLdap($original1)->getDn()->shouldBeEqualTo('cn=John,ou=employees,dc=example,dc=local');
     }
 
     function it_should_hydrate_a_modify_operation_to_ldap()

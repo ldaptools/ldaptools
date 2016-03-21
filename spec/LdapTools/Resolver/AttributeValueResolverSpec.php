@@ -13,6 +13,7 @@ namespace spec\LdapTools\Resolver;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -25,6 +26,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
         'emailAddress' => 'Chad.Sikorra@gmail.com',
         'disabled' => false,
         'passwordMustChange' => true,
+        'groups' => ['foo'],
     ];
 
     protected $entryFrom = [
@@ -57,10 +59,17 @@ class AttributeValueResolverSpec extends ObjectBehavior
     protected $connection;
 
     /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @var AddOperation
      */
-    function let($connection)
+    protected $operation;
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     * @param \LdapTools\Operation\AddOperation $operation
+     */
+    function let($connection, $operation)
     {
+        $this->operation = $operation;
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([
             'username' => 'sAMAccountName',
@@ -69,12 +78,14 @@ class AttributeValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'pwdLastSet',
             'passwordNeverExpires' => 'userAccountControl',
             'trustedForAllDelegation' => 'userAccountControl',
+            'groups' => 'memberOf',
         ]);
         $schema->setConverterMap([
             'disabled' => 'user_account_control',
             'passwordMustChange' => 'password_must_change',
             'trustedForAllDelegation' => 'user_account_control',
             'passwordNeverExpires' => 'user_account_control',
+            'groups' => 'group_membership',
         ]);
         $schema->setConverterOptions([
             'user_account_control' => [
@@ -86,7 +97,17 @@ class AttributeValueResolverSpec extends ObjectBehavior
                     'passwordIsReversible' => '128',
                 ],
                 'defaultValue' => '512',
-            ]
+            ],
+            'group_membership' => [
+                'groups' => [
+                    'to_attribute' => 'member',
+                    'from_attribute' => 'memberOf',
+                    'attribute' => 'sAMAccountName',
+                    'filter' => [
+                        'objectClass' => 'group',
+                    ],
+                ],
+            ],
         ]);
         $this->schema = $schema;
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
@@ -111,6 +132,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
 
     function it_should_convert_values_to_ldap()
     {
+        $this->setOperation($this->operation);
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','512');
         $this->toLdap()->shouldHaveKeyWithValue('username','chad');
         $this->toLdap()->shouldHaveKeyWithValue('emailAddress','Chad.Sikorra@gmail.com');
@@ -125,6 +147,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['trustedForAllDelegation'] = true;
 
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
+        $this->setOperation($this->operation);
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','590338');
     }
 
@@ -134,11 +157,13 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['disabled'] = true;
         $entry['passwordNeverExpires'] = true;
         $entry['trustedForAllDelegation'] = true;
+        unset($entry['groups']);
 
         $this->connection->execute(
             (new QueryOperation())->setFilter('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))')->setAttributes(['userAccountControl']))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
         $this->setLdapConnection($this->connection);
+        $this->setOperation($this->operation);
         $this->setDn('cn=foo,dc=foo,dc=bar');
 
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','590338');
@@ -157,6 +182,12 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $this->fromLdap()->shouldHaveKeyWithValue('passwordMustChange', true);
     }
 
+    function it_should_remove_attributes_when_specified_by_a_converter_implementing_OperationGeneratorInterface($operation)
+    {
+        $this->setOperation($operation);
+        $this->toLdap()->shouldNotContain('groups');
+    }
+    
     public function getMatchers()
     {
         return [

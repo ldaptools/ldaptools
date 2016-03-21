@@ -7,6 +7,13 @@ objects:
         # The LDAP objectClass
         class: user
         converter_options:
+            group_membership:
+                groups:
+                    to_attribute: member
+                    from_attribute: memberOf
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
             user_account_control:
                 defaultValue: '512'
                 uacMap:
@@ -59,6 +66,8 @@ objects:
         converters:
              bool:
                  - 'exchangeHideFromGAL'
+             group_membership:
+                 - 'groups'
              int:
                  - 'badPasswordCount'
                  - 'employeeNumber'
@@ -87,7 +96,6 @@ objects:
                 - 'exchangePolicyRBAC'
                 - 'exchangePolicyActiveSync'
                 - 'exchangePolicyRetention'
-                - 'groups'
                 - 'manager'
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
@@ -210,10 +218,11 @@ objects:
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
+             group_membership:
+                 - 'groups'
              int:
                 - 'exchangeAddressBookFlags'
              value_to_dn:
-                 - 'groups'
                  - 'managedBy'
                  - 'members'
              windows_guid:
@@ -224,6 +233,13 @@ objects:
                  - 'created'
                  - 'modified'
         converter_options:
+            group_membership:
+                groups:
+                    to_attribute: member
+                    from_attribute: memberOf
+                    attribute: sAMAccountName
+                    filter:
+                        objectClass: group
             group_type:
                 defaultValue: '-2147483646'
                 distribution: typeDistribution
@@ -244,10 +260,6 @@ objects:
                 default:
                     - 'exchangeDefaultSmtpAddress'
             value_to_dn:
-                groups:
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: group
                 members:
                     display_dn: true
                     attribute: sAMAccountName
@@ -305,7 +317,7 @@ objects:
         type: computer
         category: computer
         converters:
-             value_to_dn:
+             group_membership:
                  - 'groups'
              windows_guid:
                  - 'guid'
@@ -315,8 +327,10 @@ objects:
                  - 'created'
                  - 'modified'
         converter_options:
-            value_to_dn:
+            group_membership:
                 groups:
+                    to_attribute: member
+                    from_attribute: memberOf
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
@@ -359,8 +373,9 @@ objects:
              exchange_proxy_address:
                 - 'exchangeSmtpAddresses'
                 - 'exchangeDefaultSmtpAddress'
-             value_to_dn:
+             group_membership:
                  - 'groups'
+             value_to_dn:
                  - 'manager'
              windows_guid:
                  - 'guid'
@@ -376,11 +391,14 @@ objects:
                     exchangeDefaultSmtpAddress: 'smtp'
                 default:
                     - 'exchangeDefaultSmtpAddress'
-            value_to_dn:
+            group_membership:
                 groups:
+                    to_attribute: member
+                    from_attribute: memberOf
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+            value_to_dn:
                 manager:
                     display_dn: true
                     attribute: sAMAccountName

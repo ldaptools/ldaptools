@@ -12,6 +12,7 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Operation\LdapOperationInterface;
 
 /**
  * Common Attribute Converter methods and properties.
@@ -68,15 +69,15 @@ trait AttributeConverterTrait
     /**
      * Sets the current LdapConnection for access by the converter.
      *
-     * @param LdapConnectionInterface $connection
+     * @param LdapConnectionInterface|null $connection
      */
-    public function setLdapConnection(LdapConnectionInterface $connection)
+    public function setLdapConnection(LdapConnectionInterface $connection = null)
     {
         $this->connection = $connection;
     }
 
     /**
-     * {@inheritdoc}
+     * @return LdapConnectionInterface|null
      */
     public function getLdapConnection()
     {
@@ -84,15 +85,15 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $attribute
      */
     public function setAttributeName($attribute)
     {
-        return $this->attribute = $attribute;
+        $this->attribute = $attribute;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getAttributeName()
     {
@@ -100,7 +101,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $options
      */
     public function setOptions(array $options)
     {
@@ -108,7 +109,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return array
      */
     public function getOptions()
     {
@@ -116,7 +117,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param int $type
      */
     public function setOperationType($type)
     {
@@ -124,7 +125,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return int
      */
     public function getOperationType()
     {
@@ -132,7 +133,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $dn
      */
     public function setDn($dn)
     {
@@ -140,7 +141,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getDn()
     {
@@ -148,7 +149,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param string
      */
     public function setAttribute($attribute)
     {
@@ -156,7 +157,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getAttribute()
     {
@@ -164,7 +165,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return mixed
      */
     public function getLastValue()
     {
@@ -172,7 +173,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param mixed
      */
     public function setLastValue($value)
     {
@@ -180,7 +181,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param bool
      */
     public function setShouldAggregateValues($aggregateValues)
     {
@@ -188,7 +189,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function getShouldAggregateValues()
     {
@@ -196,7 +197,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return Batch
      */
     public function getBatch()
     {
@@ -204,7 +205,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param Batch $batch
      */
     public function setBatch(Batch $batch)
     {
@@ -212,7 +213,8 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param Batch $batch
+     * @return bool
      */
     public function isBatchSupported(Batch $batch)
     {
@@ -220,7 +222,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @param bool
      */
     public function setIsMultiValuedConverter($isMultiValuedConverter)
     {
@@ -228,7 +230,7 @@ trait AttributeConverterTrait
     }
 
     /**
-     * {@inheritdoc}
+     * @return bool
      */
     public function getIsMultiValuedConverter()
     {

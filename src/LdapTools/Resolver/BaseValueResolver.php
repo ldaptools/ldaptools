@@ -11,9 +11,11 @@
 namespace LdapTools\Resolver;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\AttributeConverter\OperationGeneratorInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
+use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -30,6 +32,11 @@ abstract class BaseValueResolver
      * @var array
      */
     protected $options = [];
+
+    /**
+     * @var LdapOperationInterface|null
+     */
+    protected $operation;
 
     /**
      * @var LdapConnectionInterface
@@ -57,6 +64,11 @@ abstract class BaseValueResolver
     protected $aggregated = [];
 
     /**
+     * @var array Attribute names that should be removed as the result of an operation generator.
+     */
+    protected $remove = [];
+
+    /**
      * Iterate through the aggregates for a specific LDAP value to build up the value it should actually be.
      *
      * @param array $toAggregate
@@ -75,6 +87,16 @@ abstract class BaseValueResolver
         $this->type = $type;
         $this->schema = $schema;
         $this->options = $schema->getConverterOptions();
+    }
+
+    /**
+     * Set the LDAP operation being executed.
+     *
+     * @param LdapOperationInterface|null $operation
+     */
+    public function setOperation(LdapOperationInterface $operation = null)
+    {
+        $this->operation = $operation;
     }
 
     /**
@@ -133,6 +155,9 @@ abstract class BaseValueResolver
         } else {
             $values = $this->doConvertValues($attribute, $values, $direction, $aggregate);
         }
+        if ($converter instanceof OperationGeneratorInterface && $converter->getRemoveOriginalValue()) {
+            $this->remove[] = $attribute;
+        }
 
         return $values;
     }
@@ -173,6 +198,9 @@ abstract class BaseValueResolver
         }
         if ($this->dn !== null) {
             $converter->setDn($this->dn);
+        }
+        if ($converter instanceof OperationGeneratorInterface) {
+            $converter->setOperation($this->operation);
         }
         $converter->setOperationType($this->type);
 

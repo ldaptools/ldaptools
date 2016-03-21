@@ -52,7 +52,7 @@ class BatchValueResolver extends BaseValueResolver
     {
         foreach ($this->batches as $index => $batch) {
             /** @var Batch $batch */
-            if (!$this->batches->has($index) || $batch->isTypeRemoveAll()) {
+            if (!$this->batches->has($index)) {
                 continue;
             } elseif (!$this->schema->hasConverter($batch->getAttribute())) {
                 $batch->setValues($this->encodeValues($batch->getValues()));
@@ -62,6 +62,8 @@ class BatchValueResolver extends BaseValueResolver
 
                 if (in_array($batch->getAttribute(), $this->aggregated)) {
                     $batch->setAttribute($this->schema->getAttributeToLdap($batch->getAttribute()));
+                } elseif (in_array($batch->getAttribute(), $this->remove)) {
+                    $this->batches->remove($index);
                 }
             }
         }
@@ -123,7 +125,8 @@ class BatchValueResolver extends BaseValueResolver
 
     /**
      * When aggregating a set of values they need to be modified with 'set'. The other methods ('reset', 'add', or
-     * 'remove') are not valid. Additionally, all batch modification array keys should be present.
+     * 'remove') are not valid. Additionally, all batch modification array keys should be present. However, the
+     * converter can determine whether the batch operation is valid with the 'isBatchSupported()' method.
      *
      * @param Batch $batch
      * @param AttributeConverterInterface $converter
@@ -137,5 +140,16 @@ class BatchValueResolver extends BaseValueResolver
                 array_search($batch->getModType(), Batch::TYPE)
             ));
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getConverterWithOptions($converterName)
+    {
+        $converter = parent::getConverterWithOptions($converterName);
+        $converter->setBatch($this->batches->get($this->currentBatchIndex));
+        
+        return $converter;
     }
 }
