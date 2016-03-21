@@ -12,7 +12,6 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
-use LdapTools\Operation\LdapOperationInterface;
 
 /**
  * Common Attribute Converter methods and properties.
