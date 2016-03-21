@@ -42,6 +42,45 @@ This table contains many useful AD attributes you can toggle with a simple `true
 | trustedForAllDelegation | Trust the user for delegation to any service (Kerberos). |
 | trustedForAnyAuthDelegation | Delegate using any authentication protocol (When selected for delegation to specific services only). |
 
+## Group Membership
+
+Group membership can be modified directly using the `groups` attribute on a user. You can reference a group using its
+name, SID, GUID, DN, or a `LdapObject`.
+
+```php
+// First get the user object via a query.
+$user = $ldapManager->buildLdapQuery()
+    ->select('groups')
+    ->fromUsers()
+    ->where(['username' => 'Chad'])
+    ->getLdapQuery()
+    ->getSingleResult();
+
+// Add a few groups by name, with the last one being by GUID
+$user->addGroups('Employees', 'VPN Users', '270db4d0-249d-46a7-9cc5-eb695d9af9ac');
+
+// Remove a group by a SID
+$user->removeGroups('S-1-5-21-1004336348-1177238915-682003330-512');
+
+// Reset the current groups. This will remove any groups they are currently a member of
+$user->resetGroups();
+
+// Add a group from the result of a separate LDAP query...
+$group = $ldapManager->buildLdapQuery()
+    ->fromGroups()
+    ->where(['name' => 'IT Stuff'])
+    ->getLdapQuery()
+    ->getSingleResult();
+$user->addGroups($group);
+
+// Save the changes back to LDAP...
+try {
+    $ldapManager->persist($user);
+} catch (\Exception $e) {
+    echo "Error modifying groups: ".$e->getMessage();
+}
+```
+
 ## User Log On To Workstations List 
 
 To easily modify the workstations that an account can log into, you can use the `logonWorkstations` attribute. This
