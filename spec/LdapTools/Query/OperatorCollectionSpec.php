@@ -138,6 +138,13 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->add(new bAnd())->shouldReturnAnInstanceOf('LdapTools\Query\OperatorCollection');
     }
 
+    function it_should_only_wrap_the_filter_in_an_and_when_the_collection_has_more_than_one_object()
+    {
+        $this->add(new Comparison('foo','=','bar'));
+
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=bar)');
+    }
+    
     public function getMatchers()
     {
         return [
