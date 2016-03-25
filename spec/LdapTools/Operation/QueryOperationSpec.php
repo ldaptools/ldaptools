@@ -14,6 +14,8 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Operation\RenameOperation;
+use LdapTools\Query\Operator\Comparison;
+use LdapTools\Query\OperatorCollection;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -130,6 +132,17 @@ class QueryOperationSpec extends ObjectBehavior
 
         $this->getFilter()->shouldBeEqualTo('foo');
         $this->getAttributes()->shouldBeEqualTo(['bar']);
+    }
+    
+    function it_should_support_an_OperatorCollection_as_the_filter_value()
+    {
+        $collection = new OperatorCollection();
+        $collection->add(new Comparison('foo', '=', 'bar'));
+        $this->setFilter($collection);
+        
+        $this->getFilter()->shouldBeEqualTo($collection);
+        $this->getArguments()->shouldBeEqualTo([null, '(foo=bar)', []]);
+        $this->getLogArray()->shouldContain('(foo=bar)');
     }
 
     function it_should_add_pre_operations()

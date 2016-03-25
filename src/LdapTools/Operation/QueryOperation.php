@@ -11,6 +11,7 @@
 namespace LdapTools\Operation;
 
 use LdapTools\Exception\LdapQueryException;
+use LdapTools\Query\OperatorCollection;
 
 /**
  * Represents an operation to query LDAP and return a result set.
@@ -51,6 +52,10 @@ class QueryOperation implements LdapOperationInterface
         'scope' => self::SCOPE['SUBTREE'],
     ];
 
+    /**
+     * @param null|string|OperatorCollection $filter
+     * @param array $attributes
+     */
     public function __construct($filter = null, array $attributes = [])
     {
         $this->properties['filter'] = $filter;
@@ -153,7 +158,7 @@ class QueryOperation implements LdapOperationInterface
     /**
      * Set the LDAP filter used by the operation.
      *
-     * @param string $filter
+     * @param string|OperatorCollection $filter
      * @return $this
      */
     public function setFilter($filter)
@@ -209,7 +214,7 @@ class QueryOperation implements LdapOperationInterface
     {
         return [
             $this->properties['baseDn'],
-            $this->properties['filter'],
+            $this->getLdapFilter(),
             $this->properties['attributes'],
         ];
     }
@@ -236,12 +241,25 @@ class QueryOperation implements LdapOperationInterface
     public function getLogArray()
     {
         return $this->mergeLogDefaults([
-            'Filter' => $this->properties['filter'],
+            'Filter' => $this->getLdapFilter(),
             'Base DN' => $this->properties['baseDn'],
             'Attributes' => implode(',', $this->properties['attributes']),
             'Scope' => $this->properties['scope'],
             'Use Paging' => var_export($this->properties['usePaging'], true),
             'Page Size' => $this->properties['pageSize'],
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    protected function getLdapFilter()
+    {
+        $filter = $this->properties['filter'];
+        if ($filter instanceof OperatorCollection) {
+            $filter = $filter->toLdapFilter();
+        }
+        
+        return $filter;
     }
 }
