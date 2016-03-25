@@ -51,6 +51,7 @@ class OperatorCollection implements \IteratorAggregate
      * Add an Operator to the collection.
      *
      * @param BaseOperator ...$operators
+     * @return $this
      * @throws LdapQueryException
      */
     public function add(BaseOperator ...$operators)
@@ -77,6 +78,8 @@ class OperatorCollection implements \IteratorAggregate
                 throw new InvalidArgumentException('Unknown operator type.');
             }
         }
+        
+        return $this;
     }
 
     /**

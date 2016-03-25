@@ -133,6 +133,11 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->getComparisonOperators()->shouldNotBeLike([$operator]);
     }
 
+    function it_should_chain_add_calls()
+    {
+        $this->add(new bAnd())->shouldReturnAnInstanceOf('LdapTools\Query\OperatorCollection');
+    }
+
     public function getMatchers()
     {
         return [
