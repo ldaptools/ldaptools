@@ -18,8 +18,8 @@ use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\MatchingRule;
 use LdapTools\Query\Operator\Wildcard;
 use LdapTools\Query\Operator\From;
+use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
-use PhpSpec\Exception\Example\SkippingException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -118,6 +118,19 @@ class OperatorCollectionSpec extends ObjectBehavior
 
         $this->add(new bNot(new Comparison('bar', Comparison::EQ, 'foo')));
         $this->toLdapFilter()->shouldBeEqualTo('(&(!(bar=foo))(foo=bar))');
+    }
+
+    function it_should_clone_the_operator_objects_when_cloning_the_collection()
+    {
+        $operator = new Comparison('foo', Comparison::EQ, 'bar');
+        $operators = new OperatorCollection();
+        $operators->add($operator);
+
+        $new = clone $operators;
+        $operator->setAttribute('foobar');
+
+        $this->add(...$new->getComparisonOperators());
+        $this->getComparisonOperators()->shouldNotBeLike([$operator]);
     }
 
     public function getMatchers()

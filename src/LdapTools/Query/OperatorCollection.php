@@ -210,6 +210,18 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
+     * When an operation collection is cloned, we want to make sure the operator objects are cloned as well.
+     */
+    public function __clone()
+    {
+        foreach ($this->operators as $type => $operators) {
+            foreach ($operators as $i => $operator) {
+                $this->operators[$type][$i] = clone $operator;
+            }
+        }
+    }
+
+    /**
      * Merges all the Operators into one large array in a specific order. Before doing so, it will apply any schemas
      * that exist.
      *

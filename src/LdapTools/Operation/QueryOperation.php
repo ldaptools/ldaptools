@@ -251,6 +251,16 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
+     * Make sure to clone an OperatorCollection instance.
+     */
+    public function __clone()
+    {
+        if ($this->properties['filter'] instanceof OperatorCollection) {
+            $this->properties['filter'] = clone $this->properties['filter'];
+        }
+    }
+    
+    /**
      * @return string
      */
     protected function getLdapFilter()

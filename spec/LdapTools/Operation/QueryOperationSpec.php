@@ -145,6 +145,19 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldContain('(foo=bar)');
     }
 
+    function it_should_clone_the_operator_collection()
+    {
+        $operator = new Comparison('foo', Comparison::EQ, 'bar');
+        $operators = new OperatorCollection();
+        $operators->add($operator);
+        $operation = new QueryOperation($operators);
+        $new = clone $operation;
+        $operator->setAttribute('foobar');
+
+        $this->setFilter($new->getFilter());
+        $this->getFilter()->toLdapFilter()->shouldNotBeEqualTo('(foobar=bar)');
+    }
+
     function it_should_add_pre_operations()
     {
         $operation1 = new AddOperation('cn=foo,dc=bar,dc=foo');
