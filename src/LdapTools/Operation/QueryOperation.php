@@ -74,9 +74,9 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Get th filter for the LDAP query operation.
+     * Get the filter for the LDAP query operation.
      *
-     * @return string
+     * @return string|OperatorCollection
      */
     public function getFilter()
     {
@@ -94,7 +94,7 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Get the scope type for a query type operation.
+     * Get the scope type for the query operation.
      *
      * @return null|string
      */
@@ -104,7 +104,7 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Get either: The attributes selected for a query operation. The attributes to be set for an add operation.
+     * Get the attributes to be selected by the query operation.
      *
      * @return array|null
      */
@@ -124,7 +124,7 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Set the scope of the LDAP query.
+     * Set the scope for the LDAP query operation.
      *
      * @param $scope
      * @return $this
@@ -156,7 +156,7 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Set the LDAP filter used by the operation.
+     * Set the LDAP filter for the query operation.
      *
      * @param string|OperatorCollection $filter
      * @return $this
@@ -182,7 +182,7 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
-     * Set the attributes selected or added to/from LDAP (add or select operation).
+     * Set the attributes to be selected for the query operation.
      *
      * @param array $attributes
      * @return $this;
