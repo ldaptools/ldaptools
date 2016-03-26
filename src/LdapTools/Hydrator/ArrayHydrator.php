@@ -14,6 +14,7 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Query\LdapResultSorter;
+use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\AttributeNameResolver;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
@@ -317,9 +318,9 @@ class ArrayHydrator implements HydratorInterface
      * Checks for attributes assigned an attribute converter. It will replace the value with the converted value then
      * send back all the attributes.
      *
-     * @param array|BatchCollection $values
+     * @param array|BatchCollection|OperatorCollection $values
      * @param string|null $dn
-     * @return array|BatchCollection
+     * @return array|BatchCollection|OperatorCollection
      */
     protected function convertValuesToLdap($values, $dn = null)
     {
