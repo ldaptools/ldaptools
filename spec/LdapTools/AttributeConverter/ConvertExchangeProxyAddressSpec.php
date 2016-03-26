@@ -100,10 +100,10 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
-        $operation = new QueryOperation();
-        $operation->setAttributes(['proxyAddresses'])->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))');
-
-        $this->connection->execute($operation)->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+                && $operation->getAttributes() == ['proxyAddresses'];
+        }))->willReturn($this->expectedResult);
         $addresses = [
             "smtp:foo@foo.bar",
             "SMTP:Foo.Bar@foo.bar",

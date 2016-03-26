@@ -10,6 +10,8 @@
 
 namespace LdapTools\Query\Builder;
 
+use LdapTools\Connection\LdapConnection;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Query\Operator\BaseOperator;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Query\Operator\bAnd;
@@ -26,6 +28,23 @@ use LdapTools\Query\MatchingRuleOid;
  */
 class FilterBuilder
 {
+    /**
+     * Get a FilterBuilder instance based on the connection.
+     * 
+     * @param LdapConnectionInterface|null $connection
+     * @return ADFilterBuilder|FilterBuilder
+     */
+    public static function getInstance(LdapConnectionInterface $connection = null)
+    {
+        if ($connection && $connection->getConfig()->getLdapType() == LdapConnection::TYPE_AD) {
+            $filterBuilder = new ADFilterBuilder();
+        } else {
+            $filterBuilder = new self();
+        }
+        
+        return $filterBuilder;
+    }
+    
     /**
      * A logical AND operator.
      *

@@ -29,6 +29,9 @@ class BatchValueResolverSpec extends ObjectBehavior
      */
     protected $expectedSearch;
 
+    /**
+     * @var array
+     */
     protected $expectedResult = [
         'count' => 1,
         0 => [
@@ -148,7 +151,10 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
-        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+                && $operation->getAttributes() == ['userAccountControl'];
+        }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -181,7 +187,10 @@ class BatchValueResolverSpec extends ObjectBehavior
         $ldapObject->add('trustedForAllDelegation', true);
 
         $batch = $ldapObject->getBatchCollection();
-        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+            && $operation->getAttributes() == ['userAccountControl'];
+        }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');

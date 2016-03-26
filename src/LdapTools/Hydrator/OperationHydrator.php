@@ -10,11 +10,13 @@
 
 namespace LdapTools\Hydrator;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Operation\QueryOperation;
+use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -52,10 +54,13 @@ class OperationHydrator extends ArrayHydrator
     protected function hydrateOperation(LdapOperationInterface $operation)
     {
         if ($operation instanceof BatchModifyOperation) {
+            $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
             $this->hydrateModifyOperation($operation);
         } elseif ($operation instanceof AddOperation) {
+            $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
             $this->hydrateAddOperation($operation);
         } elseif ($operation instanceof QueryOperation) {
+            $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
             $this->hydrateQueryOperation($operation);
         }
 
@@ -104,6 +109,10 @@ class OperationHydrator extends ArrayHydrator
         if (!empty($operation->getBaseDn())) {
             $this->setDefaultParameters();
             $operation->setBaseDn($this->resolveParameters(['baseDn' => $operation->getBaseDn()])['baseDn']);
+        }
+
+        if ($operation->getFilter() instanceof OperatorCollection) {
+            $this->convertValuesToLdap($operation->getFilter());
         }
     }
 

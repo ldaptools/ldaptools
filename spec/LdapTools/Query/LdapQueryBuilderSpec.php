@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Query;
 
 use LdapTools\Configuration;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Exception\InvalidArgumentException;
@@ -29,6 +30,29 @@ use Prophecy\Argument;
 class LdapQueryBuilderSpec extends ObjectBehavior
 {
     /**
+     * @var SchemaParserFactory
+     */
+    protected $schema;
+
+    /**
+     * @var LdapConnectionInterface
+     */
+    protected $connection;
+
+    protected $singleGroupEntry = [
+        'count' => 1,
+        0 => [
+            "distinguishedname" => [
+                "count" => 1,
+                0 => "CN=Foo,DC=bar,DC=foo",
+            ],
+            0 => "distinguishedName",
+            'count' => 2,
+            'dn' => "CN=Foo,DC=bar,DC=foo",
+        ],
+    ];
+    
+    /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
     function let($connection)
@@ -41,12 +65,14 @@ class LdapQueryBuilderSpec extends ObjectBehavior
             ->setPageSize(500);
         $connection->getConfig()->willReturn($domain);
         $config->setCacheType('none');
-
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get($config->getCacheType(), []);
         $dispatcher = new SymfonyEventDispatcher();
         $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
+        $this->connection = $connection;
+        $this->schema = $schemaFactory;
+        
         $this->beConstructedWith($connection, $schemaFactory);
     }
 
@@ -335,7 +361,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->getLdapQuery()->getQueryOperation()->getBaseDn()->shouldBeEqualTo('ou=stuff,dc=foo,dc=bar');
         $this->getLdapQuery()->getQueryOperation()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
         $this->getLdapQuery()->getQueryOperation()->getPageSize()->shouldBeEqualTo('9001');
-        $this->getLdapQuery()->getQueryOperation()->getFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+        $this->getLdapQuery()->getQueryOperation()->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
 
         $this->select('foo');
         $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo(['foo']);
@@ -358,5 +384,16 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->getServer()->shouldBeEqualTo(null);
         $this->setServer('foo')->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
         $this->getServer()->shouldBeEqualTo('foo');
+    }
+    
+    function it_should_hydrate_properly_getting_the_ldap_filter()
+    {
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=group))(sAMAccountName=bar))';
+        }))->willReturn($this->singleGroupEntry);
+        
+        $this->from('user');
+        $this->where(['username' => 'foo', 'groups' => 'bar']);
+        $this->toLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(sAMAccountName=foo)(memberOf=CN=Foo,DC=bar,DC=foo)))');
     }
 }

@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Builder;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Query\GroupTypeFlags;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -19,6 +20,15 @@ class ADFilterBuilderSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Query\Builder\ADFilterBuilder');
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_get_an_instance_through_the_factory_method($connection)
+    {
+        $connection->getConfig()->willReturn((new DomainConfiguration('foo.bar'))->setLdapType('ad'));
+        $this::getInstance($connection)->shouldReturnAnInstanceOf('LdapTools\Query\Builder\ADFilterBuilder');
     }
 
     function it_should_be_an_instance_of_FilterBuilder()

@@ -17,8 +17,12 @@ use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
+use LdapTools\Operation\QueryOperation;
+use LdapTools\Query\Builder\FilterBuilder;
+use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Schema\Parser\SchemaYamlParser;
 use PhpSpec\Exception\Example\SkippingException;
@@ -38,6 +42,11 @@ class OperationHydratorSpec extends ObjectBehavior
     protected $connection;
 
     /**
+     * @var LdapObject
+     */
+    protected $rootDse;
+
+    /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Object\LdapObject $rootdse
      */
@@ -48,6 +57,7 @@ class OperationHydratorSpec extends ObjectBehavior
         $connection->getConfig()->willReturn($domain);
         $connection->getRootDse()->willReturn($rootdse);
         $this->connection = $connection;
+        $this->rootDse = $rootdse;
 
         $config = new Configuration();
         $parser = new SchemaYamlParser($config->getSchemaFolder());
@@ -127,7 +137,71 @@ class OperationHydratorSpec extends ObjectBehavior
         $operation = new BatchModifyOperation($dn, $batches);
         $this->hydrateToLdap($operation)->getBatchCollection()->getBatchArray()->shouldBeEqualTo($expected);
     }
+    
+    function it_should_hydrate_a_query_operation_to_ldap_without_a_schema_or_connection()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $filter = new FilterBuilder();
+        $collection = new OperatorCollection();
+        $collection->add($filter->eq('foo','bar'));
+        $collection->add($filter->eq('bar','foo'));
+        $operation = new QueryOperation($collection, ['foo']);
 
+        $this->hydrateToLdap($operation)->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
+        $this->hydrateToLdap($operation)->getBaseDn()->shouldBeNull();
+    }
+
+    function it_should_hydrate_a_query_operation_to_ldap_with_a_schema()
+    {
+        $this->schema->setBaseDn('dc=foo,dc=bar');
+        $this->setLdapObjectSchema($this->schema);
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $this->setLdapConnection($this->connection);
+        
+        $filter = new FilterBuilder();
+        $collection = new OperatorCollection();
+        $collection->add($filter->eq('firstName','foo'));
+        $collection->add($filter->eq('lastName','bar'));
+        $collection->add($filter->eq('exchangeHideFromGAL',false));
+        $collection->addLdapObjectSchema($this->schema);
+        $operation = new QueryOperation($collection, ['foo']);
+
+        $this->hydrateToLdap($operation)->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(givenName=foo)(sn=bar)(msExchHideFromAddressLists=FALSE))');
+        $this->hydrateToLdap($operation)->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
+    }
+
+    /**
+     * @param \LdapTools\Operation\QueryOperation $operation
+     */
+    function it_should_not_attempt_to_resolve_parameters_for_a_base_dn_for_the_RootDSE($operation)
+    {
+        $operation->getBaseDn()->willReturn('');
+        $operation->setBaseDn(Argument::any())->shouldNotBeCalled();
+        
+        $this->hydrateToLdap($operation);
+    }
+    
+    function it_should_attempt_to_resolve_parameters_for_the_base_dn()
+    {
+        $this->setLdapObjectSchema($this->schema);
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $this->setLdapConnection($this->connection);
+
+        $rootDse = [
+            'defaultNamingContext' => 'dc=foo,dc=bar', 
+            'configurationNamingContext' => 'cn=config,dc=foo,dc=bar'
+        ];
+        foreach ($rootDse as $name => $value) {
+            $this->rootDse->has($name)->willReturn(true);
+            $this->rootDse->get($name)->willReturn($value);
+        }
+        
+        $operation = new QueryOperation('(foo=bar)');
+        $operation->setBaseDn('%_defaultNamingContext_%');
+        
+        $this->hydrateToLdap($operation)->getBaseDn()->shouldBeEqualTo($rootDse['defaultNamingContext']);
+    }
+    
     function it_should_only_support_an_operation_going_to_ldap()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringHydrateToLdap('foo');

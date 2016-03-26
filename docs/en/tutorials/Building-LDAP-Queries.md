@@ -23,7 +23,7 @@ $lqb = new LdapQueryBuilder();
 $filter = $lqb->select('givenName', 'sn', 'l')
     ->where(['objectClass' => 'user'])
     ->andWhere($lqb->filter()->like('sAMAccountName','*smith'))
-    ->getLdapFilter();
+    ->toLdapFilter();
     
 echo "LDAP Filter: ".$filter.PHP_EOL;
 ```
@@ -281,12 +281,12 @@ $lqb->setUsePaging(false);
 ```
 
 ------------------------
-#### getLdapFilter()
+#### toLdapFilter()
 
 Gets the LDAP filter, as a string, that the query would produce.
 
 ```php
-$filter = $lqb->getLdapFilter();
+$filter = $lqb->toLdapFilter();
 ```
 
 ## LdapQuery Methods to Retrieve LDAP Results

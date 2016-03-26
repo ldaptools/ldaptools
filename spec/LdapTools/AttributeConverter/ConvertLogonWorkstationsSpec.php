@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
@@ -19,8 +20,14 @@ use Prophecy\Argument;
 
 class ConvertLogonWorkstationsSpec extends ObjectBehavior
 {
+    /**
+     * @var LdapConnectionInterface
+     */
     protected $connection;
 
+    /**
+     * @var array
+     */
     protected $expectedSearch = [
         '(&(distinguishedName=cn=foo,dc=foo,dc=bar))',
         ['userWorkstations'],
@@ -29,6 +36,9 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         null,
     ];
 
+    /**
+     * @var array
+     */
     protected $expectedResult = [
         'count' => 1,
         0 => [
@@ -76,7 +86,10 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $this->connection->execute((new QueryOperation())->setAttributes(['userWorkstations'])->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))'))->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))' 
+                && $operation->getAttributes() == ['userWorkstations'];
+        }))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setBatch(new Batch(Batch::TYPE['ADD'],'logonWorkstations',['pc1']));

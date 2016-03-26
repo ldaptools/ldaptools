@@ -34,8 +34,14 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $connection->execute((new QueryOperation())->setFilter('(&(distinguishedName='.$this->dn.'))')->setAttributes(['objectSid']))
-            ->willReturn([ 'count' => 1, [
+        $dn = $this->dn;
+        $groupSidHex = $this->groupSidHex;
+        
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName='.$dn.'))'
+                && $operation->getAttributes() == ['objectSid'];
+        }))->willReturn([
+            'count' => 1, [
                 "objectsid" => [
                     "count" => 1,
                     0 =>  pack('H*', str_replace('\\', '', $this->userSidHex)),
@@ -43,9 +49,13 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 0 => "objectsid",
                 'count' => 1,
                 'dn' => $this->dn,
-            ]]);
-        $connection->execute((new QueryOperation())->setFilter('(&(objectSid='.$this->groupSidHex.'))')->setAttributes(['cn']))
-            ->willReturn([ 'count' => 1, [
+            ]
+        ]);
+        $connection->execute(Argument::that(function($operation) use ($groupSidHex) {
+            return $operation->getFilter()->toLdapFilter() == '(&(objectSid='.$groupSidHex.'))'
+                && $operation->getAttributes() == ['cn'];
+        }))->willReturn([
+            'count' => 1, [
                 "cn" => [
                     "count" => 1,
                     0 =>  'Domain Users',
@@ -53,9 +63,13 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 0 => "cn",
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
-            ]]);
-        $connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(member='.$this->dn.')(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
-            ->willReturn([ 'count' => 1, [
+            ]
+        ]);
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            return $operation->getFilter()->toLdapFilter() == '(&(objectClass=group)(cn=Domain Users)(member='.$dn.')(groupType:1.2.840.113556.1.4.803:=2147483648))'
+                && $operation->getAttributes() == ['objectSid'];
+        }))->willReturn([
+            'count' => 1, [
                 "objectSid" => [
                     "count" => 1,
                     0 =>  pack('H*', str_replace('\\', '', $this->groupSidHex)),
@@ -63,10 +77,12 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 0 => "objectSid",
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
-            ]]);
-        $connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
-            ->willReturn([ 'count' => 0]);
-
+            ]
+        ]);
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            return $operation->getFilter()->toLdapFilter() == '(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))'
+                && $operation->getAttributes() == ['objectSid'];
+        }))->willReturn([ 'count' => 0]);
     }
 
     function it_is_initializable()
@@ -94,8 +110,11 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
 
     function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification()
     {
-        $this->connection->execute((new QueryOperation())->setFilter('(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))')->setAttributes(['objectSid']))
-            ->willReturn([ 'count' => 1, [
+        $this->connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))'
+                && $operation->getAttributes() == ['objectSid'];
+        }))->willReturn([
+            'count' => 1, [
                 "objectSid" => [
                     "count" => 1,
                     0 =>  pack('H*', str_replace('\\', '', $this->groupSidHex)),
@@ -103,7 +122,8 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
                 0 => "objectSid",
                 "count" => 1,
                 "dn" => "CN=Domain Users,CN=Users,dc=example,dc=local",
-            ]]);
+            ]
+        ]);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $this->toLdap('Domain Users')->shouldBeEqualTo('513');
     }

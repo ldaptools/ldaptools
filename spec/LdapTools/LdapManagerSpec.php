@@ -210,7 +210,7 @@ class LdapManagerSpec extends ObjectBehavior
             ->select()
             ->from('custom_converter')
             ->where(['foo' => true])
-            ->getLdapFilter()->shouldBeEqualTo('(&(objectClass=foo)(&(bar=TRUE)))');
+            ->toLdapFilter()->shouldBeEqualTo('(&(objectClass=foo)(&(bar=TRUE)))');
     }
 
     function it_should_return_the_cache_class_in_use()

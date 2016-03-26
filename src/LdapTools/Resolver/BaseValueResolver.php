@@ -16,6 +16,7 @@ use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Factory\AttributeConverterFactory;
 use LdapTools\Operation\LdapOperationInterface;
+use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\LdapUtilities;
 
@@ -123,17 +124,21 @@ abstract class BaseValueResolver
      * Factory method for instantiation.
      *
      * @param LdapObjectSchema $schema
-     * @param BatchCollection|array $values
+     * @param BatchCollection|OperatorCollection|array $values
      * @param int $type
      * @return AttributeValueResolver|BatchValueResolver
      */
     public static function getInstance(LdapObjectSchema $schema, $values, $type)
     {
+        $instance = AttributeValueResolver::class;
+        
         if ($values instanceof BatchCollection) {
-            return new BatchValueResolver($schema, $values, $type);
-        } else {
-            return new AttributeValueResolver($schema, $values, $type);
+            $instance = BatchValueResolver::class;
+        } elseif ($values instanceof OperatorCollection) {
+            $instance = OperatorValueResolver::class;
         }
+        
+        return new $instance($schema, $values, $type);
     }
 
     /**

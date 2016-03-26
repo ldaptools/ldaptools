@@ -54,7 +54,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_convert_a_name_back_to_a_dn($connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+        }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -76,7 +78,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
 
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
+        $connection->execute(Argument::that(function($operation) use ($guidHex, $guid) {
+            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+        }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -97,7 +101,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';
 
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $connection->execute((new QueryOperation())->setFilter('(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
+        $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
+            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+        }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
@@ -193,7 +199,9 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_allow_an_or_filter_for_an_attribute($connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $connection->execute((new QueryOperation())->setFilter('(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))')->setAttributes(['distinguishedName']))->willReturn($this->entry);
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == '(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))';
+        }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [

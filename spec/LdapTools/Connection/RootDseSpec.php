@@ -44,8 +44,9 @@ class RootDseSpec extends ObjectBehavior
      */
     function let($connection, $dispatcher)
     {
-        $connection->execute((new QueryOperation())->setFilter("(&(objectClass=*))")->setAttributes(["configurationNamingContext", "defaultNamingContext", "schemaNamingContext", "supportedControl", "namingContexts", "rootDomainNamingContext", "supportedSaslMechanisms", "supportedLdapPolicies", "supportedLdapVersion", "vendorName", "vendorVersion", "isSynchronized", "isGlobalCatalogReady", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "domainFunctionality", "forestFunctionality", "domainControllerFunctionality", "dsServiceName", "currentTime"])->setBaseDn("")->setScope(QueryOperation::SCOPE['BASE']))
-            ->willReturn($this->entry);
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter()->toLdapFilter() == "(&(objectClass=*))" && $operation->getBaseDn() == "";
+        }))->willReturn($this->entry);
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->isBound()->willReturn(false);
         $connection->connect('','', true)->willReturn(null);

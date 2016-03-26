@@ -192,14 +192,14 @@ class LdapQuery
         $operatorAttributes = $this->operation->getAttributes();
         $attributes = $this->getAttributesToLdap($this->getSelectedAttributes());
 
-        $hydrator->setLdapObjectSchema(empty($this->schemas) ? null : $this->schemas[0]);
+        $hydrator->setLdapObjectSchema(...$this->schemas);
         $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->getSelectedAttributes()));
         $hydrator->setLdapConnection($this->ldap);
         $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $hydrator->setOrderBy($this->orderBy);
 
         $opHydrator = new OperationHydrator($this->ldap);
-        $opHydrator->setLdapObjectSchema(empty($this->schemas) ? null : $this->schemas[0]);
+        $opHydrator->setLdapObjectSchema(...$this->schemas);
         $this->operation->setAttributes($attributes);
         $results = $hydrator->hydrateAllFromLdap($this->ldap->execute($opHydrator->hydrateToLdap($this->operation)));
         $this->operation->setAttributes($operatorAttributes);
@@ -299,6 +299,7 @@ class LdapQuery
         }
 
         if (!empty($this->schemas)) {
+            /** @var LdapObjectSchema $schema */
             $schema = reset($this->schemas);
             $newAttributes = [];
             foreach ($attributes as $attribute) {

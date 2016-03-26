@@ -10,18 +10,13 @@
 
 namespace LdapTools\Query;
 
-use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Exception\InvalidArgumentException;
-use LdapTools\Hydrator\OperatorCollectionHydrator;
+use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Operation\QueryOperation;
-use LdapTools\Query\Builder\ADFilterBuilder;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\Operator\BaseOperator;
-use LdapTools\Query\Operator\bOr;
-use LdapTools\Query\Operator\bAnd;
-use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\From;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -64,17 +59,12 @@ class LdapQueryBuilder
     protected $orderBy = [];
 
     /**
-     * @var OperatorCollection
-     */
-    protected $operators;
-
-    /**
-     * @var null|bAnd The base 'And' operator when the method 'where' or 'andWhere' is used.
+     * @var null|Operator\bAnd The base 'And' operator when the method 'where' or 'andWhere' is used.
      */
     protected $baseAnd;
 
     /**
-     * @var null|bOr The base 'Or' operator when the method 'orWhere' is used.
+     * @var null|Operator\bOr The base 'Or' operator when the method 'orWhere' is used.
      */
     protected $baseOr;
 
@@ -94,6 +84,11 @@ class LdapQueryBuilder
     protected $filterBuilder;
 
     /**
+     * @var OperationHydrator
+     */
+    protected $hydrator;
+
+    /**
      * @param LdapConnectionInterface $connection
      * @param LdapObjectSchemaFactory $schemaFactory
      */
@@ -101,15 +96,9 @@ class LdapQueryBuilder
     {
         $this->connection = $connection;
         $this->schemaFactory = $schemaFactory;
-        $this->operation = new QueryOperation();
-
-        if ($connection && $connection->getConfig()->getLdapType() == LdapConnection::TYPE_AD) {
-            $this->filterBuilder = new ADFilterBuilder();
-        } else {
-            $this->filterBuilder = new FilterBuilder();
-        }
-
-        $this->operators = new OperatorCollection();
+        $this->operation = new QueryOperation(new OperatorCollection());
+        $this->hydrator = new OperationHydrator($this->connection);
+        $this->filterBuilder = FilterBuilder::getInstance($connection);
     }
 
     /**
@@ -297,7 +286,7 @@ class LdapQueryBuilder
 
         if (1 == count($whereStatements) && is_array($whereStatements[0])) {
             foreach ($whereStatements[0] as $attribute => $value) {
-                $this->baseAnd->add(new Comparison($attribute, Comparison::EQ, $value));
+                $this->baseAnd->add($this->filterBuilder->eq($attribute, $value));
             }
         } else {
             $this->baseAnd->add(...$whereStatements);
@@ -332,7 +321,7 @@ class LdapQueryBuilder
 
         if (1 == count($whereStatements) && is_array($whereStatements[0])) {
             foreach ($whereStatements[0] as $attribute => $value) {
-                $this->baseOr->add(new Comparison($attribute, Comparison::EQ, $value));
+                $this->baseOr->add($this->filterBuilder->eq($attribute, $value));
             }
         } else {
             $this->baseOr->add(...$whereStatements);
@@ -349,7 +338,7 @@ class LdapQueryBuilder
      */
     public function add(BaseOperator ...$operators)
     {
-        $this->operators->add(...$operators);
+        $this->operation->getFilter()->add(...$operators);
 
         return $this;
     }
@@ -386,7 +375,7 @@ class LdapQueryBuilder
     /**
      * Call this to help build additional query statements in an object-oriented fashion.
      *
-     * @return FilterBuilder|ADFilterBuilder
+     * @return Builder\FilterBuilder|Builder\ADFilterBuilder
      */
     public function filter()
     {
@@ -464,13 +453,24 @@ class LdapQueryBuilder
         $ldapQuery = new LdapQuery($this->connection);
         $operation = clone $this->operation;
 
-        $operation->setFilter($this->getLdapFilter());
+        $this->hydrator->hydrateToLdap($operation);
         $operation->setAttributes($this->getAttributesToSelect($operation));
 
         return $ldapQuery
             ->setOrderBy($this->orderBy)
             ->setQueryOperation($operation)
-            ->setLdapObjectSchemas(...$this->operators->getLdapObjectSchemas());
+            ->setLdapObjectSchemas(...$this->operation->getFilter()->getLdapObjectSchemas());
+    }
+
+    /**
+     * Get the LDAP filter formed by this query.
+     *
+     * @deprecated This will be removed in a future version. Use the "toLdapFilter()" method instead.
+     * @return string
+     */
+    public function getLdapFilter()
+    {
+        return $this->toLdapFilter();
     }
 
     /**
@@ -478,9 +478,11 @@ class LdapQueryBuilder
      *
      * @return string
      */
-    public function getLdapFilter()
+    public function toLdapFilter()
     {
-        return (new OperatorCollectionHydrator($this->connection))->toLdapFilter($this->operators);
+        $this->hydrator->setLdapObjectSchema(...$this->operation->getFilter()->getLdapObjectSchemas());
+        
+        return $this->hydrator->hydrateToLdap($this->operation)->getFilter()->toLdapFilter();
     }
 
     /**
@@ -498,7 +500,7 @@ class LdapQueryBuilder
         $this->defaultAttributes = array_filter(
             array_merge($this->defaultAttributes, $schema->getAttributesToSelect())
         );
-        $this->operators->addLdapObjectSchema($schema);
+        $this->operation->getFilter()->addLdapObjectSchema($schema);
 
         return $schema;
     }
@@ -509,7 +511,7 @@ class LdapQueryBuilder
      * should be wrapped in a "bAnd" otherwise a simple "Comparison" will do.
      *
      * @param LdapObjectSchema $schema
-     * @return bAnd|Comparison
+     * @return Operator\bAnd|Operator\Comparison
      */
     protected function getObjectFilterFromObjectSchema(LdapObjectSchema $schema)
     {
@@ -517,7 +519,7 @@ class LdapQueryBuilder
         $categoryOperator = $schema->getObjectCategory() ? $this->filter()->eq(self::ATTR_OBJECT_CATEGORY, $schema->getObjectCategory()) : null;
 
         if (count($schema->getObjectClass()) > 1) {
-            $classOperator = new bAnd();
+            $classOperator = $this->filterBuilder->bAnd();
             foreach ($schema->getObjectClass() as $class) {
                 $classOperator->add($this->filter()->eq(self::ATTR_OBJECT_CLASS, $class));
             }
@@ -526,7 +528,7 @@ class LdapQueryBuilder
         }
 
         if ($classOperator && $categoryOperator) {
-            $operator = new bAnd($categoryOperator, $classOperator);
+            $operator = $this->filterBuilder->bAnd($categoryOperator, $classOperator);
         } elseif ($schema->getObjectCategory()) {
             $operator = $categoryOperator;
         } else {
@@ -545,8 +547,8 @@ class LdapQueryBuilder
     protected function addBaseAndIfNotExists()
     {
         if (!$this->baseAnd) {
-            $this->baseAnd = new bAnd();
-            $this->operators->add($this->baseAnd);
+            $this->baseAnd = $this->filterBuilder->bAnd();
+            $this->operation->getFilter()->add($this->baseAnd);
         }
     }
 
@@ -558,8 +560,8 @@ class LdapQueryBuilder
     protected function addBaseOrIfNotExists()
     {
         if (!$this->baseOr) {
-            $this->baseOr = new bOr();
-            $this->operators->add($this->baseOr);
+            $this->baseOr = $this->filterBuilder->bOr();
+            $this->operation->getFilter()->add($this->baseOr);
         }
     }
 
@@ -574,7 +576,7 @@ class LdapQueryBuilder
     {
         if (!$this->baseFrom) {
             $this->baseFrom = new From($operator);
-            $this->operators->add($this->baseFrom);
+            $this->operation->getFilter()->add($this->baseFrom);
         } else {
             $this->baseFrom->add($operator);
         }

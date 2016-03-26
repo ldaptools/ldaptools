@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query\Builder;
 
+use LdapTools\DomainConfiguration;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -19,6 +20,16 @@ class FilterBuilderSpec extends ObjectBehavior
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Query\Builder\FilterBuilder');
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_get_an_instance_through_the_factory_method($connection)
+    {
+        $connection->getConfig()->willReturn((new DomainConfiguration('foo.bar'))->setLdapType('openldap'));
+        $this::getInstance()->shouldReturnAnInstanceOf('LdapTools\Query\Builder\FilterBuilder');
+        $this::getInstance($connection)->shouldReturnAnInstanceOf('LdapTools\Query\Builder\FilterBuilder');
     }
 
     function it_should_return_bAnd_when_calling_bAnd()
