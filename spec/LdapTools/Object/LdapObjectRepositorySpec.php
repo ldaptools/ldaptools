@@ -148,7 +148,6 @@ class LdapObjectRepositorySpec extends ObjectBehavior
     {
         $this->buildLdapQuery()->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
 
-        $this->buildLdapQuery()
-            ->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+        $this->buildLdapQuery()->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
     }
 }
