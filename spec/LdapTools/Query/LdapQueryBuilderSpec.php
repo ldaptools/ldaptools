@@ -396,4 +396,12 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->where(['username' => 'foo', 'groups' => 'bar']);
         $this->toLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(sAMAccountName=foo)(memberOf=CN=Foo,DC=bar,DC=foo)))');
     }
+    
+    function it_should_get_a_filter_without_a_schema_or_connection()
+    {
+        $this->beConstructedWith();
+        
+        $this->where(['foo' => 'bar']);
+        $this->toLdapFilter()->shouldBeEqualTo('(&(foo=bar))');
+    }
 }
