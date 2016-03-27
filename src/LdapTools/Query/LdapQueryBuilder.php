@@ -480,9 +480,10 @@ class LdapQueryBuilder
      */
     public function toLdapFilter()
     {
-        $this->hydrator->setLdapObjectSchema(...$this->operation->getFilter()->getLdapObjectSchemas());
+        $operation = clone $this->operation;
+        $this->hydrator->setLdapObjectSchema(...$operation->getFilter()->getLdapObjectSchemas());
         
-        return $this->hydrator->hydrateToLdap($this->operation)->getFilter()->toLdapFilter();
+        return $this->hydrator->hydrateToLdap($operation)->getFilter()->toLdapFilter();
     }
 
     /**
