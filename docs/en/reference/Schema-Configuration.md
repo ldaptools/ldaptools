@@ -72,7 +72,7 @@ the default schema folder. The only valid schema names for this are those that a
 schema folder.
 
 ```yaml
-include: exchange
+include_default: exchange
 objects:
     # Include any additional schema object definitions ...
 ```
