@@ -10,6 +10,8 @@
 
 namespace spec\LdapTools\Schema;
 
+use LdapTools\Query\Operator\bAnd;
+use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -245,5 +247,14 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->getBaseDn()->shouldBeNull();
         $this->setBaseDn('dc=foo,dc=bar');
         $this->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
+    }
+    
+    function it_should_set_the_filter()
+    {
+        $operator = new bAnd(new Comparison('objectClass', '=', 'user'));
+        
+        $this->getFilter()->shouldBeNull();
+        $this->setFilter($operator);
+        $this->getFilter()->shouldBeEqualTo($operator);
     }
 }

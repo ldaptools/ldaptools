@@ -1,0 +1,43 @@
+objects:
+    class_only:
+        type: ClassOnly
+        class: user
+        attributes:
+            name: cn
+    mutiple_classes:
+        type: MultipleClasses
+        class: [ user, person ]
+        attributes:
+            name: cn
+    mutiple_classes_and_category:
+        type: MultipleClassesAndCategory
+        class: [ user, person ]
+        category: foo
+        attributes:
+            name: cn
+    category_only:
+        type: CategoryOnly
+        category: user
+        attributes:
+            name: cn
+    class_and_category:
+        type: ClassAndCategory
+        category: person
+        class: user
+        attributes:
+            name: cn
+    filter_only:
+        type: FilterOnly
+        filter:
+            - eq: [ objectClass, user ]
+            - eq: [ objectCategory, person ]
+        attributes:
+            name: cn
+    all:
+        type: All
+        category: person
+        class: user
+        filter:
+            - present: foo
+        attributes:
+            name: cn

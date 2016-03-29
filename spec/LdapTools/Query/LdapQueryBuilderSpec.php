@@ -39,6 +39,16 @@ class LdapQueryBuilderSpec extends ObjectBehavior
      */
     protected $connection;
 
+    /**
+     * @var LdapObjectSchema
+     */
+    protected $objectSchema;
+
+    /**
+     * @var FilterBuilder
+     */
+    protected $fb;
+    
     protected $singleGroupEntry = [
         'count' => 1,
         0 => [
@@ -70,8 +80,11 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $dispatcher = new SymfonyEventDispatcher();
         $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
+        $this->fb = new FilterBuilder();
         $this->connection = $connection;
         $this->schema = $schemaFactory;
+        $this->objectSchema = $schema = new LdapObjectSchema('ad', 'user');
+        $this->objectSchema->setFilter($this->fb->bAnd($this->fb->eq('objectCategory', 'person'), $this->fb->eq('objectClass', 'user')));
         
         $this->beConstructedWith($connection, $schemaFactory);
     }
@@ -113,11 +126,8 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_return_self_when_calling_from_with_a_LdapObjectSchema()
     {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass('user');
-        $schema->setObjectCategory('person');
         $this->select(['cn']);
-        $this->from($schema)->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
+        $this->from($this->objectSchema)->shouldReturnAnInstanceOf('\LdapTools\Query\LdapQueryBuilder');
     }
 
     function it_should_return_self_when_calling_fromUsers()
@@ -239,26 +249,24 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     function it_should_honor_default_attributes_to_select_when_present_in_the_LdapObjectSchema()
     {
         $attributes = ['foo', 'bar'];
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass('user');
-        $schema->setObjectCategory('person');
-        $schema->setAttributesToSelect($attributes);
+        $this->objectSchema->setObjectClass('user');
+        $this->objectSchema->setObjectCategory('person');
+        $this->objectSchema->setAttributesToSelect($attributes);
 
         $this->select();
-        $this->from($schema);
+        $this->from($this->objectSchema);
         $this->getAttributes()->shouldBeEqualTo($attributes);
     }
 
     function it_should_override_default_attributes_to_select_when_explicitly_setting_attributes_in_select()
     {
         $attributes = ['foo'];
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass('user');
-        $schema->setObjectCategory('person');
-        $schema->setAttributesToSelect($attributes);
+        $this->objectSchema->setObjectClass('user');
+        $this->objectSchema->setObjectCategory('person');
+        $this->objectSchema->setAttributesToSelect($attributes);
 
         $this->select(['bar']);
-        $this->from($schema);
+        $this->from($this->objectSchema);
         $this->getAttributes()->shouldBeEqualTo(['bar']);
     }
 
@@ -296,63 +304,13 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->toLdapFilter()->shouldBeEqualTo($filter);
     }
 
-    function it_should_allow_a_schema_object_type_that_has_multiple_classes_defined_in_objectClass()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass(['foo', 'bar']);
-
-        $this->from($schema);
-        $this->toLdapFilter()->shouldBeEqualTo('(&(objectClass=foo)(objectClass=bar))');
-    }
-
-    function it_should_allow_a_schema_object_type_that_has_only_a_category_defined()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectCategory('foo');
-
-        $this->from($schema);
-        $this->toLdapFilter()->shouldBeEqualTo('(objectCategory=foo)');
-    }
-
-    function it_should_allow_a_schema_object_type_that_has_only_a_single_class_defined()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass('foo');
-
-        $this->from($schema);
-        $this->toLdapFilter()->shouldBeEqualTo('(objectClass=foo)');
-    }
-
-    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_class_defined()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectCategory('foo');
-        $schema->setObjectClass('bar');
-
-        $this->from($schema);
-        $this->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(objectClass=bar))');
-    }
-
-    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_multiple_classes_defined()
-    {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectCategory('foo');
-        $schema->setObjectClass(['foo', 'bar']);
-
-        $this->from($schema);
-        $this->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=foo)(objectClass=bar)))');
-    }
-
     function it_should_pass_operation_options_on_to_the_LdapQuery_class_correctly()
     {
         $attributes = ['foo', 'bar'];
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setObjectClass('user');
-        $schema->setObjectCategory('person');
-        $schema->setAttributesToSelect($attributes);
+        $this->objectSchema->setAttributesToSelect($attributes);
 
         $this->select();
-        $this->from($schema);
+        $this->from($this->objectSchema);
         $this->setScopeOneLevel();
         $this->setBaseDn('ou=stuff,dc=foo,dc=bar');
         $this->setPageSize('9001');
@@ -403,5 +361,11 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         
         $this->where(['foo' => 'bar']);
         $this->toLdapFilter()->shouldBeEqualTo('(&(foo=bar))');
+    }
+    
+    function it_should_throw_an_error_if_the_schema_has_no_filter_defined()
+    {
+        $schema = new LdapObjectSchema('foo','bar');
+        $this->shouldThrow(new InvalidArgumentException('The schema type "bar" needs a filter defined to query LDAP with it.'))->duringFrom($schema);
     }
 }

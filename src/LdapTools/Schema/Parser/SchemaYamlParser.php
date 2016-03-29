@@ -12,6 +12,7 @@ namespace LdapTools\Schema\Parser;
 
 use LdapTools\Exception\SchemaParserException;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\ArrayToOperator;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -54,12 +55,18 @@ class SchemaYamlParser implements SchemaParserInterface
     ];
 
     /**
+     * @var ArrayToOperator
+     */
+    protected $arrayToOp;
+
+    /**
      * @param string $schemaFolder
      */
     public function __construct($schemaFolder)
     {
         $this->schemaFolder = $schemaFolder;
         $this->defaultSchemaFolder = __DIR__.'/../../../../resources/schema';
+        $this->arrayToOp = new ArrayToOperator();
     }
 
     /**
@@ -136,6 +143,7 @@ class SchemaYamlParser implements SchemaParserInterface
         if (!((bool)count(array_filter(array_keys($objectSchema['attributes']), 'is_string')))) {
             throw new SchemaParserException('The attributes for a schema should be an associative array.');
         }
+        $this->parseFilter($ldapObjectSchema, $objectSchema);
         $ldapObjectSchema->setAttributeMap($objectSchema['attributes']);
         $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
 
@@ -191,6 +199,19 @@ class SchemaYamlParser implements SchemaParserInterface
     }
 
     /**
+     * Add the filter to the schema object.
+     * 
+     * @param LdapObjectSchema $objectSchema
+     * @param array $objectArray
+     */
+    protected function parseFilter(LdapObjectSchema $objectSchema, array $objectArray)
+    {
+        $filter = array_key_exists('filter', $objectArray) ? $objectArray['filter'] : [];
+
+        $objectSchema->setFilter($this->arrayToOp->getOperatorForSchema($objectSchema, $filter));
+    }
+
+    /**
      * Validate that an object schema meets the minimum requirements.
      *
      * @param array $objectSchema
@@ -199,8 +220,14 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     protected function validateObjectSchema($objectSchema, $objectType)
     {
-        if (!array_key_exists('class', $objectSchema) && !array_key_exists('category', $objectSchema)) {
-            throw new SchemaParserException(sprintf('Object type "%s" has no class or category defined.', $objectType));
+        $oneRequired = ['class', 'category', 'filter'];
+        
+        if (count(array_diff($oneRequired, array_keys($objectSchema))) == 3) {
+            throw new SchemaParserException(sprintf(
+                'Object type "%s" must have one of the following defined: %s',
+                $objectType,
+                implode(', ', $oneRequired)
+            ));
         }
         if (!array_key_exists('attributes', $objectSchema) || empty($objectSchema['attributes'])) {
             throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $objectType));

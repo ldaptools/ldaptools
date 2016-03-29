@@ -12,6 +12,7 @@ namespace LdapTools\Schema;
 
 use LdapTools\Cache\CacheableItemInterface;
 use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Query\Operator\BaseOperator;
 
 /**
  * Describes the attributes for a LDAP object from a schema definition.
@@ -89,6 +90,11 @@ class LdapObjectSchema implements CacheableItemInterface
      * @var string The BaseDN used for queries against this schema type.
      */
     protected $baseDn;
+
+    /**
+     * @var BaseOperator The operator representation of a filter to be used to select objects of this schema type.
+     */
+    protected $filter;
 
     /**
      * @param string $schemaName
@@ -477,5 +483,25 @@ class LdapObjectSchema implements CacheableItemInterface
     public function isMultivaluedAttribute($attribute)
     {
         return in_array(strtolower($attribute), array_map('strtolower', $this->multivaluedAttributes));
+    }
+
+    /**
+     * Set the operator that will be used as a filter for querying LDAP for this object type.
+     * 
+     * @param BaseOperator $filter
+     */
+    public function setFilter(BaseOperator $filter)
+    {
+        $this->filter = $filter;
+    }
+
+    /**
+     * Get the operator that will be used as a filter for querying LDAP for this object type.
+     *
+     * @return BaseOperator
+     */
+    public function getFilter()
+    {
+        return $this->filter;
     }
 }

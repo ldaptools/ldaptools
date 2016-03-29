@@ -1,0 +1,21 @@
+filter1:
+    - { present: serverRole }
+    - { starts_with: [ username, admin ] }
+filter2:
+    present: serverRole
+    starts_with: [ username, admin]
+filter3:
+    and:
+        - { eq: [ name, chad ] }
+        - { eq: [ state, WI ] }
+    or:
+        - { eq: [ name, Frank ] }
+        - { eq: [ state, IL ] }
+filter4:
+    - and:
+        - eq: [ objectClass, user ]
+        - eq: [ objectCategory, person ]
+    - and:
+        - present: emailAddress
+        - starts_with: [ department, IT ]
+

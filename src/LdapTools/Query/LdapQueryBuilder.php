@@ -29,16 +29,6 @@ use LdapTools\Factory\LdapObjectSchemaFactory;
 class LdapQueryBuilder
 {
     /**
-     * The attribute name used in the Comparison for the 'From' operators for an objectCategory.
-     */
-    const ATTR_OBJECT_CATEGORY = 'objectCategory';
-
-    /**
-     * The attribute name used in the Comparison for the 'From' operators for an objectClass.
-     */
-    const ATTR_OBJECT_CLASS = 'objectClass';
-
-    /**
      * @var LdapConnectionInterface The LDAP connection.
      */
     protected $connection;
@@ -207,8 +197,7 @@ class LdapQueryBuilder
                 'To build a filter with schema types you must pass a SchemaFactory to the constructor'
             );
         }
-        $schema = $this->addLdapObjectSchema($type);
-        $this->addOrUpdateFrom($this->getObjectFilterFromObjectSchema($schema));
+        $this->addOrUpdateFrom($this->addLdapObjectSchema($type));
 
         return $this;
     }
@@ -507,40 +496,6 @@ class LdapQueryBuilder
     }
 
     /**
-     * Given a schema object type, construct the filter that should be added to the "From" object. This requires some
-     * extra logic as a definition can have either both a class and a category, or just one of them. If both, then it
-     * should be wrapped in a "bAnd" otherwise a simple "Comparison" will do.
-     *
-     * @param LdapObjectSchema $schema
-     * @return Operator\bAnd|Operator\Comparison
-     */
-    protected function getObjectFilterFromObjectSchema(LdapObjectSchema $schema)
-    {
-        $classOperator = null;
-        $categoryOperator = $schema->getObjectCategory() ? $this->filter()->eq(self::ATTR_OBJECT_CATEGORY, $schema->getObjectCategory()) : null;
-
-        if (count($schema->getObjectClass()) > 1) {
-            $classOperator = $this->filterBuilder->bAnd();
-            foreach ($schema->getObjectClass() as $class) {
-                $classOperator->add($this->filter()->eq(self::ATTR_OBJECT_CLASS, $class));
-            }
-        } elseif (count($schema->getObjectClass()) == 1) {
-            $classOperator = $this->filter()->eq(self::ATTR_OBJECT_CLASS, $schema->getObjectClass()[0]);
-        }
-
-        if ($classOperator && $categoryOperator) {
-            $operator = $this->filterBuilder->bAnd($categoryOperator, $classOperator);
-        } elseif ($schema->getObjectCategory()) {
-            $operator = $categoryOperator;
-        } else {
-            $operator = $classOperator;
-        }
-
-        return $operator;
-    }
-
-
-    /**
      * Adds a base 'bAnd' operator for the convenience 'where', 'andWhere' methods only if it does not already exist.
      *
      * @throws \LdapTools\Exception\LdapQueryException
@@ -570,16 +525,24 @@ class LdapQueryBuilder
      * Adds a base 'From' operator for the convenience 'from', 'fromUsers', etc, methods only if it does not already
      * exist. If it already exists then the supplied operator is added to it.
      *
-     * @param BaseOperator $operator
+     * @param LdapObjectSchema $schema
      * @throws \LdapTools\Exception\LdapQueryException
+     * @todo The LdapObjectSchema should require the filter on construction so the exception is not needed
      */
-    protected function addOrUpdateFrom(BaseOperator $operator)
+    protected function addOrUpdateFrom(LdapObjectSchema $schema)
     {
+        if (is_null($schema->getFilter())) {
+            throw  new InvalidArgumentException(sprintf(
+                'The schema type "%s" needs a filter defined to query LDAP with it.',
+                $schema->getObjectType()
+            ));
+        }
+
         if (!$this->baseFrom) {
-            $this->baseFrom = new From($operator);
+            $this->baseFrom = new From($schema->getFilter());
             $this->operation->getFilter()->add($this->baseFrom);
         } else {
-            $this->baseFrom->add($operator);
+            $this->baseFrom->add($schema->getFilter());
         }
     }
 

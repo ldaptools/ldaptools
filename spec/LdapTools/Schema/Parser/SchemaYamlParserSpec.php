@@ -78,7 +78,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     function it_should_throw_a_SchemaParserException_when_the_schema_object_type_has_no_class_or_category(){
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->shouldThrow(new SchemaParserException('Object type "group" has no class or category defined.'))->duringParse(
+        $this->shouldThrow(new SchemaParserException('Object type "group" must have one of the following defined: class, category, filter'))->duringParse(
             'missing_fields',
             'group'
         );
@@ -264,6 +264,55 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('extension', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
+    function it_should_allow_a_schema_object_type_that_has_multiple_classes_defined_in_objectClass()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'MultipleClasses')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectClass=person))');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_only_a_category_defined()
+    {
+        $this->beConstructedWith(__DIR__ . '/../../../resources/schema');
+
+        $this->parse('filter', 'CategoryOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(objectCategory=user)');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_only_a_single_class_defined()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'ClassOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(objectClass=user)');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_class_defined()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'ClassAndCategory')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_a_single_category_and_multiple_classes_defined()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'MultipleClassesAndCategory')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=user)(objectClass=person)))');
+    }
+    
+    function it_should_allow_a_schema_object_type_that_has_only_a_filter_defined()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'FilterOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectCategory=person))');
+    }
+
+    function it_should_allow_a_schema_object_type_that_has_a_filter_defined_with_a_class_and_category()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('filter', 'All')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(foo=*)))');
+    }
+    
     function getMatchers()
     {
         return [

@@ -86,6 +86,41 @@ The name for the type is how you will refer to this LDAP schema object within th
 Default LDAP object types that the class has defined are: `user`, `group`, `computer`, `contact`.
 
 --------------------
+#### filter
+ 
+This is an instance of `\LdapTools\Query\Operator\BaseOperator`. This operator is used to construct the filter used to
+query LDAP for the object type. You can omit the `class` and `category` directives and only define a filter. If you
+also define a `class` and `category` they are added to this filter when the schema object is built.
+
+A simple filter example. This would select all objects with an objectClass equal to user that start with the name Admin.
+
+```yaml
+    filter:
+        eq: [ objectClass, user ]
+        starts_with: [ name, Admin ]
+```
+
+A more complex example. All objects with an objectClass of user and an objectCategory person, and of those only objects
+with an email address present whose department name begins with IT.
+
+```yaml
+    filter:
+        - and:
+            - eq: [ objectClass, user ]
+            - eq: [ objectCategory, person ]
+        - and:
+            - present: emailAddress
+            - starts_with: [ department, IT ]
+```
+
+This allows you to construct a query as complex as you need in an array representation. All of the methods used to
+construct the filter above (`and`, `eq`, `present`, `starts_with`) are methods of the filter shortcuts from the
+LdapQueryBuilder class. The only difference being that instead of camel-case the method names should be formatted with
+underscores.
+
+For a complete list of methods available see the [filter shortcuts documentation](../tutorials/Building-LDAP-Queries.md#filter-method-shortcuts).
+
+--------------------
 #### class
  
 This is the `objectClass` value for the LDAP object you're defining. It can be any valid LDAP objectClass value (`user`,
