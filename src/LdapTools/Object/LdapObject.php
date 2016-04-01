@@ -97,6 +97,9 @@ class LdapObject
     /**
      * Check if this LDAP Object is of a specific objectClass.
      *
+     * @deprecated This method will be removed in a future version. To check for a class select the objectClass
+     *             attribute on a query then use the normal methods (ie. has('objectClass', 'foo')) 
+     * 
      * @param string $class
      * @return bool
      */
@@ -108,6 +111,9 @@ class LdapObject
     /**
      * Check if this LDAP Object is of a specific objectCategory.
      *
+     * @deprecated This method will be removed in a future version. To check for a category select the objectCategory
+     *             attribute on a query then use the normal methods (ie. has('objectCategory', 'foo'))
+     * 
      * @param string $category
      * @return bool
      */
