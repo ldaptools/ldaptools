@@ -41,4 +41,44 @@ class LdapObjectType
      * An OU object.
      */
     const OU = 'ou';
+
+    /**
+     * An Exchange Server object.
+     */
+    const EXCHANGE_SERVER = 'ExchangeServer';
+
+    /**
+     * An Exchange Database object.
+     */
+    const EXCHANGE_DATABASE = 'ExchangeDatabase';
+
+    /**
+     * An Exchange ActiveSync Policy object.
+     */
+    const EXCHANGE_ACTIVESYNC_POLICY = 'ExchangeActiveSyncPolicy';
+    
+    /**
+     * An Exchange Retention Policy object.
+     */
+    const EXCHANGE_RETENTION_POLICY = 'ExchangeRetentionPolicy';
+
+    /**
+     * An Exchange RBAC policy object.
+     */
+    const EXCHANGE_RBAC_POLICY = 'ExchangeRBACPolicy';
+
+    /**
+     * An Exchange Transport Rule object.
+     */
+    const EXCHANGE_TRANSPORT_RULE = 'ExchangeTransportRule';
+
+    /**
+     * An Exchange DAG object.
+     */
+    const EXCHANGE_DAG = 'ExchangeDAG';
+
+    /**
+     * An Exchange OWA object.
+     */
+    const EXCHANGE_OWA = 'ExchangeOWA';
 }

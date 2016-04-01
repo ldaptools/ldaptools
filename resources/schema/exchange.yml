@@ -1,0 +1,215 @@
+objects:
+    server:
+        type: ExchangeServer
+        filter:
+            eq: [ objectClass, msExchExchangeServer ]
+            present: serverRole
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+             exchange_roles:
+                - 'roles'
+             exchange_version:
+                - 'version'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            roles: msExchCurrentServerRoles
+            sid: objectSid
+            version: serialNumber
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'version'
+            - 'roles'
+            - 'guid'
+        multivalued_attributes:
+            - roles
+            - objectClass
+    database:
+        type: ExchangeDatabase
+        filter:
+            eq: [ objectClass, msExchMDB ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+        multivalued_attributes:
+            - objectClass
+    retention_policy:
+        type: ExchangeRetentionPolicy
+        filter:
+            eq: [ objectClass, msExchRecipientPolicy ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+        multivalued_attributes:
+            - objectClass
+    activesync_policy:
+        type: ExchangeActiveSyncPolicy
+        filter:
+            eq: [ objectClass, msExchMobileMailboxPolicy ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+             int:
+                 - 'numberOfPreviousPasswordsDisallowed'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            numberOfPreviousPasswordsDisallowed: msExchMobileDeviceNumberOfPreviousPasswordsDisallowed
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'numberOfPreviousPasswordsDisallowed'
+            - 'guid'
+            - 'dn'
+            - 'guid'
+    rbac_policy:
+        type: ExchangeRBACPolicy
+        filter:
+            eq: [ objectClass, msExchRBACPolicy ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+    transport_rule:
+        type: ExchangeTransportRule
+        filter:
+            eq: [ objectClass, msExchTransportRule ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            sid: objectSid
+            ruleXml: msExchTransportRuleXml
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+            - 'ruleXml'
+    exchange_dag:
+        type: ExchangeDAG
+        filter:
+            eq: [ objectClass, msExchMDBAvailabilityGroup ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'
+    exchange_owa:
+        type: ExchangeOWA
+        filter:
+            eq: [ objectClass, msExchOWAVirtualDirectory ]
+        base_dn: "%_configurationnamingcontext_%"
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            name: cn
+            created: whenCreated
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            sid: objectSid
+        attributes_to_select:
+            - 'name'
+            - 'dn'
+            - 'guid'

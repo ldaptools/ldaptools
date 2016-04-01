@@ -45,6 +45,46 @@ class LdapObjectTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('OU');
     }
 
+    function it_should_have_an_exchange_server_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_SERVER');
+    }
+
+    function it_should_have_an_exchange_database_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_DATABASE');
+    }
+
+    function it_should_have_an_exchange_retention_policy_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_RETENTION_POLICY');
+    }
+
+    function it_should_have_an_exchange_activesync_policy_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_ACTIVESYNC_POLICY');
+    }
+
+    function it_should_have_an_exchange_rbac_policy_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_RBAC_POLICY');
+    }
+
+    function it_should_have_an_exchange_transport_rule_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_TRANSPORT_RULE');
+    }
+
+    function it_should_have_an_exchange_dag_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_DAG');
+    }
+
+    function it_should_have_an_exchange_owa_type_constant()
+    {
+        $this->shouldHaveConstant('EXCHANGE_OWA');
+    }
+
     public function getMatchers()
     {
         return [

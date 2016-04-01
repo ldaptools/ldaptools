@@ -12,6 +12,16 @@ used when generating queries and returning data from LDAP.
   * [OUs](#ad-ou-types)
   * [Password Settings Objects](#ad-password-settings-objects-types)
 
+#### Exchange Schema
+  * [Servers](#exchange-server-types)
+  * [Databases](#exchange-database-types)
+  * [Retention Policies](#exchange-retention-policy-types)
+  * [ActiveSync Policies](#exchange-activesync-policy-types)
+  * [RBAC Policies](#exchange-rbac-policy-types)
+  * [Transport Rules](#exchange-transport-rule-types)
+  * [DAG](#exchange-dag-types)
+  * [OWA](#exchange-owa-types)
+  
 #### OpenLDAP Schema
   * [Users](#openldap-user-types)
   * [Groups](#openldap-group-types)
@@ -218,6 +228,108 @@ the type name `PSO`.
 | passwordHistoryLength | msDS-PasswordHistoryLength | int |
 | passwordReversibleEncryption | msDS-PasswordReversibleEncryptionEnabled | bool |
 | precedence | msDS-PasswordSettingsPrecedence | int |
+| sid | objectSid | string |
+
+### The Exchange Schema
+---
+
+#### Exchange Server Types
+
+These are Exchange Servers `(&(objectClass=msExchExchangeServer)(serverRole=*))`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| roles | msExchCurrentServerRoles | array |
+| sid | objectSid | string |
+| version | serialNumber | string |
+
+#### Exchange Database Types
+
+These are Exchange Databases (`objectClass=msExchMDB`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| sid | objectSid | string |
+
+#### Exchange Retention Policy Types
+
+These are Exchange Retention policies (`objectClass=msExchRecipientPolicy`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| sid | objectSid | string |
+
+#### Exchange ActiveSync Policy Types
+
+These are Exchange ActiveSync policies (`objectClass=msExchMobileMailboxPolicy`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| numberOfPreviousPasswordsDisallowed | msExchMobileDeviceNumberOfPreviousPasswordsDisallowed | int |
+| sid | objectSid | string |
+
+#### Exchange RBAC Policy Type
+
+These are Exchange RBAC policies (`objectClass=msExchRBACPolicy`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| sid | objectSid | string |
+
+#### Exchange Transport Rule Types
+
+These are Exchange Databases (`objectClass=msExchTransportRule`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| sid | objectSid | string |
+
+#### Exchange DAG Types
+
+This represents an DAG (`objectClass=msExchMDBAvailabilityGroup`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| sid | objectSid | string |
+
+#### Exchange OWA Types
+
+These are the Exchange OWA instances (`objectClass=msExchOWAVirtualDirectory`).
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| name | cn | string |
+| created | whenCreated | `\DateTime` |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
 | sid | objectSid | string |
 
 ### The OpenLDAP Schema
