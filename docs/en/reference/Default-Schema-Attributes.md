@@ -256,7 +256,9 @@ These are Exchange Databases (`objectClass=msExchMDB`).
 | name | cn | string |
 | created | whenCreated | `\DateTime` |
 | guid | objectGuid | string |
+| isBeingRestored | msexchdatabasebeingrestored | bool |
 | modified | whenModified | `\DateTime` |
+| mountOnStartup | msexchedboffline | bool |
 | sid | objectSid | string |
 
 #### Exchange Retention Policy Types
@@ -331,6 +333,7 @@ These are the Exchange OWA instances (`objectClass=msExchOWAVirtualDirectory`).
 | guid | objectGuid | string |
 | modified | whenModified | `\DateTime` |
 | sid | objectSid | string |
+| url | msExchInternalHostname | string | 
 
 ### The OpenLDAP Schema
 ---

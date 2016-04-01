@@ -41,6 +41,9 @@ objects:
             eq: [ objectClass, msExchMDB ]
         base_dn: "%_configurationnamingcontext_%"
         converters:
+             bool:
+                 - 'isBeingRestored'
+                 - 'mountOnStartup'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -53,6 +56,8 @@ objects:
             created: whenCreated
             dn: distinguishedName
             guid: objectGuid
+            isBeingRestored: msexchdatabasebeingrestored
+            mountOnStartup: msexchedboffline
             sid: objectSid
         attributes_to_select:
             - 'name'
@@ -209,6 +214,7 @@ objects:
             guid: objectGuid
             modified: whenChanged
             sid: objectSid
+            url: msexchinternalhostname
         attributes_to_select:
             - 'name'
             - 'dn'
