@@ -16,7 +16,7 @@ use LdapTools\LdapManager;
 $config = (new Configuration())->load('/path/to/my/ldap.yml');
 $ldap = new LdapManager($config);
 
-// Create a basic PSO that.
+// Create a basic PSO.
 $ldap->createLdapObject()
     ->create('PSO')
     ->with([
