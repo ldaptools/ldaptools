@@ -5,6 +5,11 @@ Modifying an existing LDAP object is as easy as searching for it, making your ch
 setters/properties then sending the object back to the `LdapManager` class with the `persist()` method. All the changes
 you make to the object are tracked and when you call `persist()` it will only update the attributes you actually changed.
 
+Please keep in mind that this is not an active record design. The `LdapObject` instance is only aware of properties
+you explicitly selected as part of the LDAP query. So if you want to check if an attribute exists, or has a specific value,
+then make sure to actually select the attribute when you query LDAP. If you selected the attribute as part of the query,
+but the `has($attribute)` method returns false, then the attribute is not set.
+
 A simple example:
 
 ```php
@@ -73,8 +78,8 @@ $user->firstName = 'Fred';
 $user->lastName = 'Fuchs';
 
 // You can also call isset on a property to determine if it exists on the object...
-if (isset($user.phoneNumber)) {
-    echo "Phone: ".$user.phoneNumber.PHP_EOL; 
+if (isset($user>phoneNumber)) {
+    echo "Phone: ".$user->phoneNumber.PHP_EOL; 
 }
 ```
 
