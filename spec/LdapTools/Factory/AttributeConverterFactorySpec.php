@@ -127,6 +127,16 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     {
         $this::get('group_membership')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertGroupMembership');
     }
+
+    function it_should_return_an_exchange_version_converter()
+    {
+        $this::get('exchange_version')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeVersion');
+    }
+
+    function it_should_return_an_exchange_roles_converter()
+    {
+        $this::get('exchange_roles')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeRoles');
+    }
     
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {

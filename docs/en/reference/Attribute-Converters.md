@@ -109,3 +109,13 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Takes a bool and converts it to a string int to represent whether inheritance is blocked on an OU. 
   
   * `fromLdap`: Takes a gpOptions value and converts it to a bool for whether GPO inheritance is set to be blocked.
+
+#### *exchange_roles*
+  * `toLdap`: This should not be used. It currently does not modify the value going back to LDAP.
+  
+  * `fromLdap`: Takes an integer and and determines what roles it contains and converts that to an array of role names.
+  
+#### *exchange_version*
+  * `toLdap`: This should not be used. It currently does not modify the value going back to LDAP.
+
+  * `fromLdap`: Takes a build string stored in the serialNumber attribute and parses it to a readable Exchange version.
