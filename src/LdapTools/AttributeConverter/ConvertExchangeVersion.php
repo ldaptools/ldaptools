@@ -171,10 +171,10 @@ class ConvertExchangeVersion implements AttributeConverterInterface
     }
 
     /**
-     * @param $fullBuild
-     * @param $major
-     * @param $minor
-     * @return mixed|string
+     * @param string $fullBuild
+     * @param string $major
+     * @param string $minor
+     * @return string
      */
     protected function getFriendlyName($fullBuild, $major, $minor)
     {
