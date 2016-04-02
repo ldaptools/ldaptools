@@ -2,7 +2,7 @@
 -----------------------
 
 These LDAP queries all assume you are using an LdapManager instance (represented by `$ldap`) built from a configuration
-described [in the docs](/reference/Main-Configuration.md). This leverages the `LdapQueryBuilder` class which makes many
+described [in the docs](../reference/Main-Configuration.md). This leverages the `LdapQueryBuilder` class which makes many
 of these queries very easy.
 
 ### All Users, OUs, Groups, or Computers
