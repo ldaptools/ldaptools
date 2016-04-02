@@ -8,8 +8,9 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Connection;
+namespace LdapTools\Connection\AD;
 
+use LdapTools\Connection\BindUserStrategy;
 use LdapTools\Utilities\LdapUtilities;
 
 /**

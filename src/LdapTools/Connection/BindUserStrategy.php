@@ -10,6 +10,7 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Connection\AD\ADBindUserStrategy;
 use LdapTools\DomainConfiguration;
 
 /**

@@ -22,6 +22,6 @@ class ADLastErrorStrategySpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\Connection\ADLastErrorStrategy');
+        $this->shouldHaveType('LdapTools\Connection\AD\ADLastErrorStrategy');
     }
 }

@@ -24,7 +24,7 @@ class ADBindUserStrategySpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\Connection\ADBindUserStrategy');
+        $this->shouldHaveType('LdapTools\Connection\AD\ADBindUserStrategy');
     }
 
     function it_should_return_a_username_in_UPN_format_by_default()

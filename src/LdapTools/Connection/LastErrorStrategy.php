@@ -10,6 +10,8 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Connection\AD\ADLastErrorStrategy;
+
 /**
  * Abstract away the error handling to allow for directory specific error messages and numbers.
  *

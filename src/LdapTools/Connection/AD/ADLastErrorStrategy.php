@@ -8,7 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Connection;
+namespace LdapTools\Connection\AD;
+
+use LdapTools\Connection\ADResponseCodes;
+use LdapTools\Connection\LastErrorStrategy;
 
 /**
  * Try to retrieve a more detailed error message based on the specific AD response code.
