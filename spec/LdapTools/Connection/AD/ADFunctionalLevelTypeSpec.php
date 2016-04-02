@@ -17,7 +17,7 @@ class ADFunctionalLevelTypeSpec extends ObjectBehavior
 {
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\Connection\ADFunctionalLevelType');
+        $this->shouldHaveType('LdapTools\Connection\AD\ADFunctionalLevelType');
     }
 
     function it_should_have_a_WIN2000_constant()
@@ -59,7 +59,7 @@ class ADFunctionalLevelTypeSpec extends ObjectBehavior
     {
         return [
             'haveConstant' => function($subject, $constant) {
-                return defined('\LdapTools\Connection\ADFunctionalLevelType::'.$constant);
+                return defined('\LdapTools\Connection\AD\ADFunctionalLevelType::'.$constant);
             }
         ];
     }

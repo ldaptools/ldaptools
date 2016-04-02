@@ -10,7 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
-use LdapTools\Connection\ADFunctionalLevelType;
+use LdapTools\Connection\AD\ADFunctionalLevelType;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 

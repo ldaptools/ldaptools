@@ -10,7 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
-use LdapTools\Connection\ADFunctionalLevelType;
+use LdapTools\Connection\AD\ADFunctionalLevelType;
 
 /**
  * Converts the AD domain/forest functional level to a human readable form.

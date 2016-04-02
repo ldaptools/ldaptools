@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Connection;
+namespace LdapTools\Connection\AD;
 
 /**
  * Constants representing the Active Directory functional level types.
