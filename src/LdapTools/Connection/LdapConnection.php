@@ -62,7 +62,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $serverPool;
 
     /**
-     * @var ADBindUserStrategy|BindUserStrategy
+     * @var AD\ADBindUserStrategy|BindUserStrategy
      */
     protected $usernameFormatter;
 
