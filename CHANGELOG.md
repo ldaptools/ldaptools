@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.19.0 (2016-04-01)
+-------------------
+  * Add two new schema file directives: include, include_default. Allows for more logical separation of schema files.
+  * Add a schema object directive: base_dn. This allows setting the default query BaseDN on the object type.
+  * Add a schema object directive: filter. Allows for greater flexibility instead of class and/or category only.
+  * Add a new converter/attribute for AD OUs to determine if GPO inheritance is being blocked.
+  * Add a new converter for group membership. The 'groups' attribute can now be directly modified like you'd expect.
+  * Add a new converter for the Exchange Server version and roles.
+  * Add an Exchange Schema that includes: Exchange Servers, Databases, RBAC/ActiveSync/Retention Policies, OWA, DAG 
+  * Several LDIF improvements and fixes (line folding, line endings, multi-line base64 encoding, comment parsing, etc) 
+  * Refactor some of the LdapQueryBuilder.
+
 0.18.0 (2016-02-13)
 -------------------
   * Allow LDAP controls to be set per operation.
