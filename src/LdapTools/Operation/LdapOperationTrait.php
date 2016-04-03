@@ -88,7 +88,7 @@ trait LdapOperationTrait
     /**
      * Add an operation that should be executed before this operation.
      *
-     * @param LdapOperationInterface[] ...$operation
+     * @param LdapOperationInterface[] ...$operations
      * @return $this
      */
     public function addPreOperation(LdapOperationInterface ...$operations)
@@ -113,7 +113,7 @@ trait LdapOperationTrait
     /**
      * Add an operation that should be executed after this operation.
      *
-     * @param LdapOperationInterface[] ...$operation
+     * @param LdapOperationInterface[] ...$operations
      * @return $this
      */
     public function addPostOperation(LdapOperationInterface ...$operations)
