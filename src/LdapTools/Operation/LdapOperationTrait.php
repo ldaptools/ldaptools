@@ -75,12 +75,14 @@ trait LdapOperationTrait
     /**
      * Add a control to the operation.
      *
-     * @param LdapControl $control
+     * @param LdapControl[] ...$controls
      * @return $this
      */
-    public function addControl(LdapControl $control)
+    public function addControl(LdapControl ...$controls)
     {
-        $this->controls[] = $control;
+        foreach ($controls as $control) {
+            $this->controls[] = $control;
+        }
 
         return $this;
     }

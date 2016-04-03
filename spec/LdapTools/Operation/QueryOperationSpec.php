@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Operation;
 
+use LdapTools\Connection\LdapControl;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
@@ -178,5 +179,14 @@ class QueryOperationSpec extends ObjectBehavior
         $this->addPostOperation($operation1);
         $this->addPostOperation($operation2, $operation3);
         $this->getPostOperations()->shouldBeEqualTo([$operation1, $operation2, $operation3]);
+    }
+
+    function it_should_add_ldap_controls()
+    {
+        $control1 = new LdapControl('foo', true);
+        $control2 = new LdapControl('bar');
+
+        $this->addControl($control1, $control2);
+        $this->getControls()->shouldBeEqualTo([$control1, $control2]);
     }
 }

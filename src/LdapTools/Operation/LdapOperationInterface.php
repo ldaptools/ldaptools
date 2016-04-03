@@ -35,12 +35,12 @@ interface LdapOperationInterface
     public function getServer();
 
     /**
-     * Add a control to the operation.
+     * Add LDAP controls to the operation.
      *
-     * @param LdapControl $control
+     * @param LdapControl[] ...$controls
      * @return $this
      */
-    public function addControl(LdapControl $control);
+    public function addControl(LdapControl ...$controls);
 
     /**
      * Get the controls set for the operation.
