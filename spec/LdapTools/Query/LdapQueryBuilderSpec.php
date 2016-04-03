@@ -12,6 +12,8 @@ namespace spec\LdapTools\Query;
 
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Connection\LdapControl;
+use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Exception\InvalidArgumentException;
@@ -295,6 +297,15 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     function it_should_overwrite_order_by_attributes_when_calling_orderBy()
     {
         $this->where(['foo' => 'bar'])->orderBy('foo','DESC')->orderBy('bar')->getLdapQuery()->getOrderBy()->shouldBeEqualTo(['bar' => 'ASC']);
+    }
+    
+    function it_should_add_LDAP_controls_to_the_query_operation()
+    {
+        $control1 = new LdapControl(LdapControlType::SHOW_DELETED, true);
+        $control2 = new LdapControl(LdapControlType::PAGED_RESULTS, false);
+        
+        $this->addControl($control1, $control2);
+        $this->getLdapQuery()->getQueryOperation()->getControls()->shouldBeEqualTo([$control1, $control2]);
     }
 
     function it_should_filter_by_OUs_when_calling_fromOUs()

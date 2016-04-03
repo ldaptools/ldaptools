@@ -11,6 +11,7 @@
 namespace LdapTools\Query;
 
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Object\LdapObjectType;
@@ -358,6 +359,21 @@ class LdapQueryBuilder
     {
         $this->orderBy[$attribute] = $direction;
 
+        return $this;
+    }
+
+    /**
+     * Add LDAP controls to be used for the query.
+     * 
+     * @param LdapControl[] ...$controls
+     * @return $this
+     */
+    public function addControl(LdapControl ...$controls)
+    {
+        foreach ($controls as $control) {
+            $this->operation->addControl($control);
+        }
+        
         return $this;
     }
 
