@@ -370,9 +370,7 @@ class LdapQueryBuilder
      */
     public function addControl(LdapControl ...$controls)
     {
-        foreach ($controls as $control) {
-            $this->operation->addControl($control);
-        }
+        $this->operation->addControl(...$controls);
         
         return $this;
     }
