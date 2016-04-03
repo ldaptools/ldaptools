@@ -34,10 +34,14 @@ class LdapControl
 
     /**
      * @param string $oid
+     * @param bool $criticality
+     * @param mixed|null $value
      */
-    public function __construct($oid)
+    public function __construct($oid, $criticality = false, $value = null)
     {
         $this->oid = $oid;
+        $this->criticality = (bool) $criticality;
+        $this->value = $value;
     }
 
     /**

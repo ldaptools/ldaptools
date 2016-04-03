@@ -31,6 +31,14 @@ class LdapControlSpec extends ObjectBehavior
         $this->getOid()->shouldBeEqualTo(LdapControlType::SUB_TREE_DELETE);
     }
 
+    function it_should_be_able_to_set_the_criticality_and_value_in_the_constructor()
+    {
+        $this->beConstructedWith(LdapControlType::SUB_TREE_DELETE, true, 'foo');
+        $this->getOid()->shouldBeEqualTo(LdapControlType::SUB_TREE_DELETE);
+        $this->getCriticality()->shouldBeEqualTo(true);
+        $this->getValue()->shouldBeEqualTo('foo');
+    }
+
     function it_should_have_a_default_criticality_of_false()
     {
         $this->getCriticality()->shouldBeEqualTo(false);
