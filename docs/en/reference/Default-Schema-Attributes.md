@@ -230,6 +230,26 @@ the type name `PSO`.
 | precedence | msDS-PasswordSettingsPrecedence | int |
 | sid | objectSid | string |
 
+#### AD Deleted Objects Types
+
+These are deleted objects that reside in the AD Recycle Bin `(&(isDeleted=TRUE)(lastKnownParent=*))`
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| created | whenCreated | `\DateTime` |
+| description | description | string |
+| dn | distinguishedName | string |
+| firstName | givenName | string |
+| guid | objectGuid | string |
+| isDeleted | isDeleted | bool |
+| lastName | sn | string |
+| lastKnownLocation | lastKnownParent | string |
+| lastKnownName | lastKnownRdn | string |
+| modified | whenChanged | `\DateTime` |
+| name | cn | string |
+| sid | objectSid | string |
+| upn | userPrincipalName | string |
+
 ### The Exchange Schema
 ---
 

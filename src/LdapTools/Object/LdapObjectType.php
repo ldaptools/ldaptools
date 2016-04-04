@@ -43,6 +43,11 @@ class LdapObjectType
     const OU = 'ou';
 
     /**
+     * Deleted LDAP objects.
+     */
+    const DELETED = 'deleted';
+
+    /**
      * An Exchange Server object.
      */
     const EXCHANGE_SERVER = 'ExchangeServer';

@@ -45,6 +45,11 @@ class LdapObjectTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('OU');
     }
 
+    function it_should_have_a_deleted_type_constant()
+    {
+        $this->shouldHaveConstant('DELETED');
+    }
+
     function it_should_have_an_exchange_server_type_constant()
     {
         $this->shouldHaveConstant('EXCHANGE_SERVER');

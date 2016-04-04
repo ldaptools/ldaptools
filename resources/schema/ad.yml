@@ -560,3 +560,41 @@ objects:
             - 'passwordHistoryLength'
             - 'passwordReversibleEncryption'
             - 'precedence'
+    deleted:
+        type: deleted
+        filter:
+            eq: [ isDeleted, true ]
+            present: lastKnownLocation
+        controls:
+            - [ 1.2.840.113556.1.4.417, true ]
+        paging: false
+        base_dn: "CN=Deleted Objects,%_defaultNamingContext_%"
+        converters:
+             bool:
+                 - 'isDeleted'
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            dn: distinguishedName
+            firstName: givenName
+            lastName: sn
+            guid: objectGuid
+            isDeleted: isDeleted
+            lastKnownLocation: lastKnownParent
+            lastKnownName: msds-lastKnownRdn
+            modified: whenChanged
+            name: cn
+            sid: objectSid
+            upn: userPrincipalName
+        attributes_to_select:
+            - 'name'
+            - 'guid'
+            - 'lastKnownLocation'
+            - 'lastKnownName'
+            - 'sid'
