@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Schema;
 
+use LdapTools\Connection\LdapControl;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
@@ -256,5 +257,23 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->getFilter()->shouldBeNull();
         $this->setFilter($operator);
         $this->getFilter()->shouldBeEqualTo($operator);
+    }
+    
+    function it_should_set_whether_paging_is_used()
+    {
+        $this->getUsePaging()->shouldBeNull();
+        $this->setUsePaging(false);
+        $this->getUsePaging()->shouldBeEqualTo(false);
+    }
+    
+    function it_should_set_ldap_controls()
+    {
+        $this->getControls()->shouldBeEqualTo([]);
+        
+        $control1 = new LdapControl('foo', true);
+        $control2 = new LdapControl('bar');
+        
+        $this->setControls($control1, $control2);
+        $this->getControls()->shouldBeEqualTo([$control1, $control2]);
     }
 }

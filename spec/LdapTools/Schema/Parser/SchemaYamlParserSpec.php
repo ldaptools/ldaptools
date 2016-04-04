@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Schema\Parser;
 
 use LdapTools\Configuration;
+use LdapTools\Connection\LdapControl;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\SchemaParserException;
 use LdapTools\Schema\LdapObjectSchema;
@@ -237,7 +238,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parseAll('example')->shouldBeArray();
-        $this->parseAll('example')->shouldHaveCount(10);
+        $this->parseAll('example')->shouldHaveCount(12);
         $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
     }
 
@@ -311,6 +312,23 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parse('filter', 'All')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(foo=*)))');
+    }
+
+    function it_should_parse_a_schema_object_with_controls_listed()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $control1 = new LdapControl('foo', true, 'bar');
+        $control2 = new LdapControl('bar');
+        
+        $this->parse('example', 'controls')->getControls()->shouldBeLike([$control1, $control2]);
+    }
+    
+    function it_should_parse_a_schema_object_with_paging_set()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'paging')->getUsePaging()->shouldBeEqualTo(false);   
     }
     
     function getMatchers()

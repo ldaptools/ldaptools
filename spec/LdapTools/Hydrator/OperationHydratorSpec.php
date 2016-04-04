@@ -16,6 +16,7 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Connection\LdapControl;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AddOperation;
@@ -25,7 +26,6 @@ use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Schema\Parser\SchemaYamlParser;
-use PhpSpec\Exception\Example\SkippingException;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -200,6 +200,35 @@ class OperationHydratorSpec extends ObjectBehavior
         $operation->setBaseDn('%_defaultNamingContext_%');
         
         $this->hydrateToLdap($operation)->getBaseDn()->shouldBeEqualTo($rootDse['defaultNamingContext']);
+    }
+    
+    function it_should_add_controls_on_an_operation_going_to_ldap()
+    {
+        $operation = new QueryOperation('(foo=bar');
+
+        $this->setLdapObjectSchema($this->schema);
+        $this->setLdapConnection($this->connection);
+        
+        $this->hydrateToLdap($operation)->getControls()->shouldBeEqualTo([]);
+
+        $control = new LdapControl('foo');
+        $this->schema->setControls($control);
+
+        $this->hydrateToLdap($operation)->getControls()->shouldBeEqualTo([$control]);
+    }
+    
+    function it_should_set_whether_paging_is_used_based_off_the_schema()
+    {
+        $operation = new QueryOperation('(foo=bar');
+        
+        $this->setLdapObjectSchema($this->schema);
+        $this->setLdapConnection($this->connection);
+
+        $this->hydrateToLdap($operation)->getUsePaging()->shouldBeEqualTo(null);
+        
+        $this->schema->setUsePaging(true);
+
+        $this->hydrateToLdap($operation)->getUsePaging()->shouldBeEqualTo(true);
     }
     
     function it_should_only_support_an_operation_going_to_ldap()

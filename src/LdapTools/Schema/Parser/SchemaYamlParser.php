@@ -10,6 +10,7 @@
 
 namespace LdapTools\Schema\Parser;
 
+use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\SchemaParserException;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\ArrayToOperator;
@@ -52,6 +53,7 @@ class SchemaYamlParser implements SchemaParserInterface
         'converter_options' => 'setConverterOptions',
         'multivalued_attributes' => 'setMultivaluedAttributes',
         'base_dn' => 'setBaseDn',
+        'paging' => 'setUsePaging', 
     ];
 
     /**
@@ -146,6 +148,7 @@ class SchemaYamlParser implements SchemaParserInterface
         $this->parseFilter($ldapObjectSchema, $objectSchema);
         $ldapObjectSchema->setAttributeMap($objectSchema['attributes']);
         $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
+        $ldapObjectSchema->setControls(...$this->parseControls($objectSchema));
 
         return $ldapObjectSchema;
     }
@@ -209,6 +212,27 @@ class SchemaYamlParser implements SchemaParserInterface
         $filter = array_key_exists('filter', $objectArray) ? $objectArray['filter'] : [];
 
         $objectSchema->setFilter($this->arrayToOp->getOperatorForSchema($objectSchema, $filter));
+    }
+
+    /**
+     * @param array $objectSchema
+     * @return LdapControl[]
+     * @throws SchemaParserException
+     */
+    protected function parseControls($objectSchema)
+    {
+        $controls = [];
+
+        if (array_key_exists('controls', $objectSchema)) {
+            foreach ($objectSchema['controls'] as $control) {
+                if (!is_array($control)) {
+                    throw new SchemaParserException('The "controls" directive must contain arrays of controls.');
+                }
+                $controls[] = new LdapControl(...$control);
+            }
+        }
+        
+        return $controls;
     }
 
     /**

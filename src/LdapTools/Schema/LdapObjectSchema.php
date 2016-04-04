@@ -11,6 +11,7 @@
 namespace LdapTools\Schema;
 
 use LdapTools\Cache\CacheableItemInterface;
+use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Query\Operator\BaseOperator;
 
@@ -95,6 +96,16 @@ class LdapObjectSchema implements CacheableItemInterface
      * @var BaseOperator The operator representation of a filter to be used to select objects of this schema type.
      */
     protected $filter;
+
+    /**
+     * @var LdapControl[]
+     */
+    protected $controls = [];
+
+    /**
+     * @var bool|null
+     */
+    protected $usePaging;
 
     /**
      * @param string $schemaName
@@ -503,5 +514,45 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getFilter()
     {
         return $this->filter;
+    }
+
+    /**
+     * Set the LDAP controls needed when querying for this operation.
+     *
+     * @param \LdapTools\Connection\LdapControl[] ...$controls
+     */
+    public function setControls(LdapControl ...$controls)
+    {
+        $this->controls = $controls;
+    }
+
+    /**
+     * Get the LDAP controls needed when querying for this operation.
+     *
+     * @return \LdapTools\Connection\LdapControl[]
+     */
+    public function getControls()
+    {
+        return $this->controls;
+    }
+
+    /**
+     * Set whether paging should be used when querying LDAP for this type.
+     * 
+     * @param bool $usePaging
+     */
+    public function setUsePaging($usePaging)
+    {
+        $this->usePaging = (bool) $usePaging;
+    }
+
+    /**
+     * Get whether paging should be used when querying LDAP for this type.
+     * 
+     * @return bool|null
+     */
+    public function getUsePaging()
+    {
+        return $this->usePaging;
     }
 }

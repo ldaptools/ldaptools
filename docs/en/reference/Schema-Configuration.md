@@ -255,6 +255,31 @@ should start. It also accepts parameter names for the defaultNamingContext and t
 ```
 
 --------------------
+#### controls
+
+These are arrays of LDAP controls that should be used when performing operations/queries with this schema type. Each
+control should be an array with the OID, and optionally the criticality and value:
+
+```yaml
+    # The OID must come first, followed by whether the control is critical, and then an optional value.
+    # If you omit the criticality then it defaults to false.
+    controls:
+        - [ 1.2.840.113556.1.4.417, true ]  
+```
+
+--------------------
+#### paging
+
+This is a boolean value for whether or not paging should be used when querying for this object type. Certain controls
+require that paging is not used. If this not defined then it will default to whatever you set in your domain config or
+the Query Builder instance.
+
+```yaml
+    # Disable paging for queries using this schema type.
+    paging: false
+```
+
+--------------------
 #### extends
 
 By using this option you can explicitly state to make a object type extend another object and inherit everything it

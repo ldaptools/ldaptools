@@ -368,3 +368,19 @@ objects:
             generalized_time: foo
         converter_options:
             generalized_time: { type: windows }
+    ldap_controls:
+        type: controls
+        filter:
+            eq: [ objectClass, foo ]
+        controls:
+            - [ 'foo', true, 'bar' ]
+            - [ 'bar' ]
+        attributes:
+           foo: bar
+    paging:
+        type: paging
+        filter:
+            eq: [ objectClass, foo ]
+        paging: false
+        attributes:
+           foo: bar
