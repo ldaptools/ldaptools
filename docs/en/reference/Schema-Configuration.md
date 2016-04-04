@@ -271,7 +271,7 @@ control should be an array with the OID, and optionally the criticality and valu
 #### paging
 
 This is a boolean value for whether or not paging should be used when querying for this object type. Certain controls
-require that paging is not used. If this not defined then it will default to whatever you set in your domain config or
+require that paging is not used. If this is not defined then it will default to whatever you set in your domain config or
 the Query Builder instance.
 
 ```yaml
