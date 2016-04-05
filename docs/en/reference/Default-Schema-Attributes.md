@@ -32,7 +32,10 @@ used when generating queries and returning data from LDAP.
 
 #### AD User Types
 
-These are typical LDAP user objects (`objectClass=user` and `objectCategory=person`).
+These are typical LDAP user objects.
+
+* *Type*: `LdapObjectType::USER`
+* *Filter*: `(&(objectClass=user)(objectCategory=person))`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -108,7 +111,10 @@ These are typical LDAP user objects (`objectClass=user` and `objectCategory=pers
 
 #### AD Group Types
 
-These are typical LDAP group objects (`objectClass=group`).
+These are typical LDAP group objects.
+
+* **Type**: `LdapObjectType::GROUP`
+* **Filter**: `(objectClass=group)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -139,7 +145,10 @@ These are typical LDAP group objects (`objectClass=group`).
 
 #### AD Computer Types
 
-These are typical LDAP computer objects (`objectCategory=computer`).
+These are typical LDAP computer objects.
+
+* **Type**: `LdapObjectType::COMPUTER`
+* **Filter**: `(objectCategory=computer)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -161,7 +170,10 @@ These are typical LDAP computer objects (`objectCategory=computer`).
 
 #### AD Contact Types
 
-These are typical LDAP contact objects (`objectCategory=contact`).
+These are typical LDAP contact objects.
+
+* **Type**: `LdapObjectType::CONTACT`
+* **Filter**: `(objectCategory=contact)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -185,7 +197,10 @@ These are typical LDAP contact objects (`objectCategory=contact`).
 
 #### AD OU Types
 
-These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
+These are typical LDAP OU objects.
+
+* **Type**: `LdapObjectType::OU`
+* **Filter**: `(objectCategory=organizationalUnit)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -206,8 +221,10 @@ These are typical LDAP OU objects (`objectCategory=organizationalUnit`).
 
 #### AD Password Settings Objects Types
 
-These are Password Settings Objects, also known as PSOs, (`objectClass=msDS-PasswordSettings`). They can be used with 
+These are Password Settings Objects, also known as PSOs. They can be used with 
 the type name `PSO`.
+
+* **Filter**: `(objectClass=msDS-PasswordSettings)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -232,7 +249,10 @@ the type name `PSO`.
 
 #### AD Deleted Objects Types
 
-These are deleted objects that reside in the AD Recycle Bin `(&(isDeleted=TRUE)(lastKnownParent=*))`
+These are deleted objects that reside in the AD Recycle Bin.
+
+* **Type**: `LdapObjectType::DELETED`
+* **Filter**: `(&(isDeleted=TRUE)(lastKnownParent=*))`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -255,7 +275,10 @@ These are deleted objects that reside in the AD Recycle Bin `(&(isDeleted=TRUE)(
 
 #### Exchange Server Types
 
-These are Exchange Servers `(&(objectClass=msExchExchangeServer)(serverRole=*))`).
+These are Exchange Servers.
+
+* **Type**: `LdapObjectType::EXCHANGE_SERVER`
+* **Filter**: `(&(objectClass=msExchExchangeServer)(serverRole=*))`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -269,7 +292,10 @@ These are Exchange Servers `(&(objectClass=msExchExchangeServer)(serverRole=*))`
 
 #### Exchange Database Types
 
-These are Exchange Databases (`objectClass=msExchMDB`).
+These are Exchange Databases.
+
+* **Type**: `LdapObjectType::EXCHANGE_SERVER`
+* **Filter**: `(objectClass=msExchMDB)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -283,7 +309,10 @@ These are Exchange Databases (`objectClass=msExchMDB`).
 
 #### Exchange Retention Policy Types
 
-These are Exchange Retention policies (`objectClass=msExchRecipientPolicy`).
+These are Exchange Retention policies.
+
+* **Type**: `LdapObjectType::EXCHANGE_RETENTION_POLICY`
+* **Filter**: `(objectClass=msExchRecipientPolicy)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -295,7 +324,10 @@ These are Exchange Retention policies (`objectClass=msExchRecipientPolicy`).
 
 #### Exchange ActiveSync Policy Types
 
-These are Exchange ActiveSync policies (`objectClass=msExchMobileMailboxPolicy`).
+These are Exchange ActiveSync policies.
+
+* **Type**: `LdapObjectType::EXCHANGE_ACTIVESYNC_POLICY`
+* **Filter**: `(objectClass=msExchMobileMailboxPolicy)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -308,7 +340,10 @@ These are Exchange ActiveSync policies (`objectClass=msExchMobileMailboxPolicy`)
 
 #### Exchange RBAC Policy Type
 
-These are Exchange RBAC policies (`objectClass=msExchRBACPolicy`).
+These are Exchange RBAC policies.
+
+* **Type**: `LdapObjectType::EXCHANGE_RBAC_POLICY`
+* **Filter**: `(objectClass=msExchRBACPolicy)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -320,7 +355,10 @@ These are Exchange RBAC policies (`objectClass=msExchRBACPolicy`).
 
 #### Exchange Transport Rule Types
 
-These are Exchange Databases (`objectClass=msExchTransportRule`).
+These are Exchange Transport Rules.
+
+* **Type**: `LdapObjectType::EXCHANGE_TRANSPORT_RULE`
+* **Filter**: `(objectClass=msExchTransportRule)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -332,7 +370,10 @@ These are Exchange Databases (`objectClass=msExchTransportRule`).
 
 #### Exchange DAG Types
 
-This represents an DAG (`objectClass=msExchMDBAvailabilityGroup`).
+This represents an Exchange DAG.
+
+* **Type**: `LdapObjectType::EXCHANGE_DAG`
+* **Filter**: `(objectClass=msExchMDBAvailabilityGroup)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -344,7 +385,10 @@ This represents an DAG (`objectClass=msExchMDBAvailabilityGroup`).
 
 #### Exchange OWA Types
 
-These are the Exchange OWA instances (`objectClass=msExchOWAVirtualDirectory`).
+These are the Exchange OWA instances.
+
+* **Type**: `LdapObjectType::EXCHANGE_DAG`
+* **Filter**: `(objectClass=msExchOWAVirtualDirectory)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -360,7 +404,10 @@ These are the Exchange OWA instances (`objectClass=msExchOWAVirtualDirectory`).
 
 #### OpenLDAP User Types
 
-These are typical LDAP user objects (`objectClass=inetOrgPerson`).
+These are typical LDAP user objects.
+
+* **Type**: `LdapObjectType::USER`
+* **Filter**: `(objectClass=inetOrgPerson)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -395,7 +442,10 @@ These are typical LDAP user objects (`objectClass=inetOrgPerson`).
 
 #### OpenLDAP Group Types
 
-These are typical LDAP group objects (`objectClass=groupOfUniqueNames`).
+These are typical LDAP group objects.
+
+* **Type**: `LdapObjectType::GROUP`
+* **Filter**: `(objectClass=groupOfUniqueNames)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
@@ -409,7 +459,10 @@ These are typical LDAP group objects (`objectClass=groupOfUniqueNames`).
 
 #### OpenLDAP OU Types
 
-These are typical LDAP OU objects (`objectClass=organizationalUnit`).
+These are typical LDAP OU objects.
+
+* **Type**: `LdapObjectType::OU`
+* **Filter**: `(objectClass=organizationalUnit)`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
