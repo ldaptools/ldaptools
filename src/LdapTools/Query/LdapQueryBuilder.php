@@ -386,15 +386,26 @@ class LdapQueryBuilder
     }
 
     /**
+     * Set the scope using the QueryOperation::SCOPE constant.
+     *
+     * @param string $scope
+     * @return $this
+     */
+    public function setScope($scope)
+    {
+        $this->operation->setScope($scope);
+        
+        return $this;
+    }
+
+    /**
      * Set the scope of the query to search the complete the baseDn and all children.
      *
      * @return $this
      */
     public function setScopeSubTree()
     {
-        $this->operation->setScope(QueryOperation::SCOPE['SUBTREE']);
-
-        return $this;
+        return $this->setScope(QueryOperation::SCOPE['SUBTREE']);
     }
 
     /**
@@ -404,9 +415,7 @@ class LdapQueryBuilder
      */
     public function setScopeOneLevel()
     {
-        $this->operation->setScope(QueryOperation::SCOPE['ONELEVEL']);
-
-        return $this;
+        return $this->setScope(QueryOperation::SCOPE['ONELEVEL']);
     }
 
     /**
@@ -416,9 +425,7 @@ class LdapQueryBuilder
      */
     public function setScopeBase()
     {
-        $this->operation->setScope(QueryOperation::SCOPE['BASE']);
-
-        return $this;
+        return $this->setScope(QueryOperation::SCOPE['BASE']);
     }
 
     /**

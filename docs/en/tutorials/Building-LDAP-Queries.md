@@ -231,6 +231,12 @@ $rootDse = $lqb->where($lqb->filter()->present('objectClass'))
                 ->getSingleResult();
 ```
 
+------------------------
+#### setScope($scope)
+
+Explicitly set the scope for the query using the `QueryOperation::SCOPE` constant. The available options are:
+`QueryOperation::SCOPE['SUBTREE']`, `QueryOperation::SCOPE['ONELEVEL']`, `QueryOperation::SCOPE['BASE']`
+
 ------------------------ 
 #### orderBy($attribute, $direction = 'ASC')
 

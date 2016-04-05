@@ -193,6 +193,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->setScopeBase()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['BASE']);
         $this->setScopeOneLevel()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
         $this->setScopeSubTree()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['SUBTREE']);
+        $this->setScope(QueryOperation::SCOPE['BASE'])->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['BASE']);
     }
 
     function it_should_set_subtree_as_the_default_scope()
