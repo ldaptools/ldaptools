@@ -34,8 +34,8 @@ used when generating queries and returning data from LDAP.
 
 These are typical LDAP user objects.
 
-* *Type*: `LdapObjectType::USER`
-* *Filter*: `(&(objectClass=user)(objectCategory=person))`
+* **Type**: `LdapObjectType::USER`
+* **Filter**: `(&(objectClass=user)(objectCategory=person))`
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
