@@ -45,11 +45,10 @@ available methods and the [cookbook](/docs/en/cookbook/Common-LDAP-Queries.md) f
 // Get an instance of the query...
 $query = $ldap->buildLdapQuery();
 
-// Returns a `LdapObjectCollection` of all users whose first name 
+// Returns a LdapObjectCollection of all users whose first name 
 // starts with 'Foo' and last name is 'Bar' or 'Smith'.
 // The result set will also be ordered by state name (ascending).
-$users = $query->select()
-    ->fromUsers()
+$users = $query->fromUsers()
     ->where($query->filter()->startsWith('firstName', 'Foo'))
     ->orWhere(['lastName' => 'Bar'])
     ->orWhere(['lastName' => 'Smith'])
@@ -62,9 +61,9 @@ foreach ($users as $user) {
     echo "User: ".$user->getUsername();
 }
 
-// Get a single LDAP object...
+// Get a single LDAP object and select some specific attributes...
 $user = $ldap->buildLdapQuery()
-    ->select()
+    ->select(['upn', 'guid', 'sid', 'passwordLastSet'])
     ->fromUsers()
     ->where(['username' => 'chad'])
     ->getLdapQuery()
