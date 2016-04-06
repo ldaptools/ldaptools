@@ -114,10 +114,15 @@ class OperationHydrator extends ArrayHydrator
         if ($operation->getFilter() instanceof OperatorCollection) {
             $this->convertValuesToLdap($operation->getFilter());
         }
+
         // If null then we default to the domain config or the explicitly set value...
         if (!is_null($this->schema->getUsePaging())) {
             $operation->setUsePaging($this->schema->getUsePaging());
         }
+        if (!is_null($this->schema->getScope())) {
+            $operation->setScope($this->schema->getScope());
+        }
+
         $operation->addControl(...$this->schema->getControls());
     }
 

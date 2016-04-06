@@ -12,6 +12,7 @@ namespace LdapTools\Schema\Parser;
 
 use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\SchemaParserException;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\ArrayToOperator;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -53,7 +54,8 @@ class SchemaYamlParser implements SchemaParserInterface
         'converter_options' => 'setConverterOptions',
         'multivalued_attributes' => 'setMultivaluedAttributes',
         'base_dn' => 'setBaseDn',
-        'paging' => 'setUsePaging', 
+        'paging' => 'setUsePaging',
+        'scope' => 'setScope',
     ];
 
     /**
@@ -142,15 +144,34 @@ class SchemaYamlParser implements SchemaParserInterface
             }
         }
 
-        if (!((bool)count(array_filter(array_keys($objectSchema['attributes']), 'is_string')))) {
-            throw new SchemaParserException('The attributes for a schema should be an associative array.');
-        }
+        $this->validateSchemaType($ldapObjectSchema, $objectSchema);
         $this->parseFilter($ldapObjectSchema, $objectSchema);
         $ldapObjectSchema->setAttributeMap($objectSchema['attributes']);
         $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
         $ldapObjectSchema->setControls(...$this->parseControls($objectSchema));
 
         return $ldapObjectSchema;
+    }
+
+    /**
+     * Validates some of the schema values to check that they are allowed.
+     * 
+     * @param LdapObjectSchema $schema
+     * @param array $schemaArray
+     * @throws SchemaParserException
+     */
+    protected function validateSchemaType(LdapObjectSchema $schema, array $schemaArray)
+    {
+        if (!((bool)count(array_filter(array_keys($schemaArray['attributes']), 'is_string')))) {
+            throw new SchemaParserException('The attributes for a schema should be an associative array.');
+        }
+        if ($schema->getScope() && !in_array($schema->getScope(), QueryOperation::SCOPE)) {
+            throw new SchemaParserException(sprintf(
+                'The scope "%s" is not valid. Valid types are: %s',
+                $schema->getScope(),
+                implode(', ', QueryOperation::SCOPE)
+            ));
+        }
     }
 
     /**

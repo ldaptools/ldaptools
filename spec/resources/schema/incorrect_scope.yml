@@ -1,0 +1,8 @@
+objects:
+    scope:
+        type: scope
+        filter:
+            eq: [ objectClass, foo ]
+        scope: foo
+        attributes:
+           foo: bar

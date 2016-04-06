@@ -280,6 +280,18 @@ the Query Builder instance.
 ```
 
 --------------------
+#### scope
+
+This is a string value that determines the scope of the query performed when searching for this type. Possible values
+are `subtree` (this is a recursive search), `onelevel` (this is a list search, only items located directly underneath 
+the `base_dn` are found), and `base` (this is a one-level search, only the object represented by the `base_dn` is found).
+
+```yaml
+    # Only look for items directly underneath the base_dn.
+    scope: onelevel
+```
+
+--------------------
 #### extends
 
 By using this option you can explicitly state to make a object type extend another object and inherit everything it

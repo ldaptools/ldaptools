@@ -384,3 +384,10 @@ objects:
         paging: false
         attributes:
            foo: bar
+    scope:
+        type: scope
+        filter:
+            eq: [ objectClass, foo ]
+        scope: onelevel
+        attributes:
+           foo: bar

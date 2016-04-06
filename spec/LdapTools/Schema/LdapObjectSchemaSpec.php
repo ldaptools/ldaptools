@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Schema;
 
 use LdapTools\Connection\LdapControl;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
@@ -264,6 +265,13 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->getUsePaging()->shouldBeNull();
         $this->setUsePaging(false);
         $this->getUsePaging()->shouldBeEqualTo(false);
+    }
+    
+    function it_should_set_the_scope()
+    {
+        $this->getScope()->shouldBeNull();
+        $this->setScope(QueryOperation::SCOPE['SUBTREE']);
+        $this->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['SUBTREE']);
     }
     
     function it_should_set_ldap_controls()

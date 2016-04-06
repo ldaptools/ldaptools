@@ -230,6 +230,20 @@ class OperationHydratorSpec extends ObjectBehavior
 
         $this->hydrateToLdap($operation)->getUsePaging()->shouldBeEqualTo(true);
     }
+
+    function it_should_set_the_scope_based_off_the_schema()
+    {
+        $operation = new QueryOperation('(foo=bar');
+
+        $this->setLdapObjectSchema($this->schema);
+        $this->setLdapConnection($this->connection);
+
+        $this->hydrateToLdap($operation)->getScope()->shouldBeEqualTo('subtree');
+
+        $this->schema->setScope(QueryOperation::SCOPE['ONELEVEL']);
+
+        $this->hydrateToLdap($operation)->getScope()->shouldBeEqualTo('onelevel');
+    }
     
     function it_should_only_support_an_operation_going_to_ldap()
     {

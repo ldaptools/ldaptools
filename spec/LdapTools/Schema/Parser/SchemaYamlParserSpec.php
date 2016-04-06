@@ -14,6 +14,7 @@ use LdapTools\Configuration;
 use LdapTools\Connection\LdapControl;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\SchemaParserException;
+use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -238,7 +239,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parseAll('example')->shouldBeArray();
-        $this->parseAll('example')->shouldHaveCount(12);
+        $this->parseAll('example')->shouldHaveCount(13);
         $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
     }
 
@@ -329,6 +330,20 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parse('example', 'paging')->getUsePaging()->shouldBeEqualTo(false);   
+    }
+
+    function it_should_parse_a_schema_object_with_the_scope_set()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'scope')->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
+    }
+
+    function it_should_throw_an_error_when_parsing_an_incorrect_scope()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->shouldThrow(new SchemaParserException('The scope "foo" is not valid. Valid types are: subtree, onelevel, base'))->duringParse('incorrect_scope', 'scope');
     }
     
     function getMatchers()

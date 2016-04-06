@@ -108,6 +108,11 @@ class LdapObjectSchema implements CacheableItemInterface
     protected $usePaging;
 
     /**
+     * @var string|null
+     */
+    protected $scope;
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -554,5 +559,28 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getUsePaging()
     {
         return $this->usePaging;
+    }
+
+    /**
+     * Set the scope of the search for queries using this type.
+     * 
+     * @param string|null $scope
+     * @return $this
+     */
+    public function setScope($scope)
+    {
+        $this->scope = $scope;
+        
+        return $this;
+    }
+
+    /**
+     * Get the scope of the search for queries using this type.
+     * 
+     * @return null|string
+     */
+    public function getScope()
+    {
+        return $this->scope;
     }
 }
