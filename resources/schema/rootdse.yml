@@ -1,7 +1,11 @@
 objects:
     general:
         type: generic
-        class: '*'
+        filter:
+            present: objectClass
+        base_dn: ''
+        paging: false
+        scope: base
         attributes:
             configurationNamingContext: configurationNamingContext
             defaultNamingContext: defaultNamingContext

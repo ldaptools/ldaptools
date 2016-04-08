@@ -72,7 +72,6 @@ class RootDse
      */
     public function get()
     {
-        $usePaging = $this->connection->getConfig()->getUsePaging();
         $anonymous = !$this->connection->isBound();
 
         try {
@@ -81,7 +80,6 @@ class RootDse
             throw new LdapConnectionException(sprintf('Unable to query the RootDSE. %s', $e->getMessage()));
         } finally {
             // Make sure to set things back to how they were...
-            $this->connection->getConfig()->setUsePaging($usePaging);
             if ($anonymous && $this->connection->isBound()) {
                 $this->connection->close();
             }
@@ -98,19 +96,11 @@ class RootDse
      */
     protected function doLdapQuery($anonymous)
     {
-        $this->connection->getConfig()->setUsePaging(false);
         if ($anonymous) {
             $this->connection->connect('', '', true);
         }
-
         $schema = $this->schemaFactory->get(self::SCHEMA_ROOTDSE_NAME, $this->connection->getConfig()->getLdapType());
-        $lqb = new LdapQueryBuilder($this->connection);
-        $query = $lqb->select('*')
-            ->where($lqb->filter()->present('objectClass'))
-            ->setBaseDn('')
-            ->setScopeBase()
-            ->getLdapQuery();
-
-        return $query->setLdapObjectSchemas($schema)->getSingleResult();
+        
+        return (new LdapQueryBuilder($this->connection))->from($schema)->select('*')->getLdapQuery()->getSingleResult();
     }
 }
