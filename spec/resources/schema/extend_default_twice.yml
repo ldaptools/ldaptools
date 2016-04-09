@@ -1,0 +1,9 @@
+extends_default: ad
+objects:
+    root_dse:
+        extends_default: [ rootdse, ad ]
+        type: CustomRootDSE
+        paging: true
+        base_dn: 'foo'
+        attributes:
+            foo: bar

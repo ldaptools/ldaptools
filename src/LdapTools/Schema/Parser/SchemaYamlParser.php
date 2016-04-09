@@ -130,25 +130,22 @@ class SchemaYamlParser implements SchemaParserInterface
      */
     protected function parseYamlForObject(array $schema, $schemaName, $objectType)
     {
-        if (!array_key_exists('objects', $schema)) {
-            throw new SchemaParserException('Cannot find the "objects" section in the schema file.');
-        }
         $objectSchema = $this->getObjectFromSchema($schema, $objectType);
         $objectSchema = $this->mergeAnyExtendedSchemas($objectSchema, $schemaName);
-        $this->validateObjectSchema($objectSchema, $objectType);
+        $objectSchema = $this->cleanObjectArray($objectSchema);
+        $this->updateObjectArray($schemaName, $objectSchema);
+        
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectType);
-
         foreach ($this->optionMap as $option => $setter) {
             if (array_key_exists($option, $objectSchema)) {
                 $ldapObjectSchema->$setter($objectSchema[$option]);
             }
         }
-
-        $this->validateSchemaType($ldapObjectSchema, $objectSchema);
-        $this->parseFilter($ldapObjectSchema, $objectSchema);
-        $ldapObjectSchema->setAttributeMap($objectSchema['attributes']);
+        $ldapObjectSchema->setFilter($this->parseFilter($ldapObjectSchema, $objectSchema));
+        $ldapObjectSchema->setAttributeMap(isset($objectSchema['attributes']) ? $objectSchema['attributes'] : []);
         $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
         $ldapObjectSchema->setControls(...$this->parseControls($objectSchema));
+        $this->validateObjectSchema($ldapObjectSchema);
 
         return $ldapObjectSchema;
     }
@@ -198,6 +195,35 @@ class SchemaYamlParser implements SchemaParserInterface
     }
 
     /**
+     * Update the object in the schema array in case it extended a different object type.
+     *
+     * @param string $schemaName
+     * @param array $schemaObject
+     */
+    protected function updateObjectArray($schemaName, $schemaObject)
+    {
+        foreach ($this->schemas[$this->schemaFolder][$schemaName]['objects'] as $name => $value) {
+            if (array_key_exists('type', $value) && $value['type'] == $schemaObject['type']) {
+                $this->schemas[$this->schemaFolder][$schemaName]['objects'][$name] = $schemaObject;
+            }
+        }
+    }
+
+    /**
+     * Removes certain keys so they don't get parsed again.
+     *
+     * @param array $schemaObject
+     * @return array
+     */
+    protected function cleanObjectArray(array $schemaObject)
+    {
+        unset($schemaObject['extends']);
+        unset($schemaObject['extends_default']);
+        
+        return $schemaObject;
+    }
+
+    /**
      * Parse the converters section of an object schema definition to generate the attribute converter map.
      *
      * @param array $objectSchema
@@ -223,16 +249,26 @@ class SchemaYamlParser implements SchemaParserInterface
     }
 
     /**
-     * Add the filter to the schema object.
-     * 
+     * Get the filter for the schema object.
+     *
      * @param LdapObjectSchema $objectSchema
      * @param array $objectArray
+     * @return \LdapTools\Query\Operator\BaseOperator
+     * @throws SchemaParserException
      */
     protected function parseFilter(LdapObjectSchema $objectSchema, array $objectArray)
     {
         $filter = array_key_exists('filter', $objectArray) ? $objectArray['filter'] : [];
-
-        $objectSchema->setFilter($this->arrayToOp->getOperatorForSchema($objectSchema, $filter));
+        
+        if (empty($filter) && empty($objectSchema->getObjectClass()) && empty($objectSchema->getObjectCategory())) {
+            throw new SchemaParserException(sprintf(
+                'Object type "%s" must have one of the following defined: %s',
+                $objectSchema->getObjectType(),
+                implode(', ', ['class', 'category', 'filter'])
+            ));
+        }
+        
+        return $this->arrayToOp->getOperatorForSchema($objectSchema, $filter);
     }
 
     /**
@@ -259,23 +295,23 @@ class SchemaYamlParser implements SchemaParserInterface
     /**
      * Validate that an object schema meets the minimum requirements.
      *
-     * @param array $objectSchema
-     * @param string $objectType
+     * @param LdapObjectSchema $schema
      * @throws SchemaParserException
      */
-    protected function validateObjectSchema($objectSchema, $objectType)
+    protected function validateObjectSchema($schema)
     {
-        $oneRequired = ['class', 'category', 'filter'];
-        
-        if (count(array_diff($oneRequired, array_keys($objectSchema))) == 3) {
-            throw new SchemaParserException(sprintf(
-                'Object type "%s" must have one of the following defined: %s',
-                $objectType,
-                implode(', ', $oneRequired)
-            ));
+        if (empty($schema->getAttributeMap())) {
+            throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $schema->getObjectType()));
+        } elseif (!((bool)count(array_filter(array_keys($schema->getAttributeMap()), 'is_string')))) {
+            throw new SchemaParserException('The attributes for a schema should be an associative array.');
         }
-        if (!array_key_exists('attributes', $objectSchema) || empty($objectSchema['attributes'])) {
-            throw new SchemaParserException(sprintf('Object type "%s" has no attributes defined.', $objectType));
+        
+        if ($schema->getScope() && !in_array($schema->getScope(), QueryOperation::SCOPE)) {
+            throw new SchemaParserException(sprintf(
+                'The scope "%s" is not valid. Valid types are: %s',
+                $schema->getScope(),
+                implode(', ', QueryOperation::SCOPE)
+            ));
         }
     }
 
@@ -296,6 +332,13 @@ class SchemaYamlParser implements SchemaParserInterface
             }
             $this->mergeDefaultSchemaFile($schemaName);
             $this->mergeIncludedSchemas($schemaName);
+            if (!array_key_exists('objects', $this->schemas[$this->schemaFolder][$schemaName])) {
+                throw new SchemaParserException(sprintf(
+                    'Cannot find the "objects" section in the schema "%s" in "%s".',
+                    $schemaName,
+                    $this->schemaFolder
+                ));
+            }
         }
     }
 
@@ -317,7 +360,7 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         foreach ($include['include'] as $schema) {
-            $this->parseSchemaNameToArray($schema);
+            $this->parseAll($schema);
             $this->schemas[$this->schemaFolder][$schemaName]['objects'] = array_merge(
                 $this->schemas[$this->schemaFolder][$schemaName]['objects'],
                 $this->schemas[$this->schemaFolder][$schema]['objects']
@@ -327,7 +370,7 @@ class SchemaYamlParser implements SchemaParserInterface
         $folder = $this->schemaFolder;
         $this->schemaFolder = $this->defaultSchemaFolder;
         foreach ($include['include_default'] as $schema) {
-            $this->parseSchemaNameToArray($schema);
+            $this->parseAll($schema);
             $this->schemas[$folder][$schemaName]['objects'] = array_merge(
                 $this->schemas[$folder][$schemaName]['objects'],
                 $this->schemas[$this->schemaFolder][$schema]['objects']
@@ -351,7 +394,7 @@ class SchemaYamlParser implements SchemaParserInterface
         $folder = $this->schemaFolder;
 
         $this->schemaFolder = $this->defaultSchemaFolder;
-        $this->parseSchemaNameToArray($defaultSchemaName);
+        $this->parseAll($defaultSchemaName);
         // Perhaps an option at some point to specify the merge action/type? ie. replace vs merge.
         $this->schemas[$folder][$schemaName] = array_merge_recursive(
             $this->schemas[$this->schemaFolder][$defaultSchemaName],
@@ -375,7 +418,26 @@ class SchemaYamlParser implements SchemaParserInterface
             return $objectSchema;
         }
 
-        return array_merge_recursive($this->getParentSchemaObject($objectSchema, $schemaName), $objectSchema);
+        return $this->mergeSchemaObjectArrays($this->getParentSchemaObject($objectSchema, $schemaName), $objectSchema);
+    }
+
+    /**
+     * Performs the logic for merging one schema object array with another.
+     * 
+     * @param array $parent The parent schema object being extended.
+     * @param array $schema The base schema object being defined.
+     * @return array
+     */
+    protected function mergeSchemaObjectArrays($parent, $schema) {
+        // Directives used that exist in the schema being extended, that are arrays, should be merged.
+        foreach (array_intersect_key($schema, $parent) as $key => $value) {
+            if (is_array($value)) {
+                $schema[$key] = array_merge_recursive($parent[$key], $value);
+            }
+        }
+        
+        // Directives in the parent that have not been defined should be added.
+        return array_replace($schema, array_diff_key($parent, $schema));
     }
 
     /**
@@ -395,9 +457,9 @@ class SchemaYamlParser implements SchemaParserInterface
         $folder = $this->schemaFolder;
         $this->schemaFolder = $this->defaultSchemaFolder;
 
-        $this->parseSchemaNameToArray(reset($objectSchema['extends_default']));
+        $this->parseAll(reset($objectSchema['extends_default']));
         $parent = $this->getObjectFromSchema(
-            $this->schemas[$this->defaultSchemaFolder][reset($objectSchema['extends_default'])],
+            $this->schemas[$this->defaultSchemaFolder][$objectSchema['extends_default'][0]],
             $objectSchema['extends_default'][1]
         );
 
@@ -423,7 +485,7 @@ class SchemaYamlParser implements SchemaParserInterface
         } elseif (isset($objectSchema['extends']) && is_array($objectSchema['extends']) && 2 == count($objectSchema['extends'])) {
             $name = reset($objectSchema['extends']);
             $type = $objectSchema[1];
-            $this->parseSchemaNameToArray($name);
+            $this->parseAll($name);
             $parent = $this->getObjectFromSchema($this->schemas[$this->schemaFolder][$name], $type);
         } else {
             throw new SchemaParserException('The directive "extends" must be a string or array with exactly 2 values.');

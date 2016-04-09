@@ -60,9 +60,11 @@ class SchemaYamlParserSpec extends ObjectBehavior
     }
 
     function it_should_throw_a_SchemaParserException_when_the_schema_is_missing_an_objects_definition(){
-        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+        $folder = __DIR__.'/../../../resources/schema';
+        $schema = 'no_objects';
+        $this->beConstructedWith($folder);
 
-        $this->shouldThrow(new SchemaParserException('Cannot find the "objects" section in the schema file.'))->duringParse(
+        $this->shouldThrow(new SchemaParserException('Cannot find the "objects" section in the schema "'.$schema.'" in "'.$folder.'".'))->duringParse(
             'no_objects',
             'user'
         );
@@ -344,6 +346,17 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->shouldThrow(new SchemaParserException('The scope "foo" is not valid. Valid types are: subtree, onelevel, base'))->duringParse('incorrect_scope', 'scope');
+    }
+
+    function it_should_parse_a_schema_that_extends_a_default_schema_with_a_type_that_extends_a_different_default_schema()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=*))');
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getUsePaging()->shouldBeEqualTo(true);
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldContain('bar');
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldContain('defaultNamingContext');
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldHaveKey('foo');
     }
     
     function getMatchers()
