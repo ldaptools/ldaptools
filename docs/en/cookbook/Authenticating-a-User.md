@@ -43,7 +43,7 @@ failed. This information is possible to get by passing additional optional varia
 ```php
  
 // With your LdapManager class already instantiated...
-if ($ldapManager->authenticate($username, $password, $message, $code)) {
+if (!$ldapManager->authenticate($username, $password, $message, $code)) {
      echo "Error ($code): $message";
 }
 ```
