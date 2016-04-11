@@ -34,9 +34,9 @@ A repository object lets you easily query specific attributes for a LDAP object 
 or many results. You can also define your own custom repository for a LDAP type to encapsulate an reuse your queries.
  
 ```php
-use LdapTools\Object\LdapObjectTypes;
+use LdapTools\Object\LdapObjectType;
 
-$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+$repository = $ldap->getRepository(LdapObjectType::USER);
 
 // Retrieve the user that has a specific GUID.
 $user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
@@ -56,13 +56,13 @@ If you have multiple domains defined in your configuration, you can easily switc
 
 ```php
 // Now calls to 'getRepository', 'buildLdapQuery', etc will return objects that execute in the context of this domain.
-$query = $ldapManager->switchDomain('example.local')->buildLdapQuery();
+$query = $ldap->switchDomain('example.local')->buildLdapQuery();
 
 // Will return 'example.local'
-$ldapManager->getDomainContext();
+$ldap->getDomainContext();
 
 // Switch back to the other domain...
-$ldapManager->switchDomain('foo.bar');
+$ldap->switchDomain('foo.bar');
 ```
 
 ### Getting The LdapConnection
@@ -105,9 +105,9 @@ Using the `LdapManager` class you can save changes to LDAP users you have search
 `persist($ldapObject)` method.
 
 ```php
-use LdapTools\Object\LdapObjectTypes;
+use LdapTools\Object\LdapObjectType;
 
-$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+$repository = $ldap->getRepository(LdapObjectType::USER);
 
 // Retrieve the user that has a specific GUID.
 $user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
@@ -117,7 +117,7 @@ $user->setCity('Milwaukee');
 
 // Save the changes back to LDAP using the persist method...
 try {
-    $ldapManager->persist($user);
+    $ldap->persist($user);
 } catch (\Exception $e) {
     echo "Error saving object to LDAP: ".$e->getMessage();
 }
@@ -132,16 +132,16 @@ recursively delete a LDAP object (including anything beneath it) pass `true` to 
 A simple deletion:
 
 ```php
-use LdapTools\Object\LdapObjectTypes;
+use LdapTools\Object\LdapObjectType;
 
-$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+$repository = $ldap->getRepository(LdapObjectType::USER);
 
 // Retrieve the user that has a specific GUID.
 $user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
 
 // Delete the object from LDAP...
 try {
-    $ldapManager->delete($user);
+    $ldap->delete($user);
 } catch (\Exception $e) {
     echo "Error deleting object from LDAP: ".$e->getMessage();
 }
@@ -150,16 +150,16 @@ try {
 Recursively deleting an OU and anything beneath it:
 
 ```php
-use LdapTools\Object\LdapObjectTypes;
+use LdapTools\Object\LdapObjectType;
 
-$repository = $ldapManager->getRepository(LdapObjectTypes::OU);
+$repository = $ldap->getRepository(LdapObjectType::OU);
 
 // Retrieve the user that has a specific GUID.
 $ou = $repository->findOneByName('Consultants');
 
 // Delete the OU, along with anything beneath it...
 try {
-    $ldapManager->delete($ou, true);
+    $ldap->delete($ou, true);
 } catch (\Exception $e) {
     echo "Error deleting OU: ".$e->getMessage();
 }
@@ -173,16 +173,16 @@ to call `move($ldapObject, $container)`. All this requires is you pass the exist
 of the OU/container in standard DN form:
 
 ```php
-use LdapTools\Object\LdapObjectTypes;
+use LdapTools\Object\LdapObjectType;
 
-$repository = $ldapManager->getRepository(LdapObjectTypes::USER);
+$repository = $ldap->getRepository(LdapObjectType::USER);
 
 // Retrieve the user that has a specific GUID.
 $user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
 
 // Move the object to a new OU...
 try {
-    $ldapManager->move($user, 'ou=Employees,dc=example,dc=local');
+    $ldap->move($user, 'ou=Employees,dc=example,dc=local');
 } catch (\Exception $e) {
     echo "Error moving object: ".$e->getMessage();
 }
