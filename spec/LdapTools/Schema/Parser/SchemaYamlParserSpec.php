@@ -241,7 +241,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parseAll('example')->shouldBeArray();
-        $this->parseAll('example')->shouldHaveCount(13);
+        $this->parseAll('example')->shouldHaveCount(14);
         $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
     }
 

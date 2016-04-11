@@ -11,6 +11,8 @@ use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapObjectEvent;
 use LdapTools\Event\LdapObjectMoveEvent;
+use LdapTools\Event\LdapObjectRestoreEvent;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Factory\LdapObjectSchemaFactory;
@@ -73,13 +75,15 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Object\LdapObjectManager');
     }
 
-    function it_should_error_on_update_or_delete_if_the_dn_is_not_set()
+    function it_should_error_on_update_delete_move_or_restore_if_the_dn_is_not_set()
     {
         $ldapObject = new LdapObject(['foo' => 'bar'], [], 'user', 'user');
         $ldapObject->set('foo', 'foobar');
 
         $this->shouldThrow('\InvalidArgumentException')->duringPersist($ldapObject);
         $this->shouldThrow('\InvalidArgumentException')->duringDelete($ldapObject);
+        $this->shouldThrow('\InvalidArgumentException')->duringRestore($ldapObject);
+        $this->shouldThrow('\InvalidArgumentException')->duringMove($ldapObject, 'dc=foo,dc=bar');
     }
 
     function it_should_delete_a_ldap_object_from_its_dn()
@@ -159,6 +163,47 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
+    function it_should_restore_a_ldap_object_using_restore()
+    {
+        $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
+
+        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+
+        $this->connection->execute(Argument::that(function($operation) use ($dn) {
+            /** @var BatchModifyOperation $operation */
+            $batches = $operation->getBatchCollection()->toArray();
+
+            return $batches[0]->isTypeRemoveAll() && $batches[0]->getAttribute() == 'isDeleted'
+                && $batches[1]->isTypeReplace() && $batches[1]->getAttribute() == 'distinguishedName'
+                && $batches[1]->getValues() == ['cn=foo,cn=Users,dc=example,dc=local']
+                && $operation->getDn() == $dn;
+        }))->shouldBeCalled();
+        $this->restore($ldapObject1);
+
+        $this->connection->execute(Argument::that(function($operation) use ($dn) {
+            /** @var BatchModifyOperation $operation */
+            $batches = $operation->getBatchCollection()->toArray();
+
+            return $batches[0]->isTypeRemoveAll() && $batches[0]->getAttribute() == 'isDeleted'
+                && $batches[1]->isTypeReplace() && $batches[1]->getAttribute() == 'distinguishedName'
+                && $batches[1]->getValues() == ['cn=foo,ou=Employees,dc=example,dc=local']
+                && $operation->getDn() == $dn;
+        }))->shouldBeCalled();
+        $this->restore($ldapObject2, 'ou=Employees,dc=example,dc=local');
+    }
+
+    function it_should_error_on_restore_if_the_last_known_location_cannot_be_found_and_none_was_specified()
+    {
+        $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
+        $ldapObject = new LdapObject(['dn' => $dn],['deleted'], 'deleted', 'deleted');
+
+        $this->connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldBeCalled()->willReturn(['count' => 0]);
+        $this->connection->getRootDse()->willReturn(new LdapObject(['defaultNamingContext' => 'dc=foo,dc=bar']));
+
+        $this->shouldThrow(new InvalidArgumentException('No restore location specified and cannot find the last known location for "'.$dn.'".'))->duringRestore($ldapObject);
+    }
+    
     function it_should_not_query_ldap_for_the_RDN_when_moving_an_object_and_the_name_attribute_was_not_selected()
     {
         $this->connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldNotBeCalled();
@@ -235,6 +280,25 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
         $this->persist($ldapObject);
+    }
+
+    /**
+     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
+     */
+    function it_should_call_the_event_dispatcher_restore_events_when_restoring_an_object($dispatcher)
+    {
+        $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
+        $ldapObject = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        
+        $beforeEvent = new LdapObjectRestoreEvent(Event::LDAP_OBJECT_BEFORE_RESTORE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
+        $afterEvent = new LdapObjectRestoreEvent(Event::LDAP_OBJECT_AFTER_RESTORE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
+
+        $this->connection->execute(Argument::type('\LdapTools\Operation\BatchModifyOperation'))->willReturn(true);
+        $dispatcher->dispatch($beforeEvent)->shouldBeCalled();
+        $dispatcher->dispatch($afterEvent)->shouldBeCalled();
+        $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
+
+        $this->restore($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
     function it_should_not_try_to_modify_an_ldap_object_that_has_not_changed()

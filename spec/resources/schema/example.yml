@@ -391,3 +391,51 @@ objects:
         scope: onelevel
         attributes:
            foo: bar
+    deleted:
+        type: deleted
+        filter:
+            eq: [ isDeleted, true ]
+            present: lastKnownLocation
+        controls:
+            - [ 1.2.840.113556.1.4.417, true ]
+        paging: false
+        base_dn: "CN=Deleted Objects,%_defaultNamingContext_%"
+        converters:
+             bool:
+                 - 'isDeleted'
+             ldap_type:
+                 - 'type'
+             windows_guid:
+                 - 'guid'
+             windows_sid:
+                 - 'sid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        converter_options:
+            ldap_type:
+                user: [ top, person, organizationalPerson, user ]
+                group: [ top, group ]
+                computer: [ top, person, organizationalPerson, user, computer ]
+                contact: [ top, person, organizationalPerson, contact ]
+                ou: [ top, organizationalUnit ]
+        attributes:
+            created: whenCreated
+            dn: distinguishedName
+            firstName: givenName
+            lastName: sn
+            guid: objectGuid
+            isDeleted: isDeleted
+            lastKnownLocation: lastKnownParent
+            lastKnownName: msds-lastKnownRdn
+            modified: whenChanged
+            name: cn
+            sid: objectSid
+            type: objectClass
+            upn: userPrincipalName
+        attributes_to_select:
+            - 'name'
+            - 'guid'
+            - 'lastKnownLocation'
+            - 'lastKnownName'
+            - 'sid'

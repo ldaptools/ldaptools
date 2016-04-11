@@ -13,11 +13,11 @@ namespace LdapTools\Event;
 use LdapTools\Object\LdapObject;
 
 /**
- * An event for when a LDAP object is moved.
- *
+ * This event represents a LDAP object being restored.
+ * 
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class LdapObjectMoveEvent extends LdapObjectEvent
+class LdapObjectRestoreEvent extends LdapObjectEvent
 {
     use MoveEventTrait;
 
@@ -26,7 +26,7 @@ class LdapObjectMoveEvent extends LdapObjectEvent
      * @param LdapObject $object
      * @param string $container
      */
-    public function __construct($eventName, LdapObject $object, $container)
+    public function __construct($eventName, LdapObject $object, $container = null)
     {
         $this->container = $container;
         parent::__construct($eventName, $object);

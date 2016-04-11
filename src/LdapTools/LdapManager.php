@@ -277,6 +277,20 @@ class LdapManager
     }
 
     /**
+     * Restore a deleted LDAP object. Optionally specify where to restore it to (full DN of a container/OU).
+     *
+     * @param LdapObject $ldapObject
+     * @param string|null $container The container/OU in DN format of where it should be restored to.
+     * @return $this
+     */
+    public function restore(LdapObject $ldapObject, $container = null)
+    {
+        $this->getObjectManager()->restore($ldapObject, $container);
+
+        return $this;
+    }
+    
+    /**
      * A shorthand method for verifying a username/password combination against LDAP. Optionally you can pass a variable
      * to store the error message or error number returned from LDAP for more detailed information on authentication
      * failures.

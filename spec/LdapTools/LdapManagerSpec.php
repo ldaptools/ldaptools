@@ -15,6 +15,7 @@ use LdapTools\Connection\LdapControlType;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\AuthenticationResponse;
+use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -252,6 +253,42 @@ class LdapManagerSpec extends ObjectBehavior
         $connection->execute($operation)->shouldBeCalled();
 
         $this->delete($ldapObject, true);
+    }
+
+    /**
+     * @param \LdapTools\Connection\LdapConnectionInterface $connection
+     */
+    function it_should_restore_a_ldap_object($connection)
+    {
+        $domainConfig = new DomainConfiguration('example.local');
+        $connection->getConfig()->willReturn($domainConfig);
+        $this->beConstructedWith(new Configuration(), $connection);
+        $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
+
+        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            /** @var BatchModifyOperation $operation */
+            $batches = $operation->getBatchCollection()->toArray();
+            
+            return $batches[0]->isTypeRemoveAll() && $batches[0]->getAttribute() == 'isDeleted'
+                && $batches[1]->isTypeReplace() && $batches[1]->getAttribute() == 'distinguishedName'
+                && $batches[1]->getValues() == ['cn=foo,cn=Users,dc=example,dc=local']
+                && $operation->getDn() == $dn;
+        }))->shouldBeCalled();
+        $this->restore($ldapObject1);
+        
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            /** @var BatchModifyOperation $operation */
+            $batches = $operation->getBatchCollection()->toArray();
+
+            return $batches[0]->isTypeRemoveAll() && $batches[0]->getAttribute() == 'isDeleted'
+                && $batches[1]->isTypeReplace() && $batches[1]->getAttribute() == 'distinguishedName'
+                && $batches[1]->getValues() == ['cn=foo,ou=Employees,dc=example,dc=local']
+                && $operation->getDn() == $dn;
+        }))->shouldBeCalled();
+        $this->restore($ldapObject2, 'ou=Employees,dc=example,dc=local');
     }
 
     function it_should_get_a_ldif_object()

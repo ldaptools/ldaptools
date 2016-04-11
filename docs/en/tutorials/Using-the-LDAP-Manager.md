@@ -187,3 +187,26 @@ try {
     echo "Error moving object: ".$e->getMessage();
 }
 ```
+
+### Restoring LDAP Objects
+-----------------------
+
+Using the `LdapManager` class you can restore a deleted LDAP object. The method for doing this is `restore($ldapObject)`
+However, this is currently only supported when you are using Active Directory. This requires that you first search for
+the LDAP object you want to restore using the `LdapObjectType::DELETED` type then passing it to the restore method:
+
+```php
+use LdapTools\Object\LdapObjectType;
+
+$repository = $ldap->getRepository(LdapObjectType::DELETED);
+
+// Retrieve the deleted LDAP object by its original GUID
+$ldapObject = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
+
+// Restore the LDAP object to its original location
+try {
+    $ldap->restore($ldapObject);
+} catch (\Exception $e) {
+    echo "Unable to restore LDAP object: ".$e->getMessage();
+}
+```

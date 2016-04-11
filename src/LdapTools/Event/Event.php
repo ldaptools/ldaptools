@@ -58,6 +58,16 @@ abstract class Event implements EventInterface
     const LDAP_OBJECT_AFTER_CREATE = 'ldap.object.after_create';
 
     /**
+     * Occurs before restoring an object in LDAP.
+     */
+    const LDAP_OBJECT_BEFORE_RESTORE = 'ldap.object.before_restore';
+
+    /**
+     * Occurs after restoring an object in LDAP.
+     */
+    const LDAP_OBJECT_AFTER_RESTORE = 'ldap.object.after_restore';
+    
+    /**
      * Occurs when a LDAP object schema is loaded and before it is cached.
      */
     const LDAP_SCHEMA_LOAD = 'ldap.schema.load';
@@ -86,7 +96,6 @@ abstract class Event implements EventInterface
      * @var string The event name.
      */
     protected $name;
-
 
     /**
      * @param string $name

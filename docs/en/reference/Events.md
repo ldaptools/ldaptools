@@ -92,6 +92,8 @@ are located in the `LdapTools\Event` namespace.
 | ldap.object.after_create | `LDAP_OBJECT_AFTER_CREATE` | `LdapObjectCreationEvent` | Triggered after an object is created in LDAP. Only triggered when using the `createLdapObject()` methods of the `LdapManager`. |
 | ldap.object.before_move | `LDAP_OBJECT_BEFORE_MOVE` | `LdapObjectMoveEvent` | Triggered before an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
 | ldap.object.after_move | `LDAP_OBJECT_AFTER_MOVE` | `LdapObjectMoveEvent` | Triggered after an object is moved in LDAP. Only triggered when using the `move()` method of the `LdapManager`. |
+| ldap.object.before_restore | `LDAP_OBJECT_BEFORE_RESTORE` | `LdapObjectRestoreEvent` | Triggered before an object is restored in LDAP. Only triggered when using the `restore()` method of the `LdapManager`. |
+| ldap.object.after_restore | `LDAP_OBJECT_AFTER_RESTORE` | `LdapObjectRestoreEvent` | Triggered after an object is restored in LDAP. Only triggered when using the `restore()` method of the `LdapManager`. |
 | ldap.schema.load | `LDAP_SCHEMA_LOAD` | `LdapObjectSchemaEvent` | Triggered when a LDAP object type schema is parsed, loaded, and before it gets cached. This allows you to modify the schema without creating your own file. |
 | ldap.authentication.before | `LDAP_AUTHENTICATION_BEFORE` | `LdapAuthenticationEvent` | Triggered before an LDAP authentication operation. Allows you to get the operation details before it is sent. |
 | ldap.authentication.after | `LDAP_AUTHENTICATION_AFTER` | `LdapAuthenticationEvent` | Triggered after an LDAP authentication operation. Allows you to get the result and any error messages/codes. |
@@ -223,6 +225,29 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_AUTHENTICATION_AFTER, funct
     
     if (!$response->isAuthenticated()) {
         echo "User '".$operation->getUsername()."' failed to login:".$response->getErrorMessage();
+    }
+});
+```
+
+## The LDAP Restore Event
+-----------------------------
+
+The LDAP object restore event has setters for `LDAP_OBJECT_BEFORE_RESTORE` so you can modify the container/OU before the 
+object is actually restored. You can also use the event's `getContainer()` method to check where the restored object is
+set to go. However, it may be null if no location was explicitly defined. You can also use the `getLdapObject()` of the
+event to check the LDAP object for a `lastKnownLocation`. For example:
+ 
+```php
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapObjectRestoreEvent;
+ 
+$ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_RESTORE, function(LdapObjectRestoreEvent $event) {
+    $ldapObject = $event->getLdapObject();
+    $container = $event->getContainer();
+     
+    if (!$container && $ldapObject->has('lastKnownLocation')) {
+        echo "Location: ".$ldapObject->get('lastKnownLocation');
+        // Do some other stuff...
     }
 });
 ```
