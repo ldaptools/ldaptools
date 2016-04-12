@@ -166,6 +166,29 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_MODIFY, funct
 
 The same `getLdapObject()` method used above is valid for deletion events as well.
 
+## The LDAP Object Restore Event
+-----------------------------
+
+The LDAP object restore event has setters for `LDAP_OBJECT_BEFORE_RESTORE` so you can modify the container/OU before the 
+object is actually restored. You can also use the event's `getContainer()` method to check where the restored object is
+set to go. However, it may be null if no location was explicitly defined. You can also use the `getLdapObject()` method
+of the event to check the LDAP object for a `lastKnownLocation` value. For example:
+ 
+```php
+use LdapTools\Event\Event;
+use LdapTools\Event\LdapObjectRestoreEvent;
+ 
+$ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_RESTORE, function(LdapObjectRestoreEvent $event) {
+    $ldapObject = $event->getLdapObject();
+    $container = $event->getContainer();
+     
+    if (!$container && $ldapObject->has('lastKnownLocation')) {
+        echo "Location: ".$ldapObject->get('lastKnownLocation');
+        // Do some other stuff...
+    }
+});
+```
+
 ## The LDAP Object Schema Event
 -------------------------------
 
@@ -225,29 +248,6 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_AUTHENTICATION_AFTER, funct
     
     if (!$response->isAuthenticated()) {
         echo "User '".$operation->getUsername()."' failed to login:".$response->getErrorMessage();
-    }
-});
-```
-
-## The LDAP Restore Event
------------------------------
-
-The LDAP object restore event has setters for `LDAP_OBJECT_BEFORE_RESTORE` so you can modify the container/OU before the 
-object is actually restored. You can also use the event's `getContainer()` method to check where the restored object is
-set to go. However, it may be null if no location was explicitly defined. You can also use the `getLdapObject()` of the
-event to check the LDAP object for a `lastKnownLocation`. For example:
- 
-```php
-use LdapTools\Event\Event;
-use LdapTools\Event\LdapObjectRestoreEvent;
- 
-$ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_RESTORE, function(LdapObjectRestoreEvent $event) {
-    $ldapObject = $event->getLdapObject();
-    $container = $event->getContainer();
-     
-    if (!$container && $ldapObject->has('lastKnownLocation')) {
-        echo "Location: ".$ldapObject->get('lastKnownLocation');
-        // Do some other stuff...
     }
 });
 ```
