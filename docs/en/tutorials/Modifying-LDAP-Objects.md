@@ -17,7 +17,7 @@ use LdapTools\Object\LdapObjectType;
 
 //...
 
-$repository = $ldapManager->getRepository(LdapObjectType::USER);
+$repository = $ldap->getRepository(LdapObjectType::USER);
 
 $user = $repository->findOneByUsername('chad');
 
@@ -46,7 +46,7 @@ if ($user->hasState('WI')) {
 
 // Now actually save the changes back to LDAP
 try {
-    $ldapManager->persist($user);
+    $ldap->persist($user);
 } catch (\Exception $e) {
     echo "Error updating user! ".$e->getMessage();
 }
@@ -96,15 +96,17 @@ scenes.
 Replaces any value that might exist in the attribute with the value you specify.
 
 ------------------------
-#### add($attribute, $value)
+#### add($attribute, ...$value)
 
-Adds a value to an attribute in addition to what it already may have. It will keep the existing value intact.
+Adds a value to an attribute in addition to what it already may have. It will keep the existing value intact. This
+method is also variadic, so you can pass as many values you want as arguments to this function.
 
 ------------------------
-#### remove($attribute, $value)
+#### remove($attribute, ...$value)
 
 Remove a specific value from an attribute. Be careful with this. If the value does not actually exist within the
-attribute then an exception will be thrown during persist. It's best to wrap persist in a try/catch block.
+attribute then an exception will be thrown during persist. It's best to wrap persist in a try/catch block. This
+method is also variadic, so you can pass as many values you want as arguments to this function.
 
 ------------------------
 #### reset($attribute)

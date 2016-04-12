@@ -8,7 +8,7 @@ It also supports setting parameters within attribute values to avoid repetition.
 To get an instance of the object creator class and create some objects:
 
 ```php
-$ldapObject = $ldapManager->createLdapObject();
+$ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
 $ldapObject->createUser()
@@ -50,7 +50,9 @@ the required attributes. You can use parameters to fill in attribute values base
 want. For instance:
 
 ```php
-$object->createContact()
+$ldapObject = $ldap->createLdapObject();
+
+$ldapObject->createContact()
     ->in('%OUPath%,%_defaultnamingcontext_%')
     ->with([
         'name' => '%firstname% %lastname%',
@@ -64,10 +66,9 @@ $object->createContact()
 ```
 
 This contains several parameters. All parameters start and end with a percentage symbol. The `%firstname%` and `%lastname%`
- parameters will populate their value with their corresponding attribute name. However, `%somedomain%` and `%OUPath%` do
- not correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` and
-`OU=Sales,OU=Departments`, respectively. With the OU/container value, the parameter must be explicitly specified it cannot
-currently be the value of one of the object's attributes.
+parameters will populate their value with their corresponding attribute name. However, `%somedomain%` and `%OUPath%` do
+not correspond to a known attribute, so the parameter must be defined. It will be filled in with `foo.bar` and
+`OU=Sales,OU=Departments`, respectively.
 
 There is also a special parameter for `%_domainname_%` and `%_defaultnamingcontext_%` when creating LDAP objects. The 
 `%_domainname_%` will resolve to the fully qualified domain name of the connection in the current context (ie. 
@@ -86,20 +87,20 @@ distinguished name form (ie. `ou=users,dc=mydomain,dc=com`).
 
 You can also specify a default location all objects of a certain type by defining the `default_container` directive in 
 your schema (see [the schema configuration reference](../reference/Schema-Configuration.md)). If you define that can omit this method.
-You can also place parameters in this value that will be resolved upon creation (ie. `%EmployeeOU%,DC=example,DC=com`).
-If you use a parameter in this value it must be explicitly specified. The parameter cannot currently be the value of one
-of the object's attributes.
+You can also place parameters in this value that will be resolved upon creation (ie. `OU=%department%,%EmployeeOU%,DC=example,DC=com`).
+You can use LDAP object attributes for parameters in this string as well.
 
 ------------------------
 #### with($attributes)
 
 This specifies the attributes and values you would like for the object to have once created in LDAP. All attribute values are
-converted and renamed to their proper LDAP form based on your schema.
+converted and renamed to their proper LDAP form based on your schema. To check the name mappings and expected value types
+see the [default schema attributes](../reference/Default-Schema-Attributes.md) documentation.
 
 ------------------------
 #### setDn($container)
 
-This method allows you to explicitly state the distinguished name for the object you are creating. Typically you should
+This method allows you to explicitly set the distinguished name for the object you are creating. Typically you should
 not have to call this. The DN is determined automatically based off the `name` attribute in your schema, and the
 location you specified with the `in($container)` method.
 
@@ -107,7 +108,9 @@ location you specified with the `in($container)` method.
 #### setParameter($name, $value)
 
 This allows you to set any parameter you want that you can later use within an attribute value to have it resolve to the
-parameter value. See the full explanation of parameters near the start of this document.
+parameter value. See the full explanation of parameters near the start of this document. If you simply want to use the
+value of a separate attribute name then there is no reason to set it here, as all attribute names you define values in
+are also available as parameters automatically.
 
 ------------------------
 #### createUser()
@@ -122,7 +125,7 @@ This specifies that the resulting object should be a group LDAP object type.
 ------------------------
 #### createOU()
 
-This specifies that the resulting object should be a OU LDAP object type.
+This specifies that the resulting object should be an OU LDAP object type.
 
 ------------------------
 #### createComputer()
@@ -159,11 +162,11 @@ use LdapTools\Exception\LdapConnectionException;
 
 $ldapObject = $ldapManager->createLdapObject();
 
-// Creating a user account (enabled by default)
+// Creating a user account (enabled by default) with a few group memberships
 try {
     $object->createUser()
         ->in('cn=Users,dc=example,dc=local')
-        ->with(['username' => 'jsmith', 'password' => '12345'])
+        ->with(['username' => 'jsmith', 'password' => '12345', 'groups' => ['Employees', 'IT Staff', 'VPN Users']])
         ->execute();
 } catch (LdapConnectionException $e) {
     echo "Failed to add user!".PHP_EOL;

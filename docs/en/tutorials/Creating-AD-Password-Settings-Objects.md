@@ -47,7 +47,7 @@ $ldap->createLdapObject()
         'minimumPasswordLength' => 12,
         'passwordComplexity' => true,
         'passwordHistoryLength' => 10,
-        'appliesTo' => 'Network Administrators'     // This can be the name of a security group.
+        'appliesTo' => 'Network Administrators'     // This can be the name, SID, or GUID of a security group
     ])
     ->execute();
 ```
