@@ -107,7 +107,7 @@ The above is the general method for creating a LDIF file. But there are a lot of
 Below is a summary of some of the objects and methods involved and how to use them.
 
 ------------------------
-### The Ldif Object
+### The LDIF Object
 
 The LDIF object is used to represent the LDIF file in its entirety. When you parse a LDIF file via the parser it returns
 this object. Likewise, you can construct a LDIF object to get the LDIF string representation from it.
@@ -124,7 +124,7 @@ $ldif->setVersion(null);
 // Add a few comments to appear at the top of the LDIF...
 $ldif->addComment('This is just a test LDIF file', 'Created on '.date("m.d.y"));
 
-// Create a new entry for the LDIF by use the helper 'entry()' method.
+// Create a new entry for the LDIF by using the helper 'entry()' method.
 // This creates an entry that will add a new object to LDAP.
 $entry = $ldif->entry()->add('cn=Some User,dc=example,dc=local')->addAttribute('sn', 'Sikorra');
 
@@ -197,10 +197,10 @@ $dn = 'cn=foo,dc=example,dc=local';
 // Construct it manually...
 $modify = new LdifEntryModify($dn);
 
-$modify->replace('description', 'Works at building 2') // Complete replace the contents of an attribute.
-    ->reset('title')                                   // Reset the attribute, which removes an value it has.
+$modify->replace('description', 'Works at building 2') // Replace the contents of an attribute.
+    ->reset('title')                                   // Reset the attribute, which removes any value it has.
     ->add('telephonenumber', '555-5555')               // Add a new value to an attribute.
-    ->delete('faxnumber', '222-2222');                 // Delete a specific attribute value. The value must exist though.
+    ->delete('faxnumber', '222-2222');                 // Delete a specific attribute value. The value must exist.
 
 // Use the helper method on the LDIF object...
 $modify = $ldif->entry()->modify($dn)
