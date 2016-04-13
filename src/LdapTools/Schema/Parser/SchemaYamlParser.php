@@ -428,7 +428,8 @@ class SchemaYamlParser implements SchemaParserInterface
      * @param array $schema The base schema object being defined.
      * @return array
      */
-    protected function mergeSchemaObjectArrays($parent, $schema) {
+    protected function mergeSchemaObjectArrays($parent, $schema)
+    {
         // Directives used that exist in the schema being extended, that are arrays, should be merged.
         foreach (array_intersect_key($schema, $parent) as $key => $value) {
             if (is_array($value)) {

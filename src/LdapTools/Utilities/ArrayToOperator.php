@@ -180,7 +180,7 @@ class ArrayToOperator
         foreach ($filter as $key => $value) {
             if (is_numeric($key) && is_array($value)) {
                 foreach ($this->parseFilterToOperators($value) as $op) {
-                    $operators[] = $op;   
+                    $operators[] = $op;
                 }
             } else {
                 $operators[] = $this->processOperatorAndArguments($key, $value);

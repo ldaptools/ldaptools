@@ -175,7 +175,7 @@ class LdapObjectManager
         $operation = new BatchModifyOperation($dn, $ldapObject->getBatchCollection());
         $this->hydrateOperation($operation, $ldapObject->getType());
         $this->connection->execute($operation);
-        $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));        
+        $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
     }
     
     /**

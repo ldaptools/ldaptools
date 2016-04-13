@@ -97,7 +97,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
         if ($this->getOperationType() == AttributeConverterInterface::TYPE_CREATE) {
             /** @var AddOperation $parentOp */
             $parentOp = $this->getOperation();
-            $valueDn = function() use ($parentOp) {
+            $valueDn = function () use ($parentOp) {
                 return $parentOp->getDn();
             };
         }
@@ -112,7 +112,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
      */
     protected function shouldRemoveCurrentGroups()
     {
-        return $this->getOperationType() == self::TYPE_MODIFY 
+        return $this->getOperationType() == self::TYPE_MODIFY
             && ($this->getBatch()->isTypeRemoveAll() || $this->getBatch()->isTypeReplace());
     }
 

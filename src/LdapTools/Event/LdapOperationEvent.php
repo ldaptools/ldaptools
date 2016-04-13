@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\Event;
+
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Operation\LdapOperationInterface;
 
