@@ -47,6 +47,7 @@ class AttributeConverterFactory
         'group_membership' => '\LdapTools\AttributeConverter\ConvertGroupMembership',
         'exchange_version' => '\LdapTools\AttributeConverter\ConvertExchangeVersion',
         'exchange_roles' => '\LdapTools\AttributeConverter\ConvertExchangeRoles',
+        'ldap_type' => '\LdapTools\AttributeConverter\ConvertLdapObjectType',
     ];
 
     /**

@@ -572,6 +572,8 @@ objects:
         converters:
              bool:
                  - 'isDeleted'
+             ldap_type:
+                 - 'type'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -579,6 +581,13 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+        converter_options:
+            ldap_type:
+                user: [ top, person, organizationalPerson, user ]
+                group: [ top, group ]
+                computer: [ top, person, organizationalPerson, user, computer ]
+                contact: [ top, person, organizationalPerson, contact ]
+                ou: [ top, organizationalUnit ]
         attributes:
             created: whenCreated
             dn: distinguishedName
@@ -591,6 +600,7 @@ objects:
             modified: whenChanged
             name: cn
             sid: objectSid
+            type: objectClass
             upn: userPrincipalName
         attributes_to_select:
             - 'name'
@@ -598,3 +608,4 @@ objects:
             - 'lastKnownLocation'
             - 'lastKnownName'
             - 'sid'
+            - 'type'

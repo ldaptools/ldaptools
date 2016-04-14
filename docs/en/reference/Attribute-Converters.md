@@ -119,3 +119,8 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: This should not be used. It currently does not modify the value going back to LDAP.
 
   * `fromLdap`: Takes a build string stored in the serialNumber attribute and parses it to a readable Exchange version.
+
+#### *ldap_type*
+  * `toLdap`: This should not be used. It is currently unsupported.
+
+  * `fromLdap`: This returns the LDAP Object Type string represented by the `LdapTools\Object\LdapObjectType` constants.

@@ -137,6 +137,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     {
         $this::get('exchange_roles')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeRoles');
     }
+
+    function it_should_return_a_ldap_type_converter()
+    {
+        $this::get('ldap_type')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLdapObjectType');
+    }
     
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
