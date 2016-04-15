@@ -128,8 +128,8 @@ $ldif->addComment('This is just a test LDIF file', 'Created on '.date("m.d.y"));
 // This creates an entry that will add a new object to LDAP.
 $entry = $ldif->entry()->add('cn=Some User,dc=example,dc=local')->addAttribute('sn', 'Sikorra');
 
-// Add the created entry to the LDIF. This method is variadic, so you can add as many entries at a time as you like.
-$ldif->addEntry($add)
+// Add the created entry to the LDIF. This method is variadic, so add as many entries at a time as you like.
+$ldif->addEntry($entry);
 
 // Output the LDIF to a string and do whatever you need with it...
 $ldifData = $ldif->toString();
