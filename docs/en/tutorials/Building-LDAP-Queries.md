@@ -39,9 +39,8 @@ information it can do a lot of the heavy lifting to allow it to easily generate 
 $lqb = $ldapManager->buildLdapQuery();
 
 // When no attributes are specifically selected, it will pull a default set defined in the schema.
-$users = $lqb->select()
-    ->fromUsers()
-    ->Where(['state' => 'Wisconsin'])
+$users = $lqb->fromUsers()
+    ->where(['state' => 'Wisconsin'])
     ->getLdapQuery()
     ->getResult();
     
@@ -171,11 +170,21 @@ $lqb->where(
 This method is the same as the `where` method. It encapsulates its arguments into a logical 'AND' statement. Statements
 passed will be added to the same logical 'AND' statement that the `where` method created.
 
+```php
+// This adds to the existing and statement...
+$lqb->andWhere(['lastName' => 'Smith']);
+```
+
 ------------------------
 #### orWhere(...$statements)
 
 This method is the same as the `where` method, but it will instead encapsulate any passed arguments into a logical 'OR'
 statement.
+
+```php
+// This creates a separate OR statement...
+$lqb->orWhere(['department' => 'IT', 'department' => 'Marketing']);
+```
 
 ------------------------
 #### add(...$statements)
@@ -184,11 +193,21 @@ This is a low-level method that will take any object that is an instance of a `B
 The shorthand `$lqb->filter()` methods is what does the heavy-lifting for creating the various operator objects. You
 should not need to call this method explicitly, but it is included if you need it.
 
+```php
+// Add some operators directly to the query
+$lqb->add($lqb->filter()->startsWith('name', 'srv'), $lqb->filter()->notPresent('description'));
+```
+
 ------------------------
 #### setServer($server)
 
 This lets you set the LDAP server that the query will run against when executed. After the query finishes executing the
 connection switches back to the LDAP server it was originally connected to.
+
+```php
+// Query a specific LDAP server
+$lqb->setServer('dc3.example.local');
+```
 
 ------------------------
 #### setBaseDn($baseDn)
@@ -237,6 +256,12 @@ $rootDse = $lqb->where($lqb->filter()->present('objectClass'))
 Explicitly set the scope for the query using the `QueryOperation::SCOPE` constant. The available options are:
 `QueryOperation::SCOPE['SUBTREE']`, `QueryOperation::SCOPE['ONELEVEL']`, `QueryOperation::SCOPE['BASE']`
 
+```php
+use LdapTools\Operation\QueryOperation;
+
+$lqb->setScope(QueryOperation::SCOPE['ONELEVEL']);
+```
+
 ------------------------ 
 #### orderBy($attribute, $direction = 'ASC')
 
@@ -245,18 +270,9 @@ overwrites any already set orderBy statements. To stack multiple order statement
 
 ```php
 // Order results by last name (ascending).
-$users = $lqb->select()
-    ->fromUsers()
+$users = $lqb->fromUsers()
     ->where(['firstName' => 'John'])
     ->orderBy('lastName') 
-    ->getResult();
-    
-// Order results by last name (descending) and first name (ascending).
-$users = $lqb->select()
-    ->fromUsers()
-    ->where(['state' => 'Wisconsin'])
-    ->orderBy('lastName', 'DESC')
-    ->addOrderBy('firstName', 'ASC')
     ->getResult();
 ```
 
@@ -265,6 +281,15 @@ $users = $lqb->select()
 
 This method works the same as `orderBy($attribute)`, only calling this one will not overwrite already declared order-by 
 statements. Call this when you want to order by multiple attributes.
+
+```php
+// Order results by last name (descending) and first name (ascending).
+$users = $lqb->fromUsers()
+    ->where(['state' => 'Wisconsin'])
+    ->orderBy('lastName', 'DESC')
+    ->addOrderBy('firstName', 'ASC')
+    ->getResult();
+```
 
 ------------------------
 #### setPageSize($size)
@@ -353,11 +378,10 @@ This `LdapQuery` method will retrieve a single result from LDAP. So instead of a
 will be given a single result you can immediately begin to work with.
 
 ```php
-$lqb = $ldapManager->buildLdapQuery();
+$lqb = $ldap->buildLdapQuery();
 
-// Retrieve a single LdapObject from a query...a.
-$user = $lqb->select()
-    ->fromUsers()
+// Retrieve a single LdapObject from a query...
+$user = $lqb->fromUsers()
     ->Where(['username' => 'chad'])
     ->getLdapQuery()
     ->getSingleResult();
@@ -377,6 +401,21 @@ The behavior of this method is very similar to `getSingleResult()`, but if no re
 return `null` instead of throwing an exception. However, it will still throw an exception in the case that more than one
 result is returned from LDAP.
 
+```php
+$lqb = $ldap->buildLdapQuery();
+
+// Retrieve a single LdapObject from a query, or a null result if it doesn't exist...
+$user = $lqb->fromUsers()
+    ->Where(['username' => 'john'])
+    ->getLdapQuery()
+    ->getOneOrNullResult();
+
+// Could be null, so check first...
+if ($user) {
+    echo "DN : ".$user->getDn();
+}
+```
+
 #### getSingleScalarResult()
 ------------------------
 
@@ -384,7 +423,7 @@ Using this method you can get the value of a single attribute from the query. If
 exist then it will throw an exception.
 
 ```php
-$lqb = $ldapManager->buildLdapQuery();
+$lqb = $ldap->buildLdapQuery();
 
 // Retrieve the GUID string of a specific AD user...
 $guid = $lqb->select('guid')
@@ -402,6 +441,22 @@ echo "GUID : ".$guid;
 The behavior of this method is very similar to `getSingleScalarResult()`, but if the attribute is not found/set
 for the LDAP object it will return `null` instead of throwing an exception. However, it will still throw an exception
 in the case that more than one result is returned from LDAP or if the LDAP object does not exist.
+
+```php
+$lqb = $ldap->buildLdapQuery();
+
+// Retrieve the title of a specific AD user...
+$title = $lqb->select('title')
+    ->fromUsers()
+    ->Where(['username' => 'chad'])
+    ->getLdapQuery()
+    ->getSingleScalarResult();
+
+// Check if the attribute actually had a value first
+$title = $title ?: 'Unknown';
+
+echo $title;
+```
 
 ## Filter Method Shortcuts
 ------------------------
@@ -440,16 +495,28 @@ Creates an "approximately-equal-to" comparison between the attribute and the val
 LDAP specific implementation of this operator. But it will typically function like a "sounds like" comparison: 
 `(attribute~=value)`
 
+```php
+$lqb->filter()->aeq('firstName', 'Sue');
+```
+
 ------------------------
 #### eq($attribute, $value)
 
 Creates an "equal-to" comparison between the attribute and the value: `(attribute=value)`
+
+```php
+$lqb->filter()->eq('lastName', 'Sikorra');
+```
 
 ------------------------
 #### neq($attribute, $value)
 
 Creates a "not-equal-to" comparison between the attribute and the value. This is equivalent to wrapping a
  `eq($attribute, $value)` within a 'NOT' statement: `(!(attribute=value))`
+
+```php
+$lqb->filter()->neq('department', 'Purchasing');
+```
 
 ------------------------
 #### lt($attribute, $value)
@@ -458,10 +525,18 @@ Creates a "less-than" comparison between the attribute and the value. Since an a
 LDAP, this is a combination of a greater-than-or-equal-to operator along with a check if the attribute is set/present.
 This is encapsulated within a logical 'AND' operator: `(&(!(attribute>=value))(attribute=*))`
 
+```php
+$lqb->filter()->lt('badPasswordCount', 2);
+```
+
 ------------------------
 #### leq($attribute, $value)
 
 Creates a "less-than-or-equal-to" comparison between the attribute and the value: `(attribute<=value)`
+
+```php
+$lqb->filter()->leq('badPasswordCount', 1);
+```
 
 ------------------------
 #### gt($attribute, $value)
@@ -470,40 +545,76 @@ Creates a "greater-than" comparison between the attribute and the value. Since a
 LDAP, this is a combination of a less-than-or-equal-to operator along with a check if the attribute is set/present.
 This is encapsulated within a logical 'AND' operator: `(&(!(attribute<=value))(attribute=*))`
 
+```php
+$lqb->filter()->gt('created', new \DateTime('01-20-2013'));
+```
+
 ------------------------
 #### geq($attribute, $value)
 
 Creates a "greater-than-or-equal-to" comparison between the attribute and the value: `(attribute>=value)`
+
+```php
+$lqb->filter()->geq('badPasswordCount', 3);
+```
 
 ------------------------
 #### bitwiseAnd($attribute, $value)
 
 Creates a bitwise 'AND' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.803:=value)`
 
+```php
+use LdapTools\Query\UserAccountControlFlags;
+
+$lqb->filter()->bitwiseAnd('userAccountControl', UserAccountControlFlags::DISABLED);
+```
+
 ------------------------
 #### bitwiseOr($attribute, $value)
 
 Creates a bitwise 'OR' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.804:=value)`
+
+```php
+use LdapTools\Query\GroupTypeFlags;
+
+$lqb->filter()->bitwiseOr('groupType', GroupTypeFlags::UNIVERSAL_GROUP);
+```
 
 ------------------------
 #### startsWith($attribute, $value)
 
 Creates a "equal-to" comparison with a wildcard after the value: `(attribute=value*)`
 
+```php
+$lqb->filter()->startsWith('department', 'IT');
+```
+
 ------------------------
 #### endsWith($attribute, $value)
 
 Creates a "equal-to" comparison with a wildcard before the value: `(attribute=*value)`
+
+```php
+$lqb->filter()->endsWith('description', 'service');
+```
 
 ------------------------
 #### contains($attribute, $value)
 
 Creates a "equal-to" comparison with a wildcards at each end of the value: `(attribute=*value*)`
 
+```php
+$lqb->filter()->contains('name', 'admin');
+```
+
 ------------------------
 #### like($attribute, $value)
 
 Creates a "equal-to" comparison that will not escape any wildcards you use in the value: `(attribute=v*a*l*u*e)`.
+
+```php
+$lqb->filter()->like('description', '*Some*thing*');
+```
 
 ------------------------
 #### present($attribute)
@@ -511,26 +622,52 @@ Creates a "equal-to" comparison that will not escape any wildcards you use in th
 Creates a "equal-to" comparison with a single wildcard as the value. Returns any entry with this attribute populated: 
 `(attribute=*)`
 
+```php
+$lqb->filter()->present('mail');
+```
+
 ------------------------
 #### notPresent($attribute)
 
 Creates a negated form of the `present($attribute)` method. Returns any entry that does not contain the attribute: 
 `(!(attribute=*))`
 
+```php
+$lqb->filter()->notPresent('department');
+```
+
 ------------------------
 #### bAnd(...$statements)
 
 Creates a logical 'AND' statement against all other operators passed to it: `(&((attribute=value)(attribute=value)))`
+
+```php
+$lqb->filter()->bAnd(
+    $lqb->filter()->eq('department', 'IT'), 
+    $lqb->filter()->startsWith('firstName', 'Tim')
+);
+```
 
 ------------------------
 #### bOr(...$statements)
 
 Creates a logical 'OR' statement against all other operators passed to it: `(|((attribute=value)(attribute=value)))`
 
+```php
+$lqb->filter()->bOr(
+    $lqb->filter()->eq('department', 'IT'), 
+    $lqb->filter()->eq('department', 'Purchasing')
+);
+```
+
 ------------------------
 #### bNot($statements)
 
 Creates a logical 'NOT' statement against whatever other statement you pass it it: `(!(attribute=value))`
+
+```php
+$lqb->filter()->bNot($lqb->filter()->eq('department', 'IT'));
+```
 
 ## Active Directory Filter Method Shortcuts
 
@@ -575,6 +712,17 @@ This creates a matching rule comparison using the OID `IN_CHAIN` against the gro
 you have a custom attribute, or some other attribute you would like to run it against, you must pass it as the second
 argument.
 
+```php
+$username = 'chad';
+
+// Query by a username to get all of their groups recursively...
+$groups = $ldap->buildLdapQuery()
+    ->fromGroups()
+    ->where($query->filter()->hasMemberRecursively($username))
+    ->getLdapQuery()
+    ->getResult();
+```
+
 ------------------------
 #### isRecursivelyMemberOf($group)
 
@@ -589,12 +737,8 @@ Recursively checks an object's group membership for a group. The `$group` parame
 This creates a matching rule comparison using the OID `IN_CHAIN` against the users `groups` attribute.
 
 ```php
-use LdapTools\Object\LdapObjectType;
-
-// ...
-
 // Query by a group name...
-$query = $ldapManager->buildLdapQuery();
+$query = $ldap->buildLdapQuery();
 $users = $query->select()
     ->fromUsers()
     ->where($query->filter()->isRecursivelyMemberOf('Employees'))
@@ -604,7 +748,8 @@ $users = $query->select()
 // If you are not targeting a specific set of objects from the schema, then you must
 // pass 'false' as the second argument and specify a full DN. Otherwise this method
 // will attempt to use the 'groups' attribute from the schema by default.
-$ldapObjects = $query->select('description')
+$ldapObjects = $ldap->buildLdapQuery()
+    ->select('description')
     ->where(['cn' => 'foo'])
     ->andWhere($query->filter()->isRecursivelyMemberOf('CN=Foo,DC=foo,DC=bar', false))
     ->getLdapQuery()
