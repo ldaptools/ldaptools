@@ -9,6 +9,7 @@ used when generating queries and returning data from LDAP.
   * [Groups](#ad-group-types)
   * [Computers](#ad-computer-types)
   * [Contacts](#ad-contact-types)
+  * [Containers](#ad-container-types)
   * [OUs](#ad-ou-types)
   * [Password Settings Objects](#ad-password-settings-objects-types)
 
@@ -218,6 +219,22 @@ These are typical LDAP OU objects.
 | state | st | string |
 | streetAddress | streetAddress | string |
 | zipCode | postalCode | string |
+
+#### AD Container Types
+
+These are typical LDAP Container objects.
+
+* **Type**: `LdapObjectType::CONTAINER`
+* **Filter**: `(objectCategory=container)`
+
+| LdapTools Name  | LDAP Attribute | Value Type |
+| --------------- | -------------- | ---------- |
+| created | whenCreated | `\DateTime` | 
+| description | description | string |
+| dn | dn | string |
+| guid | objectGuid | string |
+| modified | whenModified | `\DateTime` |
+| name | ou | string |
 
 #### AD Password Settings Objects Types
 

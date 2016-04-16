@@ -40,6 +40,11 @@ class LdapObjectTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('COMPUTER');
     }
 
+    function it_should_have_a_container_type_constant()
+    {
+        $this->shouldHaveConstant('CONTAINER');
+    }
+
     function it_should_have_an_ou_type_constant()
     {
         $this->shouldHaveConstant('OU');

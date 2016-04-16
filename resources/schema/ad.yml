@@ -482,6 +482,33 @@ objects:
             objectclass: [ 'top', 'organizationalUnit' ]
         required_attributes:
             - 'name'
+    container:
+        type: container
+        filter:
+            eq: [ objectCategory, container ]
+        converters:
+             windows_guid:
+                 - 'guid'
+             windows_generalized_time:
+                 - 'created'
+                 - 'modified'
+        attributes:
+            created: whenCreated
+            description: description
+            dn: distinguishedName
+            guid: objectGuid
+            modified: whenChanged
+            name: cn
+        multivalued_attributes:
+            - objectClass
+        attributes_to_select:
+            - 'description'
+            - 'name'
+            - 'guid'
+        default_values:
+            objectclass: [ 'top', 'container' ]
+        required_attributes:
+            - 'name'
     password_settings:
         type: PSO
         class: msDS-PasswordSettings

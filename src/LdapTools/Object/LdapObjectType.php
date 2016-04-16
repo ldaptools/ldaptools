@@ -43,6 +43,11 @@ class LdapObjectType
     const OU = 'ou';
 
     /**
+     * A container object. 
+     */
+    const CONTAINER = 'container';
+
+    /**
      * Deleted LDAP objects.
      */
     const DELETED = 'deleted';
