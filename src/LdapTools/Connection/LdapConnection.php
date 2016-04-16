@@ -238,7 +238,10 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         if ($this->config->getUseTls() && !@ldap_start_tls($this->connection)) {
-            throw new LdapConnectionException(sprintf("Failed to start TLS: %s", $this->getLastError()));
+            throw new LdapConnectionException(
+                sprintf("Failed to start TLS: %s", $this->getLastError()),
+                $this->getExtendedErrorNumber()
+            );
         }
 
         $this->server = explode('://', $ldapUrl)[1];
@@ -265,7 +268,10 @@ class LdapConnection implements LdapConnectionInterface
         }
 
         if (!$this->isBound) {
-            throw new LdapBindException(sprintf('Unable to bind to LDAP: %s', $this->getLastError()));
+            throw new LdapBindException(
+                sprintf('Unable to bind to LDAP: %s', $this->getLastError()),
+                $this->getExtendedErrorNumber()
+            );
         }
     }
 
