@@ -13,6 +13,7 @@ namespace LdapTools\Query;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Exception\LogicException;
 use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Operation\QueryOperation;
@@ -189,12 +190,12 @@ class LdapQueryBuilder
     public function from($type)
     {
         if (!is_string($type) && !($type instanceof LdapObjectSchema)) {
-            throw new \RuntimeException(
+            throw new InvalidArgumentException(
                 'You must either pass the schema object type as a string to this method, or pass the schema types '
                 .'LdapObjectSchema to this method.'
             );
         } elseif (is_string($type) && !$this->schemaFactory) {
-            throw new \RuntimeException(
+            throw new LogicException(
                 'To build a filter with schema types you must pass a SchemaFactory to the constructor'
             );
         }
@@ -456,7 +457,7 @@ class LdapQueryBuilder
     public function getLdapQuery()
     {
         if (!$this->connection) {
-            throw new \RuntimeException(
+            throw new LogicException(
                 'To get a LdapQuery instance you must pass a LdapConnection to the constructor'
             );
         }

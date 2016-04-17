@@ -236,17 +236,17 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->toLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(objectGuid='.$guidHex.')))');
     }
 
-    function it_should_throw_a_RuntimeException_when_calling_getLdapQuery_and_a_ldap_connection_is_not_set()
+    function it_should_throw_a_LogicException_when_calling_getLdapQuery_and_a_ldap_connection_is_not_set()
     {
         $this->beConstructedWith(null,null);
         $this->where(['foo' => 'bar']);
-        $this->shouldThrow('\RuntimeException')->during('getLdapQuery');
+        $this->shouldThrow('LdapTools\Exception\LogicException')->during('getLdapQuery');
     }
 
-    function it_should_throw_a_RuntimeException_when_calling_from_with_a_string_and_a_schema_factory_is_not_set()
+    function it_should_throw_a_LogicException_when_calling_from_with_a_string_and_a_schema_factory_is_not_set()
     {
         $this->beConstructedWith(null,null);
-        $this->shouldThrow('\RuntimeException')->during('from', ['foo']);
+        $this->shouldThrow('LdapTools\Exception\LogicException')->during('from', ['foo']);
     }
 
     function it_should_honor_default_attributes_to_select_when_present_in_the_LdapObjectSchema()
