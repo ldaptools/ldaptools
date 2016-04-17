@@ -11,6 +11,7 @@
 namespace LdapTools\Resolver;
 
 use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Exception\LogicException;
 
 /**
  * Iterates over the attributes to process and replace parameter values in the required order based on dependencies.
@@ -217,7 +218,7 @@ class ParameterResolver
     {
         foreach ($this->requirements as $attribute => $parameters) {
             if (in_array($parent, $parameters) && in_array($attribute, $parentParameters)) {
-                throw new \LogicException(sprintf(
+                throw new LogicException(sprintf(
                     'Circular parameter dependency detected. Parameters "%s" and "%s" depend on each other.',
                     $parent,
                     $attribute

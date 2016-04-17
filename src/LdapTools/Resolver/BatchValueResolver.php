@@ -13,6 +13,7 @@ namespace LdapTools\Resolver;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
+use LdapTools\Exception\LogicException;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -134,7 +135,7 @@ class BatchValueResolver extends BaseValueResolver
     protected function validateBatchAggregate(Batch $batch, AttributeConverterInterface $converter)
     {
         if (!$converter->isBatchSupported($batch)) {
-            throw new \LogicException(sprintf(
+            throw new LogicException(sprintf(
                 'Unable to modify "%s". The "%s" action is not allowed.',
                 $batch->getAttribute(),
                 array_search($batch->getModType(), Batch::TYPE)

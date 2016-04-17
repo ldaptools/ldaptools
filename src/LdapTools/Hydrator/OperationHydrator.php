@@ -12,6 +12,7 @@ namespace LdapTools\Hydrator;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Exception\LogicException;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\LdapOperationInterface;
@@ -140,10 +141,10 @@ class OperationHydrator extends ArrayHydrator
         }
 
         if (!$this->schema) {
-            throw new \LogicException("You must explicitly set the DN or specify a schema type.");
+            throw new LogicException("You must explicitly set the DN or specify a schema type.");
         }
         if (!$this->schema->hasAttribute('name')) {
-            throw new \LogicException(
+            throw new LogicException(
                 'To create an object you must specify the name attribute in the schema. That attribute should typically'
                 .' map to the "cn" attribute, as it will use that as the base of the distinguished name.'
             );
@@ -151,7 +152,7 @@ class OperationHydrator extends ArrayHydrator
 
         $location = $operation->getLocation() ?: $this->schema->getDefaultContainer();
         if (empty($location)) {
-            throw new \LogicException('You must specify a container or OU to place this LDAP object in.');
+            throw new LogicException('You must specify a container or OU to place this LDAP object in.');
         }
         $attribute = $this->schema->getAttributeToLdap('name');
         $rdnValue = LdapUtilities::escapeValue($operation->getAttributes()[$attribute], null, LDAP_ESCAPE_DN);

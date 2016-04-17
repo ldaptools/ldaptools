@@ -15,6 +15,7 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Exception\LogicException;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\QueryOperation;
@@ -176,7 +177,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($this->connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->shouldThrow(new \LogicException('Unable to modify "disabled". The "REMOVE" action is not allowed.'))
+        $this->shouldThrow(new LogicException('Unable to modify "disabled". The "REMOVE" action is not allowed.'))
             ->duringToLdap();
     }
 

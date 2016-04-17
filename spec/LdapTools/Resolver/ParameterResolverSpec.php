@@ -83,7 +83,7 @@ class ParameterResolverSpec extends ObjectBehavior
         ];
         $this->beConstructedWith($attributes, []);
 
-        $this->shouldThrow('\LogicException')->duringResolve();
+        $this->shouldThrow('LdapTools\Exception\LogicException')->duringResolve();
     }
 
     function it_should_return_attributes_correctly_when_no_parameters_are_used()

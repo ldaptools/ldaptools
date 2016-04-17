@@ -13,6 +13,7 @@ namespace LdapTools\Hydrator;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\LogicException;
 use LdapTools\Query\LdapResultSorter;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\AttributeNameResolver;
@@ -308,7 +309,7 @@ class ArrayHydrator implements HydratorInterface
         }
 
         if (!empty($missing)) {
-            throw new \LogicException(
+            throw new LogicException(
                 sprintf('The following required attributes are missing: %s', implode(', ', $missing))
             );
         }
