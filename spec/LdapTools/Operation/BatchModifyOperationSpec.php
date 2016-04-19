@@ -14,6 +14,7 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Operation\AddOperation;
+use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
@@ -134,5 +135,18 @@ class BatchModifyOperationSpec extends ObjectBehavior
 
         $this->addControl($control1, $control2);
         $this->getControls()->shouldBeEqualTo([$control1, $control2]);
+    }
+
+    function it_should_clone_the_batch_collection()
+    {
+        $batch = new Batch(Batch::TYPE['ADD'], 'foo', 'bar');
+        $batches = new BatchCollection();
+        $batches->add($batch);
+        $operation = new BatchModifyOperation('foo', $batches);
+        $new = clone $operation;
+        $batch->setAttribute('foobar');
+
+        $this->setBatchCollection($new->getBatchCollection());
+        $this->getBatchCollection()->get(0)->getAttribute()->shouldNotBeEqualTo('foobar');
     }
 }

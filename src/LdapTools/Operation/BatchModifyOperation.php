@@ -127,6 +127,16 @@ class BatchModifyOperation implements LdapOperationInterface
     }
 
     /**
+     * Make sure to clone a BatchCollection instance.
+     */
+    public function __clone()
+    {
+        if ($this->properties['batch']) {
+            $this->properties['batch'] = clone $this->properties['batch'];
+        }
+    }
+
+    /**
      * @return array
      */
     protected function getBatchArray()
