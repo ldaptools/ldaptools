@@ -66,7 +66,7 @@ class Wildcard extends Comparison
             $this->setUseConverter(false);
         }
 
-        $this->attribute = $attribute;
+        $this->setAttribute($attribute);
         $this->value = $value;
         $this->validOperators = [ self::EQ ];
         $this->operatorSymbol = self::EQ;
@@ -76,22 +76,26 @@ class Wildcard extends Comparison
     /**
      * {@inheritdoc}
      */
-    public function getLdapFilter()
+    public function getLdapFilter($alias = null)
     {
+        if ($this->skipFilterForAlias($alias)) {
+            return '';
+        }
+
         if ($this->wildcardType == self::CONTAINS) {
-            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER).'*';
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER).'*';
         } elseif ($this->wildcardType == self::STARTS_WITH) {
-            $value = LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER).'*';
+            $value = LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER).'*';
         } elseif ($this->wildcardType == self::ENDS_WITH) {
-            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER);
+            $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER);
         } elseif ($this->wildcardType == self::LIKE) {
-            $value = LdapUtilities::escapeValue($this->getValueForQuery(), '*', LDAP_ESCAPE_FILTER);
+            $value = LdapUtilities::escapeValue($this->getValueForQuery($alias), '*', LDAP_ESCAPE_FILTER);
         } else {
             $value = '*';
         }
 
         return self::SEPARATOR_START
-            .$this->getAttributeToQuery()
+            .$this->getAttributeToQuery($alias)
             .$this->operatorSymbol
             .$value
             .self::SEPARATOR_END;

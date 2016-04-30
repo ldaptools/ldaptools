@@ -11,6 +11,7 @@
 namespace LdapTools\Resolver;
 
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Resolves names for a LDAP entry going to and from LDAP so they are the correct case/name.
@@ -55,7 +56,7 @@ class AttributeNameResolver
             }
             // If the LDAP attribute name was also explicitly selected for, and is not already in the array, add it...
             if ($this->selectedButNotPartOfEntry($attribute, $newEntry)) {
-                $newEntry[self::getKeyNameCaseInsensitive($attribute, $this->selectedAttributes)] = $value;
+                $newEntry[LdapUtilities::getValueCaseInsensitive($attribute, $this->selectedAttributes)] = $value;
             }
         }
         // The DN attribute must be present as it is used in many critical functions.
@@ -79,20 +80,6 @@ class AttributeNameResolver
         }
 
         return $toLdap;
-    }
-
-    /**
-     * Looks up a key name in an array in a case-insensitive way and returns the key how it appears in the array.
-     *
-     * @param string $attribute
-     * @param array $selected
-     * @return string
-     */
-    public static function getKeyNameCaseInsensitive($attribute, array $selected)
-    {
-        $lcAttribute = strtolower($attribute);
-
-        return $selected[array_change_key_case(array_flip($selected))[$lcAttribute]];
     }
 
     /**
@@ -150,7 +137,7 @@ class AttributeNameResolver
         foreach ($mappedNames as $mappedName) {
             // Any names specifically selected for should be in the result array...
             if ($this->selectedButNotPartOfEntry($mappedName, $newEntry)) {
-                $newEntry[self::getKeyNameCaseInsensitive($mappedName, $this->selectedAttributes)] = $value;
+                $newEntry[LdapUtilities::getValueCaseInsensitive($mappedName, $this->selectedAttributes)] = $value;
             }
         }
 

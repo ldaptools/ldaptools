@@ -21,6 +21,11 @@ use LdapTools\Utilities\LdapUtilities;
 abstract class BaseOperator
 {
     /**
+     * Separates the alias from the attribute.
+     */
+    const ALIAS_DELIMITER = '.';
+
+    /**
      * The start parenthesis of a LDAP grouping.
      */
     const SEPARATOR_START = '(';
@@ -41,6 +46,11 @@ abstract class BaseOperator
     protected $translatedAttribute = '';
 
     /**
+     * @var array The attribute name for a specific alias after its schema has been applied. 
+     */
+    protected $translatedAliasAttribute = [];
+
+    /**
      * @var mixed The value for the attribute without any possible converters.
      */
     protected $value;
@@ -51,9 +61,19 @@ abstract class BaseOperator
     protected $convertedValue;
 
     /**
+     * @var array The attribute value for specific aliases that were used.
+     */
+    protected $convertedAliasValue = [];
+
+    /**
      * @var bool Whether or not an Attribute Converter was used.
      */
     protected $converterUsed = false;
+
+    /**
+     * @var array Whether or not an attribute converter was used for a specific alias.
+     */
+    protected $converterAliasUsed = [];
 
     /**
      * @var bool Whether or not a converter, if present, will be used against this operator.
@@ -69,6 +89,11 @@ abstract class BaseOperator
      * @var array The valid operator symbols that can be set.
      */
     protected $validOperators = [];
+
+    /**
+     * @var null|string The alias this operator is associated with, if any.
+     */
+    protected $alias;
 
     /**
      * Get the attribute value.
@@ -93,21 +118,31 @@ abstract class BaseOperator
     /**
      * Get the converted value.
      *
+     * @param string|null $alias
      * @return mixed
      */
-    public function getConvertedValue()
+    public function getConvertedValue($alias = null)
     {
-        return $this->convertedValue;
+        if ($alias && isset($this->convertedAliasValue[$alias])) {
+            return $this->convertedAliasValue[$alias];
+        } else {
+            return $this->convertedValue;
+        }
     }
 
     /**
      * Set the converted value.
      *
+     * @param string|null $alias
      * @param mixed $value
      */
-    public function setConvertedValue($value)
+    public function setConvertedValue($value, $alias = null)
     {
-        $this->convertedValue = $value;
+        if ($alias) {
+            $this->convertedAliasValue[$alias] = $value;
+        } else {
+            $this->convertedValue = $value;   
+        }
     }
 
     /**
@@ -127,27 +162,45 @@ abstract class BaseOperator
      */
     public function setAttribute($attribute)
     {
+        if (strpos($attribute, '.') !== false) {
+            $pieces = explode('.', $attribute, 2);
+            $this->setAlias($pieces[0]);
+            $attribute = $pieces[1];
+        // If an alias was already set then this must be set back to null.    
+        } else {
+            $this->alias = null;
+        }
         $this->attribute = $attribute;
     }
 
     /**
      * Get the translated attribute (the attribute after the schema conversion).
      *
+     * @param string|null $alias
      * @return string|null
      */
-    public function getTranslatedAttribute()
+    public function getTranslatedAttribute($alias = null)
     {
-        return $this->translatedAttribute;
+        if ($alias && isset($this->translatedAliasAttribute[$alias])) {
+            return $this->translatedAliasAttribute[$alias];
+        } else {
+            return $this->translatedAttribute;
+        }
     }
 
     /**
      * Set the translated attribute (the attribute after the schema conversion).
      *
+     * @param string|null $alias
      * @param $attribute|null
      */
-    public function setTranslatedAttribute($attribute)
+    public function setTranslatedAttribute($attribute, $alias = null)
     {
-        $this->translatedAttribute = $attribute;
+        if ($alias) {
+            $this->translatedAliasAttribute[$alias] = $attribute;
+        } else {
+            $this->translatedAttribute = $attribute;
+        }
     }
 
     /**
@@ -180,6 +233,26 @@ abstract class BaseOperator
     }
 
     /**
+     * Get the alias this operator is associated with. If none is assigned this will be null.
+     *
+     * @return string|null
+     */
+    public function getAlias()
+    {
+        return $this->alias;
+    }
+
+    /**
+     * Set the alias this operator is associated with. To assign no alias set it to null.
+     *
+     * @param string|null
+     */
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
+    }
+
+    /**
      * Set whether a converter should be used or not.
      *
      * @param bool $value
@@ -203,45 +276,61 @@ abstract class BaseOperator
      * Set whether a converter was used or not.
      *
      * @param bool $value
+     * @param string|null $alias
      */
-    public function setWasConverterUsed($value)
+    public function setWasConverterUsed($value, $alias = null)
     {
-        $this->converterUsed = (bool) $value;
+        if ($alias) {
+            $this->converterAliasUsed[$alias] = (bool) $value;
+        } else {
+            $this->converterUsed = (bool) $value;
+        }
     }
 
     /**
      * Get whether a converter was used or not.
      *
+     * @param string|null $alias
      * @return bool
      */
-    public function getWasConverterUsed()
+    public function getWasConverterUsed($alias = null)
     {
-        return $this->converterUsed;
+        if ($alias) {
+            return isset($this->converterAliasUsed[$alias]) ? $this->converterAliasUsed[$alias] : false;
+        } else {
+            return $this->converterUsed;
+        }
     }
 
     /**
      * Returns the operator translated to its LDAP filter string value.
      *
+     * @param string|null $alias
      * @return string
      */
-    public function getLdapFilter()
+    public function getLdapFilter($alias = null)
     {
+        if ($this->skipFilterForAlias($alias)) {
+            return '';
+        }
+
         return self::SEPARATOR_START
-            .$this->getAttributeToQuery()
+            .$this->getAttributeToQuery($alias)
             .$this->operatorSymbol
-            .LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER)
+            .LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER)
             .self::SEPARATOR_END;
     }
 
     /**
      * This will get the translated attribute or just the attribute if no schema translation was done.
      *
+     * @param null|string $alias
      * @return string
      * @throws LdapQueryException
      */
-    protected function getAttributeToQuery()
+    protected function getAttributeToQuery($alias)
     {
-        $attribute = $this->translatedAttribute ? $this->translatedAttribute : $this->attribute;
+        $attribute = $this->getTranslatedAttribute($alias) ?: $this->getAttribute();
 
         // This avoids possible LDAP injection from unverified input for an attribute name.
         if (!LdapUtilities::isValidAttributeFormat($attribute)) {
@@ -256,8 +345,21 @@ abstract class BaseOperator
      *
      * @return mixed
      */
-    protected function getValueForQuery()
+    protected function getValueForQuery($alias)
     {
-        return $this->converterUsed ? $this->convertedValue : $this->value;
+        $value = $this->getConvertedValue($alias);
+        
+        return is_null($value) ? $this->getValue() : $value;
+    }
+
+    /**
+     * Determine whether the operator should actually produce a filter (only if alias is null or matches the current one)
+     * 
+     * @param string|null $alias
+     * @return bool
+     */
+    protected function skipFilterForAlias($alias)
+    {
+        return $this->getAlias() && $this->getAlias() != $alias;
     }
 }

@@ -53,7 +53,7 @@ class Comparison extends BaseOperator
             self::LTE,
         ];
         $this->setOperatorSymbol($comparison);
-        $this->attribute = $attribute;
+        $this->setAttribute($attribute);
         $this->value = $value;
     }
 }

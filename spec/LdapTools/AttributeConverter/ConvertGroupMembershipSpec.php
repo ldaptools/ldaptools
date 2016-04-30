@@ -131,7 +131,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
 
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) use ($guidHex, $guid) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
         }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -155,7 +155,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
 
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
         }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -259,7 +259,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))';
+            return $operation->getFilter() == '(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))';
         }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
@@ -290,13 +290,13 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))';
         }))->willReturn($this->entry);
         $connection->execute(Argument::that(function($operation) use ($guid, $guidHex) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
         }))->willReturn($this->entryGuid);
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
         }))->willReturn($this->entrySid);
         $this->setOptions(['foo' => [
             'to_attribute' => 'member',
@@ -345,13 +345,13 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
 
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))';
         }))->willReturn($this->entry);
         $connection->execute(Argument::that(function($operation) use ($guid, $guidHex) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
         }))->willReturn($this->entryGuid);
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
         }))->willReturn($this->entrySid);
         $this->setOptions(['foo' => [
             'to_attribute' => 'member',
@@ -435,7 +435,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $this->setBatch($batch);
 
         $connection->execute(Argument::that(function($operation) use ($dn) {
-            return $operation->getFilter()->toLdapFilter() == "(&(distinguishedName=$dn))" 
+            return $operation->getFilter() == "(&(distinguishedName=$dn))" 
                 && $operation->getAttributes() == ['memberOf'];
         }))->willReturn($this->expectedResult);
         foreach ($this->expectedResult[0]['memberOf'] as $groupDn) {

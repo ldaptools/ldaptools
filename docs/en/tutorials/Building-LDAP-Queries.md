@@ -7,6 +7,7 @@ takes care of escaping all values passed to it when generating the filter.
 
 * [LdapQueryBuilder Methods](#ldapquerybuilder-methods)
 * [Filter Method Shortcuts](#filter-method-shortcuts)
+* [Using Aliases](#using-aliases-in-queries)
 * [Retrieving Query Results](#ldapquery-methods-to-retrieve-ldap-results)
 
 ## Generating LDAP Filters Without LdapManager
@@ -94,7 +95,7 @@ $lqb->select(['givenName', 'l', 'objectSid', 'sid']);
 ```
 
 ------------------------
-#### from($ldapType)
+#### from($ldapType, $alias = null)
 
 The `from` method requires an argument for the LDAP type. This type must be defined in your LDAP schema. Common types
 that are in the schema by default include: `user`, `group`, `contact`, `computer`, `ou`. These types are defined as constants
@@ -109,12 +110,15 @@ $lqb->from(LdapObjectType::USER);
 
 // Search for computers
 $lqb->from(LdapObjectType::COMPUTER);
+
+// Search for users and assign an alias to it
+$lqb->from(LdapObjectType::USER, 'u');
 ```
 
 ------------------------
-#### fromUsers()
+#### fromUsers($alias = null)
 
-A convenience shortcut of the `from` method to select from LDAP `user` types.
+A convenience shortcut of the `from` method to select from LDAP `user` types. Optionally pass a string alias name.
 
 ```php
 // Search for users
@@ -122,9 +126,9 @@ $lqb->fromUsers();
 ```
 
 ------------------------
-#### fromGroups()
+#### fromGroups($alias = null)
 
-A convenience shortcut of the `from` method to select from LDAP `group` types.
+A convenience shortcut of the `from` method to select from LDAP `group` types. Optionally pass a string alias name.
 
 ```php
 // Search for groups
@@ -132,9 +136,9 @@ $lqb->fromGroups();
 ```
 
 ------------------------
-#### fromOUs()
+#### fromOUs($alias = null)
 
-A convenience shortcut of the `from` method to select from LDAP `ou` types.
+A convenience shortcut of the `from` method to select from LDAP `ou` types. Optionally pass a string alias name.
 
 ```php
 // Search for OUs
@@ -319,6 +323,50 @@ Gets the LDAP filter, as a string, that the query would produce.
 ```php
 $filter = $lqb->toLdapFilter();
 ```
+
+## Using Aliases
+
+When you want to search for multiple object types you can assign them specific aliases to refer to them in your filter.
+This makes it easy to get all the results you need with a single query:
+
+```php
+use LdapTools\Object\LdapObjectType;
+
+$query = $ldap->buildLdapQuery();
+
+// Get all users with a department that starts with IT and groups that contain 'admin' in their description.
+// The resulting objects are ordered by their name (for both users and groups).
+$results = $query
+    ->fromUsers('u')
+    ->fromGroups('g')
+    ->where($query->filter()->startsWith('u.department', 'IT'))
+    ->andWhere($query->filter()->contains('g.description', 'admin'))
+    ->sortBy('name')
+    ->getLdapQuery()
+    ->getResult();
+
+foreach ($results as $result) {
+    if ($user->isType(LdapObjectType::USER)) {
+        echo "User: ".$result->getName();
+    } else {
+        echo "Group: ".$result->getName();
+    }
+}
+
+// Select all OUs and Containers at the root of the domain. Order them by name with OUs first, then containers.
+$results = $ldap->buildLdapQuery()
+    ->from(LdapObjectType::OU, 'u')
+    ->from(LdapObjectType::CONTAINER, 'c')
+    ->addOrderBy('u.name', 'ASC')
+    ->addOrderBy('c.name', 'ASC')
+    ->setScopeOneLevel()
+    ->getLdapQuery()
+    ->getResult();
+```
+
+You can reference an alias in the query builder anywhere that you would reference a specific attribute (select,
+orderBy, where/andWhere/or/orWhere statements, etc). The only rule that applies for alias names is that they can only
+be alphanumeric (but can also contain underscores).
 
 ## LdapQuery Methods to Retrieve LDAP Results
 -----------------------

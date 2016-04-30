@@ -19,7 +19,6 @@ use LdapTools\Object\LdapObjectType;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\Operator\BaseOperator;
-use LdapTools\Query\Operator\From;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Factory\LdapObjectSchemaFactory;
 
@@ -41,11 +40,6 @@ class LdapQueryBuilder
     protected $operation;
 
     /**
-     * @var array The combined default attributes to select from each schema.
-     */
-    protected $defaultAttributes = [];
-
-    /**
      * @var array The attributes to order by, if any. They will be in ['attribute' => 'ASC'] form.
      */
     protected $orderBy = [];
@@ -59,11 +53,6 @@ class LdapQueryBuilder
      * @var null|Operator\bOr The base 'Or' operator when the method 'orWhere' is used.
      */
     protected $baseOr;
-
-    /**
-     * @var null|From The base 'From' operator used for object selection.
-     */
-    protected $baseFrom;
 
     /**
      * @var LdapObjectSchemaFactory
@@ -184,22 +173,23 @@ class LdapQueryBuilder
      * schema, such as 'user' or 'group' or you can pass the LdapObjectSchema for the type. If you are using this class
      * without a schema then construct the query manually by just using the "where" and "andWhere" methods.
      *
-     * @param mixed $type
+     * @param mixed $type The string schema type name or a LdapObjectSchema
+     * @param null|string $alias The alias name to refer to the type being selected
      * @return $this
+     * @throws \LdapTools\Exception\LdapQueryException
+     * @todo The LdapObjectSchema should require the filter on construction so the exception is not needed
      */
-    public function from($type)
+    public function from($type, $alias = null)
     {
-        if (!is_string($type) && !($type instanceof LdapObjectSchema)) {
-            throw new InvalidArgumentException(
-                'You must either pass the schema object type as a string to this method, or pass the schema types '
-                .'LdapObjectSchema to this method.'
-            );
-        } elseif (is_string($type) && !$this->schemaFactory) {
-            throw new LogicException(
-                'To build a filter with schema types you must pass a SchemaFactory to the constructor'
-            );
+        $type = $this->getSchemaFromType($type);
+        if (is_null($type->getFilter())) {
+            throw  new InvalidArgumentException(sprintf(
+                'The schema type "%s" needs a filter defined to query LDAP with it.',
+                $type->getObjectType()
+            ));
         }
-        $this->addOrUpdateFrom($this->addLdapObjectSchema($type));
+        $this->operation->getFilter()->addLdapObjectSchema($type, $alias);
+        $this->hydrator->setLdapObjectSchema($type);
 
         return $this;
     }
@@ -207,11 +197,12 @@ class LdapQueryBuilder
     /**
      * A convenience method to select from user object types.
      *
+     * @param string|null $alias
      * @return $this
      */
-    public function fromUsers()
+    public function fromUsers($alias = null)
     {
-        $this->from(LdapObjectType::USER);
+        $this->from(LdapObjectType::USER, $alias);
 
         return $this;
     }
@@ -219,11 +210,12 @@ class LdapQueryBuilder
     /**
      * A convenience method to select from group object types.
      *
+     * @param string|null $alias
      * @return $this
      */
-    public function fromGroups()
+    public function fromGroups($alias = null)
     {
-        $this->from(LdapObjectType::GROUP);
+        $this->from(LdapObjectType::GROUP, $alias);
 
         return $this;
     }
@@ -231,11 +223,12 @@ class LdapQueryBuilder
     /**
      * A convenience method to select from OU object types.
      *
+     * @param string|null $alias
      * @return $this
      */
-    public function fromOUs()
+    public function fromOUs($alias = null)
     {
-        $this->from(LdapObjectType::OU);
+        $this->from(LdapObjectType::OU, $alias);
 
         return $this;
     }
@@ -440,13 +433,13 @@ class LdapQueryBuilder
     }
 
     /**
-     * Get all the attributes that will be returned from this query.
+     * Get the attributes selected for this query.
      *
      * @return array
      */
     public function getAttributes()
     {
-        return $this->getAttributesToSelect($this->operation);
+        return $this->operation->getAttributes();
     }
 
     /**
@@ -461,16 +454,10 @@ class LdapQueryBuilder
                 'To get a LdapQuery instance you must pass a LdapConnection to the constructor'
             );
         }
-        $ldapQuery = new LdapQuery($this->connection);
-        $operation = clone $this->operation;
 
-        $this->hydrator->hydrateToLdap($operation);
-        $operation->setAttributes($this->getAttributesToSelect($operation));
-
-        return $ldapQuery
-            ->setOrderBy($this->orderBy)
-            ->setQueryOperation($operation)
-            ->setLdapObjectSchemas(...$this->operation->getFilter()->getLdapObjectSchemas());
+        return (new LdapQuery($this->connection))
+            ->setQueryOperation(clone $this->operation)
+            ->setOrderBy($this->orderBy);
     }
 
     /**
@@ -491,30 +478,28 @@ class LdapQueryBuilder
      */
     public function toLdapFilter()
     {
-        $operation = clone $this->operation;
-        $this->hydrator->setLdapObjectSchema(...$operation->getFilter()->getLdapObjectSchemas());
-        
-        return $this->hydrator->hydrateToLdap($operation)->getFilter()->toLdapFilter();
+        return $this->hydrator->hydrateToLdap(clone $this->operation)->getFilter();
     }
 
     /**
-     * When a 'From' operator is added for a specific object type, this will be called to load its corresponding
-     * schema definition object and automatically update the "From" object for the query.
-     *
-     * @param mixed $schema
+     * @param string|LdapObjectSchema $type
      * @return LdapObjectSchema
      */
-    protected function addLdapObjectSchema($schema)
-    {
-        if (!($schema instanceof LdapObjectSchema)) {
-            $schema = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $schema);
+    protected function getSchemaFromType($type) {
+        if (is_string($type) && !$this->schemaFactory) {
+            throw new LogicException(
+                'To build a filter with schema types you must pass a SchemaFactory to the constructor'
+            );
+        } elseif (is_string($type)) {
+            $type = $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $type);
+        } elseif (!($type instanceof LdapObjectSchema)) {
+            throw new InvalidArgumentException(
+                'You must either pass the schema object type as a string to this method, or pass the schema types '
+                . 'LdapObjectSchema to this method.'
+            );
         }
-        $this->defaultAttributes = array_filter(
-            array_merge($this->defaultAttributes, $schema->getAttributesToSelect())
-        );
-        $this->operation->getFilter()->addLdapObjectSchema($schema);
 
-        return $schema;
+        return $type;
     }
 
     /**
@@ -541,41 +526,5 @@ class LdapQueryBuilder
             $this->baseOr = $this->filterBuilder->bOr();
             $this->operation->getFilter()->add($this->baseOr);
         }
-    }
-
-    /**
-     * Adds a base 'From' operator for the convenience 'from', 'fromUsers', etc, methods only if it does not already
-     * exist. If it already exists then the supplied operator is added to it.
-     *
-     * @param LdapObjectSchema $schema
-     * @throws \LdapTools\Exception\LdapQueryException
-     * @todo The LdapObjectSchema should require the filter on construction so the exception is not needed
-     */
-    protected function addOrUpdateFrom(LdapObjectSchema $schema)
-    {
-        if (is_null($schema->getFilter())) {
-            throw  new InvalidArgumentException(sprintf(
-                'The schema type "%s" needs a filter defined to query LDAP with it.',
-                $schema->getObjectType()
-            ));
-        }
-
-        if (!$this->baseFrom) {
-            $this->baseFrom = new From($schema->getFilter());
-            $this->operation->getFilter()->add($this->baseFrom);
-        } else {
-            $this->baseFrom->add($schema->getFilter());
-        }
-    }
-
-    /**
-     * Get the attributes that will be selected based on whether a specific selection was called for or not.
-     *
-     * @param QueryOperation $operation
-     * @return array
-     */
-    protected function getAttributesToSelect(QueryOperation $operation)
-    {
-        return empty($operation->getAttributes()) ? $this->defaultAttributes : $operation->getAttributes();
     }
 }

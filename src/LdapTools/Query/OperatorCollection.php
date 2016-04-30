@@ -12,7 +12,6 @@ namespace LdapTools\Query;
 
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Exception\LdapQueryException;
-use LdapTools\Query\Operator\From;
 use LdapTools\Query\Operator\MatchingRule;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Query\Operator\BaseOperator;
@@ -30,15 +29,24 @@ use LdapTools\Query\Operator\Wildcard;
 class OperatorCollection implements \IteratorAggregate
 {
     /**
+     * Validates the characters in an alias.
+     */
+    const ALIAS_REGEX = '/^[a-zA-Z0-9_]+$/';
+
+    /**
      * @var array Contains the LdapObjectSchema objects
      */
     protected $schema = [];
 
     /**
+     * @var LdapObjectSchema[] An array mapping of alias names to schema objects.
+     */
+    protected $aliases = [];
+
+    /**
      * @var array Contains the various Operator objects grouped by their type.
      */
     protected $operators = [
-        'from' => [],
         'and' => [],
         'or' => [],
         'not' => [],
@@ -50,7 +58,7 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Add an Operator to the collection.
      *
-     * @param BaseOperator ...$operators
+     * @param BaseOperator[] ...$operators
      * @return $this
      * @throws LdapQueryException
      */
@@ -69,11 +77,6 @@ class OperatorCollection implements \IteratorAggregate
                 $this->operators['matchingrule'][] = $operator;
             } elseif ($operator instanceof Comparison) {
                 $this->operators['comparison'][] = $operator;
-            } elseif ($operator instanceof From) {
-                if (1 == count($this->operators['from'])) {
-                    throw new LdapQueryException('You cannot add more than one "From" operator to a query');
-                }
-                $this->operators['from'][] = $operator;
             } else {
                 throw new InvalidArgumentException('Unknown operator type.');
             }
@@ -83,23 +86,41 @@ class OperatorCollection implements \IteratorAggregate
     }
 
     /**
-     * Add a LdapObjectSchema for a object type that will be selected for.
+     * Add a LdapObjectSchema for a object type that will be selected for. Optionally specify a specific alias that is
+     * used to reference it. If no alias is specified, then it uses the object type name for the schema.
      *
      * @param LdapObjectSchema $schema
+     * @param null|string $alias
      */
-    public function addLdapObjectSchema(LdapObjectSchema $schema)
+    public function addLdapObjectSchema(LdapObjectSchema $schema, $alias = null)
     {
-        $this->schema[$schema->getObjectType()] = $schema;
+        if (!is_null($alias) && !is_string($alias)) {
+            throw new InvalidArgumentException(sprintf(
+                'The alias for type "%s" must be a string, but "%s" was given.',
+                $schema->getObjectType(),
+                is_string($alias) ? $alias : gettype($alias)
+            ));
+        }
+        $alias = $alias ?: $schema->getObjectType();
+        if (!preg_match(self::ALIAS_REGEX, $alias)) {
+            throw new InvalidArgumentException(sprintf(
+                'The alias "%s" for type "%s" is invalid. Allowed characters are: A-Z, a-z, 0-9, -, _',
+                $alias,
+                $schema->getObjectType()
+            ));
+        }
+        
+        $this->aliases[$alias] = $schema;
     }
 
     /**
-     * Get all the LdapObjectSchemas loaded into the collection by 'type' => object.
-     *
-     * @return LdapObjectSchema[]
+     * Get the aliases in the form of ['alias' => LdapObjectSchema]
+     * 
+     * @return string[]
      */
-    public function getLdapObjectSchemas()
+    public function getAliases()
     {
-        return array_values($this->schema);
+        return $this->aliases;
     }
 
     /**
@@ -110,16 +131,6 @@ class OperatorCollection implements \IteratorAggregate
     public function getIterator()
     {
         return new \ArrayIterator($this->sortOperatorsToArray());
-    }
-
-    /**
-     * Get all the 'From' Operators.
-     *
-     * @return From[]
-     */
-    public function getFromOperators()
-    {
-        return $this->operators['from'];
     }
 
     /**
@@ -195,18 +206,15 @@ class OperatorCollection implements \IteratorAggregate
     /**
      * Get the LDAP filter string representation of all the operators in the collection.
      *
+     * @param string|null $alias The alias to narrow the filter to.
      * @return string
      */
-    public function toLdapFilter()
+    public function toLdapFilter($alias = null)
     {
-        $filters = [];
-        foreach ($this->toArray() as $operator) {
-            $filters[] = $operator->getLdapFilter();
-        }
-        $filter = implode('', $filters);
-
-        if (1 < count($this->toArray())) {
-            $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
+        if (is_null($alias) && !empty($this->aliases)) {
+            $filter = $this->getLdapFilterForAliases();
+        } else {
+            $filter = $this->getLdapFilter($alias);
         }
 
         return $filter;
@@ -234,7 +242,6 @@ class OperatorCollection implements \IteratorAggregate
     protected function sortOperatorsToArray()
     {
         return array_merge(
-            $this->operators['from'],
             $this->operators['and'],
             $this->operators['or'],
             $this->operators['not'],
@@ -242,5 +249,52 @@ class OperatorCollection implements \IteratorAggregate
             $this->operators['wildcard'],
             $this->operators['matchingrule']
         );
+    }
+
+    protected function getLdapFilter($alias)
+    {
+        $filters = [];
+
+        if (!is_null($alias) && !array_key_exists($alias, $this->aliases)) {
+            throw new InvalidArgumentException(sprintf(
+                'Alias "%s" is not valid. Valid aliases are: %s',
+                $alias,
+                empty($this->aliases) ? '(none defined)' : implode(', ', array_keys($this->aliases))
+            ));
+        }
+
+        if (!is_null($alias)) {
+            $filters[] = $this->aliases[$alias]->getFilter()->getLdapFilter();
+        }
+        foreach ($this->toArray() as $operator) {
+            $filters[] = $operator->getLdapFilter($alias);
+        }
+        $filter = implode('', $filters);
+
+        if (1 < count($filters)) {
+            $filter = bAnd::SEPARATOR_START.bAnd::SYMBOL.$filter.bAnd::SEPARATOR_END;
+        }
+
+        return $filter;
+    }
+
+    /**
+     * Constructs a filter for multiple aliases that would return the requested LDAP objects in a single query.
+     *
+     * @return string
+     */
+    protected function getLdapFilterForAliases()
+    {
+        $filters = [];
+
+        foreach (array_keys($this->aliases) as $alias) {
+            $filters[] = $this->getLdapFilter($alias);
+        }
+
+        if (count($filters) == 1) {
+            return $filters[0];
+        } else {
+            return bOr::SEPARATOR_START.bOr::SYMBOL.implode('', $filters).bOr::SEPARATOR_END;
+        }
     }
 }

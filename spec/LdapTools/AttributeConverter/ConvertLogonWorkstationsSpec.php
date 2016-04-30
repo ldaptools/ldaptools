@@ -87,7 +87,7 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
     {
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))' 
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))' 
                 && $operation->getAttributes() == ['userWorkstations'];
         }))->willReturn($this->expectedResult);
 

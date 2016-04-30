@@ -47,19 +47,25 @@ trait ContainsOperatorsTrait
     /**
      * @inheritdoc
      */
-    public function getLdapFilter()
+    public function getLdapFilter($alias = null)
     {
-        return self::SEPARATOR_START.self::SYMBOL.$this->getChildrenFilterString().self::SEPARATOR_END;
+        $innerFilter = $this->getChildrenFilterString($alias);
+        if (empty($innerFilter)) {
+            return '';
+        }
+
+        return self::SEPARATOR_START.self::SYMBOL.$innerFilter.self::SEPARATOR_END;
     }
 
     /**
+     * @param string|null $alias
      * @return string
      */
-    protected function getChildrenFilterString()
+    protected function getChildrenFilterString($alias = null)
     {
         $filters = [];
         foreach ($this->children as $child) {
-            $filters[] = $child->getLdapFilter();
+            $filters[] = $child->getLdapFilter($alias);
         }
 
         return implode($filters);

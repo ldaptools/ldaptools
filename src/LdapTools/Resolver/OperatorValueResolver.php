@@ -33,7 +33,7 @@ class OperatorValueResolver extends BaseValueResolver
      * @param OperatorCollection $operators
      * @param int $type The LDAP operation type. See AttributeConverterInterface::TYPE_*.
      */
-    public function __construct(LdapObjectSchema $schema, OperatorCollection $operators, $type)
+    public function __construct(LdapObjectSchema $schema = null, OperatorCollection $operators, $type)
     {
         parent::__construct($schema, $type);
         $this->operators = $operators;
@@ -46,8 +46,13 @@ class OperatorValueResolver extends BaseValueResolver
      */
     public function toLdap()
     {
-        foreach ($this->operators as $operator) {
-            $this->processOperator($operator);
+        /** @var LdapObjectSchema $schema */
+        foreach ($this->operators->getAliases() as $alias => $schema) {
+            $this->schema = $schema;
+            $this->processOperator($schema->getFilter(), $alias);
+            foreach ($this->operators as $operator) {
+                $this->processOperator($operator, $alias);
+            }
         }
 
         return $this->operators;
@@ -55,30 +60,35 @@ class OperatorValueResolver extends BaseValueResolver
 
     /**
      * @param BaseOperator $operator
+     * @param string|null $alias
+     * @oaran string $alias
      */
-    protected function processOperator(BaseOperator $operator)
+    protected function processOperator(BaseOperator $operator, $alias)
     {
         if ($operator instanceof ContainsOperatorsInterface) {
             foreach ($operator->getChildren() as $childOperator) {
-                $this->processOperator($childOperator);
+                $this->processOperator($childOperator, $alias);
             }
-        } elseif (!$operator->getWasConverterUsed() && $this->schema->hasConverter($operator->getAttribute())) {
-            $this->convertOperatorValues($operator);
+        } elseif (!$operator->getWasConverterUsed($alias) && $this->schema->hasConverter($operator->getAttribute())) {
+            $this->convertOperatorValues($operator, $alias);
         }
-        $operator->setTranslatedAttribute($this->schema->getAttributeToLdap($operator->getAttribute()));
+        $operator->setTranslatedAttribute($this->schema->getAttributeToLdap($operator->getAttribute()), $alias);
     }
 
     /**
      * @param BaseOperator $operator
+     * @param string $alias
      */
-    protected function convertOperatorValues(BaseOperator $operator)
+    protected function convertOperatorValues(BaseOperator $operator, $alias)
     {
+        if (!is_null($operator->getAlias()) && $operator->getAlias() !== $alias) {
+            return;
+        }
         $isValueArray = is_array($operator->getValue());
         $values = $isValueArray ? $operator->getValue() : [$operator->getValue()];
         $values = $this->doConvertValues($operator->getAttribute(), $values, 'toLdap');
-
-        $operator->setConvertedValue($isValueArray ? $values : $values[0]);
-        $operator->setWasConverterUsed(true);
+        $operator->setConvertedValue($isValueArray ? $values : $values[0], $alias);
+        $operator->setWasConverterUsed(true, $alias);
     }
     
     /**

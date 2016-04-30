@@ -12,6 +12,7 @@ namespace spec\LdapTools\Query;
 
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCollection;
+use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -44,6 +45,33 @@ class LdapResultSorterSpec extends ObjectBehavior
         ],
     ];
 
+    protected $toSortGroups = [
+        [
+            'name' => 'Marketing',
+            'description' => 'Pointless Stuff',
+        ],
+        [
+            'name' => 'Finance',
+            'description' => 'Money and Things',
+        ],
+        [
+            'name' => 'Accounting',
+            'description' => 'Excel Spreadsheet Makers',
+        ],
+        [
+            'name' => 'Accounts Payable',
+            'description' => 'More Money and Things',
+        ],
+        [
+            'name' => 'IT',
+            'description' => 'Tech People',
+        ],
+        [
+            'name' => 'Environmental',
+            'description' => 'Waste Disposal Specialists',
+        ],
+    ];    
+
     protected $orderBy = [
         'firstName' => 'ASC'
     ];
@@ -57,7 +85,7 @@ class LdapResultSorterSpec extends ObjectBehavior
     {
         $this->collection = new LdapObjectCollection();
         foreach ($this->toSort as $sort) {
-            $this->collection->add(new LdapObject($sort, ['person'], 'user', 'user'));
+            $this->collection->add(new LdapObject($sort, 'user'));
         }
         $this->beConstructedWith($this->orderBy);
     }
@@ -124,6 +152,25 @@ class LdapResultSorterSpec extends ObjectBehavior
         $this->beConstructedWith(['created' => 'DESC']);
         $this->sort($toSort)->shouldHaveFirstValue('lastName','Feng');
         $this->sort($toSort)->shouldHaveFirstValue('firstName','Amy');
+    }
+
+    function it_should_sort_on_multiple_attributes_with_aliases()
+    {
+        $aliases = [
+            'user' => new LdapObjectSchema('ad', 'user'),
+            'group' => new LdapObjectSchema('ad', 'group'),
+        ];
+        $this->beConstructedWith(['name' => 'ASC', 'user.firstName' => 'ASC'], $aliases);
+        foreach ($this->toSortGroups as $sort) {
+            $this->collection->add(new LdapObject($sort, 'group'));
+        }
+
+        $this->sort($this->toSort)->shouldHaveFirstValue('firstName','Amy');
+        $this->sort($this->toSort)->shouldHaveLastValue('firstName','Tim');
+        $this->sort(array_merge($this->toSort, $this->toSortGroups))->shouldHaveFirstValue('name','Accounting');
+        $this->sort(array_merge($this->toSort, $this->toSortGroups))->shouldHaveLastValue('lastName','Peterson');
+        $this->sort($this->collection)->first()->get('name')->shouldBeEqualTo('Accounting');
+        $this->sort($this->collection)->last()->get('lastName')->shouldBeEqualTo('Peterson');
     }
 
     public function getMatchers()

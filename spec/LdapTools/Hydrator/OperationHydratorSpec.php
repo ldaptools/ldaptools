@@ -23,6 +23,8 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Builder\FilterBuilder;
+use LdapTools\Query\LdapQuery;
+use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Schema\Parser\SchemaYamlParser;
@@ -47,6 +49,11 @@ class OperationHydratorSpec extends ObjectBehavior
     protected $rootDse;
 
     /**
+     * @var SchemaYamlParser
+     */
+    protected $parser;
+
+    /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      * @param \LdapTools\Object\LdapObject $rootdse
      */
@@ -60,8 +67,8 @@ class OperationHydratorSpec extends ObjectBehavior
         $this->rootDse = $rootdse;
 
         $config = new Configuration();
-        $parser = new SchemaYamlParser($config->getSchemaFolder());
-        $this->schema = $parser->parse('ad', 'user');
+        $this->parser = new SchemaYamlParser($config->getSchemaFolder());
+        $this->schema = $this->parser->parse('ad', 'user');
     }
 
     function it_is_initializable()
@@ -147,7 +154,7 @@ class OperationHydratorSpec extends ObjectBehavior
         $collection->add($filter->eq('bar','foo'));
         $operation = new QueryOperation($collection, ['foo']);
 
-        $this->hydrateToLdap($operation)->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
+        $this->hydrateToLdap($operation)->getFilter()->shouldBeEqualTo('(&(foo=bar)(bar=foo))');
         $this->hydrateToLdap($operation)->getBaseDn()->shouldBeNull();
     }
 
@@ -166,7 +173,9 @@ class OperationHydratorSpec extends ObjectBehavior
         $collection->addLdapObjectSchema($this->schema);
         $operation = new QueryOperation($collection, ['foo']);
 
-        $this->hydrateToLdap($operation)->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(givenName=foo)(sn=bar)(msExchHideFromAddressLists=FALSE))');
+        $this->hydrateToLdap($operation)->getFilter()->shouldBeEqualTo(
+            '(&(&(objectCategory=person)(objectClass=user))(givenName=foo)(sn=bar)(msExchHideFromAddressLists=FALSE))'
+        );
         $this->hydrateToLdap($operation)->getBaseDn()->shouldBeEqualTo('dc=foo,dc=bar');
     }
 
@@ -176,8 +185,12 @@ class OperationHydratorSpec extends ObjectBehavior
     function it_should_not_attempt_to_resolve_parameters_for_a_base_dn_for_the_RootDSE($operation)
     {
         $operation->getBaseDn()->willReturn('');
+        $operation->getAttributes()->willReturn(['foo']);
+        $operation->setAttributes(['foo'])->shouldBeCalled();
+        $operation->getFilter()->willReturn('(objectClass=*)');
+
+        $this->connection->getRootDse()->shouldNotBeCalled();
         $operation->setBaseDn(Argument::any())->shouldNotBeCalled();
-        
         $this->hydrateToLdap($operation);
     }
     
@@ -198,7 +211,7 @@ class OperationHydratorSpec extends ObjectBehavior
         
         $operation = new QueryOperation('(foo=bar)');
         $operation->setBaseDn('%_defaultNamingContext_%');
-        
+
         $this->hydrateToLdap($operation)->getBaseDn()->shouldBeEqualTo($rootDse['defaultNamingContext']);
     }
     
@@ -233,7 +246,7 @@ class OperationHydratorSpec extends ObjectBehavior
 
     function it_should_set_the_scope_based_off_the_schema()
     {
-        $operation = new QueryOperation('(foo=bar');
+        $operation = new QueryOperation('(foo=bar)');
 
         $this->setLdapObjectSchema($this->schema);
         $this->setLdapConnection($this->connection);
@@ -243,6 +256,102 @@ class OperationHydratorSpec extends ObjectBehavior
         $this->schema->setScope(QueryOperation::SCOPE['ONELEVEL']);
 
         $this->hydrateToLdap($operation)->getScope()->shouldBeEqualTo('onelevel');
+    }
+    
+    function it_should_select_get_the_correct_attributes_to_select_based_off_the_alias_in_use()
+    {
+        $this->setLdapConnection($this->connection);
+        $gSchema = $this->parser->parse('ad','group');
+
+        $operators = new OperatorCollection();
+        $operators->addLdapObjectSchema($this->schema, 'u');
+        $operators->addLdapObjectSchema($gSchema, 'g');
+        
+        $operationSelect = new QueryOperation($operators);
+        $operationDefault = clone $operationSelect;
+        $operationSelect->setAttributes(['u.firstName', 'u.lastName', 'name', 'g.description', 'g.members']);
+        $operationDefault->setAttributes(['g.name', 'g.description']);
+        
+        // Only the specifically selected attributes for the alias, in addition to the generic name attribute.
+        $this->setLdapObjectSchema($this->schema);
+        $this->setAlias('u');
+        $this->hydrateToLdap(clone $operationSelect)->getAttributes()->shouldBeEqualTo([
+            'givenName', 
+            'sn', 
+            'cn'
+        ]);
+
+        // Only the specifically selected attributes, in addition to the generic name attribute.
+        $this->setLdapObjectSchema($gSchema);
+        $this->setAlias('g');
+        $this->hydrateToLdap(clone $operationSelect)->getAttributes()->shouldBeEqualTo([
+            'cn',
+            'description',
+            'member'
+        ]);
+
+        // Check that defaults for a given alias are selected if non specifically are for that alias.
+        $this->setLdapObjectSchema($this->schema);
+        $this->setAlias('u');
+        $this->hydrateToLdap(clone $operationDefault)->getAttributes()->shouldBeEqualTo([
+            'cn',
+            'givenName',
+            'sn',
+            'sAMAccountName',
+            'mail',
+            'distinguishedName',
+            'objectGuid',
+        ]);
+    }
+    
+    function it_should_correctly_add_attributes_to_select_based_off_aliases_in_the_order_by_selection()
+    {
+        $this->setLdapConnection($this->connection);
+        $gSchema = $this->parser->parse('ad','group');
+
+        $operators = new OperatorCollection();
+        $operators->addLdapObjectSchema($this->schema, 'u');
+        $operators->addLdapObjectSchema($gSchema, 'g');
+
+        $operationSelect = new QueryOperation($operators);
+        $operationDefault = clone $operationSelect;
+        $operationSelect->setAttributes(['u.firstName', 'u.lastName', 'name', 'g.description', 'g.members']);
+        $operationDefault->setAttributes(['g.name', 'g.description']);
+
+        $this->setOrderBy([
+            'g.sid' => LdapQuery::ORDER['DESC'],
+            'u.department' => LdapQuery::ORDER['ASC'],
+            'guid' => LdapQuery::ORDER['ASC'],
+            'u.lastName' => LdapQuery::ORDER['DESC'],
+        ]);
+        
+        // Any specifically selected attributes + specifically aliased attributes in the order by + generic in the order by.
+        // Should also avoid adding duplicates.
+        $this->setLdapObjectSchema($this->schema);
+        $this->setAlias('u');
+        $this->hydrateToLdap(clone $operationSelect)->getAttributes()->shouldBeEqualTo([
+            'givenName',
+            'sn',
+            'cn',
+            'department',
+            'objectGuid',
+        ]);        
+    }
+    
+    function it_should_hydrate_the_ldap_filter_for_a_query_operation_based_off_the_current_alias()
+    {
+        $this->setLdapConnection($this->connection);
+        $gSchema = $this->parser->parse('ad','group');
+
+        $operators = new OperatorCollection();
+        $operators->addLdapObjectSchema($this->schema, 'u');
+        $operators->addLdapObjectSchema($gSchema, 'g');
+        $operators->add(new Comparison('g.foo', '=', 'bar'));
+        $operators->add(new Comparison('u.bar', '=', 'foo'));
+        $operation = new QueryOperation($operators);
+        
+        $this->setAlias('g');
+        $this->hydrateToLdap($operation)->getFilter()->shouldBeEqualTo('(&(objectClass=group)(foo=bar))');
     }
     
     function it_should_only_support_an_operation_going_to_ldap()

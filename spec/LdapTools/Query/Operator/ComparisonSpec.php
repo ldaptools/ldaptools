@@ -163,6 +163,86 @@ class ComparisonSpec extends ObjectBehavior
         $this->getLdapFilter()->shouldBeEqualTo('(foo~=\2a\28foo=\29\28\2a)');
     }
 
+    function it_should_set_the_alias_based_off_the_attribute()
+    {
+        $this->beConstructedWith('foo.bar', '=', 'foo');
+
+        $this->getAlias()->shouldBeEqualTo('foo');
+        $this->getAttribute()->shouldBeEqualTo('bar');
+
+        $this->setAttribute('bar.foo');
+        $this->getAlias()->shouldBeEqualTo('bar');
+        $this->getAttribute()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_set_the_converted_value_for_a_specific_alias()
+    {
+        $this->setValue('foo');
+        $this->setConvertedValue('bar', 'foo');
+        $this->getConvertedValue('foo')->shouldBeEqualTo('bar');
+        // If a converted value was never set for an alias, it will return null.
+        $this->getConvertedValue('bar')->shouldBeEqualTo(null);
+        // No 'non-alias' converted value was set, so this would return null too.
+        $this->getConvertedValue()->shouldBeEqualTo(null);
+    }
+
+    function it_should_set_the_translated_attribute_name_for_a_specific_alias()
+    {
+        $this->setAttribute('name');
+        $this->setTranslatedAttribute('ou', 'ou');
+        $this->setTranslatedAttribute('cn', 'container');
+        $this->getTranslatedAttribute('ou')->shouldBeEqualTo('ou');
+        $this->getTranslatedAttribute('container')->shouldBeEqualTo('cn');
+        // If a translated attribute was never set for an alias, it will return an empty string.
+        $this->getTranslatedAttribute('bar')->shouldBeEqualTo('');
+        // No 'non-alias' translated attribute was set, so this would return an empty string too.
+        $this->getTranslatedAttribute()->shouldBeEqualTo('');
+    }
+
+    function it_should_set_if_a_converter_was_used_for_a_specific_alias()
+    {
+        $this->setAttribute('foo');
+        $this->getWasConverterUsed()->shouldBeEqualTo(false);
+        $this->getWasConverterUsed('foo')->shouldBeEqualTo(false);
+
+        $this->setWasConverterUsed(true);
+        $this->getWasConverterUsed()->shouldBeEqualTo(true);
+        $this->getWasConverterUsed('foo')->shouldBeEqualTo(false);
+
+        $this->setWasConverterUsed(true, 'foo');
+        $this->setWasConverterUsed(false);
+        $this->getWasConverterUsed('foo')->shouldBeEqualTo(true);
+        $this->getWasConverterUsed()->shouldBeEqualTo(false);
+    }
+
+    function it_should_return_the_LDAP_filter_correctly_based_on_the_alias_in_use()
+    {
+        $this->setAttribute('bar.foo');
+
+        // When set to a specific alias (in this case 'bar'), other aliases will generate an empty string...
+        $this->getLdapFilter('foo')->shouldBeEqualTo('');
+        // The absence of an alias when one is explicitly set will also return an empty string...
+        $this->getLdapFilter()->shouldBeEqualTo('');
+        // When the alias is specifically called then the filter will be returned...
+        $this->getLdapFilter('bar')->shouldBeEqualTo('(foo=bar)');
+
+        $this->setAttribute('foo');
+        // No alias defined according to the attribute, so no alias specified will return the filter...
+        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar)');
+        // This will return the filter for the context of the 'foo' alias, as a specific alias wasn't defined.
+        $this->getLdapFilter('foo')->shouldBeEqualTo('(foo=bar)');
+    }
+
+    function it_should_get_the_LDAP_filter_with_any_converted_values_or_translated_attributes_for_an_alias()
+    {
+        $this->setAttribute('u.foo');
+        $this->getLdapFilter('u')->shouldBeEqualTo('(foo=bar)');
+        $this->setTranslatedAttribute('foobar', 'u');
+        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=bar)');
+        $this->setConvertedValue('foo', 'u');
+        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=foo)');
+    }
+
     public function getMatchers()
     {
         return [

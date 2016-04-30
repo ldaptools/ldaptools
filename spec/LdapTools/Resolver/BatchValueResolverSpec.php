@@ -153,7 +153,7 @@ class BatchValueResolverSpec extends ObjectBehavior
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
                 && $operation->getAttributes() == ['userAccountControl'];
         }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
@@ -189,7 +189,7 @@ class BatchValueResolverSpec extends ObjectBehavior
 
         $batch = $ldapObject->getBatchCollection();
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
             && $operation->getAttributes() == ['userAccountControl'];
         }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);

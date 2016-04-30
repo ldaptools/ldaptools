@@ -25,8 +25,9 @@ class LdapObjectSpec extends ObjectBehavior
 
     function let()
     {
-        $this->beConstructedWith($this->attributes, ['top', 'organizationalPerson', 'user'], 'user', 'user');
+        $this->beConstructedWith($this->attributes, 'user');
     }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Object\LdapObject');
@@ -219,18 +220,6 @@ class LdapObjectSpec extends ObjectBehavior
     function it_should_return_self_when_calling_remove()
     {
         $this->remove('firstName', 'Chad')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
-    }
-
-    function it_should_check_if_the_object_contains_an_objectClass()
-    {
-        $this->isClass('organizationalPerson')->shouldBeEqualTo(true);
-        $this->isClass('group')->shouldBeEqualTo(false);
-    }
-
-    function it_should_check_if_the_object_is_a_specific_category()
-    {
-        $this->isCategory('user')->shouldBeEqualTo(true);
-        $this->isCategory('contact')->shouldBeEqualTo(false);
     }
 
     function it_should_check_if_the_object_is_a_specific_type()

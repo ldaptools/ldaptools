@@ -116,16 +116,16 @@ class ConvertGPLinkSpec extends ObjectBehavior
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
         
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)))';
+            return $operation->getFilter() == '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)))';
         }))->willReturn($this->expectedDisplayResult);
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))';
+            return $operation->getFilter() == '(&(|(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))';
         }))->willReturn($this->expectedSingleDisplayResult);
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(displayName=Foo)(displayName=Bar)))';
+            return $operation->getFilter() == '(&(|(displayName=Foo)(displayName=Bar)))';
         }))->willReturn($this->expectedDNResult);
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=ou=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=ou=foo,dc=foo,dc=bar))';
         }))->willReturn($this->expectedCurrentValueResult);
 
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
@@ -182,10 +182,10 @@ class ConvertGPLinkSpec extends ObjectBehavior
             'dn' => "cn={8E1F85EB-4882-4920-88A5-CF52F31D8D32},cn=policies,cn=system,DC=example,DC=local",
         ];
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(displayName=Foo)(displayName=Bar)(displayName=FooBar)))';
+            return $operation->getFilter() == '(&(|(displayName=Foo)(displayName=Bar)(displayName=FooBar)))';
         }))->willReturn($result);
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(|(displayName=Bar)(displayName=FooBar)))';
+            return $operation->getFilter() == '(&(|(displayName=Bar)(displayName=FooBar)))';
         }))->willReturn($anotherResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);

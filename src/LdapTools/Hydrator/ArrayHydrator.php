@@ -14,7 +14,6 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Exception\LogicException;
-use LdapTools\Query\LdapResultSorter;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\AttributeNameResolver;
 use LdapTools\Resolver\BaseValueResolver;
@@ -156,9 +155,6 @@ class ArrayHydrator implements HydratorInterface
         for ($i = 0; $i < $entryCount; $i++) {
             $results[] = $this->hydrateFromLdap($entries[$i]);
         }
-        if (!empty($this->orderBy)) {
-            $results = $this->sortResults($results);
-        }
 
         return $results;
     }
@@ -194,28 +190,6 @@ class ArrayHydrator implements HydratorInterface
     public function setLdapConnection(LdapConnectionInterface $connection = null)
     {
         $this->connection = $connection;
-    }
-
-    /**
-     * Takes a LDAP result set and passes it on to the sorter. Makes sure that orderBy attributes are in the correct
-     * case first, if possible.
-     *
-     * @param array $results
-     * @return array
-     */
-    protected function sortResults(array $results)
-    {
-        $orderBy = [];
-        if ($this->schema && $this->selectedAttributes !== ['*']) {
-            // Ignore case differences to ease later comparisons.
-            foreach ($this->orderBy as $attribute => $direction) {
-                $orderBy[AttributeNameResolver::getKeyNameCaseInsensitive($attribute, $this->selectedAttributes)] = $direction;
-            }
-        } else {
-            $orderBy = $this->orderBy;
-        }
-
-        return (new LdapResultSorter($orderBy))->sort($results);
     }
 
     /**
@@ -325,7 +299,7 @@ class ArrayHydrator implements HydratorInterface
      */
     protected function convertValuesToLdap($values, $dn = null)
     {
-        if (!$this->schema) {
+        if (!($values instanceof OperatorCollection) && !$this->schema) {
             return $values;
         }
         $valueResolver = BaseValueResolver::getInstance(

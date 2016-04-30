@@ -42,6 +42,8 @@ syntax for LDAP filters. All values are also automatically escaped. Check the [t
 available methods and the [cookbook](/docs/en/cookbook/Common-LDAP-Queries.md) for more query examples.
 
 ```php
+use LdapTools\Object\LdapObjectType;
+
 // Get an instance of the query...
 $query = $ldap->buildLdapQuery();
 
@@ -60,6 +62,15 @@ echo "Found ".$users->count()." user(s).";
 foreach ($users as $user) {
     echo "User: ".$user->getUsername();
 }
+
+// Get all OUs and Containers at the base of the domain, ordered by name.
+$results = $ldap->buildLdapQuery()
+    ->from(LdapObjectType::OU)
+    ->from(LdapObjectType::CONTAINER)
+    ->orderBy('name')
+    ->setScopeOneLevel()
+    ->getLdapQuery()
+    ->getResult();
 
 // Get a single LDAP object and select some specific attributes...
 $user = $ldap->buildLdapQuery()

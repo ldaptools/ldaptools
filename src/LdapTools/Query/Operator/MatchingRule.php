@@ -36,7 +36,7 @@ class MatchingRule extends BaseOperator
     {
         $this->validOperators = [ self::SYMBOL ];
         $this->operatorSymbol = self::SYMBOL;
-        $this->attribute = $attribute;
+        $this->setAttribute($attribute);
         $this->value = $value;
         $this->oid = $oid;
     }
@@ -44,17 +44,20 @@ class MatchingRule extends BaseOperator
     /**
      * {@inheritdoc}
      */
-    public function getLdapFilter()
+    public function getLdapFilter($alias = null)
     {
+        if ($this->skipFilterForAlias($alias)) {
+            return '';
+        }
         if (!LdapUtilities::isValidAttributeFormat($this->oid)) {
             throw new LdapQueryException(sprintf('Matching rule "%s" is not a valid format.', $this->oid));
         }
 
         return self::SEPARATOR_START
-            .$this->getAttributeToQuery()
+            .$this->getAttributeToQuery($alias)
             .':'.$this->oid.':'
             .$this->operatorSymbol
-            .LdapUtilities::escapeValue($this->getValueForQuery(), null, LDAP_ESCAPE_FILTER)
+            .LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER)
             .self::SEPARATOR_END;
     }
 }

@@ -11,6 +11,8 @@
 namespace LdapTools\Query;
 
 use LdapTools\Object\LdapObject;
+use LdapTools\Object\LdapObjectCollection;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Sorts LDAP results by specified attributes and direction (ASC, DESC).
@@ -25,24 +27,33 @@ class LdapResultSorter
     protected $orderBy = [];
 
     /**
-     * @param array $orderBy
+     * @var \LdapTools\Schema\LdapObjectSchema[]
      */
-    public function __construct(array $orderBy)
+    protected $aliases = [];
+
+    /**
+     * @param array $orderBy
+     * @param \LdapTools\Schema\LdapObjectSchema[] $aliases The aliases used, if any (in the form of ['alias' => LdapObjectSchema])
+     */
+    public function __construct(array $orderBy = [], array $aliases = [])
     {
         $this->orderBy = $orderBy;
+        $this->aliases = $aliases;
     }
 
     /**
      * Reorganize the array to the desired orderBy methods passed to the class.
      *
-     * @param array $results The unsorted result set.
+     * @param array|LdapObjectCollection $results The unsorted result set.
      * @return array The sorted result set.
      */
-    public function sort(array $results)
+    public function sort($results)
     {
+        $isCollection = $results instanceof LdapObjectCollection;
+        $results = $isCollection ? $results->toArray() : $results;
         usort($results, array($this, 'resultSortCallback'));
 
-        return $results;
+        return $isCollection ? new LdapObjectCollection(...$results) : $results;
     }
 
     /**
@@ -103,13 +114,19 @@ class LdapResultSorter
      */
     protected function getComparisonValue($entry, $attribute)
     {
+        $alias = null;
+        if (!empty($this->aliases)) {
+            list($alias, $attribute) = LdapUtilities::getAliasAndAttribute($attribute);
+        }
+
         $value = '';
         if (is_array($entry) && isset($entry[$attribute])) {
             $value = $entry[$attribute];
         // Be forgiving if they are hydrating to an array and the case of the attribute was not correct.
         } elseif (is_array($entry) && array_key_exists(strtolower($attribute), array_change_key_case($entry))) {
             $value = array_change_key_case($entry)[strtolower($attribute)];
-        } elseif (($entry instanceof LdapObject) && $entry->has($attribute)) {
+        // Only get the value if there is no alias requested, or if an alias was requested the object type must match the alias.    
+        } elseif (($entry instanceof LdapObject) && (!$alias || $entry->isType($this->aliases[$alias]->getObjectType())) && $entry->has($attribute)) {
             $value = $entry->get($attribute);
         }
         // How to handle multi-valued attributes? This will at least prevent errors, but may not be accurate.

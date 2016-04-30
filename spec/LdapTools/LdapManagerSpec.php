@@ -208,7 +208,6 @@ class LdapManagerSpec extends ObjectBehavior
 
         $this->beConstructedWith($config);
         $this->buildLdapQuery()
-            ->select()
             ->from('custom_converter')
             ->where(['foo' => true])
             ->toLdapFilter()->shouldBeEqualTo('(&(objectClass=foo)(&(bar=TRUE)))');
@@ -243,7 +242,7 @@ class LdapManagerSpec extends ObjectBehavior
         $connection->getConfig()->willReturn($domainConfig);
         $this->beConstructedWith(new Configuration(), $connection);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'],['user'], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $operation = new DeleteOperation($ldapObject->get('dn'));
         $connection->execute($operation)->shouldBeCalled();
 
@@ -265,8 +264,8 @@ class LdapManagerSpec extends ObjectBehavior
         $this->beConstructedWith(new Configuration(), $connection);
         $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
 
-        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
-        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
+        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
         
         $connection->execute(Argument::that(function($operation) use ($dn) {
             /** @var BatchModifyOperation $operation */

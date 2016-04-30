@@ -101,7 +101,7 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
                 && $operation->getAttributes() == ['proxyAddresses'];
         }))->willReturn($this->expectedResult);
         $addresses = [

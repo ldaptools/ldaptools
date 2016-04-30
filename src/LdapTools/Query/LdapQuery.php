@@ -17,10 +17,12 @@ use LdapTools\Exception\EmptyResultException;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Exception\MultiResultException;
 use LdapTools\Factory\HydratorFactory;
+use LdapTools\Hydrator\HydrateQueryTrait;
 use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\LdapUtilities;
 
 /**
  * Executes and hydrates a LDAP query.
@@ -29,6 +31,8 @@ use LdapTools\Schema\LdapObjectSchema;
  */
 class LdapQuery
 {
+    use HydrateQueryTrait;
+
     /**
      * The valid ordering types for data hydrated from LDAP.
      */
@@ -188,23 +192,13 @@ class LdapQuery
      */
     public function execute($hydratorType = HydratorFactory::TO_OBJECT)
     {
-        $hydrator = $this->hydratorFactory->get($hydratorType);
-        $operatorAttributes = $this->operation->getAttributes();
-        $attributes = $this->getAttributesToLdap($this->getSelectedAttributes());
+        if (is_string($this->operation->getFilter()) || empty($this->operation->getFilter()->getAliases())) {
+            $results = $this->getResultsFromLdap(clone $this->operation, $hydratorType);
+        } else {
+            $results = $this->getResultsForAliases($hydratorType);
+        }
 
-        $hydrator->setLdapObjectSchema(...$this->schemas);
-        $hydrator->setSelectedAttributes($this->mergeOrderByAttributes($this->getSelectedAttributes()));
-        $hydrator->setLdapConnection($this->ldap);
-        $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
-        $hydrator->setOrderBy($this->orderBy);
-
-        $opHydrator = new OperationHydrator($this->ldap);
-        $opHydrator->setLdapObjectSchema(...$this->schemas);
-        $this->operation->setAttributes($attributes);
-        $results = $hydrator->hydrateAllFromLdap($this->ldap->execute($opHydrator->hydrateToLdap($this->operation)));
-        $this->operation->setAttributes($operatorAttributes);
-
-        return $results;
+        return $this->sortResults($results);
     }
 
     /**
@@ -228,29 +222,6 @@ class LdapQuery
     public function getQueryOperation()
     {
         return $this->operation;
-    }
-
-    /**
-     * Set the LDAP schema objects to be used for the results.
-     *
-     * @param LdapObjectSchema[] $schemas
-     * @return $this
-     */
-    public function setLdapObjectSchemas(LdapObjectSchema ...$schemas)
-    {
-        $this->schemas = $schemas;
-
-        return $this;
-    }
-
-    /**
-     * Get the LdapObjectSchemas added to this query.
-     *
-     * @return LdapObjectSchema[] LdapObjectSchemas
-     */
-    public function getLdapObjectSchemas()
-    {
-        return $this->schemas;
     }
 
     /**
@@ -287,76 +258,120 @@ class LdapQuery
     }
 
     /**
-     * If there are schemas present, then translate selected attributes to retrieve to their LDAP names.
-     *
-     * @param array $attributes
-     * @return array
+     * @param mixed $results
+     * @return mixed $results
      */
-    protected function getAttributesToLdap(array $attributes)
+    protected function sortResults($results)
     {
-        if (!empty($this->orderBy)) {
-            $attributes = $this->mergeOrderByAttributes($attributes);
+        if (empty($this->orderBy)) {
+            return $results;
         }
+        $aliases = [];
+        if (!is_string($this->operation->getFilter()) && !empty($this->operation->getFilter()->getAliases())) {
+            $aliases = $this->operation->getFilter()->getAliases();
+        }
+        $selected = $this->getSelectedForAllAliases($aliases);
+        $orderBy = $this->getFormattedOrderBy($selected, $aliases);
 
-        if (!empty($this->schemas)) {
-            /** @var LdapObjectSchema $schema */
-            $schema = reset($this->schemas);
-            $newAttributes = [];
-            foreach ($attributes as $attribute) {
-                $newAttributes[] = $schema->getAttributeToLdap($attribute);
+        return (new LdapResultSorter($orderBy, $aliases))->sort($results);
+    }
+
+    /**
+     * @param QueryOperation $operation
+     * @param string $hydratorType
+     * @param null|LdapObjectSchema $schema
+     * @param null|string $alias
+     * @return mixed
+     */
+    protected function getResultsFromLdap(QueryOperation $operation, $hydratorType, $schema = null, $alias = null)
+    {
+        $hydrator = $this->hydratorFactory->get($hydratorType);
+        $hydrator->setLdapConnection($this->ldap);
+        $hydrator->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
+        $hydrator->setLdapObjectSchema($schema);
+        $hydrator->setSelectedAttributes($this->getAttributesToLdap($operation->getAttributes(), false, $schema, $alias));
+
+        $opHydrator = new OperationHydrator($this->ldap);
+        $opHydrator->setAlias($alias);
+        $opHydrator->setOrderBy($this->orderBy);
+        $opHydrator->setLdapObjectSchema($schema);
+        $opHydrator->hydrateToLdap($operation);
+
+        return $hydrator->hydrateAllFromLdap($this->ldap->execute($operation));
+    }
+
+    /**
+     * Goes through each alias for the operation to get results only for that specific type, then combine and return
+     * them all.
+     *
+     * @param string $hydratorType
+     * @return array|LdapObjectCollection|mixed
+     */
+    protected function getResultsForAliases($hydratorType)
+    {
+        /** @var LdapObjectCollection|array $results */
+        $results = [];
+
+        foreach ($this->operation->getFilter()->getAliases() as $alias => $schema) {
+            $objects = $this->getResultsFromLdap(clone $this->operation, $hydratorType, $schema, $alias);
+            if ($objects instanceof LdapObjectCollection && $results) {
+                $results->add(...$objects->toArray());
+            } elseif ($objects instanceof LdapObjectCollection) {
+                $results = $objects;
+            } else {
+                $results = array_merge($results, $objects);
             }
-            $attributes = $newAttributes;
         }
 
-        return $attributes;
+        return $results;
     }
 
     /**
-     * If any attributes that were requested to be ordered by are not explicitly in the attribute selection, add them.
-     *
-     * @param array $attributes
+     * Get all the attributes that were selected for the query taking into account all of the aliases used.
+     * 
+     * @param array $aliases
      * @return array
      */
-    protected function mergeOrderByAttributes(array $attributes)
+    protected function getSelectedForAllAliases(array $aliases)
     {
-        if (!$this->isWildCardSelection()) {
-            foreach (array_keys($this->orderBy) as $attribute) {
-                if (!in_array(strtolower($attribute), array_map('strtolower', $attributes))) {
-                    $attributes[] = $attribute;
-                }
+        if (empty($aliases)) {
+            $selected = $this->mergeOrderByAttributes($this->getSelectedQueryAttributes($this->operation->getAttributes()));
+        } else {
+            // If there are aliases, then we need to loop through each one to determine was was actually selected for each.
+            $selected = [];
+            foreach ($aliases as $alias => $schema) {
+                $selected = array_replace(
+                    $selected,
+                    $this->mergeOrderByAttributes($this->getSelectedQueryAttributes($this->operation->getAttributes(), $schema), $alias)
+                );
             }
         }
 
-        return $attributes;
+        return $selected;
     }
 
     /**
-     * Determine what attributes should be selected. This helps account for all attributes being selected both within
-     * and out of the context of a schema.
-     *
+     * This formats the orderBy array to ignore case differences between the orderBy name and the actually selected name,
+     * such as for sorting arrays.
+     * 
+     * @param $selected
+     * @param $aliases
      * @return array
      */
-    protected function getSelectedAttributes()
+    protected function getFormattedOrderBy($selected, $aliases)
     {
-        $attributes = $this->operation->getAttributes();
-
-        // Interpret a single wildcard as only schema attributes.
-        if (!empty($this->schemas) && !empty($attributes) && $attributes[0] == '*') {
-            $attributes = array_keys($this->schemas[0]->getAttributeMap());
-        // Interpret a double wildcard as all LDAP attributes even if they aren't in the schema file.
-        } elseif (!empty($this->schemas) && !empty($attributes) && $attributes[0] == '**') {
-            $attributes = ['*'];
+        if (!empty($aliases) && !$this->isWildCardSelection()) {
+            $orderBy = [];
+            foreach ($this->orderBy as $attribute => $direction) {
+                list($alias, $attr) = LdapUtilities::getAliasAndAttribute($attribute);
+                $orderAttr = LdapUtilities::getValueCaseInsensitive($attr, $selected);
+                $orderAttr = $alias ? "$alias.$orderAttr" : $orderAttr;
+                $orderBy[$orderAttr] = $direction;
+            }
+        } else {
+            $orderBy = $this->orderBy;
         }
 
-        return $attributes;
-    }
-
-    /**
-     *
-     * @return bool
-     */
-    protected function isWildCardSelection()
-    {
-        return (count($this->operation->getAttributes()) === 1 && ($this->operation->getAttributes()[0] == '*' || $this->operation->getAttributes()[0] == '**'));
+        return $orderBy;
     }
 }

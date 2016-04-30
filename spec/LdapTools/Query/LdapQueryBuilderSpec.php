@@ -249,27 +249,10 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->shouldThrow('LdapTools\Exception\LogicException')->during('from', ['foo']);
     }
 
-    function it_should_honor_default_attributes_to_select_when_present_in_the_LdapObjectSchema()
+    function it_should_set_the_attributes_to_select()
     {
-        $attributes = ['foo', 'bar'];
-        $this->objectSchema->setObjectClass('user');
-        $this->objectSchema->setObjectCategory('person');
-        $this->objectSchema->setAttributesToSelect($attributes);
-
-        $this->select();
-        $this->from($this->objectSchema);
-        $this->getAttributes()->shouldBeEqualTo($attributes);
-    }
-
-    function it_should_override_default_attributes_to_select_when_explicitly_setting_attributes_in_select()
-    {
-        $attributes = ['foo'];
-        $this->objectSchema->setObjectClass('user');
-        $this->objectSchema->setObjectCategory('person');
-        $this->objectSchema->setAttributesToSelect($attributes);
-
+        $this->getAttributes()->shouldBeEqualTo([]);
         $this->select(['bar']);
-        $this->from($this->objectSchema);
         $this->getAttributes()->shouldBeEqualTo(['bar']);
     }
 
@@ -318,8 +301,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
 
     function it_should_pass_operation_options_on_to_the_LdapQuery_class_correctly()
     {
-        $attributes = ['foo', 'bar'];
-        $this->objectSchema->setAttributesToSelect($attributes);
+        $this->objectSchema->setAttributesToSelect(['foo', 'bar']);
 
         $this->select();
         $this->from($this->objectSchema);
@@ -327,7 +309,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->setBaseDn('ou=stuff,dc=foo,dc=bar');
         $this->setPageSize('9001');
 
-        $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo($attributes);
+        $this->getLdapQuery()->getQueryOperation()->getAttributes()->shouldBeEqualTo([]);
         $this->getLdapQuery()->getQueryOperation()->getBaseDn()->shouldBeEqualTo('ou=stuff,dc=foo,dc=bar');
         $this->getLdapQuery()->getQueryOperation()->getScope()->shouldBeEqualTo(QueryOperation::SCOPE['ONELEVEL']);
         $this->getLdapQuery()->getQueryOperation()->getPageSize()->shouldBeEqualTo('9001');
@@ -359,7 +341,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     function it_should_hydrate_properly_getting_the_ldap_filter()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(&(objectClass=group))(sAMAccountName=bar))';
+            return $operation->getFilter() == '(&(&(objectClass=group))(sAMAccountName=bar))';
         }))->willReturn($this->singleGroupEntry);
         
         $this->from('user');
@@ -379,5 +361,23 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     {
         $schema = new LdapObjectSchema('foo','bar');
         $this->shouldThrow(new InvalidArgumentException('The schema type "bar" needs a filter defined to query LDAP with it.'))->duringFrom($schema);
+    }
+
+    function it_should_generate_a_filter_from_multiple_types()
+    {
+        $this->fromUsers();
+        $this->fromGroups();
+        
+        $this->toLdapFilter()->shouldBeEqualTo('(|(&(objectCategory=person)(objectClass=user))(objectClass=group))');
+    }
+    
+    function it_should_generate_a_filter_from_multiple_types_when_using_an_alias()
+    {
+        $this->fromUsers('u');
+        $this->fromGroups('g');
+        $this->where(['u.department' => 'IT', 'g.description' => 'Test']);
+        $this->andWhere($this->filter()->startsWith('name', 'Admin'));
+        
+        $this->toLdapFilter()->shouldBeEqualTo('(|(&(&(objectCategory=person)(objectClass=user))(&(department=IT)(cn=Admin*)))(&(objectClass=group)(&(description=Test)(cn=Admin*))))');
     }
 }

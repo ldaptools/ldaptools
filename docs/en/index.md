@@ -66,6 +66,15 @@ foreach ($users as $user) {
     echo "User: ".$user->getUsername();
 }
 
+// Get all OUs and Containers at the base of the domain, ordered by name.
+$results = $ldap->buildLdapQuery()
+    ->from(LdapObjectType::OU)
+    ->from(LdapObjectType::CONTAINER)
+    ->orderBy('name')
+    ->setScopeOneLevel()
+    ->getLdapQuery()
+    ->getResult();
+
 // Get a single LDAP object and select some specific attributes...
 $user = $ldap->buildLdapQuery()
     ->select(['upn', 'guid', 'sid', 'passwordLastSet'])

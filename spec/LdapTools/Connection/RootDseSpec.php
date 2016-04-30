@@ -45,7 +45,7 @@ class RootDseSpec extends ObjectBehavior
     function let($connection, $dispatcher)
     {
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == "(&(objectClass=*))" && $operation->getBaseDn() == "";
+            return $operation->getFilter() == "(&(objectClass=*))" && $operation->getBaseDn() == "";
         }))->willReturn($this->entry);
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->isBound()->willReturn(false);

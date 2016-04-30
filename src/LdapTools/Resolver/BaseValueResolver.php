@@ -83,11 +83,13 @@ abstract class BaseValueResolver
      * @param LdapObjectSchema $schema
      * @param int $type
      */
-    public function __construct(LdapObjectSchema $schema, $type)
+    public function __construct(LdapObjectSchema $schema = null, $type)
     {
         $this->type = $type;
         $this->schema = $schema;
-        $this->options = $schema->getConverterOptions();
+        if ($schema) {
+            $this->options = $schema->getConverterOptions();
+        }
     }
 
     /**
@@ -123,12 +125,12 @@ abstract class BaseValueResolver
     /**
      * Factory method for instantiation.
      *
-     * @param LdapObjectSchema $schema
+     * @param LdapObjectSchema|null $schema
      * @param BatchCollection|OperatorCollection|array $values
      * @param int $type
      * @return AttributeValueResolver|BatchValueResolver
      */
-    public static function getInstance(LdapObjectSchema $schema, $values, $type)
+    public static function getInstance(LdapObjectSchema $schema = null, $values, $type)
     {
         $instance = AttributeValueResolver::class;
         

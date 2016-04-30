@@ -39,16 +39,6 @@ class LdapObject
     protected $type = '';
 
     /**
-     * @var array The objectClass values for this object.
-     */
-    protected $class = [];
-
-    /**
-     * @var string The objectCategory for this object.
-     */
-    protected $category = '';
-
-    /**
      * @var array The attributes and values that represent this LDAP object.
      */
     protected $attributes = [];
@@ -60,15 +50,11 @@ class LdapObject
 
     /**
      * @param array $attributes
-     * @param array $class
-     * @param string $category
      * @param string $type
      */
-    public function __construct(array $attributes, array $class = [], $category = '', $type = '')
+    public function __construct(array $attributes, $type = '')
     {
         $this->attributes = $attributes;
-        $this->class = $class;
-        $this->category = $category;
         $this->type = $type;
         $this->batches = new BatchCollection(isset($attributes['dn']) ? $attributes['dn'] : null);
     }
@@ -92,34 +78,6 @@ class LdapObject
     public function isType($type)
     {
         return ($this->type == $type);
-    }
-
-    /**
-     * Check if this LDAP Object is of a specific objectClass.
-     *
-     * @deprecated This method will be removed in a future version. To check for a class select the objectClass
-     *             attribute on a query then use the normal methods (ie. has('objectClass', 'foo')) 
-     * 
-     * @param string $class
-     * @return bool
-     */
-    public function isClass($class)
-    {
-        return in_array($class, $this->class);
-    }
-
-    /**
-     * Check if this LDAP Object is of a specific objectCategory.
-     *
-     * @deprecated This method will be removed in a future version. To check for a category select the objectCategory
-     *             attribute on a query then use the normal methods (ie. has('objectCategory', 'foo'))
-     * 
-     * @param string $category
-     * @return bool
-     */
-    public function isCategory($category)
-    {
-        return ($this->category == $category);
     }
 
     /**

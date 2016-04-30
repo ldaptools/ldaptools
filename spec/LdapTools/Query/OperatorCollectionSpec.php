@@ -30,12 +30,6 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Query\OperatorCollection');
     }
 
-    function it_should_add_a_from_correctly()
-    {
-        $this->add(new From(new Comparison('objectclass', Comparison::EQ, 'foobar')));
-        $this->getFromOperators()->shouldHaveCount(1);
-    }
-
     function it_should_add_a_comparison_correctly()
     {
         $this->add(new Comparison('foo', Comparison::EQ, 'bar'));
@@ -84,31 +78,57 @@ class OperatorCollectionSpec extends ObjectBehavior
 
     function it_should_add_a_ldapobjectschema_when_calling_addLdapObjectSchema()
     {
-        $this->addLdapObjectSchema(new LdapObjectSchema('foo','bar'));
-        $this->getLdapObjectSchemas()->shouldHaveCount(1);
+        $schema = new LdapObjectSchema('foo','bar');
+        $this->addLdapObjectSchema($schema);
+        $this->getAliases()->shouldContain($schema);
     }
-
-    function it_should_return_an_array_when_calling_getLdapObjectSchemas()
+    
+    function it_should_add_a_ldapobjectschema_with_a_specific_alias()
     {
-        $this->getLdapObjectSchemas()->shouldBeArray();
+        $schema = new LdapObjectSchema('foo', 'bar');
+        $alias = 'foobar';
+
+        $this->addLdapObjectSchema($schema, $alias);
+        $this->getAliases()->shouldHaveKeyWithValue($alias, $schema);
+    }
+    
+    function it_should_validate_an_alias_name()
+    {
+        $schema = new LdapObjectSchema('foo', 'bar');
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, false);
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a.b');
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a*b');
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a b');
+        
+        $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a');
+        $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, '_a');
+        $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, '0_Ab');
+    }
+    
+    function it_should_add_a_ldapobjectschema_with_an_alias_of_the_object_type_by_default()
+    {
+        $this->addLdapObjectSchema(new LdapObjectSchema('foo', 'bar'));
+        $this->getAliases()->shouldHaveKey('bar');
     }
 
     function it_should_sort_the_operators()
     {
-        $this->add(new From(new Comparison('objectclass', Comparison::EQ, 'foobar')));
-        $this->add(new bAnd());
         $this->add(new MatchingRule('foo', MatchingRuleOid::BIT_OR, 1));
+        $this->add(new bAnd());
 
-        $this->toArray()->shouldHaveFirstItemAs('\LdapTools\Query\Operator\From');
+        $this->toArray()->shouldHaveFirstItemAs('\LdapTools\Query\Operator\bAnd');
         $this->toArray()->shouldHaveLastItemAs('\LdapTools\Query\Operator\MatchingRule');
     }
 
-    public function it_should_throw_an_LdapQueryException_when_adding_more_than_one_From_operator()
+    public function it_should_support_multiple_LdapObjectSchemas()
     {
-        $this->add(new From(new Comparison('objectclass', Comparison::EQ, 'foobar')));
-        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringAdd(
-            new From(new Comparison('objectclass', Comparison::EQ, 'foobar'))
-        );
+        $foo = new LdapObjectSchema('foo', 'foo');
+        $foo->setFilter(new Comparison('foo', '=', 'foo'));
+        $bar = new LdapObjectSchema('foo', 'bar');
+        $bar->setFilter(new Comparison('foo', '=', 'bar'));
+
+        $this->addLdapObjectSchema($foo);
+        $this->addLdapObjectSchema($bar);
     }
 
     function it_should_get_the_ldap_filter_for_the_operators()
@@ -118,6 +138,38 @@ class OperatorCollectionSpec extends ObjectBehavior
 
         $this->add(new bNot(new Comparison('bar', Comparison::EQ, 'foo')));
         $this->toLdapFilter()->shouldBeEqualTo('(&(!(bar=foo))(foo=bar))');
+    }
+
+    function it_should_get_the_ldap_filter_for_all_aliases_and_wrap_them_in_an_or_statement()
+    {
+        $foo = new LdapObjectSchema('foo', 'foo');
+        $foo->setFilter(new Comparison('foo', Comparison::EQ, 'bar'));
+        $bar = new LdapObjectSchema('foo', 'bar');
+        $bar->setFilter(new Comparison('bar', Comparison::EQ, 'foo'));
+        
+        $this->addLdapObjectSchema($bar);
+        $this->addLdapObjectSchema($foo);
+
+        $this->toLdapFilter()->shouldBeEqualTo('(|(bar=foo)(foo=bar))');
+    }
+    
+    function it_should_get_the_ldap_filter_for_a_specific_alias()
+    {
+        $foo = new LdapObjectSchema('foo', 'foo');
+        $foo->setFilter(new Comparison('foo', Comparison::EQ, 'bar'));
+        $bar = new LdapObjectSchema('foo', 'bar');
+        $bar->setFilter(new Comparison('bar', Comparison::EQ, 'foo'));
+
+        $this->addLdapObjectSchema($bar);
+        $this->addLdapObjectSchema($foo);
+
+        $this->toLdapFilter('foo')->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter('bar')->shouldBeEqualTo('(bar=foo)');
+    }
+    
+    function it_should_throw_an_exception_when_trying_to_get_a_filter_for_an_alias_that_doesnt_exist()
+    {
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringToLdapFilter('foo');
     }
 
     function it_should_clone_the_operator_objects_when_cloning_the_collection()

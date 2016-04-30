@@ -87,11 +87,4 @@ interface HydratorInterface
      * @param int $type
      */
     public function setOperationType($type);
-
-    /**
-     * Set the attributes to order by and their direction.
-     *
-     * @param array $orderBy
-     */
-    public function setOrderBy(array $orderBy);
 }

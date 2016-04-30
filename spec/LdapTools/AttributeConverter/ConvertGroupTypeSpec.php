@@ -127,7 +127,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
         }))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
@@ -142,7 +142,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
         }))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
@@ -160,7 +160,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
         }))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
@@ -173,7 +173,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
         }))->willReturn(['count' => 0]);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
@@ -192,7 +192,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function it_should_be_case_insensitive_to_the_current_attribute_name()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter()->toLdapFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
         }))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);

@@ -66,11 +66,6 @@ class AttributeNameResolverSpec extends ObjectBehavior
         $this->toLdap($objectToLdap)->shouldHaveKey('cn');
     }
 
-    function it_should_lookup_a_key_in_an_array_in_a_case_insensitive_way_to_get_the_key_name()
-    {
-        $this::getKeyNameCaseInsensitive('firstName',['FirstName'])->shouldBeEqualTo('FirstName');
-    }
-
     function it_should_return_all_LDAP_attributes_merged_with_the_schema_if_a_wildcard_was_used()
     {
         $map = [

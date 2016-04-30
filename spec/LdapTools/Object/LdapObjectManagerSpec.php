@@ -77,7 +77,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_error_on_update_delete_move_or_restore_if_the_dn_is_not_set()
     {
-        $ldapObject = new LdapObject(['foo' => 'bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['foo' => 'bar'], 'user');
         $ldapObject->set('foo', 'foobar');
 
         $this->shouldThrow('\InvalidArgumentException')->duringPersist($ldapObject);
@@ -90,7 +90,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $this->connection->execute(new DeleteOperation('cn=foo,dc=foo,dc=bar'))->willReturn(true);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $this->delete($ldapObject);
     }
 
@@ -116,7 +116,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
         $this->connection->execute(new BatchModifyOperation($dn, $batch))->willReturn(null);
 
-        $ldapObject = new LdapObject(['dn' => $dn], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => $dn], 'user');
         $ldapObject->set('firstName', 'Chad');
         $ldapObject->add('lastName', 'Sikorra');
         $ldapObject->remove('username', 'csikorra');
@@ -133,7 +133,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         );
         $this->connection->execute($operation)->willReturn(true);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
@@ -146,7 +146,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         );
         $this->connection->execute($operation)->willReturn(true);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo\, bar,dc=foo,dc=bar', 'name' => 'foo, bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo\, bar,dc=foo,dc=bar', 'name' => 'foo, bar'], 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
@@ -159,7 +159,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         );
         $this->connection->execute($operation)->willReturn(true);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', '');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar']);
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
@@ -167,8 +167,8 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
 
-        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
-        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        $ldapObject1 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
+        $ldapObject2 = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
 
         $this->connection->execute(Argument::that(function($operation) use ($dn) {
             /** @var BatchModifyOperation $operation */
@@ -196,7 +196,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_error_on_restore_if_the_last_known_location_cannot_be_found_and_none_was_specified()
     {
         $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
-        $ldapObject = new LdapObject(['dn' => $dn],['deleted'], 'deleted', 'deleted');
+        $ldapObject = new LdapObject(['dn' => $dn], 'deleted');
 
         $this->connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldBeCalled()->willReturn(['count' => 0]);
         $this->connection->getRootDse()->willReturn(new LdapObject(['defaultNamingContext' => 'dc=foo,dc=bar']));
@@ -209,7 +209,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->connection->execute(Argument::type('\LdapTools\Operation\QueryOperation'))->shouldNotBeCalled();
         $this->connection->execute(Argument::type('\LdapTools\Operation\RenameOperation'))->shouldBeCalled();
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $this->move($ldapObject, 'ou=employees,dc=foo,dc=bar');
     }
 
@@ -218,7 +218,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
      */
     function it_should_call_the_event_dispatcher_delete_events_when_deleting_an_object($dispatcher)
     {
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_DELETE, $ldapObject);
         $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_DELETE, $ldapObject);
 
@@ -241,7 +241,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
             'ou=employees,dc=foo,dc=bar'
         );
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar', 'name' => 'foo'], 'user');
         $beforeEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_BEFORE_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
         $afterEvent = new LdapObjectMoveEvent(Event::LDAP_OBJECT_AFTER_MOVE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
 
@@ -268,7 +268,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $this->connection->execute(new BatchModifyOperation($dn, $batch))->willReturn(null);
         $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
-        $ldapObject = new LdapObject(['dn' => $dn], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => $dn], 'user');
         $ldapObject->set('firstName', 'Chad');
         $ldapObject->add('lastName', 'Sikorra');
         $ldapObject->remove('username', 'csikorra');
@@ -288,7 +288,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_call_the_event_dispatcher_restore_events_when_restoring_an_object($dispatcher)
     {
         $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
-        $ldapObject = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'],['deleted'], 'deleted', 'deleted');
+        $ldapObject = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
         
         $beforeEvent = new LdapObjectRestoreEvent(Event::LDAP_OBJECT_BEFORE_RESTORE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
         $afterEvent = new LdapObjectRestoreEvent(Event::LDAP_OBJECT_AFTER_RESTORE, $ldapObject, 'ou=employees,dc=foo,dc=bar');
@@ -303,7 +303,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_not_try_to_modify_an_ldap_object_that_has_not_changed()
     {
-        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], 'user');
         $this->connection->execute(Argument::any())->shouldNotBeCalled();
 
         $this->persist($ldapObject);
@@ -316,7 +316,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     {
         $this->beConstructedWith($this->connection, $this->objectSchemaFactory, $dispatcher);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $beforeEvent = new LdapObjectEvent(Event::LDAP_OBJECT_BEFORE_MODIFY, $ldapObject);
         $afterEvent = new LdapObjectEvent(Event::LDAP_OBJECT_AFTER_MODIFY, $ldapObject);
         $dispatcher->dispatch($beforeEvent)->shouldNotBeCalled();
@@ -328,7 +328,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
     function it_should_persist_an_ldap_object_that_has_no_schema_type()
     {
         $dn = 'cn=user,dc=foo,dc=bar';
-        $ldapObject = new LdapObject(['dn' => $dn], ['user'], 'user', '');
+        $ldapObject = new LdapObject(['dn' => $dn]);
         $ldapObject->set('foo', 'bar');
         $batch = new BatchCollection($dn);
         $batch->add(new Batch(Batch::TYPE['REPLACE'],'foo','bar'));

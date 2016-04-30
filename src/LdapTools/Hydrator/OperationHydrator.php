@@ -26,11 +26,18 @@ use LdapTools\Utilities\LdapUtilities;
  */
 class OperationHydrator extends ArrayHydrator
 {
+    use HydrateQueryTrait;
+
     /**
      * @var LdapOperationInterface
      */
     protected $operation;
-    
+
+    /**
+     * @var string $alias The current alias for the context of a query operation.
+     */
+    protected $alias;
+
     /**
      * {@inheritdoc}
      */
@@ -41,11 +48,21 @@ class OperationHydrator extends ArrayHydrator
         if (!($operation instanceof LdapOperationInterface)) {
             throw new InvalidArgumentException('Expects an instance of LdapOperationInterface to convert to LDAP.');
         }
-        if (!$this->schema) {
+        if (!$this->schema && !($operation instanceof QueryOperation)) {
             return $operation;
         }
 
         return $this->hydrateOperation($operation);
+    }
+
+    /**
+     * Set the current alias that the operation is targeting (in the context of a query operation).
+     * 
+     * @param null|string $alias
+     */
+    public function setAlias($alias)
+    {
+        $this->alias = $alias;
     }
 
     /**
@@ -101,8 +118,9 @@ class OperationHydrator extends ArrayHydrator
      */
     protected function hydrateQueryOperation(QueryOperation $operation)
     {
+        $operation->setAttributes($this->getAttributesToLdap($operation->getAttributes(), true, $this->schema, $this->alias));
         // Only want it set if it wasn't explicitly set...
-        if (is_null($operation->getBaseDn())) {
+        if ($this->schema && is_null($operation->getBaseDn())) {
             $operation->setBaseDn($this->schema->getBaseDn());
         }
 
@@ -111,20 +129,20 @@ class OperationHydrator extends ArrayHydrator
             $this->setDefaultParameters();
             $operation->setBaseDn($this->resolveParameters(['baseDn' => $operation->getBaseDn()])['baseDn']);
         }
-
-        if ($operation->getFilter() instanceof OperatorCollection) {
-            $this->convertValuesToLdap($operation->getFilter());
-        }
-
         // If null then we default to the domain config or the explicitly set value...
-        if (!is_null($this->schema->getUsePaging())) {
+        if ($this->schema && !is_null($this->schema->getUsePaging())) {
             $operation->setUsePaging($this->schema->getUsePaging());
         }
-        if (!is_null($this->schema->getScope())) {
+        if ($this->schema && !is_null($this->schema->getScope())) {
             $operation->setScope($this->schema->getScope());
         }
-
-        $operation->addControl(...$this->schema->getControls());
+        if ($this->schema) {
+            $operation->addControl(...$this->schema->getControls());
+        }
+        if ($operation->getFilter() instanceof OperatorCollection) {
+            $this->convertValuesToLdap($operation->getFilter());
+            $operation->setFilter($operation->getFilter()->toLdapFilter($this->alias));
+        }
     }
 
     /**

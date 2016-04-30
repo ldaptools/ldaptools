@@ -255,4 +255,45 @@ class LdapUtilities
 
         return $rdn[0].'='.self::escapeValue($rdn[1], null, LDAP_ESCAPE_DN);
     }
+
+    /**
+     * Given an attribute, split it between its alias and attribute. This will return an array where the first value
+     * is the alias and the second is the attribute name. If there is no alias then the first value will be null.
+     * 
+     * ie. list($alias, $attribute) = LdapUtilities::getAliasAndAttribute($attribute);
+     * 
+     * @param string $attribute
+     * @return array
+     */
+    public static function getAliasAndAttribute($attribute)
+    {
+        $alias = null;
+
+        if (strpos($attribute, '.') !== false) {
+            $pieces = explode('.', $attribute, 2);
+            $alias = $pieces[0];
+            $attribute = $pieces[1];
+        }
+        
+        return [$alias, $attribute];
+    }
+
+    /**
+     * Looks up an array value in a case-insensitive way and return it how it appears in the array.
+     *
+     * @param string $needle
+     * @param array $haystack
+     * @return string
+     */
+    public static function getValueCaseInsensitive($needle, array $haystack)
+    {
+        $lcNeedle = strtolower($needle);
+        $lcKeys = array_change_key_case(array_flip($haystack));
+        
+        if (!isset($lcKeys[$lcNeedle])) {
+            throw new InvalidArgumentException(sprintf('Value "%s" not found in array.', $needle));
+        }
+
+        return $haystack[$lcKeys[$lcNeedle]];
+    }
 }

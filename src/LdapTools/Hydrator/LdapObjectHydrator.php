@@ -26,14 +26,8 @@ class LdapObjectHydrator extends ArrayHydrator
     public function hydrateFromLdap(array $entry)
     {
         $entry = parent::hydrateFromLdap($entry);
-        $class = $this->schema ? $this->schema->getObjectClass() : [];
 
-        return new LdapObject(
-            $entry,
-            $class,
-            $this->schema ? $this->schema->getObjectCategory() : '',
-            $type = $this->schema ? $this->schema->getObjectType() : ''
-        );
+        return new LdapObject($entry, $this->schema ? $this->schema->getObjectType() : '');
     }
 
     /**
