@@ -135,7 +135,7 @@ class SchemaYamlParser implements SchemaParserInterface
         $objectSchema = $this->cleanObjectArray($objectSchema);
         $this->updateObjectArray($schemaName, $objectSchema);
         
-        $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectType);
+        $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectSchema['type']);
         foreach ($this->optionMap as $option => $setter) {
             if (array_key_exists($option, $objectSchema)) {
                 $ldapObjectSchema->$setter($objectSchema[$option]);
@@ -183,7 +183,7 @@ class SchemaYamlParser implements SchemaParserInterface
     {
         $objectSchema = null;
         foreach ($schema['objects'] as $ldapObject) {
-            if (array_key_exists('type', $ldapObject) && $ldapObject['type'] == $objectType) {
+            if (array_key_exists('type', $ldapObject) && strtolower($ldapObject['type']) == strtolower($objectType)) {
                 $objectSchema = $ldapObject;
             }
         }

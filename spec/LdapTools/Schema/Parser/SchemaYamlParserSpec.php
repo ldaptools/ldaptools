@@ -358,7 +358,14 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldContain('defaultNamingContext');
         $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldHaveKey('foo');
     }
-    
+
+    function it_should_be_case_insensitive_when_getting_a_ldap_object_schema_type()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'UseR')->getObjectType()->shouldBeEqualTo('user');
+    }
+
     function getMatchers()
     {
         return [
