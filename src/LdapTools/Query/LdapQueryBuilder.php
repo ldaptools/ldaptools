@@ -482,6 +482,24 @@ class LdapQueryBuilder
     }
 
     /**
+     * Determines which function, if any, should be called.
+     *
+     * @param string $method
+     * @param array $arguments
+     * @return mixed
+     */
+    public function __call($method, $arguments)
+    {
+        if (!preg_match('/^(from)(.*)$/', $method, $matches)) {
+            throw new \RuntimeException(sprintf('The method "%s" is unknown.', $method));
+        }
+        $method = $matches[1];
+        array_unshift($arguments, strtolower($matches[2]));
+        
+        return $this->$method(...$arguments);
+    }
+
+    /**
      * @param string|LdapObjectSchema $type
      * @return LdapObjectSchema
      */

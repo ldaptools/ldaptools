@@ -380,4 +380,15 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         
         $this->toLdapFilter()->shouldBeEqualTo('(|(&(&(objectCategory=person)(objectClass=user))(&(department=IT)(cn=Admin*)))(&(objectClass=group)(&(description=Test)(cn=Admin*))))');
     }
+    
+    function it_should_be_able_to_call_from_with_a_dynamic_schema_type_name()
+    {
+        $this->fromOU()->shouldReturnAnInstanceOf('LdapTools\Query\LdapQueryBuilder');
+        $this->fromContainer('c');
+
+        $this->getLdapQuery()->getQueryOperation()->getFilter()->getAliases()->shouldHaveKey('ou');
+        $this->getLdapQuery()->getQueryOperation()->getFilter()->getAliases()->shouldHaveKey('c');
+
+        $this->shouldThrow('LdapTools\Exception\SchemaParserException')->duringFromFoo();
+    }
 }
