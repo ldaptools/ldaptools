@@ -20,6 +20,8 @@ use Stash\Pool;
  */
 class StashCache implements CacheInterface
 {
+    use CacheTrait;
+
     /**
      * @var string The cache folder location.
      */
@@ -29,11 +31,6 @@ class StashCache implements CacheInterface
      * @var Pool The Stash cache pool.
      */
     protected $pool;
-
-    /**
-     * @var string The prefix to the cache.
-     */
-    protected $cachePrefix = '/ldaptools';
 
     /**
      * @var bool Whether the cache should auto refresh based on creation/modification times.
@@ -51,26 +48,6 @@ class StashCache implements CacheInterface
     public function setOptions(array $options)
     {
         $this->parseOptions($options);
-    }
-
-    /**
-     * The prefix to use for the root Stash directory for the cache.
-     *
-     * @param $prefix
-     */
-    public function setCachePrefix($prefix)
-    {
-        $this->cachePrefix = $prefix;
-    }
-
-    /**
-     * The prefix used for the root Stash directory for the cache.
-     *
-     * @return string
-     */
-    public function getCachePrefix()
-    {
-        return $this->cachePrefix;
     }
 
     /**
@@ -152,7 +129,7 @@ class StashCache implements CacheInterface
      */
     public function delete($type, $name)
     {
-        return $this->getPool()->getItem($this->getCachePath($type, $name))->clear();
+        return $this->getPool()->getItem($this->getCacheName($type, $name))->clear();
     }
 
     /**
@@ -182,25 +159,13 @@ class StashCache implements CacheInterface
     }
 
     /**
-     * Form the "directory" string that Stash uses to look for the item.
-     *
-     * @param string $itemType
-     * @param string $itemName
-     * @return string
-     */
-    protected function getCachePath($itemType, $itemName)
-    {
-        return $this->cachePrefix.'/'.$itemType.'/'.$itemName;
-    }
-
-    /**
      * @param string $itemType
      * @param string $itemName
      * @return \Stash\Interfaces\ItemInterface
      */
     protected function getCacheItem($itemType, $itemName)
     {
-        return $this->getPool()->getItem($this->getCachePath($itemType, $itemName));
+        return $this->getPool()->getItem($this->getCacheName($itemType, $itemName));
     }
 
     /**
@@ -209,7 +174,7 @@ class StashCache implements CacheInterface
     protected function getPool()
     {
         if (!$this->pool) {
-            $this->pool = new Pool(new Filesystem(['path' => $this->cacheFolder]));
+            $this->pool = new Pool(new FileSystem(['path' => $this->cacheFolder]));
         }
 
         return $this->pool;

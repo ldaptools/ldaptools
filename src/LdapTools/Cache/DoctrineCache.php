@@ -19,15 +19,12 @@ use Doctrine\Common\Cache\FilesystemCache;
  */
 class DoctrineCache implements CacheInterface
 {
+    use CacheTrait;
+
     /**
      * @var string The cache folder location.
      */
     protected $cacheFolder;
-
-    /**
-     * @var string The prefix to the cache.
-     */
-    protected $cachePrefix = '/ldaptools';
 
     /**
      * @var FileSystemCache
@@ -47,25 +44,7 @@ class DoctrineCache implements CacheInterface
         $this->parseOptions($options);
     }
 
-    /**
-     * The prefix to use for the root Stash directory for the cache.
-     *
-     * @param $prefix
-     */
-    public function setCachePrefix($prefix)
-    {
-        $this->cachePrefix = $prefix;
-    }
 
-    /**
-     * The prefix used for the root Stash directory for the cache.
-     *
-     * @return string
-     */
-    public function getCachePrefix()
-    {
-        return $this->cachePrefix;
-    }
 
     /**
      * The location to where the cache will be kept.
@@ -150,18 +129,6 @@ class DoctrineCache implements CacheInterface
     public function deleteAll()
     {
         return $this->getCache()->flushAll();
-    }
-
-    /**
-     * Form the name used to refer to the item for Doctrine cache
-     *
-     * @param string $itemType
-     * @param string $itemName
-     * @return string
-     */
-    protected function getCacheName($itemType, $itemName)
-    {
-        return $this->cachePrefix.'/'.$itemType.'/'.$itemName;
     }
 
     /**

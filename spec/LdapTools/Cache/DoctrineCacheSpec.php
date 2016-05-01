@@ -130,4 +130,14 @@ class DoctrineCacheSpec extends ObjectBehavior
         $this->contains(LdapObjectSchema::getCacheType(), 'foo.bar')->shouldBeEqualTo(false);
         $this->contains(LdapObjectSchema::getCacheType(), 'bar.foo')->shouldBeEqualTo(false);
     }
+
+    function it_should_be_case_insensitive_when_looking_up_an_item_in_the_cache()
+    {
+        $this->setCacheFolder($this->testCacheDir);
+        $item = new LdapObjectSchema('foo', 'bar');
+        $this->set($item);
+        $this->contains(LdapObjectSchema::getCacheType(), 'fOo.bAr')->shouldBeEqualTo(true);
+        $this->get(LdapObjectSchema::getCacheType(), 'fOo.bAr')->shouldBeLike($item);
+        $this->deleteAll();
+    }
 }
