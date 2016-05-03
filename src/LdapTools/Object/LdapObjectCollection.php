@@ -15,7 +15,7 @@ namespace LdapTools\Object;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class LdapObjectCollection implements \IteratorAggregate
+class LdapObjectCollection implements \IteratorAggregate, \Countable
 {
     /**
      * @var LdapObject[]

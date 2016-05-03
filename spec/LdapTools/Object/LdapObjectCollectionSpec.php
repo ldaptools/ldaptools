@@ -36,6 +36,11 @@ class LdapObjectCollectionSpec extends ObjectBehavior
         $this->shouldHaveType('\IteratorAggregate');
     }
 
+    function it_should_implement_countable()
+    {
+        $this->shouldImplement('\Countable');
+    }
+
     function it_should_expect_any_number_of_objects_to_the_constructor()
     {
         $this->beConstructedWith(...$this->ldapObjects);
