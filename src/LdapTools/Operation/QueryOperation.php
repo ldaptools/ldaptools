@@ -50,6 +50,7 @@ class QueryOperation implements LdapOperationInterface
         'pageSize' => null,
         'usePaging' => null,
         'scope' => self::SCOPE['SUBTREE'],
+        'sizeLimit' => 0,
     ];
 
     /**
@@ -208,15 +209,45 @@ class QueryOperation implements LdapOperationInterface
     }
 
     /**
+     * Set the size limit for the number of entries returned from LDAP. When set to 0 this means no limit.
+     *
+     * @param int $sizeLimit
+     * @return $this
+     */
+    public function setSizeLimit($sizeLimit)
+    {
+        $this->properties['sizeLimit'] = $sizeLimit;
+
+        return $this;
+    }
+
+    /**
+     * Get the size limit for the number of entries returned from LDAP. When set to 0 this means no limit.
+     *
+     * @return int
+     */
+    public function getSizeLimit()
+    {
+        return $this->properties['sizeLimit'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getArguments()
     {
-        return [
+        $args = [
             $this->properties['baseDn'],
             $this->getLdapFilter(),
             $this->properties['attributes'],
+            0,
         ];
+        
+        if ($this->properties['sizeLimit'] && !$this->properties['usePaging']) {
+            array_push($args, $this->properties['sizeLimit']);
+        }
+        
+        return $args;
     }
 
     /**
@@ -247,6 +278,7 @@ class QueryOperation implements LdapOperationInterface
             'Scope' => $this->properties['scope'],
             'Use Paging' => var_export($this->properties['usePaging'], true),
             'Page Size' => $this->properties['pageSize'],
+            'Size Limit' => $this->properties['sizeLimit'],
         ]);
     }
 

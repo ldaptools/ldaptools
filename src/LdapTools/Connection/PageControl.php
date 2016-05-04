@@ -35,6 +35,16 @@ class PageControl
     protected $pageSize = 0;
 
     /**
+     * @var int The size limit for the paging operation.
+     */
+    protected $sizeLimit = 0;
+
+    /**
+     * @var int The result set number the paging operation is currently on.
+     */
+    protected $resultNumber = 0;
+
+    /**
      * @var bool Whether or not paging is actually active for the connection.
      */
     protected $isEnabled = true;
@@ -48,16 +58,18 @@ class PageControl
     }
 
     /**
-     * Start a paging operation by setting up the cookie and the page size.
+     * Start a paging operation by setting up the cookie and the page size. Optionally set a size limit.
      *
      * @param int $pageSize
+     * @param int $sizeLimit
      * @throws LdapConnectionException
      */
-    public function start($pageSize)
+    public function start($pageSize, $sizeLimit = 0)
     {
         if ($this->isEnabled) {
             $this->cookie = '';
-            $this->pageSize = $pageSize;
+            $this->pageSize = ($sizeLimit && $sizeLimit < $pageSize) ? $sizeLimit : $pageSize;
+            $this->sizeLimit = $sizeLimit;
         }
     }
 
@@ -71,6 +83,7 @@ class PageControl
         if ($this->isEnabled) {
             $this->resetPagingControl();
             $this->cookie = null;
+            $this->resultNumber = 0;
         }
     }
 
@@ -83,6 +96,10 @@ class PageControl
     {
         if (!$this->isEnabled) {
             return;
+        }
+        // If the size limit exceeds the page size, and the next page would exceed the limit, reduce the page size...
+        if ($this->sizeLimit && ($this->resultNumber + $this->pageSize) > $this->sizeLimit) {
+            $this->pageSize = $this->sizeLimit - $this->resultNumber;
         }
         if (!@ldap_control_paged_result($this->connection->getConnection(), $this->pageSize, false, $this->cookie)) {
             throw new LdapConnectionException(sprintf(
@@ -103,6 +120,7 @@ class PageControl
         if (!$this->isEnabled) {
             return;
         }
+        $this->resultNumber += $this->pageSize;
         if (!@ldap_control_paged_result_response($this->connection->getConnection(), $result, $this->cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->connection->getLastError())
@@ -117,7 +135,9 @@ class PageControl
      */
     public function resetPagingControl()
     {
-        if (!@ldap_control_paged_result($this->connection->getConnection(), 0)) {
+        // Per RFC 2696, to abandon a paged search you should send a size of 0 along with the cookie used in the search.
+        // However, testing this it doesn't seem to completely work. Perhaps a PHP bug?
+        if (!@ldap_control_paged_result($this->connection->getConnection(), 0, false, $this->cookie)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results control for read operation: %s',
                 $this->connection->getLastError()
@@ -132,7 +152,13 @@ class PageControl
      */
     public function isActive()
     {
-        return ($this->cookie !== null && $this->cookie != '');
+        $active = ($this->cookie !== null && $this->cookie != '');
+        
+        if ($this->sizeLimit && $this->sizeLimit === $this->pageSize) {
+            $active = false;
+        }
+        
+        return $active;
     }
 
     /**

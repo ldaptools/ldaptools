@@ -48,7 +48,7 @@ class QueryOperationHandler implements OperationHandlerInterface
 
         /** @var QueryOperation $operation */
         $this->paging()->setIsEnabled($this->shouldUsePaging($operation));
-        $this->paging()->start($operation->getPageSize());
+        $this->paging()->start($operation->getPageSize(), $operation->getSizeLimit());
         do {
             $this->paging()->next();
 

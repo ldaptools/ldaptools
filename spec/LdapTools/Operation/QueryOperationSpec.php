@@ -107,6 +107,7 @@ class QueryOperationSpec extends ObjectBehavior
             'dc=foo,dc=bar',
             '(foo=bar)',
             ['foo'],
+            0,
         ];
         $this->setBaseDn($args[0]);
         $this->setFilter($args[1]);
@@ -125,6 +126,7 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Use Paging');
         $this->getLogArray()->shouldHaveKey('Server');
         $this->getLogArray()->shouldHaveKey('Controls');
+        $this->getLogArray()->shouldHaveKey('Size Limit');
     }
 
     function it_should_support_being_constructed_with_a_filter_and_attributes()
@@ -142,7 +144,7 @@ class QueryOperationSpec extends ObjectBehavior
         $this->setFilter($collection);
         
         $this->getFilter()->shouldBeEqualTo($collection);
-        $this->getArguments()->shouldBeEqualTo([null, '(foo=bar)', []]);
+        $this->getArguments()->shouldBeEqualTo([null, '(foo=bar)', [], 0]);
         $this->getLogArray()->shouldContain('(foo=bar)');
     }
 
@@ -188,5 +190,12 @@ class QueryOperationSpec extends ObjectBehavior
 
         $this->addControl($control1, $control2);
         $this->getControls()->shouldBeEqualTo([$control1, $control2]);
+    }
+    
+    function it_should_set_a_size_limit_for_the_query()
+    {
+        $this->getSizeLimit()->shouldBeEqualTo(0);
+        $this->setSizeLimit(5);
+        $this->getSizeLimit()->shouldBeEqualTo(5);
     }
 }

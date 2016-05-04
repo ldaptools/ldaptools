@@ -443,6 +443,29 @@ class LdapQueryBuilder
     }
 
     /**
+     * Set the size limit for the amount of results returned from LDAP for the query.
+     * 
+     * @param int $sizeLimit
+     * @return $this
+     */
+    public function setSizeLimit($sizeLimit)
+    {
+        $this->operation->setSizeLimit($sizeLimit);
+        
+        return $this;
+    }
+
+    /**
+     * Get the size limit for the amount of results returned from LDAP for the query.
+     * 
+     * @return int
+     */
+    public function getSizeLimit()
+    {
+        return $this->operation->getSizeLimit();
+    }
+
+    /**
      * Get the LdapQuery object based on the constructed filter and parameters in this builder.
      *
      * @return LdapQuery

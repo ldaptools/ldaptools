@@ -296,6 +296,15 @@ $users = $lqb->fromUsers()
 ```
 
 ------------------------
+#### setSizeLimit($size)
+
+This methods sets the size limit for the amount of results returned from LDAP for the query.
+
+```php
+$lqb->setSizeLimit(10);
+```
+
+------------------------
 #### setPageSize($size)
 
 This methods sets the paging size for the query. It will default to whatever value you set in your configuration. The

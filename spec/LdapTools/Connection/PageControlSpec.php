@@ -57,4 +57,9 @@ class PageControlSpec extends ObjectBehavior
         $this->update(null);
         $this->end();
     }
+    
+    function it_should_be_able_to_start_the_control_with_a_size_limit()
+    {
+        $this->start(10, 20);
+    }
 }

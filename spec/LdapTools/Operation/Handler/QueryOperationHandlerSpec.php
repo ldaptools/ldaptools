@@ -82,7 +82,25 @@ class QueryOperationHandlerSpec extends ObjectBehavior
             ->setFilter('(sAMAccountName=foo)');
 
         $this->pager->setIsEnabled(true)->shouldBeCalled();
-        $this->pager->start(10)->shouldBeCalled();
+        $this->pager->start(10, 0)->shouldBeCalled();
+        $this->pager->next()->shouldBeCalled();
+
+        // Cannot simulate this without a connection. But the above control logic will be validated anyway.
+        $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
+    }
+
+    function it_should_use_a_size_limit_with_the_pager_when_paging_is_enabled()
+    {
+        $operation = new QueryOperation();
+        $operation->setPageSize(10)
+            ->setSizeLimit(20)
+            ->setUsePaging(true)
+            ->setAttributes(['cn'])
+            ->setBaseDn('example.local')
+            ->setFilter('(sAMAccountName=foo)');
+
+        $this->pager->setIsEnabled(true)->shouldBeCalled();
+        $this->pager->start(10, 20)->shouldBeCalled();
         $this->pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
@@ -98,7 +116,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
             ->setFilter('(sAMAccountName=foo)');
 
         $this->pager->setIsEnabled(false)->shouldBeCalled();
-        $this->pager->start(null)->shouldBeCalled();
+        $this->pager->start(null, 0)->shouldBeCalled();
         $this->pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.

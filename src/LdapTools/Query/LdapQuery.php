@@ -313,13 +313,31 @@ class LdapQuery
         $results = [];
 
         foreach ($this->operation->getFilter()->getAliases() as $alias => $schema) {
-            $objects = $this->getResultsFromLdap(clone $this->operation, $hydratorType, $schema, $alias);
+            $operation = clone $this->operation;
+
+            /**
+             * If we received the partial limit of results, re-adjust the next operations limit so we don't go over.
+             * 
+             * @todo This is getting difficult due to multiple operations needed to select all schema types. If this was
+             *       a single operation the issue would not exist. But with a single query and multiple types I cannot
+             *       easily determine which result is what type. Unsure of the best way to fix this at the moment. 
+             */ 
+            if ($operation->getSizeLimit() && count($results) < $operation->getSizeLimit()) {
+                $operation->setSizeLimit($operation->getSizeLimit() - count($results));
+            }
+
+            $objects = $this->getResultsFromLdap($operation, $hydratorType, $schema, $alias);
             if ($objects instanceof LdapObjectCollection && $results) {
                 $results->add(...$objects->toArray());
             } elseif ($objects instanceof LdapObjectCollection) {
                 $results = $objects;
             } else {
                 $results = array_merge($results, $objects);
+            }
+
+            // If the results have reached the expected size limit then end the loop.
+            if ($this->operation->getSizeLimit() && count($results) == $operation->getSizeLimit()) {
+                break;
             }
         }
 
