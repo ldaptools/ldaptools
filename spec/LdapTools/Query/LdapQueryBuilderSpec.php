@@ -220,11 +220,11 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->filter()->shouldBeLike(new FilterBuilder());
     }
 
-    function it_should_return_the_filter_when_calling_getLdapFilter()
+    function it_should_return_the_filter_when_calling_toLdapFilter()
     {
         $filter = '(objectClass=group)';
         $this->fromGroups();
-        $this->getLdapFilter()->shouldBeEqualTo($filter);
+        $this->toLdapFilter()->shouldBeEqualTo($filter);
     }
 
     function it_should_not_escape_hex_string_search_values_that_are_already_escaped()

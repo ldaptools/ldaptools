@@ -45,9 +45,19 @@ trait ContainsOperatorsTrait
     }
 
     /**
-     * @inheritdoc
+     * @deprecated Use the 'toLdapFilter()' method instead.
+     * @param null $alias
+     * @return string
      */
     public function getLdapFilter($alias = null)
+    {
+        return $this->toLdapFilter($alias);
+    }
+
+    /**
+     * @inheritdoc
+     */
+    public function toLdapFilter($alias = null)
     {
         $innerFilter = $this->getChildrenFilterString($alias);
         if (empty($innerFilter)) {
@@ -65,7 +75,7 @@ trait ContainsOperatorsTrait
     {
         $filters = [];
         foreach ($this->children as $child) {
-            $filters[] = $child->getLdapFilter($alias);
+            $filters[] = $child->toLdapFilter($alias);
         }
 
         return implode($filters);

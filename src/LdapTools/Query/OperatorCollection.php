@@ -264,10 +264,10 @@ class OperatorCollection implements \IteratorAggregate
         }
 
         if (!is_null($alias)) {
-            $filters[] = $this->aliases[$alias]->getFilter()->getLdapFilter();
+            $filters[] = $this->aliases[$alias]->getFilter()->toLdapFilter();
         }
         foreach ($this->toArray() as $operator) {
-            $filters[] = $operator->getLdapFilter($alias);
+            $filters[] = $operator->toLdapFilter($alias);
         }
         $filter = implode('', $filters);
 

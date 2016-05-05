@@ -44,13 +44,13 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_bitwise_and_filter()
     {
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
     }
 
     function it_should_return_the_correct_ldap_bitwise_or_filter()
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=2)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=2)');
     }
 
     function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
@@ -62,19 +62,19 @@ class MatchingRuleSpec extends ObjectBehavior
     function it_should_throw_a_LdapQueryException_on_an_invalid_oid()
     {
         $this->beConstructedWith('foo', 'foo=bar)(', 2);
-        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringToLdapFilter();
     }
 
     function it_should_accept_text_as_an_oid()
     {
         $this->beConstructedWith('foo', 'FooBarMatch', 2);
-        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+        $this->shouldNotThrow('\LdapTools\Exception\LdapQueryException')->duringToLdapFilter();
     }
 
     function it_should_escape_special_characters_when_going_to_ldap()
     {
         $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, '\*)3');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\5c\2a\293)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\5c\2a\293)');
     }
 
     function it_should_set_the_alias_based_off_the_attribute()
@@ -134,27 +134,27 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->setAttribute('bar.foo');
 
         // When set to a specific alias (in this case 'bar'), other aliases will generate an empty string...
-        $this->getLdapFilter('foo')->shouldBeEqualTo('');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('');
         // The absence of an alias when one is explicitly set will also return an empty string...
-        $this->getLdapFilter()->shouldBeEqualTo('');
+        $this->toLdapFilter()->shouldBeEqualTo('');
         // When the alias is specifically called then the filter will be returned...
-        $this->getLdapFilter('bar')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter('bar')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
 
         $this->setAttribute('foo');
         // No alias defined according to the attribute, so no alias specified will return the filter...
-        $this->getLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
         // This will return the filter for the context of the 'foo' alias, as a specific alias wasn't defined.
-        $this->getLdapFilter('foo')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
     }
 
     function it_should_get_the_LDAP_filter_with_any_converted_values_or_translated_attributes_for_an_alias()
     {
         $this->setAttribute('u.foo');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foo:1.2.840.113556.1.4.803:=2)');
         $this->setTranslatedAttribute('foobar', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=2)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=2)');
         $this->setConvertedValue('foo', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=foo)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=foo)');
     }
     
     public function getMatchers()

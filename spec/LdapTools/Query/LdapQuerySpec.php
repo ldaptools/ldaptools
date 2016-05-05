@@ -753,6 +753,32 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getArrayResult()->shouldHaveCount(4);
     }
 
+    function it_should_limit_the_results_for_subsequent_operations_if_a_size_limit_is_set_so_we_dont_go_over_the_limit()
+    {
+        $foo = new LdapObjectSchema('foo','foo');
+        $bar = new LdapObjectSchema('foo','bar');
+        $foo->setFilter(new Comparison('foo','=','bar'));
+        $bar->setFilter(new Comparison('bar','=','foo'));
+
+        $filter = new OperatorCollection();
+        $filter->addLdapObjectSchema($foo);
+        $filter->addLdapObjectSchema($bar);
+        $this->operation->setFilter($filter);
+        $this->operation->setAttributes([]);
+        $this->operation->setSizeLimit(4);
+
+        $this->ldap->execute(Argument::that(function($op) {
+            return $op->getFilter() == '(foo=bar)' && $op->getSizeLimit() == 4;
+        }))->shouldBeCalled()->willReturn($this->ldapEntries);
+
+        // The above returns 2 results, since the limit is 4 this next call should be set to a max of 2...
+        $this->ldap->execute(Argument::that(function($op) {
+            return $op->getFilter() == '(bar=foo)' && $op->getSizeLimit() == 2;
+        }))->shouldBeCalled()->willReturn($this->sortEntries);
+
+        $this->getResult();
+    }
+    
     public function getMatchers()
     {
         return [

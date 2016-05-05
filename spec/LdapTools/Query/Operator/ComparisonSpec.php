@@ -98,25 +98,25 @@ class ComparisonSpec extends ObjectBehavior
     function it_should_return_the_correct_ldap_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::EQ, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=bar)');
     }
 
     function it_should_return_the_correct_ldap_greater_than_or_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::GTE, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo>=bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo>=bar)');
     }
 
     function it_should_return_the_correct_ldap_less_than_or_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::LTE, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo<=bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo<=bar)');
     }
 
     function it_should_return_the_correct_ldap_approximately_equals_filter()
     {
         $this->beConstructedWith('foo', Comparison::AEQ, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo~=bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo~=bar)');
     }
 
     function it_should_be_able_to_set_and_get_the_value()
@@ -154,13 +154,13 @@ class ComparisonSpec extends ObjectBehavior
     function it_should_throw_a_LdapQueryException_when_using_an_invalid_attribute_name()
     {
         $this->beConstructedWith('foo=*bar', Comparison::AEQ, 'bar');
-        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringToLdapFilter();
     }
 
     function it_should_escape_special_characters_when_going_to_ldap()
     {
         $this->beConstructedWith('foo', Comparison::AEQ, '*(foo=)(*');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo~=\2a\28foo=\29\28\2a)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo~=\2a\28foo=\29\28\2a)');
     }
 
     function it_should_set_the_alias_based_off_the_attribute()
@@ -220,27 +220,27 @@ class ComparisonSpec extends ObjectBehavior
         $this->setAttribute('bar.foo');
 
         // When set to a specific alias (in this case 'bar'), other aliases will generate an empty string...
-        $this->getLdapFilter('foo')->shouldBeEqualTo('');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('');
         // The absence of an alias when one is explicitly set will also return an empty string...
-        $this->getLdapFilter()->shouldBeEqualTo('');
+        $this->toLdapFilter()->shouldBeEqualTo('');
         // When the alias is specifically called then the filter will be returned...
-        $this->getLdapFilter('bar')->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter('bar')->shouldBeEqualTo('(foo=bar)');
 
         $this->setAttribute('foo');
         // No alias defined according to the attribute, so no alias specified will return the filter...
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=bar)');
         // This will return the filter for the context of the 'foo' alias, as a specific alias wasn't defined.
-        $this->getLdapFilter('foo')->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('(foo=bar)');
     }
 
     function it_should_get_the_LDAP_filter_with_any_converted_values_or_translated_attributes_for_an_alias()
     {
         $this->setAttribute('u.foo');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foo=bar)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foo=bar)');
         $this->setTranslatedAttribute('foobar', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=bar)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar=bar)');
         $this->setConvertedValue('foo', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=foo)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar=foo)');
     }
 
     public function getMatchers()

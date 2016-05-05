@@ -26,10 +26,10 @@ class ArrayToOperatorSpec extends ObjectBehavior
     {
         $yml = Yaml::parse(file_get_contents(__DIR__.'/../../resources/filter/filters.yaml'));
         
-        $this->toOperator($yml['filter1'])->getLdapFilter()->shouldBeEqualTo('(&(serverRole=*)(username=admin*))');
-        $this->toOperator($yml['filter2'])->getLdapFilter()->shouldBeEqualTo('(&(serverRole=*)(username=admin*))');
-        $this->toOperator($yml['filter3'])->getLdapFilter()->shouldBeEqualTo('(&(&(name=chad)(state=WI))(|(name=Frank)(state=IL)))');
-        $this->toOperator($yml['filter4'])->getLdapFilter()->shouldBeEqualTo('(&(&(objectClass=user)(objectCategory=person))(&(emailAddress=*)(department=IT*)))');
+        $this->toOperator($yml['filter1'])->toLdapFilter()->shouldBeEqualTo('(&(serverRole=*)(username=admin*))');
+        $this->toOperator($yml['filter2'])->toLdapFilter()->shouldBeEqualTo('(&(serverRole=*)(username=admin*))');
+        $this->toOperator($yml['filter3'])->toLdapFilter()->shouldBeEqualTo('(&(&(name=chad)(state=WI))(|(name=Frank)(state=IL)))');
+        $this->toOperator($yml['filter4'])->toLdapFilter()->shouldBeEqualTo('(&(&(objectClass=user)(objectCategory=person))(&(emailAddress=*)(department=IT*)))');
     }
     
     function it_should_get_an_operator_filter_for_a_schema_adding_the_objectClass_objectCategory_and_filter_array()
@@ -38,7 +38,7 @@ class ArrayToOperatorSpec extends ObjectBehavior
         $schema->setObjectClass(['user']);
         $schema->setObjectCategory('person');
         
-        $this->getOperatorForSchema($schema, [])->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
-        $this->getOperatorForSchema($schema, ['starts_with' => ['username', 'admin']])->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(username=admin*)))');
+        $this->getOperatorForSchema($schema, [])->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+        $this->getOperatorForSchema($schema, ['starts_with' => ['username', 'admin']])->toLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(username=admin*)))');
     }
 }

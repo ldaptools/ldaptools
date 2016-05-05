@@ -272,49 +272,49 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'MultipleClasses')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectClass=person))');
+        $this->parse('filter', 'MultipleClasses')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectClass=person))');
     }
 
     function it_should_allow_a_schema_object_type_that_has_only_a_category_defined()
     {
         $this->beConstructedWith(__DIR__ . '/../../../resources/schema');
 
-        $this->parse('filter', 'CategoryOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(objectCategory=user)');
+        $this->parse('filter', 'CategoryOnly')->getFilter()->toLdapFilter()->shouldBeEqualTo('(objectCategory=user)');
     }
 
     function it_should_allow_a_schema_object_type_that_has_only_a_single_class_defined()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'ClassOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(objectClass=user)');
+        $this->parse('filter', 'ClassOnly')->getFilter()->toLdapFilter()->shouldBeEqualTo('(objectClass=user)');
     }
 
     function it_should_allow_a_schema_object_type_that_has_a_single_category_and_class_defined()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'ClassAndCategory')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
+        $this->parse('filter', 'ClassAndCategory')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=person)(objectClass=user))');
     }
 
     function it_should_allow_a_schema_object_type_that_has_a_single_category_and_multiple_classes_defined()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'MultipleClassesAndCategory')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=user)(objectClass=person)))');
+        $this->parse('filter', 'MultipleClassesAndCategory')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=user)(objectClass=person)))');
     }
     
     function it_should_allow_a_schema_object_type_that_has_only_a_filter_defined()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'FilterOnly')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectCategory=person))');
+        $this->parse('filter', 'FilterOnly')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectClass=user)(objectCategory=person))');
     }
 
     function it_should_allow_a_schema_object_type_that_has_a_filter_defined_with_a_class_and_category()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('filter', 'All')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(foo=*)))');
+        $this->parse('filter', 'All')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(&(objectCategory=person)(objectClass=user))(&(foo=*)))');
     }
 
     function it_should_parse_a_schema_object_with_controls_listed()
@@ -352,7 +352,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('extend_default_twice', 'CustomRootDSE')->getFilter()->getLdapFilter()->shouldBeEqualTo('(&(objectClass=*))');
+        $this->parse('extend_default_twice', 'CustomRootDSE')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectClass=*))');
         $this->parse('extend_default_twice', 'CustomRootDSE')->getUsePaging()->shouldBeEqualTo(true);
         $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldContain('bar');
         $this->parse('extend_default_twice', 'CustomRootDSE')->getAttributeMap()->shouldContain('defaultNamingContext');

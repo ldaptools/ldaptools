@@ -65,25 +65,25 @@ class WildcardSpec extends ObjectBehavior
     public function it_should_return_a_string_with_the_wildcard_operators_on_each_side_when_using_contains()
     {
         $this->beConstructedWith('foo', Wildcard::CONTAINS, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*bar*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*bar*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_right_side_when_using_starts_with()
     {
         $this->beConstructedWith('foo', Wildcard::STARTS_WITH, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=bar*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=bar*)');
     }
 
     public function it_should_return_a_string_with_the_wildcard_operators_on_the_left_side_when_using_ends_with()
     {
         $this->beConstructedWith('foo', Wildcard::ENDS_WITH, 'bar');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*bar)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*bar)');
     }
 
     public function it_should_return_a_string_with_unescaped_wildcards_when_using_like()
     {
         $this->beConstructedWith('foo', Wildcard::LIKE, '*b*a*r*');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*b*a*r*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*b*a*r*)');
     }
 
     public function it_should_not_use_a_converter_if_the_type_is_present()
@@ -101,31 +101,31 @@ class WildcardSpec extends ObjectBehavior
     function it_should_throw_a_LdapQueryException_when_using_an_invalid_attribute_name()
     {
         $this->beConstructedWith('foob<ar*', Wildcard::LIKE, '*bar*');
-        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringGetLdapFilter();
+        $this->shouldThrow('\LdapTools\Exception\LdapQueryException')->duringToLdapFilter();
     }
 
     function it_should_escape_special_characters_when_going_to_ldap_with_starts_with()
     {
         $this->beConstructedWith('foo', Wildcard::STARTS_WITH, '*test');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=\2atest*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=\2atest*)');
     }
 
     function it_should_escape_special_characters_when_going_to_ldap_with_ends_with()
     {
         $this->beConstructedWith('foo', Wildcard::ENDS_WITH, '*test=)');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\2atest=\29)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*\2atest=\29)');
     }
 
     function it_should_escape_special_characters_when_going_to_ldap_with_contains()
     {
         $this->beConstructedWith('foo', Wildcard::ENDS_WITH, '*te*st<*');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*\2ate\2ast<\2a)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*\2ate\2ast<\2a)');
     }
 
     function it_should_escape_special_characters_when_going_to_ldap_with_like()
     {
         $this->beConstructedWith('foo', Wildcard::LIKE, '*te*s)t*');
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*te*s\29t*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*te*s\29t*)');
     }
 
 
@@ -186,27 +186,27 @@ class WildcardSpec extends ObjectBehavior
         $this->setAttribute('bar.foo');
 
         // When set to a specific alias (in this case 'bar'), other aliases will generate an empty string...
-        $this->getLdapFilter('foo')->shouldBeEqualTo('');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('');
         // The absence of an alias when one is explicitly set will also return an empty string...
-        $this->getLdapFilter()->shouldBeEqualTo('');
+        $this->toLdapFilter()->shouldBeEqualTo('');
         // When the alias is specifically called then the filter will be returned...
-        $this->getLdapFilter('bar')->shouldBeEqualTo('(foo=*bar*)');
+        $this->toLdapFilter('bar')->shouldBeEqualTo('(foo=*bar*)');
 
         $this->setAttribute('foo');
         // No alias defined according to the attribute, so no alias specified will return the filter...
-        $this->getLdapFilter()->shouldBeEqualTo('(foo=*bar*)');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo=*bar*)');
         // This will return the filter for the context of the 'foo' alias, as a specific alias wasn't defined.
-        $this->getLdapFilter('foo')->shouldBeEqualTo('(foo=*bar*)');
+        $this->toLdapFilter('foo')->shouldBeEqualTo('(foo=*bar*)');
     }
 
     function it_should_get_the_LDAP_filter_with_any_converted_values_or_translated_attributes_for_an_alias()
     {
         $this->setAttribute('u.foo');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foo=*bar*)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foo=*bar*)');
         $this->setTranslatedAttribute('foobar', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=*bar*)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar=*bar*)');
         $this->setConvertedValue('foo', 'u');
-        $this->getLdapFilter('u')->shouldBeEqualTo('(foobar=*foo*)');
+        $this->toLdapFilter('u')->shouldBeEqualTo('(foobar=*foo*)');
     }
 
     public function getMatchers()

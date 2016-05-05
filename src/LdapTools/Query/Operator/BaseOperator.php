@@ -303,12 +303,22 @@ abstract class BaseOperator
     }
 
     /**
+     * @deprecated Use the 'toLdapFilter()' method instead.
+     * @param null $alias
+     * @return string
+     */
+    public function getLdapFilter($alias = null)
+    {
+        return $this->toLdapFilter($alias);        
+    }
+
+    /**
      * Returns the operator translated to its LDAP filter string value.
      *
      * @param string|null $alias
      * @return string
      */
-    public function getLdapFilter($alias = null)
+    public function toLdapFilter($alias = null)
     {
         if ($this->skipFilterForAlias($alias)) {
             return '';
