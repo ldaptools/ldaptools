@@ -353,6 +353,7 @@ abstract class BaseOperator
     /**
      * Depending on whether a converter was used, get the value that should be used for the query.
      *
+     * @param null|string $alias
      * @return mixed
      */
     protected function getValueForQuery($alias)
