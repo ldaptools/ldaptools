@@ -27,7 +27,7 @@ interface ContainsOperatorsInterface
     /**
      * Add another Operator to this Operator.
      *
-     * @param BaseOperator ...$operators
+     * @param BaseOperator[] ...$operators
      */
     public function add(BaseOperator ...$operators);
 }

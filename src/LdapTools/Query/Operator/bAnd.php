@@ -22,7 +22,7 @@ class bAnd extends BaseOperator implements ContainsOperatorsInterface
     const SYMBOL = '&';
 
     /**
-     * @param BaseOperator ...$operators
+     * @param BaseOperator[] ...$operators
      */
     public function __construct(BaseOperator ...$operators)
     {
