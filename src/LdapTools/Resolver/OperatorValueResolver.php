@@ -49,7 +49,7 @@ class OperatorValueResolver extends BaseValueResolver
         /** @var LdapObjectSchema $schema */
         foreach ($this->operators->getAliases() as $alias => $schema) {
             $this->schema = $schema;
-            $this->processOperator($schema->getFilter(), $alias);
+            $this->processOperator($schema->getFilter(), null);
             foreach ($this->operators as $operator) {
                 $this->processOperator($operator, $alias);
             }

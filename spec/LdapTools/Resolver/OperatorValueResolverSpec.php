@@ -13,6 +13,7 @@ namespace spec\LdapTools\Resolver;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Configuration;
 use LdapTools\Query\Builder\FilterBuilder;
+use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Schema\Parser\SchemaYamlParser;
@@ -79,5 +80,12 @@ class OperatorValueResolverSpec extends ObjectBehavior
         $this->toLdap()->toLdapFilter('user')->shouldEqual('(&(&(objectCategory=person)(objectClass=user))(cn=foo)(givenName=bar))');
         $this->toLdap()->toLdapFilter('ou')->shouldEqual('(&(objectClass=organizationalUnit)(ou=foo)(description=foobar))');
         $this->toLdap()->toLdapFilter()->shouldEqual('(|(&(&(objectCategory=person)(objectClass=user))(cn=foo)(givenName=bar))(&(objectClass=organizationalUnit)(ou=foo)(description=foobar)))');
+    }
+
+    function it_should_convert_the_filter_for_a_schema_if_it_uses_mapped_attribute_names_with_converters()
+    {
+        $this->schema->setFilter(new Comparison('exchangeHideFromGAL','=', true));
+
+        $this->toLdap()->toLdapFilter()->shouldEqual('(|(msExchHideFromAddressLists=TRUE)(objectClass=organizationalUnit))');
     }
 }
