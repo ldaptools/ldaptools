@@ -327,6 +327,10 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
+             user_account_control:
+                 - 'disabled'
+                 - 'trustedForAllDelegation'
+                 - 'trustedForAnyAuthDelegation'
         converter_options:
             group_membership:
                 groups:
@@ -335,10 +339,18 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
+            user_account_control:
+                # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
+                defaultValue: '4096'
+                uacMap:
+                    disabled: '2'
+                    trustedForAllDelegation: '524288'
+                    trustedForAnyAuthDelegation: '16777216'
         attributes:
             accountName: sAMAccountName
             created: whenCreated
             description: description
+            disabled: userAccountControl
             dn: distinguishedName
             dnsHostName: dNSHostName
             groups: memberOf
@@ -350,6 +362,8 @@ objects:
             osServicePack: operatingSystemServicePack
             osVersion: operatingSystemVersion
             sid: objectSid
+            trustedForAllDelegation: userAccountControl
+            trustedForAnyAuthDelegation: userAccountControl
         multivalued_attributes:
             - groups
             - objectClass
@@ -360,8 +374,7 @@ objects:
             - 'guid'
         default_values:
             accountName: "%name%"
-            # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
-            userAccountControl: "4096"
+            disabled: false
             objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
         required_attributes:
             - 'name'

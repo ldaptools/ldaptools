@@ -156,6 +156,7 @@ These are typical LDAP computer objects.
 | accountName | sAMAccountName | string |
 | created | whenCreated | `\DateTime` |
 | description | description | string |
+| disabled | userAccountControl | bool |
 | displayName | displayName | string |
 | dn | dn | string |
 | dnsHostName | dNSHostName | string |
@@ -168,6 +169,8 @@ These are typical LDAP computer objects.
 | osServicePack | operatingSystemServicePack | string |
 | osVersion | operatingSystemVersion | string |
 | sid | objectSid | string |
+| trustedForAllDelegation | userAccountControl | bool |
+| trustedForAnyAuthDelegation | userAccountControl | bool |
 
 #### AD Contact Types
 
