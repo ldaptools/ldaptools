@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -49,5 +50,12 @@ class ConvertAccountExpirationSpec extends ObjectBehavior
     function it_should_throw_an_attribute_converter_exception_if_the_value_to_ldap_is_not_supported()
     {
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new \SplObjectStorage());
+    }
+
+    function it_should_convert_a_bool_to_the_correct_LDAP_filter_when_querying()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(|(pwdLastSet=0)(pwdLastSet=9223372036854775807))');
+        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(&(pwdLastSet>=1)(pwdLastSet<=9223372036854775806))');
     }
 }

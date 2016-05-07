@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Query\Builder\FilterBuilder;
 
 /**
  * Used to convert an accountExpires value to a DateTime object, or detect if the value indicates it never expires and
@@ -34,6 +35,10 @@ class ConvertAccountExpiration implements AttributeConverterInterface
      */
     public function toLdap($value)
     {
+        // A simple bool for a LDAP search requires some additional filter logic, other values can fall through...
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO && is_bool($value)) {
+            return $this->getQueryOperator($value);
+        }
         if (!($value === false || ($value instanceof \DateTime))) {
             throw new AttributeConverterException('Expecting a bool or DateTime when converting to LDAP.');
         }
@@ -47,5 +52,28 @@ class ConvertAccountExpiration implements AttributeConverterInterface
     public function fromLdap($value)
     {
         return ($value == 0  || $value == self::NEVER_EXPIRES) ? false : (new ConvertWindowsTime())->fromLdap($value);
+    }
+
+    /**
+     * @param bool $value
+     * @return \LdapTools\Query\Operator\BaseOperator
+     */
+    protected function getQueryOperator($value)
+    {
+        $fb = new FilterBuilder();
+
+        if ($value) {
+            $operator = $fb->bAnd(
+                $fb->gte('pwdLastSet', '1'),
+                $fb->lte('pwdLastSet', '9223372036854775806')
+            );
+        } else {
+            $operator = $fb->bOr(
+                $fb->eq('pwdLastSet', '0'),
+                $fb->eq('pwdLastSet', '9223372036854775807')
+            );
+        }
+
+        return $operator;
     }
 }
