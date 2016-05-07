@@ -62,6 +62,9 @@ class MatchingRule extends BaseOperator
         if (!LdapUtilities::isValidAttributeFormat($this->oid)) {
             throw new LdapQueryException(sprintf('Matching rule "%s" is not a valid format.', $this->oid));
         }
+        if ($this->getValueForQuery($alias) instanceof BaseOperator) {
+            return $this->getValueForQuery($alias)->toLdapFilter($alias);
+        }
 
         return self::SEPARATOR_START
             .$this->getAttributeToQuery($alias)

@@ -12,6 +12,7 @@ namespace spec\LdapTools\Query\Operator;
 
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\MatchingRuleOid;
+use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -155,6 +156,13 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->toLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=2)');
         $this->setConvertedValue('foo', 'u');
         $this->toLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=foo)');
+    }
+    
+    function it_should_return_the_filter_for_the_value_if_the_value_is_a_BaseOperator_instance()
+    {
+        $this->setAttribute('foo');
+        $this->setValue(new Comparison('foobar', '=', 'stuff'));
+        $this->toLdapFilter()->shouldEqual('(foobar=stuff)');
     }
     
     public function getMatchers()

@@ -87,6 +87,9 @@ class OperatorValueResolver extends BaseValueResolver
         $isValueArray = is_array($operator->getValue());
         $values = $isValueArray ? $operator->getValue() : [$operator->getValue()];
         $values = $this->doConvertValues($operator->getAttribute(), $values, 'toLdap');
+        if ($values instanceof BaseOperator) {
+            $this->processOperator($values, $alias);
+        }
         $operator->setConvertedValue($isValueArray ? $values : $values[0], $alias);
         $operator->setWasConverterUsed(true, $alias);
     }

@@ -91,6 +91,9 @@ class Wildcard extends Comparison
         if ($this->skipFilterForAlias($alias)) {
             return '';
         }
+        if ($this->getValueForQuery($alias) instanceof BaseOperator) {
+            return $this->getValueForQuery($alias)->toLdapFilter($alias);
+        }
 
         if ($this->wildcardType == self::CONTAINS) {
             $value = '*'.LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER).'*';

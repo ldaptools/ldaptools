@@ -323,6 +323,9 @@ abstract class BaseOperator
         if ($this->skipFilterForAlias($alias)) {
             return '';
         }
+        if ($this->getValueForQuery($alias) instanceof BaseOperator) {
+            return $this->getValueForQuery($alias)->toLdapFilter($alias);
+        }
 
         return self::SEPARATOR_START
             .$this->getAttributeToQuery($alias)

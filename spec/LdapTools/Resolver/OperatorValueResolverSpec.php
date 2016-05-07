@@ -88,4 +88,10 @@ class OperatorValueResolverSpec extends ObjectBehavior
 
         $this->toLdap()->toLdapFilter()->shouldEqual('(|(msExchHideFromAddressLists=TRUE)(objectClass=organizationalUnit))');
     }
+
+    function it_should_convert_values_with_operators_to_filters()
+    {
+        $this->collection->add($this->filter->eq('user.disabled', false));
+        $this->toLdap()->toLdapFilter()->shouldEqual('(|(&(&(objectCategory=person)(objectClass=user))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))(&(objectClass=organizationalUnit)))');
+    }
 }

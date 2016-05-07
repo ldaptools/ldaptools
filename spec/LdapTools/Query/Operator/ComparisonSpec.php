@@ -243,6 +243,13 @@ class ComparisonSpec extends ObjectBehavior
         $this->toLdapFilter('u')->shouldBeEqualTo('(foobar=foo)');
     }
 
+    function it_should_return_the_filter_for_the_value_if_the_value_is_a_BaseOperator_instance()
+    {
+        $this->setAttribute('foo');
+        $this->setValue(new Comparison('foobar', '=', 'stuff'));
+        $this->toLdapFilter()->shouldEqual('(foobar=stuff)');
+    }
+
     public function getMatchers()
     {
         return [
