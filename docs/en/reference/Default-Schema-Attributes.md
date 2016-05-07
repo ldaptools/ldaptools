@@ -287,6 +287,7 @@ These are deleted objects that reside in the AD Recycle Bin.
 | lastKnownName | lastKnownRdn | string |
 | modified | whenChanged | `\DateTime` |
 | name | cn | string |
+| schemaType | objectClass| string |
 | sid | objectSid | string |
 | upn | userPrincipalName | string |
 

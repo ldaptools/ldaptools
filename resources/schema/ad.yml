@@ -613,7 +613,7 @@ objects:
              bool:
                  - 'isDeleted'
              ldap_type:
-                 - 'type'
+                 - 'schemaType'
              windows_guid:
                  - 'guid'
              windows_sid:
@@ -639,8 +639,8 @@ objects:
             lastKnownName: msds-lastKnownRdn
             modified: whenChanged
             name: cn
+            schemaType: objectClass
             sid: objectSid
-            type: objectClass
             upn: userPrincipalName
         attributes_to_select:
             - 'name'
@@ -648,4 +648,4 @@ objects:
             - 'lastKnownLocation'
             - 'lastKnownName'
             - 'sid'
-            - 'type'
+            - 'schemaType'
