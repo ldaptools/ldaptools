@@ -124,11 +124,11 @@ class FilterBuilderSpec extends ObjectBehavior
 
     function it_should_correctly_format_a_less_than_filter()
     {
-        $this->lt('foo', '5')->getLdapFilter()->shouldBeEqualTo('(&(!(foo>=5))(foo=*))');
+        $this->lt('foo', '5')->toLdapFilter()->shouldBeEqualTo('(&(!(foo>=5))(foo=*))');
     }
 
     function it_should_correctly_format_a_greater_than_filter()
     {
-        $this->gt('foo', '5')->getLdapFilter()->shouldBeEqualTo('(&(!(foo<=5))(foo=*))');
+        $this->gt('foo', '5')->toLdapFilter()->shouldBeEqualTo('(&(!(foo<=5))(foo=*))');
     }
 }
