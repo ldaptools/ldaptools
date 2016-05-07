@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
+use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 
@@ -39,9 +40,14 @@ class ConvertGroupType implements AttributeConverterInterface
     public function toLdap($value)
     {
         $this->validateCurrentAttribute($this->getOptions()['typeMap']);
-        $this->setDefaultLastValue('groupType', $this->getOptions()['defaultValue']);
 
-        return $this->modifyGroupTypeValue((bool) $value);
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO) {
+            $valueToLdap = $this->getQueryOperator($value);
+        } else {
+            $valueToLdap = $this->modifyGroupTypeValue((bool)$value);
+        }
+
+        return $valueToLdap;
     }
 
     /**
@@ -81,6 +87,7 @@ class ConvertGroupType implements AttributeConverterInterface
      */
     protected function modifyGroupTypeValue($value)
     {
+        $this->setDefaultLastValue('groupType', $this->getOptions()['defaultValue']);
         $lastValue = is_array($this->getLastValue()) ? reset($this->getLastValue()) : $this->getLastValue();
 
         // If the bit we are expecting is already set how we want it, then do not attempt to modify it.
@@ -132,8 +139,7 @@ class ConvertGroupType implements AttributeConverterInterface
      */
     protected function modifyBitmaskValue($value, $toggle, $attribute)
     {
-        $bit = array_change_key_case($this->getOptions()['typeMap'])[strtolower($attribute)];
-        $bit = in_array($this->getAttribute(), $this->getOptions()['types']['type']) ? -1 * abs($bit) : $bit;
+        $bit = $this->getBitForAttribute($attribute);
 
         if ($toggle) {
             $value = (int) $value + (int) $bit;
@@ -152,5 +158,33 @@ class ConvertGroupType implements AttributeConverterInterface
     protected function shouldInvertValue()
     {
         return strtolower($this->getAttribute()) == strtolower($this->getOptions()['distribution']);
+    }
+
+    /**
+     * @param string $attribute
+     * @return int
+     */
+    protected function getBitForAttribute($attribute)
+    {
+        $bit = array_change_key_case($this->getOptions()['typeMap'])[strtolower($attribute)];
+        $bit = in_array($this->getAttribute(), $this->getOptions()['types']['type']) ? -1 * abs($bit) : $bit;
+
+        return $bit;
+    }
+
+    /**
+     * Transform a bool value into the bitwise operator needed for the LDAP filter.
+     *
+     * @param bool $value
+     * @return \LdapTools\Query\Operator\BaseOperator
+     */
+    protected function getQueryOperator($value)
+    {
+        $fb = new FilterBuilder();
+        $bit = abs($this->getBitForAttribute($this->getAttribute()));
+        $operator = $fb->bitwiseAnd('groupType', (string) $bit);
+        $value = $this->shouldInvertValue() ? !$value : $value;
+
+        return $value ? $operator : $fb->bNot($operator);
     }
 }

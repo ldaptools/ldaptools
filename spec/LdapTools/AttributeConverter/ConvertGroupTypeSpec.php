@@ -199,4 +199,25 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->setAttribute('TypeSecuritY');
         $this->toLdap(true)->shouldBeEqualTo("-2147483646");
     }
+
+    function it_should_convert_a_bool_value_into_the_bitwise_operator_for_the_returned_value()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
+        $this->setAttribute('typeSecurity');
+        $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2147483648)');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2147483648))');
+        $this->setAttribute('typeDistribution');
+        $this->toLdap(true)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2147483648))');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2147483648)');
+        $this->setAttribute('scopeGlobal');
+        $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2)');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2))');
+        $this->setAttribute('scopeUniversal');
+        $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=8)');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=8))');
+        $this->setAttribute('scopeDomainLocal');
+        $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=4)');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=4))');
+    }
 }
