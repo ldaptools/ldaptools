@@ -207,4 +207,21 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->setAttribute('DisaBleD');
         $this->toLdap(false)->shouldBeEqualTo('512');
     }
+    
+    function it_should_convert_a_bool_value_into_the_bitwise_operator_for_the_returned_value()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
+        $this->setAttribute('disabled');
+        $this->toLdap(true)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
+        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(userAccountControl:1.2.840.113556.1.4.803:=2)');
+        $this->toLdap(false)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bNot');
+        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(!(userAccountControl:1.2.840.113556.1.4.803:=2))');
+
+        $this->setAttribute('smartCardRequired');
+        $this->toLdap(true)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
+        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(userAccountControl:1.2.840.113556.1.4.803:=262144)');
+        $this->toLdap(false)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bNot');
+        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(!(userAccountControl:1.2.840.113556.1.4.803:=262144))');
+    }
 }

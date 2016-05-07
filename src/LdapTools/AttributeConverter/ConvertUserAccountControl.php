@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
+use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\UserAccountControlFlags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 
@@ -38,9 +39,12 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     public function toLdap($value)
     {
         $this->validateCurrentAttribute($this->getOptions()['uacMap']);
-        $this->setDefaultLastValue('userAccountControl', $this->getOptions()['defaultValue']);
 
-        return $this->modifyUacValue((bool) $value);
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO) {
+            return $this->getQueryOperator((bool) $value);
+        } else {
+            return $this->modifyUacValue((bool) $value);
+        }
     }
 
     /**
@@ -70,6 +74,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     protected function modifyUacValue($value)
     {
+        $this->setDefaultLastValue('userAccountControl', $this->getOptions()['defaultValue']);
         if (is_array($this->getLastValue())) {
             $lastValue = $this->getLastValue();
             $lastValue = reset($lastValue);
@@ -90,6 +95,21 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         }
 
         return (string) $uac;
+    }
+
+    /**
+     * Transform a bool value into the bitwise operator needed for the LDAP filter.
+     * 
+     * @param bool $value
+     * @return \LdapTools\Query\Operator\BaseOperator
+     */
+    protected function getQueryOperator($value)
+    {
+        $fb = new FilterBuilder();
+        $mappedValue = $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute());
+        $operator = $fb->bitwiseAnd('userAccountControl', $mappedValue);
+
+        return $value ? $operator : $fb->bNot($operator);
     }
 
     /**
