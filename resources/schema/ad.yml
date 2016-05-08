@@ -19,11 +19,14 @@ objects:
                 defaultValue: '512'
                 uacMap:
                     disabled: '2'
+                    enabled: '2'
                     passwordIsReversible: '128'
                     passwordNeverExpires: '65536'
                     smartCardRequired: '262144'
                     trustedForAllDelegation: '524288'
                     trustedForAnyAuthDelegation: '16777216'
+                invert:
+                    - 'enabled'
             value_to_dn:
                 exchangeMailboxDatabase:
                     attribute: cn
@@ -86,6 +89,7 @@ objects:
                  - 'passwordLastSet'
              user_account_control:
                  - 'disabled'
+                 - 'enabled'
                  - 'passwordIsReversible'
                  - 'passwordNeverExpires'
                  - 'smartCardRequired'
@@ -121,6 +125,7 @@ objects:
             emailAddress: mail
             employeeId: employeeId
             employeeNumber: employeeNumber
+            enabled: userAccountControl
             exchangeAlias: mailNickname
             exchangeHideFromGAL: msExchHideFromAddressLists
             exchangeMailboxDatabase: homeMDB
@@ -329,6 +334,7 @@ objects:
                  - 'modified'
              user_account_control:
                  - 'disabled'
+                 - 'enabled'
                  - 'trustedForAllDelegation'
                  - 'trustedForAnyAuthDelegation'
         converter_options:
@@ -344,8 +350,11 @@ objects:
                 defaultValue: '4096'
                 uacMap:
                     disabled: '2'
+                    enabled: '2'
                     trustedForAllDelegation: '524288'
                     trustedForAnyAuthDelegation: '16777216'
+                invert:
+                    - 'enabled'
         attributes:
             accountName: sAMAccountName
             created: whenCreated
@@ -353,6 +362,7 @@ objects:
             disabled: userAccountControl
             dn: distinguishedName
             dnsHostName: dNSHostName
+            enabled: userAccountControl
             groups: memberOf
             guid: objectGuid
             location: location

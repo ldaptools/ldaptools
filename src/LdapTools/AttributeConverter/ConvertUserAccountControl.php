@@ -30,6 +30,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         $this->setOptions([
             'uacMap' => [],
             'defaultValue' => UserAccountControlFlags::NORMAL_ACCOUNT,
+            'invert' => [],
         ]);
     }
 
@@ -53,8 +54,9 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     public function fromLdap($value)
     {
         $this->validateCurrentAttribute($this->getOptions()['uacMap']);
-
-        return (bool) ((int) $value & (int) $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute()));
+        $value = (bool) ((int) $value & (int) $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute()));
+        
+        return $this->shouldInvertValue() ? !$value : $value;
     }
 
     /**
@@ -63,6 +65,14 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     public function getShouldAggregateValues()
     {
         return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isBatchSupported(Batch $batch)
+    {
+        return $batch->isTypeReplace();
     }
 
     /**
@@ -86,6 +96,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         if ($this->fromLdap($lastValue) === $value) {
             return $lastValue;
         }
+        $value = $this->shouldInvertValue() ? !$value : $value;
 
         $mappedValue = $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute());
         if ($value) {
@@ -108,15 +119,18 @@ class ConvertUserAccountControl implements AttributeConverterInterface
         $fb = new FilterBuilder();
         $mappedValue = $this->getArrayValue($this->getOptions()['uacMap'], $this->getAttribute());
         $operator = $fb->bitwiseAnd('userAccountControl', $mappedValue);
+        $value = $this->shouldInvertValue() ? !$value : $value;
 
         return $value ? $operator : $fb->bNot($operator);
     }
 
     /**
-     * {@inheritdoc}
+     * Check if the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled) 
+     *
+     * @return bool
      */
-    public function isBatchSupported(Batch $batch)
+    protected function shouldInvertValue()
     {
-        return $batch->isTypeReplace();
+        return in_array(strtolower($this->getAttribute()), array_map('strtolower', $this->getOptions()['invert']));
     }
 }

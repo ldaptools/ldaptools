@@ -55,6 +55,7 @@ These are typical LDAP user objects.
 | emailAddress | mail | string |
 | employeeId | employeeId | string |
 | employeeNumber | employeeNumber | int |
+| enabled | userAccountControl | bool |
 | exchangeAlias | mailNickname | string |
 | exchangeHideFromGAL | msExchHideFromAddressLists | bool |
 | exchangeMailboxDatabase | homeMDB | string |
@@ -160,6 +161,7 @@ These are typical LDAP computer objects.
 | displayName | displayName | string |
 | dn | dn | string |
 | dnsHostName | dNSHostName | string |
+| enabled | userAccountControl | bool |
 | groups | memberOf | array |
 | guid | objectGuid | string |
 | location | location | string |

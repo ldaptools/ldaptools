@@ -59,6 +59,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $options = [
             'uacMap' => [
                 'disabled' => '2',
+                'enabled' => '2',
                 'passwordNeverExpires' => '65536',
                 'smartCardRequired' => '262144',
                 'trustedForAllDelegation' => '262144',
@@ -66,6 +67,9 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
                 'passwordIsReversible' => '128',
             ],
             'defaultValue' => '512',
+            'invert' => [
+                'enabled',
+            ],
         ];
         $this->setOptions($options);
         $this->setLdapConnection($connection);
@@ -84,6 +88,10 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 
     function it_should_convert_a_value_from_ldap_to_a_php_bool()
     {
+        $this->setAttribute('enabled');
+        $this->fromLdap('514')->shouldBeEqualTo(false);
+        $this->fromLdap('512')->shouldBeEqualTo(true);
+
         $this->setAttribute('disabled');
         // 514 represents a "normal account" with the disabled bit set.
         $this->fromLdap('514')->shouldBeEqualTo(true);
@@ -125,6 +133,11 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->setAttribute('disabled');
         $this->toLdap(true)->shouldBeEqualTo('514');
         $this->setLastValue('514');
+        $this->setAttribute('enabled');
+        $this->toLdap(true)->shouldBeEqualTo('512');
+        $this->setLastValue('512');
+        $this->toLdap(false)->shouldBeEqualTo('514');
+        $this->setLastValue('514');
         $this->setAttribute('passwordNeverExpires');
         $this->toLdap(true)->shouldBeEqualTo('66050');
     }
@@ -137,6 +150,8 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         }))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
+        $this->setAttribute('enabled');
+        $this->toLdap(true)->shouldBeEqualTo('512');
         $this->setAttribute('disabled');
         $this->toLdap(true)->shouldBeEqualTo('514');
         $this->setLastValue('514');
@@ -223,5 +238,11 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(userAccountControl:1.2.840.113556.1.4.803:=262144)');
         $this->toLdap(false)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bNot');
         $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(!(userAccountControl:1.2.840.113556.1.4.803:=262144))');
+
+        $this->setAttribute('enabled');
+        $this->toLdap(true)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\bNot');
+        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(!(userAccountControl:1.2.840.113556.1.4.803:=2))');
+        $this->toLdap(false)->shouldReturnAnInstanceOf('LdapTools\Query\Operator\MatchingRule');
+        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(userAccountControl:1.2.840.113556.1.4.803:=2)');
     }
 }
