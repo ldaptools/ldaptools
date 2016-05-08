@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -35,5 +36,13 @@ class ConvertPasswordMustChangeSpec extends ObjectBehavior
     {
         $this->fromLdap('0')->shouldBeEqualTo(true);
         $this->fromLdap('130660331300000000')->shouldBeEqualTo(false);
+    }
+    
+    function it_should_convert_a_bool_properly_when_searching_LDAP_with_a_filter()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
+        $this->toLdap(true)->shouldBeEqualTo('0');
+        $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(pwdLastSet=0))');   
     }
 }
