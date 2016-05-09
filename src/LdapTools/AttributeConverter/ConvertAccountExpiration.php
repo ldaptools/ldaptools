@@ -40,7 +40,10 @@ class ConvertAccountExpiration implements AttributeConverterInterface
             return $this->getQueryOperator($value);
         }
         if (!($value === false || ($value instanceof \DateTime))) {
-            throw new AttributeConverterException('Expecting a bool or DateTime when converting to LDAP.');
+            throw new AttributeConverterException(sprintf(
+                'Expecting a bool false or DateTime object when converting to LDAP for "%s".',
+                $this->getAttribute()
+            ));
         }
 
         return ($value === false) ? '0' : (new ConvertWindowsTime())->toLdap($value);
@@ -64,13 +67,13 @@ class ConvertAccountExpiration implements AttributeConverterInterface
 
         if ($value) {
             $operator = $fb->bAnd(
-                $fb->gte('pwdLastSet', '1'),
-                $fb->lte('pwdLastSet', '9223372036854775806')
+                $fb->gte('accountExpires', '1'),
+                $fb->lte('accountExpires', '9223372036854775806')
             );
         } else {
             $operator = $fb->bOr(
-                $fb->eq('pwdLastSet', '0'),
-                $fb->eq('pwdLastSet', '9223372036854775807')
+                $fb->eq('accountExpires', '0'),
+                $fb->eq('accountExpires', self::NEVER_EXPIRES)
             );
         }
 

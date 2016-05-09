@@ -55,7 +55,7 @@ class ConvertAccountExpirationSpec extends ObjectBehavior
     function it_should_convert_a_bool_to_the_correct_LDAP_filter_when_querying()
     {
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
-        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(|(pwdLastSet=0)(pwdLastSet=9223372036854775807))');
-        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(&(pwdLastSet>=1)(pwdLastSet<=9223372036854775806))');
+        $this->toLdap(false)->toLdapFilter()->shouldBeEqualTo('(|(accountExpires=0)(accountExpires=9223372036854775807))');
+        $this->toLdap(true)->toLdapFilter()->shouldBeEqualTo('(&(accountExpires>=1)(accountExpires<=9223372036854775806))');
     }
 }
