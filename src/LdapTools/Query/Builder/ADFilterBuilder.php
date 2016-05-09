@@ -37,6 +37,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for accounts that are set to expire at a certain date.
      *
+     * @deprecated Use the accountExpirationDate schema attribute instead (bool true)
      * @return \LdapTools\Query\Operator\bAnd
      */
     public function accountExpires()
@@ -50,6 +51,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for accounts that never expire.
      *
+     * @deprecated Use the accountExpirationDate schema attribute instead (bool false)
      * @return \LdapTools\Query\Operator\bOr
      */
     public function accountNeverExpires()
@@ -63,6 +65,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for disabled accounts via a bitwise AND comparison on userAccountControl.
      *
+     * @deprecated Use the disabled schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function accountIsDisabled()
@@ -73,6 +76,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for locked accounts via a comparison on the lockoutTime attribute.
      *
+     * @deprecated Use the 'locked' schema attribute instead.
      * @return \LdapTools\Query\Operator\Comparison
      */
     public function accountIsLocked()
@@ -83,6 +87,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Check for a specific AD group type by its flag.
      *
+     * @deprecated Use the group type schema attributes instead.
      * @see \LdapTools\Query\GroupTypeFlags
      * @param int $flag A constant from GroupTypeFlags
      * @return \LdapTools\Query\Operator\MatchingRule
@@ -95,6 +100,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for groups that are security enabled.
      *
+     * @deprecated Use the typeSecurity schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function groupIsSecurityEnabled()
@@ -105,6 +111,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Check for groups that are distribution lists.
      *
+     * @deprecated Use the typeDistribution schema attribute instead.
      * @return \LdapTools\Query\Operator\bNot
      */
     public function groupIsDistribution()
@@ -115,6 +122,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for groups that are global in scope.
      *
+     * @deprecated Use the scopeGlobal schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function groupIsGlobal()
@@ -125,6 +133,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for groups that are universal in scope.
      *
+     * @deprecated Use the scopeUniversal schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function groupIsUniversal()
@@ -135,6 +144,7 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Checks for groups that are domain local in scope.
      *
+     * @deprecated Use the scopeDomainLocal schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function groupIsDomainLocal()
@@ -143,18 +153,9 @@ class ADFilterBuilder extends FilterBuilder
     }
 
     /**
-     * Checks for the existence of an attribute that should only be set on mail-enabled objects.
-     *
-     * @return \LdapTools\Query\Operator\Wildcard
-     */
-    public function mailEnabled()
-    {
-        return $this->present(self::ATTR['PROXY_ADDRESSES']);
-    }
-
-    /**
      * Checks for accounts where the password never expires via a bitwise AND comparison on userAccountControl.
      *
+     * @deprecated Use the passwordNeverExpires schema attribute instead.
      * @return \LdapTools\Query\Operator\MatchingRule
      */
     public function passwordNeverExpires()
@@ -165,11 +166,22 @@ class ADFilterBuilder extends FilterBuilder
     /**
      * Check for accounts where they must change their password on the next logon.
      *
+     * @deprecated Use the passwordMustChange schema attribute instead (bool false)
      * @return \LdapTools\Query\Operator\Comparison
      */
     public function passwordMustChange()
     {
         return $this->eq(self::ATTR['PASSWORD_LAST_SET'], 0);
+    }
+
+    /**
+     * Checks for the existence of an attribute that should only be set on mail-enabled objects.
+     *
+     * @return \LdapTools\Query\Operator\Wildcard
+     */
+    public function mailEnabled()
+    {
+        return $this->present(self::ATTR['PROXY_ADDRESSES']);
     }
 
     /**
