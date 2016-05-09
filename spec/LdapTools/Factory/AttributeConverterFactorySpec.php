@@ -142,7 +142,12 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     {
         $this::get('ldap_type')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLdapObjectType');
     }
-    
+
+    function it_should_return_a_lockout_time_converter()
+    {
+        $this::get('lockout_time')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLockoutTime');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo_bar');

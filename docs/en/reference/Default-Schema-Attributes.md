@@ -77,6 +77,8 @@ These are typical LDAP user objects.
 | initials | initials | string |
 | ipPhone | ipPhone | string |
 | lastName | sn | string |
+| locked | lockoutTime | bool |
+| lockedDate | lockoutTime | `\DateTime|false` |
 | logonWorkstations | userWorkstations | array |
 | manager | manager | string |
 | middleName | middleName | string |

@@ -8,6 +8,8 @@ objects:
         # The LDAP objectClass
         class: user
         converter_options:
+            lockout_time:
+                bool: locked
             group_membership:
                 groups:
                     to_attribute: member
@@ -108,6 +110,9 @@ objects:
              logon_workstations: [ logonWorkstations ]
              account_expires: [ accountExpirationDate ]
              primary_group: [ primaryGroup ]
+             lockout_time:
+                - 'locked'
+                - 'lockedDate'
         # This is the actual mapping of attribute names to what they really are in LDAP.
         attributes:
             accountExpirationDate: accountExpires
@@ -147,6 +152,8 @@ objects:
             initials: initials
             ipPhone: ipPhone
             lastName: sn
+            locked: lockoutTime
+            lockedDate: lockoutTime
             logonWorkstations: userWorkstations
             manager: manager
             middleName: middleName
