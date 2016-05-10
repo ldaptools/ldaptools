@@ -233,8 +233,14 @@ objects:
                 - 'exchangeDefaultSmtpAddress'
              group_membership:
                  - 'groups'
+             group_type:
+                 - 'typeSecurity'
+                 - 'typeDistribution'
+                 - 'scopeGlobal'
+                 - 'scopeUniversal'
+                 - 'scopeDomainLocal'
              int:
-                - 'exchangeAddressBookFlags'
+                 - 'exchangeAddressBookFlags'
              value_to_dn:
                  - 'managedBy'
                  - 'members'
