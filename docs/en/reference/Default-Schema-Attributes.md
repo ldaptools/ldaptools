@@ -144,8 +144,9 @@ These are typical LDAP group objects.
 | scopeGlobal | groupType | bool |
 | scopeUniversal | groupType | bool |
 | sid | objectSid | string |
-| typeSecurity | groupType | bool |
+| typeBuiltin | groupType | bool |
 | typeDistribution | groupType | bool |
+| typeSecurity | groupType | bool |
 
 #### AD Computer Types
 

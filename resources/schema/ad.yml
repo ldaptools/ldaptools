@@ -234,6 +234,7 @@ objects:
              group_membership:
                  - 'groups'
              group_type:
+                 - 'typeBuiltin'
                  - 'typeSecurity'
                  - 'typeDistribution'
                  - 'scopeGlobal'
@@ -313,6 +314,7 @@ objects:
             modified: whenChanged
             name: cn
             sid: objectSid
+            typeBuiltin: groupType
             typeSecurity: groupType
             typeDistribution: groupType
             scopeDomainLocal: groupType
