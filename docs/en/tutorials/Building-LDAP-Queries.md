@@ -115,6 +115,16 @@ $lqb->from(LdapObjectType::COMPUTER);
 $lqb->from(LdapObjectType::USER, 'u');
 ```
 
+You can also call the `from()` method dynamically for schema types you have defined:
+
+```php
+// Selects from the 'ExchangeServer' schema type.
+$lqb->fromExchangeServer();
+
+// Selects from the 'container' schema type, and assigns it an alias of 'c'.
+$lqb->fromContainer('c');
+```
+
 ------------------------
 #### fromUsers($alias = null)
 
@@ -507,7 +517,7 @@ $title = $lqb->select('title')
     ->fromUsers()
     ->Where(['username' => 'chad'])
     ->getLdapQuery()
-    ->getSingleScalarResult();
+    ->getSingleScalarOrNullResult();
 
 // Check if the attribute actually had a value first
 $title = $title ?: 'Unknown';
@@ -549,7 +559,7 @@ list and description of available methods is below.
 #### aeq($attribute, $value)
 
 Creates an "approximately-equal-to" comparison between the attribute and the value. The results are dependent on the
-LDAP specific implementation of this operator. But it will typically function like a "sounds like" comparison: 
+LDAP specific implementation of this operator. But it will typically function as a "sounds like" comparison: 
 `(attribute~=value)`
 
 ```php
