@@ -1,6 +1,22 @@
 CHANGELOG
 =========
 
+0.20.0 (2016-05-10)
+-------------------
+  * Add a schema type for searching for deleted LDAP objects (AD Recycle Bin support).
+  * Add a method to restore LDAP objects from the AD Recycle Bin.
+  * Allow for querying multiple schema types at once.
+  * Allow using aliases when querying multiple schema types to form more complex LDAP filters.
+  * Add the ability to set size limits on queries.
+  * Querying with userAccountControl properties via bool values now produces the expected result.
+  * Querying with group type/scope attributes via bool values now produces the expected result.
+  * Querying for accounts with expiration dates can now be done via a bool on the schema attribute.
+  * Add the ability to disable/enable, and set auth delegation, on AD computer objects via attributes.
+  * Add an 'enabled' attribute for the user schema as a convenience.
+  * Remove the class and category methods on the LdapObject instances. Simplify the constructor.
+  * Change 'getLdapFilter()' to 'toLdapFilter()' in all places for consistency. Deprecate 'getLdapFilter()'.
+  * A few bug fixes.
+
 0.19.0 (2016-04-01)
 -------------------
   * Add two new schema file directives: include, include_default. Allows for more logical separation of schema files.
