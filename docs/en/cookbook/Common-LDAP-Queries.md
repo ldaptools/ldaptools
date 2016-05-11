@@ -22,6 +22,9 @@ $computers = $ldap->buildLdapQuery()->fromComputers()->getLdapQuery()->getResult
 
 # All contacts
 $contacts = $ldap->buildLdapQuery()->fromContacts()->getLdapQuery()->getResult();
+
+# All deleted objects (AD only)
+$deleted = $ldap->buildLdapQuery()->fromDeleted()->getLdapQuery()->getResult();
 ```
 
 ### Users Created After a Certain Date
@@ -91,10 +94,9 @@ $users = $query->fromUsers()
 ### All Disabled User Accounts
 
 ```php
-$query = $ldap->buildLdapQuery();
-
-$users = $query->fromUsers()
-    ->where($query->filter()->accountIsDisabled())
+$users = $ldap->buildLdapQuery()
+    ->fromUsers()
+    ->where(['disabled' => true])
     ->getLdapQuery()
     ->getResult();
 ```
@@ -102,10 +104,9 @@ $users = $query->fromUsers()
 ### All Locked User Accounts
 
 ```php
-$query = $ldap->buildLdapQuery();
-
-$users = $query->fromUsers()
-    ->where($query->filter()->accountIsLocked())
+$users = $ldap->buildLdapQuery()
+    ->fromUsers()
+    ->where(['locked' => true])
     ->getLdapQuery()
     ->getResult();
 ```
@@ -116,7 +117,7 @@ $users = $query->fromUsers()
 $query = $ldap->buildLdapQuery();
 
 $users = $query->fromUsers()
-    ->where($query->filter()->bNot($query->filter()->accountIsDisabled()))
+    ->where(['enabled' => true])
     ->andWhere($query->filter()->mailEnabled())
     ->getLdapQuery()
     ->getResult();
@@ -125,11 +126,9 @@ $users = $query->fromUsers()
 ### All Active User Accounts With Passwords That Must Change on Next Login
 
 ```php
-$query = $ldap->buildLdapQuery();
-
-$users = $query->fromUsers()
-    ->where($query->filter()->bNot($query->filter()->accountIsDisabled()))
-    ->andWhere($query->filter()->passwordMustChange())
+$users = $ldap->buildLdapQuery()
+    ->fromUsers()
+    ->where(['enabled' => true, 'passwordMustChange' => true])
     ->getLdapQuery()
     ->getResult();
 ```
@@ -140,7 +139,7 @@ $users = $query->fromUsers()
 $query = $ldap->buildLdapQuery();
 
 $groups = $query->fromGroups()
-    ->where($query->filter()->groupIsSecurityEnabled())
+    ->where(['typeSecurity' => true])
     ->andWhere($query->filter()->notPresent('members'))
     ->getLdapQuery()
     ->getResult();
@@ -149,10 +148,9 @@ $groups = $query->fromGroups()
 ### User Accounts With Passwords That Do Not Expire
 
 ```php
-$query = $ldap->buildLdapQuery();
-
-$users = $query->fromUsers()
-    ->where($query->filter()->passwordNeverExpires())
+$users = $ldap->buildLdapQuery()
+    ->fromUsers()
+    ->where(['passwordNeverExpires' => true])
     ->getLdapQuery()
     ->getResult();
 ```
@@ -171,9 +169,8 @@ $users = $query->fromUsers()
 ### User Accounts With Hidden Mailboxes Sorted By Last Name
 
 ```php
-$query = $ldap->buildLdapQuery();
-
-$users = $query->fromUsers()
+$users = $ldap->buildLdapQuery()
+    ->fromUsers()
     ->where(['exchangeHideFromGAL' => true])
     ->orderBy('lastName')
     ->getLdapQuery()

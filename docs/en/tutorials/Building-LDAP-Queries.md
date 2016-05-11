@@ -742,28 +742,6 @@ If you're using a `LdapConnection` that has a LDAP type set as `ad`, then when y
 additional filter method shortcuts that are specific to Active Directory:
 
 ------------------------
-#### accountIsDisabled()
-
-Checks for disabled accounts. Creates a bitwise 'AND' comparison against the `userAccountControl` attribute.
-
-------------------------
-#### accountIsLocked()
-
-Check for locked accounts. Creates a "greater-than-or-equal-to" comparison against the `lockoutTime` attribute.
-
-------------------------
-#### passwordMustChange()
-
-Checks for accounts that must change their password on the next login. Creates an "equal-to" comparison against the
-`pwdLastSet` attribute.
-
-------------------------
-#### passwordNeverExpires()
-
-Checks for accounts that have passwords that are set to never expire. Creates a bitwise 'AND' comparison against the 
-`userAccountControl` attribute.
-
-------------------------
 #### hasMemberRecursively($member, $attribute = 'members')
 ---
 
@@ -828,45 +806,3 @@ $ldapObjects = $ldap->buildLdapQuery()
 ---
 
 Performs a simple check to determine whether an LDAP object is mail-enabled (ie. can receive email from Exchange).
-
-------------------------
-#### groupIsDomainLocal()
----
-
-Performs a bitwiseAnd check to determine whether a group is domain local in scope.
-
-------------------------
-#### groupIsGlobal()
----
-
-Performs a bitwiseAnd check to determine whether a group is global in scope.
-
-------------------------
-#### groupIsUniversal()
----
-
-Performs a bitwiseAnd check to determine whether a group is universal in scope.
-
-------------------------
-#### groupIsSecurityEnabled()
----
-
-Performs a bitwiseAnd check to determine whether a group is security enabled.
-
-------------------------
-#### groupIsUniversal()
----
-
-Performs negation of the security enabled bitwiseAnd check to determine whether a group is a distribution type.
-
-------------------------
-#### accountExpires()
----
-
-Performs a check to determine if the account is set to expire at a certain date.
-
-------------------------
-#### accountNeverExpires()
----
-
-Performs a check to determine if the account is set to never expire.
