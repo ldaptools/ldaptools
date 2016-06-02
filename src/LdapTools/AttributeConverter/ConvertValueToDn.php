@@ -105,7 +105,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
     protected function buildLdapQuery(array $filter, $isOrFilter)
     {
         $query = new LdapQueryBuilder($this->connection);
-        $query->select('distinguishedName');
+        $query->select('dn');
 
         $statement = $isOrFilter ? $query->filter()->bOr() : $query->filter()->bAnd();
         foreach ($filter as $attribute => $values) {

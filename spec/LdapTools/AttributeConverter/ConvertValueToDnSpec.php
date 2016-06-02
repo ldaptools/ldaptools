@@ -55,7 +55,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))' && $operation->getAttributes() == ['dn'];
         }))->willReturn($this->entry);
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
