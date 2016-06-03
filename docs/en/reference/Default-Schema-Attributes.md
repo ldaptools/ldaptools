@@ -387,8 +387,8 @@ These are Exchange Transport Rules.
 * **Type**: `LdapObjectType::EXCHANGE_TRANSPORT_RULE`
 * **Filter**: `(objectClass=msExchTransportRule)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
 | name | cn | string | The common name (RDN) of the transport rule |
 | created | whenCreated | `\DateTime` | The date the transport rule was created |
 | guid | objectGuid | string | The transport rule's GUID |
