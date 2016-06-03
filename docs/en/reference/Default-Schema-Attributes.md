@@ -200,7 +200,7 @@ These are typical LDAP contact objects.
 | groups | memberOf | array | The group names the contact belongs to (not recursive) |
 | guid | objectGuid | string | The contact's GUID |
 | lastName | sn | string | The contact's last name |
-| manager | manager | string | The common name of the user's manager |
+| manager | manager | string | The common name of the contact's manager |
 | modified | whenModified | `\DateTime` | The date the contact was last modified |
 | phoneNumber | telephoneNumber | string | The contact's telephone number |
 | sid | objectSid | string | The contact's SID (Security Identifier) |
