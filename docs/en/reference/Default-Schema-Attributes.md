@@ -38,80 +38,81 @@ These are typical LDAP user objects.
 * **Type**: `LdapObjectType::USER`
 * **Filter**: `(&(objectClass=user)(objectCategory=person))`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| accountExpirationDate | accountExpires | `\DateTime|false` |
-| badPasswordCount | badPwdCount | int |
-| city | l | string |
-| company | company | string |
-| country | c | string |
-| created | whenCreated | `\DateTime` | 
-| department | department | string |
-| description | description | string |
-| disabled | userAccountControl | bool |
-| displayName | displayName | string |
-| division | division | string |
-| dn | dn | string |
-| emailAddress | mail | string |
-| employeeId | employeeId | string |
-| employeeNumber | employeeNumber | int |
-| enabled | userAccountControl | bool |
-| exchangeAlias | mailNickname | string |
-| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
-| exchangeMailboxDatabase | homeMDB | string |
-| exchangeMailboxGuid | msExchMailboxGUID | string |
-| exchangePolicyRBAC | msExchRBACPolicyLink | string |
-| exchangePolicyActiveSync | msExchMobileMailboxPolicyLink | string |
-| exchangePolicyRetention | msExchMailboxTemplateLink | string |
-| exchangeSendOnBehalfOf | publicDelegates | array |
-| exchangeSmtpAddresses | proxyAddresses | array |
-| exchangeDefaultSmtpAddress | proxyAddresses | string |
-| fax | facsimileTelephoneNumber | string |
-| firstName | givenName | string |
-| groups | memberOf | array |
-| guid | objectGuid | string |
-| homeDirectory | homeDirectory | string |
-| homeDrive | homeDrive | string |
-| homePage | wWWHomePage | string |
-| homePhone | homePhone | string |
-| initials | initials | string |
-| ipPhone | ipPhone | string |
-| lastName | sn | string |
-| locked | lockoutTime | bool |
-| lockedDate | lockoutTime | `\DateTime|false` |
-| logonWorkstations | userWorkstations | array |
-| manager | manager | string |
-| middleName | middleName | string |
-| mobilePhone | mobile | string |
-| office | physicalDeliveryOfficeName  | string |
-| organization | o | string |
-| otherFaxes | otherFacsimileTelephoneNumber | array |
-| otherHomePhones | otherHomePhone | array |
-| otherIpPhones | otherIpPhone | array |
-| otherPagers | otherPager | array |
-| otherPhoneNumbers | otherTelephoneNumber | array |
-| password | unicodePwd | string |
-| passwordIsReversible | userAccountControl | bool |
-| passwordLastSet | pwdLastSet | `\DateTime` |
-| passwordMustChange | pwdLastSet | bool |
-| passwordNeverExpires | userAccountControl | bool |
-| pager | pager | string |
-| phoneNumber | telephoneNumber | string |
-| poBox | postOfficeBox | string |
-| primaryGroup | primaryGroupID | string |
-| profilePath | profilePath | string |
-| scriptPath | scriptPath | string |
-| servicePrincipalNames | servicePrincipalName | array |
-| sid | objectSid | string |
-| smartCardRequired | userAccountControl | bool |
-| state | st | string |
-| streetAddress | streetAddress | string |
-| title | title | string |
-| trustedForAllDelegation | userAccountControl | bool |
-| trustedForAnyAuthDelegation | userAccountControl | bool |
-| username | sAMAccountName | string |
-| upn | userPrincipalName | string |
-| zipCode | postalCode | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| accountExpirationDate | accountExpires | `\DateTime|false` | The date the account expires |
+| badPasswordCount | badPwdCount | int | The number of bad password attempts |
+| city | l | string | The city for the user account |
+| company | company | string | The company for the user account |
+| country | c | string | The country for the user account |
+| created | whenCreated | `\DateTime` | The date the account was created |
+| department | department | string | The department for the user account |
+| description | description | string | The description for the user account |
+| disabled | userAccountControl | bool | Whether or not the account is disabled |
+| displayName | displayName | string | The display name for the account |
+| division | division | string | The user's division |
+| dn | dn | string | The full distinguished name of the user |
+| emailAddress | mail | string | The user's email address |
+| employeeId | employeeId | string | The user's employee ID |
+| employeeNumber | employeeNumber | int | The user's employee number |
+| enabled | userAccountControl | bool | Whether or not the account is enabled |
+| exchangeAlias | mailNickname | string | The user's exchange alias |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool | Whether the user should be hidden from the address list |
+| exchangeMailboxDatabase | homeMDB | string | The database name where the user's mailbox is located |
+| exchangeMailboxGuid | msExchMailboxGUID | string | The user's mailbox GUID |
+| exchangePolicyRBAC | msExchRBACPolicyLink | string | The name of the assigned RBAC policy |
+| exchangePolicyActiveSync | msExchMobileMailboxPolicyLink | string | The name of the assigned ActiveSync policy | 
+| exchangePolicyRetention | msExchMailboxTemplateLink | string | The name of the assigned retention policy |
+| exchangeSendOnBehalfOf | publicDelegates | array | All of the users that can send-on-behalf of this user |
+| exchangeSmtpAddresses | proxyAddresses | array | All of the user's assigned SMTP addresses |
+| exchangeDefaultSmtpAddress | proxyAddresses | string | The user's default SMTP address |
+| fax | facsimileTelephoneNumber | string | The user's fax phone number |
+| firstName | givenName | string | The user's first name |
+| groups | memberOf | array | The group names the user belongs to (not recursive) |
+| guid | objectGuid | string | The user's GUID |
+| homeDirectory | homeDirectory | string | The user's home directory path (ie. the UNC path) |
+| homeDrive | homeDrive | string | The user's home drive letter (ie. "H:") |
+| homePage | wWWHomePage | string | The user's home page as a URL |
+| homePhone | homePhone | string | The user's home telephone number |
+| initials | initials | string | The initials that represent part of the user's name (ie. middle initial) |
+| ipPhone | ipPhone | string |  The user's IP telephone number |
+| lastName | sn | string | The user's last name |
+| locked | lockoutTime | bool | Whether or not the user's account is locked out |
+| lockedDate | lockoutTime | `\DateTime|false` | The date the user's account was locked (or false if not) |
+| logonWorkstations | userWorkstations | array | The system names the user is allowed to login to |
+| manager | manager | string | The common name of the user's manager |
+| middleName | middleName | string | A name in addition to the user's first/last name (ie. middle name) |
+| mobilePhone | mobile | string | The user's mobile phone number |
+| modified | whenChanged | `\DateTime` | The date when the account was last modified |
+| office | physicalDeliveryOfficeName  | string | The user's office name |
+| organization | o | string | The user's organization name |
+| otherFaxes | otherFacsimileTelephoneNumber | array | Additional fax telephone numbers for the user |
+| otherHomePhones | otherHomePhone | array | Additional home telephone numbers for the user |
+| otherIpPhones | otherIpPhone | array | Additional IP telephone numbers for the user |
+| otherPagers | otherPager | array | Additional pager numbers for the user |
+| otherPhoneNumbers | otherTelephoneNumber | array |  Additional telephone numbers for the user |
+| password | unicodePwd | string | The user's password (can only be created or modified) |
+| passwordIsReversible | userAccountControl | bool | Whether the password is reversible |
+| passwordLastSet | pwdLastSet | `\DateTime` | The date the password was last set |
+| passwordMustChange | pwdLastSet | bool | Whether the password must change on next login |
+| passwordNeverExpires | userAccountControl | bool | Whether the password is set to never expire |
+| pager | pager | string | The user's pager number |
+| phoneNumber | telephoneNumber | string | The user's primary telephone number |
+| poBox | postOfficeBox | string | The user's PO box number |
+| primaryGroup | primaryGroupID | string | The user's primary group (typically Domain Users) |
+| profilePath | profilePath | string | The user's profile path (ie. \\some\path) |
+| scriptPath | scriptPath | string | The user's login script (ie. \\server\scripts\login.bat) |
+| servicePrincipalNames | servicePrincipalName | array | All of the user's SPNs (ie `['SQLservice\foo.bar.com:1456']` |
+| sid | objectSid | string | The user's SID (security identifier) |
+| smartCardRequired | userAccountControl | bool | Whether or not the user must use a smart card |
+| state | st | string | The user's state (ie. WI) |
+| streetAddress | streetAddress | string | The user's street address |
+| title | title | string | The user's title (ie. Systems Administrator) |
+| trustedForAllDelegation | userAccountControl | bool | Whether the account is trusted for delegation |
+| trustedForAnyAuthDelegation | userAccountControl | bool | Whether the account is trusted for any auth delegation |
+| username | sAMAccountName | string | The user's username |
+| upn | userPrincipalName | string | The user's user principal name (ie. foo@bar.local)
+| zipCode | postalCode | string | The user's zip code |
 
 #### AD Group Types
 
@@ -120,33 +121,33 @@ These are typical LDAP group objects.
 * **Type**: `LdapObjectType::GROUP`
 * **Filter**: `(objectClass=group)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| accountName | sAMAccountName | string |
-| created | whenCreated | `\DateTime` |
-| description | description | string |
-| displayName | displayName | string |
-| dn | dn | string |
-| emailAddress | mail | string |
-| exchangeAddressBookFlags | msExchAddressBookFlags | int |
-| exchangeAlias | mailNickname | string |
-| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
-| exchangeInternalOnly | msExchRequireAuthToSendTo | bool |
-| exchangeSmtpAddresses | proxyAddresses | array |
-| exchangeDefaultSmtpAddress | proxyAddresses | string |
-| groups | memberOf | array |
-| guid | objectGuid | string |
-| managedBy | managedBy | string |
-| members | member | array|
-| modified |whenModified | `\DateTime` |
-| name | cn | string |
-| scopeDomainLocal | groupType | bool |
-| scopeGlobal | groupType | bool |
-| scopeUniversal | groupType | bool |
-| sid | objectSid | string |
-| typeBuiltin | groupType | bool |
-| typeDistribution | groupType | bool |
-| typeSecurity | groupType | bool |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| accountName | sAMAccountName | string | The account name of the group |
+| created | whenCreated | `\DateTime` | The date the group was created |
+| description | description | string | The description of the group |
+| displayName | displayName | string | The display name for the group |
+| dn | dn | string | The full distinguished name of the group |
+| emailAddress | mail | string | The group's email address |
+| exchangeAddressBookFlags | msExchAddressBookFlags | int | 
+| exchangeAlias | mailNickname | string | The group's exchange alias |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool | Whether the group should be hidden from the address list |
+| exchangeInternalOnly | msExchRequireAuthToSendTo | bool | Whether the group requires authentication to send to it |
+| exchangeSmtpAddresses | proxyAddresses | array | All of the group's assigned SMTP addresses |
+| exchangeDefaultSmtpAddress | proxyAddresses | string | The group's default SMTP address |
+| groups | memberOf | array | The group names the group belongs to (not recursive) |
+| guid | objectGuid | string | The group's GUID |
+| managedBy | managedBy | string | The common name for who the group is managed by |
+| members | member | array| All of the members of the group (not recursive) |
+| modified | whenChanged | `\DateTime` | The date when the group was last modified |
+| name | cn | string | The common name (RDN) of the group |
+| scopeDomainLocal | groupType | bool | Whether or not the group's scope is domain local |
+| scopeGlobal | groupType | bool | Whether or not the group's scope is global |
+| scopeUniversal | groupType | bool | Whether or not the group's scope is universal |
+| sid | objectSid | string | The group's SID (security identifier)
+| typeBuiltin | groupType | bool | Whether or not this is builtin group |
+| typeDistribution | groupType | bool | Whether or not this is a distribution group |
+| typeSecurity | groupType | bool | Whether or not this is a security group |
 
 #### AD Computer Types
 
@@ -155,27 +156,27 @@ These are typical LDAP computer objects.
 * **Type**: `LdapObjectType::COMPUTER`
 * **Filter**: `(objectCategory=computer)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| accountName | sAMAccountName | string |
-| created | whenCreated | `\DateTime` |
-| description | description | string |
-| disabled | userAccountControl | bool |
-| displayName | displayName | string |
-| dn | dn | string |
-| dnsHostName | dNSHostName | string |
-| enabled | userAccountControl | bool |
-| groups | memberOf | array |
-| guid | objectGuid | string |
-| location | location | string |
-| modified |whenModified | `\DateTime` |
-| name | cn | string |
-| os | operatingSystem | string |
-| osServicePack | operatingSystemServicePack | string |
-| osVersion | operatingSystemVersion | string |
-| sid | objectSid | string |
-| trustedForAllDelegation | userAccountControl | bool |
-| trustedForAnyAuthDelegation | userAccountControl | bool |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| accountName | sAMAccountName | string | The account name of the computer |
+| created | whenCreated | `\DateTime` | The date the computer object was created |
+| description | description | string | The description of the computer |
+| disabled | userAccountControl | bool | Whether or not the computer object is disabled |
+| displayName | displayName | string | The display name for the computer |
+| dn | dn | string | The full distinguished name of the computer |
+| dnsHostName | dNSHostName | string | The fully qualified domain name (FQDN) of the computer |
+| enabled | userAccountControl | bool | Whether or not the computer object is enabled |
+| groups | memberOf | array | The group names the computer belongs to (not recursive) |
+| guid | objectGuid | string | The computer's GUID |
+| location | location | string | The location of the computer (such as office name) |
+| modified |whenModified | `\DateTime` | The date the computer was last modified |
+| name | cn | string | The common name (RDN) of the computer |
+| os | operatingSystem | string | The operating system name for the computer object |
+| osServicePack | operatingSystemServicePack | string | The name of the operating system service pack |
+| osVersion | operatingSystemVersion | string | The operating system version number (ie. 6.0) |
+| sid | objectSid | string | The computer's SID (Security Identifier)
+| trustedForAllDelegation | userAccountControl | bool | Whether the computer is trusted for delegation |
+| trustedForAnyAuthDelegation | userAccountControl | bool | Whether the computer is trusted for any auth delegation |
 
 #### AD Contact Types
 
@@ -184,25 +185,25 @@ These are typical LDAP contact objects.
 * **Type**: `LdapObjectType::CONTACT`
 * **Filter**: `(objectCategory=contact)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| created | whenCreated | `\DateTime` | 
-| description | description | string |
-| displayName | displayName | string |
-| dn | dn | string |
-| emailAddress | mail | string |
-| exchangeAlias | mailNickname | string |
-| exchangeHideFromGAL | msExchHideFromAddressLists | bool |
-| exchangeSmtpAddresses | proxyAddresses | array |
-| exchangeDefaultSmtpAddress | proxyAddresses | string |
-| firstName | givenName | string |
-| groups | memberOf | array |
-| guid | objectGuid | string |
-| lastName | sn | string |
-| manager | manager | string |
-| modified | whenModified | `\DateTime` |
-| phoneNumber | telephoneNumber | string |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| created | whenCreated | `\DateTime` | The date the contact was created |
+| description | description | string | The description of the contact  |
+| displayName | displayName | string | The display name for the contact |
+| dn | dn | string | The full distinguished name of the contact |
+| emailAddress | mail | string | The contact's email address |
+| exchangeAlias | mailNickname | string | The contact's exchange alias |
+| exchangeHideFromGAL | msExchHideFromAddressLists | bool | Whether the contact should be hidden from the address list |
+| exchangeSmtpAddresses | proxyAddresses | array | All of the contact's assigned SMTP addresses |
+| exchangeDefaultSmtpAddress | proxyAddresses | string | The contact's default SMTP address |
+| firstName | givenName | string | The contact's first name |
+| groups | memberOf | array | The group names the contact belongs to (not recursive) |
+| guid | objectGuid | string | The contact's GUID |
+| lastName | sn | string | The contact's last name |
+| manager | manager | string | The common name of the user's manager |
+| modified | whenModified | `\DateTime` | The date the contact was last modified |
+| phoneNumber | telephoneNumber | string | The contact's telephone number |
+| sid | objectSid | string | The contact's SID (Security Identifier) |
 
 #### AD OU Types
 
@@ -211,22 +212,22 @@ These are typical LDAP OU objects.
 * **Type**: `LdapObjectType::OU`
 * **Filter**: `(objectCategory=organizationalUnit)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| city | l | string |
-| country | c | string |
-| created | whenCreated | `\DateTime` | 
-| description | description | string |
-| dn | dn | string |
-| gpoLinks | gPLink | array |
-| gpoInheritanceBlocked | gpOptions | bool |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| name | ou | string |
-| sid | objectSid | string |
-| state | st | string |
-| streetAddress | streetAddress | string |
-| zipCode | postalCode | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| city | l | string | The OU's city name |
+| country | c | string | The OU's country name |
+| created | whenCreated | `\DateTime` | When date the OU was created |
+| description | description | string | The description of the OU |
+| dn | dn | string | The full distinguished name of the OU |
+| gpoLinks | gPLink | array | All of the GPO names linked to this OU |
+| gpoInheritanceBlocked | gpOptions | bool | Whether or not GPO inheritance is blocked for this OU |
+| guid | objectGuid | string | The OU's GUID |
+| modified | whenModified | `\DateTime` | The date the OU was last modified |
+| name | ou | string | The common name (RDN) for the OU |
+| sid | objectSid | string | The OU's SID (Security Identifier) |
+| state | st | string | The OU's state name |
+| streetAddress | streetAddress | string | The OU's street address |
+| zipCode | postalCode | string | The OU's zip code |
 
 #### AD Container Types
 
@@ -235,14 +236,14 @@ These are typical LDAP Container objects.
 * **Type**: `LdapObjectType::CONTAINER`
 * **Filter**: `(objectCategory=container)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| created | whenCreated | `\DateTime` | 
-| description | description | string |
-| dn | dn | string |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| name | ou | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| created | whenCreated | `\DateTime` |  The date the container was created |
+| description | description | string | The description of the container |
+| dn | dn | string | The full distinguished name of the container |
+| guid | objectGuid | string | The container's GUID |
+| modified | whenModified | `\DateTime` | The date the container was last modified |
+| name | cn | string | The common name (RDN) for the container |
 
 #### AD Password Settings Objects Types
 
@@ -251,26 +252,26 @@ the type name `PSO`.
 
 * **Filter**: `(objectClass=msDS-PasswordSettings)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| appliesTo | msDS-PSOAppliesTo | array |
-| created | whenCreated | `\DateTime` |
-| description | description | string |
-| dn | distinguishedName | string |
-| guid | objectGuid | string |
-| lockoutDuration | msDS-LockoutDuration | `\LdapTools\Utilities\ADTimeSpan` |
-| lockoutObservationWindow | msDS-LockoutObservationWindow | `\LdapTools\Utilities\ADTimeSpan` |
-| lockoutThreshold | msDS-LockoutThreshold | int |
-| maximumPasswordAge | msDS-MaximumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` |
-| minimumPasswordAge | msDS-MinimumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` |
-| minimumPasswordLength | msDS-MinimumPasswordLength | int |
-| modified | whenChanged | `\DateTime` |
-| name | cn | string |
-| passwordComplexity | msDS-PasswordComplexityEnabled | bool |
-| passwordHistoryLength | msDS-PasswordHistoryLength | int |
-| passwordReversibleEncryption | msDS-PasswordReversibleEncryptionEnabled | bool |
-| precedence | msDS-PasswordSettingsPrecedence | int |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| appliesTo | msDS-PSOAppliesTo | array | All of the group/user names this PSO is applied to |
+| created | whenCreated | `\DateTime` | The date the PSO was created |
+| description | description | string | The description of the PSO |
+| dn | distinguishedName | string | The full distinguished name of the PSO |
+| guid | objectGuid | string | The PSO's GUID |
+| lockoutDuration | msDS-LockoutDuration | `\LdapTools\Utilities\ADTimeSpan` | Lockout duration time span |
+| lockoutObservationWindow | msDS-LockoutObservationWindow | `\LdapTools\Utilities\ADTimeSpan` | Lockout observation window time span |
+| lockoutThreshold | msDS-LockoutThreshold | int | Number of attempts before the account is locked |
+| maximumPasswordAge | msDS-MaximumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` | Max password age time span |
+| minimumPasswordAge | msDS-MinimumPasswordAge | `\LdapTools\Utilities\ADTimeSpan` | Min password age time span |
+| minimumPasswordLength | msDS-MinimumPasswordLength | int | Min password length |
+| modified | whenChanged | `\DateTime` | The date the PSO was last modified |
+| name | cn | string | The common name (RDN) for the PSO |
+| passwordComplexity | msDS-PasswordComplexityEnabled | bool | Whether or not password complexity is enabled |
+| passwordHistoryLength | msDS-PasswordHistoryLength | int | The number of previous passwords that cannot be used |
+| passwordReversibleEncryption | msDS-PasswordReversibleEncryptionEnabled | bool | Whether the password can be decrypted |
+| precedence | msDS-PasswordSettingsPrecedence | int | The precedence (lower value == higher rank) of this PSO |
+| sid | objectSid | string | The PSO's SID (Security Identifier) |
 
 #### AD Deleted Objects Types
 
@@ -279,22 +280,22 @@ These are deleted objects that reside in the AD Recycle Bin.
 * **Type**: `LdapObjectType::DELETED`
 * **Filter**: `(&(isDeleted=TRUE)(lastKnownParent=*))`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| created | whenCreated | `\DateTime` |
-| description | description | string |
-| dn | distinguishedName | string |
-| firstName | givenName | string |
-| guid | objectGuid | string |
-| isDeleted | isDeleted | bool |
-| lastName | sn | string |
-| lastKnownLocation | lastKnownParent | string |
-| lastKnownName | lastKnownRdn | string |
-| modified | whenChanged | `\DateTime` |
-| name | cn | string |
-| schemaType | objectClass| string |
-| sid | objectSid | string |
-| upn | userPrincipalName | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| created | whenCreated | `\DateTime` | The date when the object was created |
+| description | description | string | The description of the deleted object |
+| dn | distinguishedName | string | The full distinguished name of the deleted object |
+| firstName | givenName | string | The first name of the deleted object (if any) |
+| guid | objectGuid | string | The deleted object's GUID |
+| isDeleted | isDeleted | bool | Whether the object is deleted |
+| lastName | sn | string | The last name of the deleted object (if any) |
+| lastKnownLocation | lastKnownParent | string | The DN of the last known location (ie. ou=foo,dc=example,dc=com) |
+| lastKnownName | lastKnownRdn | string | The last known name (RDN) for the deleted object |
+| modified | whenChanged | `\DateTime` | The date the deleted object was last modified |
+| name | cn | string | The current name (RDN) of the deleted object |
+| schemaType | objectClass| string | The LdpaTools schema type of the object (ie. user, group, computer, etc) |
+| sid | objectSid | string | The deleted object's SID (Security Identifier)
+| upn | userPrincipalName | string | The user principal name of the deleted object (if any) |
 
 ### The Exchange Schema
 ---
@@ -306,32 +307,32 @@ These are Exchange Servers.
 * **Type**: `LdapObjectType::EXCHANGE_SERVER`
 * **Filter**: `(&(objectClass=msExchExchangeServer)(serverRole=*))`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| roles | msExchCurrentServerRoles | array |
-| sid | objectSid | string |
-| version | serialNumber | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the exchange server |
+| created | whenCreated | `\DateTime` | The date the exchange server object was created |
+| guid | objectGuid | string | The exchange server's GUID |
+| modified | whenModified | `\DateTime` | The date the exchange server was last modified |
+| roles | msExchCurrentServerRoles | array | All of the role names for the exchange server |
+| sid | objectSid | string | The exchange server's SID (Security Identifier) |
+| version | serialNumber | string | The friendly Exchange version name (ie. Exchange 2013 RTM) |
 
 #### Exchange Database Types
 
 These are Exchange Databases.
 
-* **Type**: `LdapObjectType::EXCHANGE_SERVER`
+* **Type**: `LdapObjectType::EXCHANGE_DATABASE`
 * **Filter**: `(objectClass=msExchMDB)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| isBeingRestored | msexchdatabasebeingrestored | bool |
-| modified | whenModified | `\DateTime` |
-| mountOnStartup | msexchedboffline | bool |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the exchange database | 
+| created | whenCreated | `\DateTime` | The date the exchange database was created |
+| guid | objectGuid | string | The exchange database's GUID |
+| isBeingRestored | msexchdatabasebeingrestored | bool | Whether the database is currently being restored |
+| modified | whenModified | `\DateTime` | The date the exchange database was last modified |
+| mountOnStartup | msexchedboffline | bool | Whether or not the database should be mounted on startup |
+| sid | objectSid | string | The exchange database's SID (Security Identifier) |
 
 #### Exchange Retention Policy Types
 
@@ -340,13 +341,13 @@ These are Exchange Retention policies.
 * **Type**: `LdapObjectType::EXCHANGE_RETENTION_POLICY`
 * **Filter**: `(objectClass=msExchRecipientPolicy)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the retention policy |
+| created | whenCreated | `\DateTime` | The date the retention policy was created |
+| guid | objectGuid | string | The retention policy's GUID |
+| modified | whenModified | `\DateTime` | The date the retention policy was last modified |
+| sid | objectSid | string | The retention policy's SID (Security Identifier |
 
 #### Exchange ActiveSync Policy Types
 
@@ -355,14 +356,14 @@ These are Exchange ActiveSync policies.
 * **Type**: `LdapObjectType::EXCHANGE_ACTIVESYNC_POLICY`
 * **Filter**: `(objectClass=msExchMobileMailboxPolicy)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| numberOfPreviousPasswordsDisallowed | msExchMobileDeviceNumberOfPreviousPasswordsDisallowed | int |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the ActiveSync policy |
+| created | whenCreated | `\DateTime` | The date the ActiveSync policy was created |
+| guid | objectGuid | string | The ActiveSync policy's GUID |
+| modified | whenModified | `\DateTime` | The date the ActiveSync policy was last modified |
+| numberOfPreviousPasswordsDisallowed | msExchMobileDeviceNumberOfPreviousPasswordsDisallowed | int | Password history limit |
+| sid | objectSid | string | The ActiveSync policy's SID (Security Identifier) |
 
 #### Exchange RBAC Policy Type
 
@@ -371,13 +372,13 @@ These are Exchange RBAC policies.
 * **Type**: `LdapObjectType::EXCHANGE_RBAC_POLICY`
 * **Filter**: `(objectClass=msExchRBACPolicy)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the RBAC policy |
+| created | whenCreated | `\DateTime` | The date the RBAC policy was created |
+| guid | objectGuid | string | The RBAC policy's GUID |
+| modified | whenModified | `\DateTime` | The date the RBAC policy was last modified |
+| sid | objectSid | string | The RBAC policy's SID (Security Identifier) |
 
 #### Exchange Transport Rule Types
 
@@ -388,11 +389,11 @@ These are Exchange Transport Rules.
 
 | LdapTools Name  | LDAP Attribute | Value Type |
 | --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| sid | objectSid | string |
+| name | cn | string | The common name (RDN) of the transport rule |
+| created | whenCreated | `\DateTime` | The date the transport rule was created |
+| guid | objectGuid | string | The transport rule's GUID |
+| modified | whenModified | `\DateTime` | The date the transport rule was last modified |
+| sid | objectSid | string | The transport rule's SID (Security Identifier) |
 
 #### Exchange DAG Types
 
@@ -401,29 +402,29 @@ This represents an Exchange DAG.
 * **Type**: `LdapObjectType::EXCHANGE_DAG`
 * **Filter**: `(objectClass=msExchMDBAvailabilityGroup)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| sid | objectSid | string |
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the DAG |
+| created | whenCreated | `\DateTime` | The date the DAG was created |
+| guid | objectGuid | string | The DAG's GUID |
+| modified | whenModified | `\DateTime` | The date the DAG was last modified |
+| sid | objectSid | string | The DAG's SID (Security Identifier) |
 
 #### Exchange OWA Types
 
 These are the Exchange OWA instances.
 
-* **Type**: `LdapObjectType::EXCHANGE_DAG`
+* **Type**: `LdapObjectType::EXCHANGE_OWA`
 * **Filter**: `(objectClass=msExchOWAVirtualDirectory)`
 
-| LdapTools Name  | LDAP Attribute | Value Type |
-| --------------- | -------------- | ---------- |
-| name | cn | string |
-| created | whenCreated | `\DateTime` |
-| guid | objectGuid | string |
-| modified | whenModified | `\DateTime` |
-| sid | objectSid | string |
-| url | msExchInternalHostname | string | 
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| name | cn | string | The common name (RDN) of the OWA object |
+| created | whenCreated | `\DateTime` | The date the OWA object was created |
+| guid | objectGuid | string | The OWA's GUID |
+| modified | whenModified | `\DateTime` | The date the OWA object was last modified |
+| sid | objectSid | string | The OWA's SID (Security Identifier) |
+| url | msExchInternalHostname | string | The URL of the OWA instance |
 
 ### The OpenLDAP Schema
 ---
