@@ -65,9 +65,9 @@ class LdapObjectTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('EXCHANGE_DATABASE');
     }
 
-    function it_should_have_an_exchange_retention_policy_type_constant()
+    function it_should_have_an_exchange_recipient_policy_type_constant()
     {
-        $this->shouldHaveConstant('EXCHANGE_RETENTION_POLICY');
+        $this->shouldHaveConstant('EXCHANGE_RECIPIENT_POLICY');
     }
 
     function it_should_have_an_exchange_activesync_policy_type_constant()

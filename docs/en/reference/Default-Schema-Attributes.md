@@ -16,7 +16,7 @@ used when generating queries and returning data from LDAP.
 #### Exchange Schema
   * [Servers](#exchange-server-types)
   * [Databases](#exchange-database-types)
-  * [Retention Policies](#exchange-retention-policy-types)
+  * [Recipient Policies](#exchange-recipient-policy-types)
   * [ActiveSync Policies](#exchange-activesync-policy-types)
   * [RBAC Policies](#exchange-rbac-policy-types)
   * [Transport Rules](#exchange-transport-rule-types)
@@ -334,20 +334,20 @@ These are Exchange Databases.
 | mountOnStartup | msexchedboffline | bool | Whether or not the database should be mounted on startup |
 | sid | objectSid | string | The exchange database's SID (Security Identifier) |
 
-#### Exchange Retention Policy Types
+#### Exchange Recipient Policy Types
 
-These are Exchange Retention policies.
+These are Exchange Recipient policies.
 
-* **Type**: `LdapObjectType::EXCHANGE_RETENTION_POLICY`
+* **Type**: `LdapObjectType::EXCHANGE_RECIPIENT_POLICY`
 * **Filter**: `(objectClass=msExchRecipientPolicy)`
 
 | LdapTools Name  | LDAP Attribute | Value Type | Description |
 | --------------- | -------------- | ---------- | ----------- |
-| name | cn | string | The common name (RDN) of the retention policy |
-| created | whenCreated | `\DateTime` | The date the retention policy was created |
-| guid | objectGuid | string | The retention policy's GUID |
-| modified | whenModified | `\DateTime` | The date the retention policy was last modified |
-| sid | objectSid | string | The retention policy's SID (Security Identifier |
+| name | cn | string | The common name (RDN) of the recipient policy |
+| created | whenCreated | `\DateTime` | The date the recipient policy was created |
+| guid | objectGuid | string | The recipient policy's GUID |
+| modified | whenModified | `\DateTime` | The date the recipient policy was last modified |
+| sid | objectSid | string | The recipient policy's SID (Security Identifier |
 
 #### Exchange ActiveSync Policy Types
 

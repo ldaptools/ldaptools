@@ -68,9 +68,9 @@ class LdapObjectType
     const EXCHANGE_ACTIVESYNC_POLICY = 'ExchangeActiveSyncPolicy';
     
     /**
-     * An Exchange Retention Policy object.
+     * An Exchange Recipient Policy object.
      */
-    const EXCHANGE_RETENTION_POLICY = 'ExchangeRetentionPolicy';
+    const EXCHANGE_RECIPIENT_POLICY = 'ExchangeRecipientPolicy';
 
     /**
      * An Exchange RBAC policy object.

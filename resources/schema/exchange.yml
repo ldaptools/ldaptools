@@ -65,8 +65,8 @@ objects:
             - 'guid'
         multivalued_attributes:
             - objectClass
-    retention_policy:
-        type: ExchangeRetentionPolicy
+    recipient_policy:
+        type: ExchangeRecipientPolicy
         filter:
             eq: [ objectClass, msExchRecipientPolicy ]
         base_dn: "%_configurationnamingcontext_%"
