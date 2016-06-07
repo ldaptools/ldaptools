@@ -47,10 +47,15 @@ class LdapUtilities
     /**
      * The mask to use when sanitizing arrays with LDAP password information.
      */
-    const MASK = '******';
+    const MASK_PASSWORD = '******';
 
     /**
-     * The attributes to mask in a batch/attribute array.
+     * The mask to use when sanitizing values for LDAP that have binary data that cannot display properly.
+     */
+    const MASK_BINARY = '(Binary Data)';
+
+    /**
+     * The password attributes to mask in a batch/attribute array.
      */
     const MASK_ATTRIBUTES = [
         'unicodepwd',
@@ -192,41 +197,70 @@ class LdapUtilities
     }
 
     /**
-     * Attempts to mask passwords in a LDAP batch array while keeping the rest intact.
+     * Sanitizes certain values in a batch array to make them safe for logging (ie. mask passwords, replace binary data).
      *
-     * @param array $batch
+     * @param array $batches
      * @return array
      */
-    public static function maskBatchArray(array $batch)
+    public static function sanitizeBatchArray(array $batches)
     {
-        foreach ($batch as $i => $batchItem) {
-            if (!isset($batchItem['attrib']) || !isset($batchItem['values'])) {
+        foreach ($batches as $bI => $batch) {
+            if (!isset($batch['values'])) {
                 continue;
             }
-            if (!in_array(strtolower($batchItem['attrib']), self::MASK_ATTRIBUTES)) {
-                continue;
+            foreach ($batch['values'] as $vI => $value) {
+                if (is_string($value) && self::isBinary($value)) {
+                    $batches[$bI]['values'][$vI] = LdapUtilities::MASK_BINARY;
+                }
             }
-            $batch[$i]['values'] = [self::MASK];
+            if (isset($batch['attrib']) && in_array(strtolower($batch['attrib']), self::MASK_ATTRIBUTES)) {
+                $batches[$bI]['values'] = [self::MASK_PASSWORD];
+            }
         }
 
-        return $batch;
+        return $batches;
     }
 
     /**
-     * Attempts to mask password attribute values used in logging.
+     * Sanitizes certain values in an attribute key => value array to make them safe for logging (ie. mask passwords,
+     * replace binary data).
      *
      * @param array $attributes
      * @return array
      */
-    public static function maskAttributeArray(array $attributes)
+    public static function sanitizeAttributeArray(array $attributes)
     {
-        foreach ($attributes as $key => $value) {
-            if (in_array(strtolower($key), self::MASK_ATTRIBUTES)) {
-                $attributes[$key] = self::MASK;
+        foreach ($attributes as $name => $values) {
+            if (in_array(strtolower($name), self::MASK_ATTRIBUTES)) {
+                $attributes[$name] = self::MASK_PASSWORD;
+            } else {
+                $replaced = false;
+                $newValues = is_array($values) ? $values : [$values];
+                foreach ($newValues as $i => $v) {
+                    if (is_string($v) && self::isBinary($v)) {
+                        $newValues[$i] = LdapUtilities::MASK_BINARY;
+                        $replaced = true;
+                    }
+                }
+                if ($replaced) {
+                    $attributes[$name] = is_array($values) ? $newValues : reset($newValues);
+                }
             }
         }
 
         return $attributes;
+    }
+
+    /**
+     * Check if a string contains non-printable, and likely binary, data. There is no easy way to do this, as there can
+     * really only be a best effort attempt to detect it.
+     * 
+     * @param string $value
+     * @return bool
+     */
+    public static function isBinary($value)
+    {
+        return !preg_match('//u', $value);
     }
 
     /**

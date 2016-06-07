@@ -118,11 +118,9 @@ class BatchModifyOperation implements LdapOperationInterface
      */
     public function getLogArray()
     {
-        $batch = LdapUtilities::maskBatchArray($this->getBatchArray());
-
         return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
-            'Batch' => print_r($batch, true),
+            'Batch' => print_r(LdapUtilities::sanitizeBatchArray($this->getBatchArray()), true),
         ]);
     }
 

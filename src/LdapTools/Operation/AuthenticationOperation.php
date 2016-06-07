@@ -168,7 +168,7 @@ class AuthenticationOperation implements LdapOperationInterface
         // Though it is still available via the getPassword() method if needed.
         return $this->mergeLogDefaults([
             'Username' => $this->properties['username'],
-            'Password' => LdapUtilities::MASK,
+            'Password' => LdapUtilities::MASK_PASSWORD,
             'Anonymous' => var_export($this->properties['isAnonymousBind'], true),
             'Switch to Credentials' => var_export($this->properties['switchToCredentials'], true),
         ]);

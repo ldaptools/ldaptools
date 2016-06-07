@@ -147,7 +147,7 @@ class AddOperation implements LdapOperationInterface
     {
         return $this->mergeLogDefaults([
             'DN' => $this->properties['dn'],
-            'Attributes' => print_r(LdapUtilities::maskAttributeArray($this->properties['attributes']), true),
+            'Attributes' => print_r(LdapUtilities::sanitizeAttributeArray($this->properties['attributes']), true),
         ]);
     }
 }

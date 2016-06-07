@@ -129,21 +129,23 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');
     }
 
-    function it_should_mask_passwords_in_an_array_of_attributes_and_values()
+    function it_should_mask_passwords_and_binary_in_an_array_of_attributes_and_values()
     {
         $attributes = [
             'username' => 'foo',
             'unicodePwd' => 'correct horse battery staple',
             'userPassword' => '12345',
+            'userParameters' => hex2bin('f0ba44'),
         ];
         $masked = $attributes;
-        $masked['unicodePwd'] = LdapUtilities::MASK;
-        $masked['userPassword'] = LdapUtilities::MASK;
+        $masked['unicodePwd'] = LdapUtilities::MASK_PASSWORD;
+        $masked['userPassword'] = LdapUtilities::MASK_PASSWORD;
+        $masked['userParameters'] = LdapUtilities::MASK_BINARY;
 
-        $this::maskAttributeArray($attributes)->shouldBeEqualTo($masked);
+        $this::sanitizeAttributeArray($attributes)->shouldBeEqualTo($masked);
     }
 
-    function it_should_mask_passwords_in_a_ldap_batch_array()
+    function it_should_mask_passwords_and_binary_data_in_a_ldap_batch_array()
     {
         $batch = [
             [
@@ -161,13 +163,27 @@ class LdapUtilitiesSpec extends ObjectBehavior
                 "modtype" => LDAP_MODIFY_BATCH_REPLACE,
                 "values"  => ["Jack"],
             ],
+            [
+                "attrib"  => "userParameters",
+                "modtype" => LDAP_MODIFY_BATCH_REPLACE,
+                "values"  => [hex2bin('f0ba44')],
+            ],
         ];
 
         $masked = $batch;
-        $masked[0]['values'] = ['******'];
-        $masked[1]['values'] = ['******'];
+        $masked[0]['values'] = [LdapUtilities::MASK_PASSWORD];
+        $masked[1]['values'] = [LdapUtilities::MASK_PASSWORD];
+        $masked[3]['values'] = [LdapUtilities::MASK_BINARY];
 
-        $this::maskBatchArray($batch)->shouldBeEqualTo($masked);
+        $this::sanitizeBatchArray($batch)->shouldBeEqualTo($masked);
+    }
+    
+    function it_should_check_if_a_string_is_actually_binary_data()
+    {
+        $this::isBinary(hex2bin('f0ba44'))->shouldEqual(true);
+        $this::isBinary("\r\nfoo\r\tbar ")->shouldEqual(false);
+        $this::isBinary('123')->shouldEqual(false);
+        $this->isBinary('UTF-8 Data - fÒbÀr.')->shouldEqual(false);
     }
     
     function it_should_split_a_string_between_its_alias_and_attribute()
