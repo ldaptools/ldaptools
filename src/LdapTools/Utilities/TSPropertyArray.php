@@ -46,11 +46,6 @@ class TSPropertyArray
         'CtxInitialProgram' => '',
         'CtxInitialProgramW' => '',
     ];
-
-    /**
-     * @var string The default data that occurs before the TSPropertyArray (CtxCfgPresent with a bunch of spaces...?)
-     */
-    protected $defaultPreBinary = '43747843666750726573656e742020202020202020202020202020202020202020202020202020202020202020202020';
     
     /**
      * @var TSProperty[]
@@ -63,12 +58,7 @@ class TSPropertyArray
     protected $signature = self::VALID_SIGNATURE;
 
     /**
-     * @var string Binary data that occurs before the TSPropertyArray data in userParameters.
-     */
-    protected $preBinary = '';
-
-    /**
-     * @var string Binary data that occurs after the TSPropertyArray data in userParameters.
+     * @var string
      */
     protected $postBinary = '';
 
@@ -76,15 +66,13 @@ class TSPropertyArray
      * Construct in one of the following ways:
      *
      *   - Pass an array of TSProperty key => value pairs (See DEFAULTS constant).
-     *   - Pass the userParameters binary value. The object representation of that will be decoded and constructed.
+     *   - Pass the TSPropertyArray binary value. The object representation of that will be decoded and constructed.
      *   - Pass nothing and a default set of TSProperty key => value pairs will be used (See DEFAULTS constant).
      *
      * @param mixed $tsPropertyArray
      */
     public function __construct($tsPropertyArray = null)
     {
-        $this->preBinary = hex2bin($this->defaultPreBinary);
-
         if (is_null($tsPropertyArray) || is_array($tsPropertyArray)) {
             $tsPropertyArray = $tsPropertyArray ?: self::DEFAULTS;
             foreach ($tsPropertyArray as $key => $value) {
@@ -94,7 +82,7 @@ class TSPropertyArray
                 $this->tsProperty[$key] = $tsProperty;
             }
         } else {
-            $this->decodeUserParameters($tsPropertyArray);
+            $this->decode($tsPropertyArray);
         }
     }
 
@@ -174,15 +162,13 @@ class TSPropertyArray
      */
     public function toBinary()
     {
-        $binary = $this->preBinary;
-
-        $binary .= hex2bin(str_pad(dechex(MBString::ord($this->signature)), 2, 0, STR_PAD_LEFT));
+        $binary = hex2bin(str_pad(dechex(MBString::ord($this->signature)), 2, 0, STR_PAD_LEFT));
         $binary .= hex2bin(str_pad(dechex(count($this->tsProperty)), 2, 0, STR_PAD_LEFT));
         foreach ($this->tsProperty as $tsProperty) {
             $binary .= $tsProperty->toBinary();
         }
 
-        return $binary.$this->postBinary;
+        return $binary;
     }
 
     /**
@@ -212,6 +198,36 @@ class TSPropertyArray
     }
 
     /**
+     * Get any binary data that was after the decoded binary TSPropertyArray data.
+     * 
+     * @return string
+     */
+    public function getPostBinary()
+    {
+        return $this->postBinary;        
+    }
+
+    /**
+     * Get the signature value for the TSPropertyArray data.
+     *
+     * @return string
+     */
+    public function getSignature()
+    {
+        return $this->signature;
+    }
+
+    /**
+     * Check whether the signature is valid, thus signifying a valid data structure.
+     * 
+     * @return bool
+     */
+    public function isSignatureValid()
+    {
+        return $this->signature == self::VALID_SIGNATURE;
+    }
+
+    /**
      * @param string $propName
      */
     protected function validateProp($propName)
@@ -231,32 +247,23 @@ class TSPropertyArray
     }
     
     /**
-     * Get an associative array with all of the userParameters property names and values.
+     * Given the TSPropertyArray binary data, extract out all of the TSProperty values.
      *
-     * @param string $userParameters
+     * @param string $tsPropArray
      * @return array
      */
-    protected function decodeUserParameters($userParameters)
+    protected function decode($tsPropArray)
     {
-        $userParameters = bin2hex($userParameters);
-
-        // Save the 96-byte array of reserved data, so as to not ruin anything that may be stored there.
-        $this->preBinary = hex2bin(substr($userParameters, 0, 96));
+        $tsPropArray = bin2hex($tsPropArray);
         // The signature is a 2-byte unicode character at the front
-        $this->signature = MBString::chr(hexdec(substr($userParameters, 96, 2)));
-        // This asserts the validity of the tsPropertyArray data. For some reason 'P' means valid...
-        if ($this->signature != self::VALID_SIGNATURE) {
-            throw new InvalidArgumentException('Invalid TSPropertyArray data');
-        }
-
+        $this->signature = MBString::chr(hexdec(substr($tsPropArray, 0, 2)));
         // The property count is a 2-byte unsigned integer indicating the number of elements for the tsPropertyArray
-        // It starts at position 98. The actual variable data begins at position 100.
-        $length = $this->addTSPropData(substr($userParameters, 100), hexdec(substr($userParameters, 98, 2)));
-
+        // It starts at position 2. The actual variable data begins at position 4.
+        $length = $this->addTSPropData(substr($tsPropArray, 4), hexdec(substr($tsPropArray, 2, 2)));
         // Reserved data length + (count and sig length == 4) + the added lengths of the TSPropertyArray
         // This saves anything after that variable TSPropertyArray data, so as to not squash anything stored there
-        if (strlen($userParameters) > (96 + 4 + $length)) {
-            $this->postBinary = hex2bin(substr($userParameters, (96 + 4 + $length)));
+        if (strlen($tsPropArray) > (4 + $length)) {
+            $this->postBinary = hex2bin(substr($tsPropArray, (4 + $length)));
         }
     }
 

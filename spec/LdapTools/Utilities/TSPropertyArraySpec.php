@@ -34,7 +34,7 @@ class TSPropertyArraySpec extends ObjectBehavior
     
     function it_should_get_the_default_binary_value_when_newly_constructed()
     {
-        $this->toBinary()->shouldHaveHex($this->defaultHex);
+        $this->toBinary()->shouldHaveHex(substr($this->defaultHex, 96));
     }
     
     function it_should_support_being_constructed_with_a_binary_value()
@@ -126,24 +126,31 @@ class TSPropertyArraySpec extends ObjectBehavior
         ]);
     }
 
-    function it_should_respect_the_binary_data_stored_before_and_after_the_TSPropertyArray_data_when_encoding_to_binary()
+    function it_should_respect_the_binary_data_stored_after_the_TSPropertyArray_data_when_constructed()
     {
-        $preBinary = '666f6f626172666f6f626172666f6f626172202020202020202020202020202020202020202020202020202020202020';
         $postBinary = '666f6f626172';
+        $hex = bin2hex((new TSPropertyArray())->set('CtxWFProfilePath', 'foo')->toBinary());
+        $hexAdd = $hex.$postBinary;
+        $this->beConstructedWith(hex2bin($hexAdd));
 
-        $hex = bin2hex((new TSPropertyArray())->toBinary());
-        $hex = substr_replace($hex, $preBinary, 0, 96);
-        $hex .= $postBinary;
-        
-        $hexAdd = bin2hex((new TSPropertyArray())->set('CtxWFProfilePath', 'foo')->toBinary());
-        $hexAdd = substr_replace($hexAdd, $preBinary, 0, 96);
-        $hexAdd .= $postBinary;        
-        
-        $this->beConstructedWith(hex2bin($hex));
-        $this->toBinary()->shouldHaveHex($hex);
-        
         $this->set('CtxWFProfilePath', 'foo');
-        $this->toBinary()->shouldHaveHex($hexAdd);
+        $this->toBinary()->shouldHaveHex($hex);
+        $this->getPostBinary()->shouldEqual(hex2bin($postBinary));
+    }
+
+    function it_should_get_the_signature_for_the_data()
+    {
+        $this->beConstructedWith((new TSPropertyArray())->toBinary());
+        $this->getSignature()->shouldEqual(TSPropertyArray::VALID_SIGNATURE);
+        $this->isSignatureValid()->shouldEqual(true);
+    }
+    
+    function it_should_be_able_to_check_whether_the_signature_is_valid()
+    {
+        $hex = substr($this->defaultHex, 96);
+        
+        $this->beConstructedWith(hex2bin(substr_replace($hex, '61', 0, 2)));
+        $this->isSignatureValid()->shouldEqual(false);
     }
 
     public function getMatchers()
