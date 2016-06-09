@@ -18,7 +18,7 @@ use Prophecy\Argument;
 
 class UserParametersSpec extends ObjectBehavior
 {
-    protected $defaultHex = '6d3a20202020202020202020202020202020202020206409376978373720202020202020202020202020202020'.
+    protected $defaultHex = '6d747843666750726573656e742020202020202020206409376978373720202020202020202020202020202020'.
         '20202050101a080143747843666750726573656e74e394b5e694b1e688b0e381a2200201437478574650726f66696c6550617468e380b0'.
         '220201437478574650726f66696c655061746857e380b01802014374785746486f6d65446972e380b01a02014374785746486f6d654469'.
         '7257e380b02202014374785746486f6d654469724472697665e380b02402014374785746486f6d65446972447269766557e380b0120801'.
@@ -48,7 +48,12 @@ class UserParametersSpec extends ObjectBehavior
         $this->getDialInData()->shouldReturnAnInstanceOf('LdapTools\Utilities\DialInData');
         $this->getTSPropertyArray()->shouldBeNull();
         
-        $this->toBinary()->shouldEqual(hex2bin(substr($this->defaultHex, 0, 96)));
+        $this->toBinary()->shouldEqual(hex2bin(substr_replace(
+            substr($this->defaultHex, 0, 96),
+            '6d3a2020202020202020202020202020202020202020',
+            0,
+            44
+        )));
     }
     
     function it_should_not_construct_the_dialin_data_if_it_is_completely_empty()
@@ -117,7 +122,7 @@ class UserParametersSpec extends ObjectBehavior
     {
         $this->beConstructedWith(hex2bin($this->defaultHex));
         
-        $this->getReservedDataString()->shouldEqual('m:');
+        $this->getReservedDataString()->shouldEqual(UserParameters::RESERVED_DATA_VALUE['NPS_RDS']);
     }
     
     function it_should_get_empty_binary_data_when_nothing_is_set()
