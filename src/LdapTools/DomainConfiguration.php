@@ -594,7 +594,7 @@ class DomainConfiguration
      */
     protected function validateInteger($value, $name)
     {
-        if (!filter_var($value, FILTER_VALIDATE_INT)) {
+        if (filter_var($value, FILTER_VALIDATE_INT) === false) {
             throw new InvalidArgumentException(sprintf("The %s should be an integer.", $name));
         }
     }
