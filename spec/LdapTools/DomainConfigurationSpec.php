@@ -202,13 +202,6 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_PROTOCOL_VERSION, 3);
         $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_REFERRALS, 0);
     }
-    
-    function it_should_set_the_idle_reconnection_time()
-    {
-        $this->getIdleReconnect()->shouldBeEqualTo(600);
-        $this->setIdleReconnect(0)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
-        $this->getIdleReconnect()->shouldBeEqualTo(0);
-    }
 
     function it_should_return_self_when_calling_the_setters()
     {
