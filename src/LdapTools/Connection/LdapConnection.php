@@ -137,7 +137,7 @@ class LdapConnection implements LdapConnectionInterface
     public function close()
     {
         if ($this->isBound) {
-            ldap_close($this->connection);
+            @ldap_close($this->connection);
             $this->isBound = false;
             $this->server = null;
         }
