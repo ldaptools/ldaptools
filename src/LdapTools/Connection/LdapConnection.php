@@ -118,9 +118,7 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Get a LdapObject that represents the RootDSE information for the domain.
-     *
-     * @return \LdapTools\Object\LdapObject
+     * {@inheritdoc}
      */
     public function getRootDse()
     {
@@ -185,9 +183,7 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * @param LdapOperationInterface $operation
-     * @return array|mixed
-     * @throws LdapConnectionException
+     * {@inheritdoc}
      */
     public function execute(LdapOperationInterface $operation)
     {
@@ -195,9 +191,7 @@ class LdapConnection implements LdapConnectionInterface
     }
 
     /**
-     * Get the server the connection is using. If it is not yet connected this will return null.
-     *
-     * @return string|null
+     * {@inheritdoc}
      */
     public function getServer()
     {
