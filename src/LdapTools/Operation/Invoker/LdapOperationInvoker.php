@@ -140,7 +140,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      * @param string|null $wantedServer The server we want the connection to be on.
      * @param LdapOperationInterface $operation
      */
-    protected function switchServerIfNeeded($currentServer, $wantedServer, $operation)
+    protected function switchServerIfNeeded($currentServer, $wantedServer, LdapOperationInterface $operation)
     {
         if ($operation instanceof AuthenticationOperation || strtolower($currentServer) == strtolower($wantedServer)) {
             return;
