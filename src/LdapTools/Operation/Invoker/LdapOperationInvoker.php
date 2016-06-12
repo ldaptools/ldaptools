@@ -77,6 +77,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
             $this->switchServerIfNeeded($this->connection->getServer(), $operation->getServer(), $operation);
+            $this->idleReconnectIfNeeded($operation);
             $this->setLdapControls($operation);
 
             return $handler->execute($operation);
@@ -148,6 +149,24 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $this->connection->close();
         }
         $this->connection->connect(null, null, false, $wantedServer);
+    }
+
+    /**
+     * If the connection has been open as long as, or longer than, the configured idle reconnect time, then close and
+     * reconnect the LDAP connection.
+     * 
+     * @param LdapOperationInterface $operation
+     */
+    protected function idleReconnectIfNeeded(LdapOperationInterface $operation)
+    {
+        // An auth operation will force a reconnect anyways, so avoid extra work
+        if (!$this->connection->getConfig()->getIdleReconnect() || $operation instanceof AuthenticationOperation) {
+            return;
+        }
+
+        if ($this->connection->getIdleTime() >= $this->connection->getConfig()->getIdleReconnect()) {
+            $this->connection->close()->connect();
+        }
     }
 
     /**

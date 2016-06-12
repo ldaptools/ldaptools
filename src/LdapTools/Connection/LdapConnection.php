@@ -82,6 +82,11 @@ class LdapConnection implements LdapConnectionInterface
     protected $logger;
 
     /**
+     * @var \DateTime|null
+     */
+    protected $lastActivity;
+
+    /**
      * @param DomainConfiguration $config
      * @param EventDispatcherInterface $dispatcher
      * @param LdapLoggerInterface $logger
@@ -138,6 +143,7 @@ class LdapConnection implements LdapConnectionInterface
             @ldap_close($this->connection);
             $this->isBound = false;
             $this->server = null;
+            $this->lastActivity = null;
         }
 
         return $this;
@@ -154,6 +160,7 @@ class LdapConnection implements LdapConnectionInterface
         $password = $password ?: $this->config->getPassword();
 
         $this->bind($username, $password, $anonymous);
+        $this->lastActivity = new \DateTime();
 
         return $this;
     }
@@ -187,7 +194,10 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function execute(LdapOperationInterface $operation)
     {
-        return $this->config->getOperationInvoker()->execute($operation);
+        $result = $this->config->getOperationInvoker()->execute($operation);
+        $this->lastActivity = new \DateTime();
+
+        return $result;
     }
 
     /**
@@ -196,6 +206,20 @@ class LdapConnection implements LdapConnectionInterface
     public function getServer()
     {
         return $this->server;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getIdleTime()
+    {
+        if (is_null($this->lastActivity)) {
+            $idleTime = 0;
+        } else {
+            $idleTime = (new \DateTime())->getTimestamp() - $this->lastActivity->getTimestamp();
+        }
+        
+        return $idleTime;
     }
 
     /**

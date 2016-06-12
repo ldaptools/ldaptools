@@ -85,4 +85,9 @@ class LdapConnectionSpec extends ObjectBehavior
     {
         $this->setControl(new LdapControl('foo'));
     }
+    
+    function it_should_get_an_idle_time_of_0_when_it_has_not_been_connected()
+    {
+        $this->getIdleTime()->shouldBeEqualTo(0);
+    }
 }

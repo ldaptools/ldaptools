@@ -44,6 +44,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $connection->getConnection()->willReturn(null);
         $connection->isBound()->willReturn(true);
         $connection->getServer()->willReturn('foo');
+        $connection->getIdleTime()->willReturn(1);
 
         $this->setConnection($connection);
         $this->setEventDispatcher($dispatcher);
@@ -161,10 +162,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\AuthenticationOperationHandler $handler
-     */
-    function it_should_not_connect_before_or_after_an_authentication_operation_with_a_specific_server_set($handler)
+    function it_should_not_connect_before_or_after_an_authentication_operation_with_a_specific_server_set()
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('foo')->setServer('foo');
 
@@ -265,6 +263,63 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $operation = new BatchModifyOperation('dc=foo,dc=bar', new BatchCollection());
         $handler->execute($operation)->shouldNotBeCalled(true);
         
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_reconnect_a_connection_that_has_been_idle_too_long($handler)
+    {
+        $operation = (new DeleteOperation('foo'))->setServer('foo');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+        
+        $this->connection->getIdleTime()->willReturn(600);
+        $this->connection->close()->shouldBeCalled()->willReturn($this->connection);
+        $this->connection->connect()->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_not_reconnect_a_connection_that_hasnt_been_idle_too_long($handler)
+    {
+        $operation = (new DeleteOperation('foo'))->setServer('foo');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+
+        $this->connection->getIdleTime()->willReturn(599);
+        $this->connection->close()->shouldNotBeCalled();
+        $this->connection->connect()->shouldNotBeCalled();
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_not_idle_reconnect_on_an_authentication_operation($handler)
+    {
+        $operation = (new AuthenticationOperation('foo', 'bar'))->setServer('foo');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+
+        $this->connection->getIdleTime()->willReturn(601);
+        $this->connection->close()->shouldNotBeCalled();
+        $this->connection->connect()->shouldNotBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }

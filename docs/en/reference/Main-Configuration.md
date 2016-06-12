@@ -292,3 +292,21 @@ domains:
 ```
 
 **Default**: `[LDAP_OPT_PROTOCOL_VERSION => 3, LDAP_OPT_REFERRALS => 0]`
+
+-------------------------------
+#### idle_reconnect
+
+The elapsed time (in seconds) when an idle connection will attempt to reconnect to LDAP. A value of 0 means never. This
+is useful for long running processes where an LDAP connection is left open.
+
+You should set this value sightly below the max idle time for your LDAP server. For Active Directory, idle connections 
+timeout after 15 minutes by default. For OpenLDAP, idle connections never timeout by default. You should check your
+LDAP server settings before changing this value.
+
+```yaml
+domains:
+    example:
+        idle_reconnect: 0
+```
+
+**Default**: `600` (10 minutes)

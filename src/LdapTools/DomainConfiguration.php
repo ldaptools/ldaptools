@@ -57,6 +57,7 @@ class DomainConfiguration
         'encoding' => 'encoding',
         'bind_format' => 'bindFormat',
         'ldap_options' => 'ldapOptions',
+        'idle_reconnect' => 'idleReconnect'
     ];
 
     /**
@@ -93,6 +94,7 @@ class DomainConfiguration
             LDAP_OPT_PROTOCOL_VERSION => 3,
             LDAP_OPT_REFERRALS => 0,
         ],
+        'idleReconnect' => 600,
     ];
 
     /**
@@ -262,8 +264,7 @@ class DomainConfiguration
      */
     public function setPort($port)
     {
-        $this->validateInteger($port, "port number");
-        $this->config['port'] = $port;
+        $this->config['port'] = $this->validateInteger($port, "port number");;
 
         return $this;
     }
@@ -287,8 +288,7 @@ class DomainConfiguration
      */
     public function setPageSize($pageSize)
     {
-        $this->validateInteger($pageSize, "page size");
-        $this->config['pageSize'] = $pageSize;
+        $this->config['pageSize'] = $this->validateInteger($pageSize, "page size");;
 
         return $this;
     }
@@ -543,6 +543,31 @@ class DomainConfiguration
     }
 
     /**
+     * Set the elapsed time (in seconds) when an idle connection will attempt to reconnect to LDAP. If you want to set
+     * it so an idle reconnect never happens, set the value to 0.
+     *
+     * @param int $seconds
+     * @return $this
+     */
+    public function setIdleReconnect($seconds)
+    {
+        $this->config['idleReconnect'] = $this->validateInteger($seconds, "idle reconnect");;
+
+        return $this;
+    }
+
+    /**
+     * Get the elapsed time (in seconds) when an idle connection will attempt to reconnect to LDAP. A value of 0 means
+     * never.
+     *
+     * @return int
+     */
+    public function getIdleReconnect()
+    {
+        return $this->config['idleReconnect'];
+    }
+
+    /**
      * Get the operation invoker used in the LDAP connection.
      *
      * @return LdapOperationInvokerInterface
@@ -591,11 +616,14 @@ class DomainConfiguration
      *
      * @param mixed $value
      * @param string $name
+     * @return int
      */
     protected function validateInteger($value, $name)
     {
         if (filter_var($value, FILTER_VALIDATE_INT) === false) {
             throw new InvalidArgumentException(sprintf("The %s should be an integer.", $name));
         }
+
+        return $value;
     }
 }

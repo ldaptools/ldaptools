@@ -65,6 +65,9 @@ domains:
         ldap_options:
             ldap_opt_protocol_version: 3
             ldap_opt_referrals: 0
+        # Optional: The elapsed time a connection can be idle before it is closed and reconnected. Default: 600. To
+        #   To disable this altogether set it to 0.
+        idle_reconnect: 600
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

@@ -69,6 +69,13 @@ interface LdapConnectionInterface
     public function getServer();
 
     /**
+     * Get the time, in seconds, that the connection has been idle. If not connected this will always return 0.
+     *
+     * @return int
+     */
+    public function getIdleTime();
+
+    /**
      * Return a RootDse LDAP object for this connection.
      *
      * @return \LdapTools\Object\LdapObject
