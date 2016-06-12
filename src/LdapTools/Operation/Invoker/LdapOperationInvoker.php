@@ -176,10 +176,6 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     protected function setLdapControls(LdapOperationInterface $operation)
     {
-        if (empty($operation->getControls())) {
-            return;
-        }
-
         foreach ($operation->getControls() as $control) {
             $this->connection->setControl($control);
         }
@@ -193,10 +189,6 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     protected function resetLdapControls(LdapOperationInterface $operation)
     {
-        if (empty($operation->getControls())) {
-            return;
-        }
-
         foreach ($operation->getControls() as $control) {
             $reset = clone $control;
             $reset->setValue(false);
