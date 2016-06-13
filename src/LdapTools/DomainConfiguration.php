@@ -265,7 +265,6 @@ class DomainConfiguration
     public function setPort($port)
     {
         $this->config['port'] = $this->validateInteger($port, "port number");
-        ;
 
         return $this;
     }
