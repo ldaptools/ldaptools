@@ -73,6 +73,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
     protected function executeOperation(LdapOperationInterface $operation,  ConnectionState $state, LogOperation $log = null)
     {
         try {
+            $this->connectIfNotBound($operation);
             $handler = $this->getOperationHandler($operation);
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
@@ -166,6 +167,18 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
 
         if ($this->connection->getIdleTime() >= $this->connection->getConfig()->getIdleReconnect()) {
             $this->connection->close()->connect();
+        }
+    }
+
+    /**
+     * If a connection is not bound (such as a lazy bind config) we need to force a connection.
+     * 
+     * @param LdapOperationInterface $operation
+     */
+    protected function connectIfNotBound(LdapOperationInterface $operation)
+    {
+        if (!$this->connection->isBound() && !($operation instanceof AuthenticationOperation)) {
+            $this->connection->connect();
         }
     }
 

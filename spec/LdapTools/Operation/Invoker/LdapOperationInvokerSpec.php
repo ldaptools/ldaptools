@@ -323,4 +323,48 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->addHandler($handler);
         $this->execute($operation);
     }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_connect_if_not_yet_bound_on_execution($handler)
+    {
+        $operation = new DeleteOperation('foo');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+
+        $this->connection->getServer()->willReturn(null);
+        $this->connection->isBound()->willReturn(false);
+        $this->connection->getIdleTime()->willReturn(1);
+        
+        $this->connection->close()->shouldNotBeCalled();
+        $this->connection->connect()->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
+
+    /**
+     * @param \LdapTools\Operation\Handler\OperationHandler $handler
+     */
+    function it_should_not_connect_if_not_yet_bound_on_an_AuthenticationOperation($handler)
+    {
+        $operation = new AuthenticationOperation('foo', 'bar');
+        $handler->supports($operation)->willReturn(true);
+        $handler->setConnection($this->connection)->shouldBeCalled();
+        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($operation)->shouldBeCalled();
+        $handler->execute($operation)->shouldBeCalled();
+
+        $this->connection->getServer()->willReturn(null);
+        $this->connection->isBound()->willReturn(false);
+        $this->connection->getIdleTime()->willReturn(1);
+
+        $this->connection->close()->shouldNotBeCalled();
+        $this->connection->connect()->shouldNotBeCalled();
+        $this->addHandler($handler);
+        $this->execute($operation);
+    }
 }
