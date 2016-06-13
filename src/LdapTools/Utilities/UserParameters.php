@@ -179,7 +179,7 @@ class UserParameters
         // Check if any dial-in data is set first.
         $dialInData = substr($hex, 44, 52);
         if ($dialInData != str_pad('', 52, '20')) {
-            $this->dialInData = new DialInData(hex2bin($dialInData));    
+            $this->dialInData = new DialInData(hex2bin($dialInData));
         }
         
         // It's possible there is no TSPropertyArray data and only dial-in data is set.

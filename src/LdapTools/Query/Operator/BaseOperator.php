@@ -141,7 +141,7 @@ abstract class BaseOperator
         if ($alias) {
             $this->convertedAliasValue[$alias] = $value;
         } else {
-            $this->convertedValue = $value;   
+            $this->convertedValue = $value;
         }
     }
 
@@ -309,7 +309,7 @@ abstract class BaseOperator
      */
     public function getLdapFilter($alias = null)
     {
-        return $this->toLdapFilter($alias);        
+        return $this->toLdapFilter($alias);
     }
 
     /**

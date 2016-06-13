@@ -321,7 +321,7 @@ class LdapQuery
              * @todo This is getting difficult due to multiple operations needed to select all schema types. If this was
              *       a single operation the issue would not exist. But with a single query and multiple types I cannot
              *       easily determine which result is what type. Unsure of the best way to fix this at the moment. 
-             */ 
+             */
             if ($operation->getSizeLimit() && count($results) < $operation->getSizeLimit()) {
                 $operation->setSizeLimit($operation->getSizeLimit() - count($results));
             }

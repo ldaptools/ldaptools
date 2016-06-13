@@ -112,7 +112,7 @@ class DialInData
      */
     public function isSignatureValid()
     {
-        return $this->signature == self::VALID_SIGNATURE;        
+        return $this->signature == self::VALID_SIGNATURE;
     }
 
     /**

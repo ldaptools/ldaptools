@@ -204,7 +204,7 @@ class TSPropertyArray
      */
     public function getPostBinary()
     {
-        return $this->postBinary;        
+        return $this->postBinary;
     }
 
     /**
@@ -234,7 +234,7 @@ class TSPropertyArray
     {
         if (!$this->has($propName)) {
             throw new InvalidArgumentException(sprintf('TSProperty for "%s" does not exist.', $propName));
-        }    
+        }
     }
     
     /**

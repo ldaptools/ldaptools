@@ -264,7 +264,8 @@ class DomainConfiguration
      */
     public function setPort($port)
     {
-        $this->config['port'] = $this->validateInteger($port, "port number");;
+        $this->config['port'] = $this->validateInteger($port, "port number");
+        ;
 
         return $this;
     }
@@ -288,7 +289,7 @@ class DomainConfiguration
      */
     public function setPageSize($pageSize)
     {
-        $this->config['pageSize'] = $this->validateInteger($pageSize, "page size");;
+        $this->config['pageSize'] = $this->validateInteger($pageSize, "page size");
 
         return $this;
     }
@@ -551,7 +552,7 @@ class DomainConfiguration
      */
     public function setIdleReconnect($seconds)
     {
-        $this->config['idleReconnect'] = $this->validateInteger($seconds, "idle reconnect");;
+        $this->config['idleReconnect'] = $this->validateInteger($seconds, "idle reconnect");
 
         return $this;
     }

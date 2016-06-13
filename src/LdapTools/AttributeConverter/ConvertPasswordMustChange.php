@@ -9,6 +9,7 @@
  */
 
 namespace LdapTools\AttributeConverter;
+
 use LdapTools\Query\Builder\FilterBuilder;
 
 /**
@@ -28,7 +29,7 @@ class ConvertPasswordMustChange implements AttributeConverterInterface
     {
         /**
          * @todo There's a lot more potential logic that needs to happen for this to be accurate...
-         */ 
+         */
         if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO && !$value) {
             $fb = new FilterBuilder();
             $value = $fb->bNot($fb->eq('pwdLastSet', '0'));

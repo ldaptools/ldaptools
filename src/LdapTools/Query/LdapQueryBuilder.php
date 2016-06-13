@@ -526,7 +526,8 @@ class LdapQueryBuilder
      * @param string|LdapObjectSchema $type
      * @return LdapObjectSchema
      */
-    protected function getSchemaFromType($type) {
+    protected function getSchemaFromType($type)
+    {
         if (is_string($type) && !$this->schemaFactory) {
             throw new LogicException(
                 'To build a filter with schema types you must pass a SchemaFactory to the constructor'
