@@ -24,7 +24,7 @@
     },
     "require-dev": {
         "phpspec/phpspec": "~2.5",
-        "fabpot/php-cs-fixer": "~1.0",
+        "friendsofphp/php-cs-fixer": "~1.0",
         "tedivm/stash": ">=0.14.1",
         "doctrine/cache": "~1.0"
     },
