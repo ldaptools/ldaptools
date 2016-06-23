@@ -24,6 +24,16 @@ use \LdapTools\DomainConfiguration;
 
 class LdapManagerSpec extends ObjectBehavior
 {
+    /**
+     * @var Configuration
+     */
+    protected $config;
+
+    /**
+     * @var DomainConfiguration
+     */
+    protected $domain;
+    
     function let()
     {
         $config = new Configuration();
@@ -42,6 +52,8 @@ class LdapManagerSpec extends ObjectBehavior
 
         $config->addDomain($domain, $anotherDomain);
 
+        $this->config = $config;
+        $this->domain = $domain;
         $this->beConstructedWith($config);
     }
 
@@ -153,7 +165,11 @@ class LdapManagerSpec extends ObjectBehavior
 
     function it_should_error_when_calling_getRepository_for_a_type_that_does_not_exist()
     {
-        $this->shouldThrow('\Exception')->duringGetRepository('foo');
+        $this->config->setSchemaFolder(__DIR__.'/../resources/schema');
+        $this->domain->setSchemaName('example');
+        $this->beConstructedWith($this->config);
+        $this->shouldThrow(new \RuntimeException('Unable to load Repository for type "foo": Cannot find object type "foo" in schema.'))->duringGetRepository('foo');
+        $this->shouldThrow(new \RuntimeException('Unable to load Repository for type "user": Repository class "\Foo\Bar" not found.'))->duringGetRepository('user');
     }
 
     function it_should_return_a_ldap_object_creator_when_calling_createLdapObject()

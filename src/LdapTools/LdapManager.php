@@ -219,13 +219,17 @@ class LdapManager
         try {
             $ldapObjectSchema = $this->getLdapObjectSchema($type);
             $repositoryClass = $ldapObjectSchema->getRepository();
-
+            if (!class_exists($repositoryClass)) {
+                throw new \RuntimeException(sprintf('Repository class "%s" not found.', $repositoryClass));
+            }
             $repository = new $repositoryClass($ldapObjectSchema, $this->getConnection());
-        } catch (\ErrorException $e) {
+            if (!($repository instanceof LdapObjectRepository)) {
+                throw new \RuntimeException('Your repository class must extend \LdapTools\Object\LdapObjectRepository.');
+            }
+        } catch (\Exception $e) {
             throw new \RuntimeException(sprintf('Unable to load Repository for type "%s": %s', $type, $e->getMessage()));
-        }
-        if (!($repository instanceof LdapObjectRepository)) {
-            throw new \RuntimeException('Your repository class must extend \LdapTools\LdapObjectRepository.');
+        } catch (\Throwable $e) {
+            throw new \RuntimeException(sprintf('Unable to load Repository for type "%s": %s', $type, $e->getMessage()));
         }
 
         return $repository;
