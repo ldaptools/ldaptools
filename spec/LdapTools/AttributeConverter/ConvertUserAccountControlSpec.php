@@ -215,7 +215,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->setDn(null);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
-        $this->shouldThrow(new \RuntimeException('Unable to query for the current "userAccountControl" attribute.'))->duringToLdap(true);
+        $this->shouldThrow(new AttributeConverterException('Unable to query for the current "userAccountControl" attribute.'))->duringToLdap(true);
     }
 
     function it_should_be_case_insensitive_to_the_current_attribute_name()

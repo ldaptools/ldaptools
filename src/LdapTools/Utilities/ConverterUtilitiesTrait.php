@@ -62,12 +62,13 @@ trait ConverterUtilitiesTrait
     /**
      * If the current attribute does not exist in the array, then throw an error.
      *
-     * @param $options
+     * @param array $options
+     * @throws AttributeConverterException
      */
     protected function validateCurrentAttribute(array $options)
     {
         if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($options))) {
-            throw new \RuntimeException(
+            throw new AttributeConverterException(
                 sprintf('You must first define "%s" in the options for this converter.', $this->getAttribute())
             );
         }
@@ -94,7 +95,7 @@ trait ConverterUtilitiesTrait
     protected function getCurrentLdapAttributeValue($attribute)
     {
         if (!$this->getDn() || !$this->getLdapConnection()) {
-            throw new \RuntimeException(sprintf('Unable to query for the current "%s" attribute.', $attribute));
+            throw new AttributeConverterException(sprintf('Unable to query for the current "%s" attribute.', $attribute));
         }
 
         $query = new LdapQueryBuilder($this->getLdapConnection());

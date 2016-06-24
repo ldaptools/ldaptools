@@ -187,7 +187,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->setDn(null);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeDistribution');
-        $this->shouldThrow(new \RuntimeException('Unable to query for the current "groupType" attribute.'))->duringToLdap(true);
+        $this->shouldThrow(new AttributeConverterException('Unable to query for the current "groupType" attribute.'))->duringToLdap(true);
     }
 
     function it_should_be_case_insensitive_to_the_current_attribute_name()
