@@ -13,10 +13,9 @@ namespace spec\LdapTools\AttributeConverter;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
-use LdapTools\Query\Operator\bAnd;
-use LdapTools\Query\Operator\Comparison;
-use LdapTools\Query\OperatorCollection;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -31,6 +30,11 @@ class ConvertGroupTypeSpec extends ObjectBehavior
      * @var LdapConnectionInterface
      */
     protected $connection;
+
+    /**
+     * @var callable
+     */
+    protected $expectedOp;
 
     /**
      * @var array
@@ -53,6 +57,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function let($connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->connection = $connection;
         $options = [
             'defaultValue' => '-2147483646',
@@ -74,6 +79,10 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
+        $this->expectedOp = function($operation) {
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';
+        };
     }
 
     function it_is_initializable()
@@ -126,9 +135,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
-        }))->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('typeDistribution');
@@ -141,9 +148,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
-        }))->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
@@ -159,9 +164,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     {
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
-        }))->willReturn($result);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
@@ -172,13 +175,11 @@ class ConvertGroupTypeSpec extends ObjectBehavior
 
     function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
-        }))->willReturn(['count' => 0]);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
-        $this->shouldThrow(new \RuntimeException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
+        $this->shouldThrow(new AttributeConverterException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
     }
 
     function it_should_error_when_a_dn_is_not_set_and_a_modification_type_is_requested()
@@ -191,9 +192,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
 
     function it_should_be_case_insensitive_to_the_current_attribute_name()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))';
-        }))->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('TypeSecuritY');

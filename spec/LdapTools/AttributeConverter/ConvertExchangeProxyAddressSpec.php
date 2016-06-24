@@ -13,7 +13,7 @@ namespace spec\LdapTools\AttributeConverter;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\DomainConfiguration;
-use LdapTools\Operation\QueryOperation;
+use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -53,6 +53,7 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->setOptions($options);
         $this->setLdapConnection($connection);
+        $this->connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->setDn('cn=foo,dc=foo,dc=bar');
     }
 
@@ -101,8 +102,9 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-                && $operation->getAttributes() == ['proxyAddresses'];
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getAttributes() == ['proxyAddresses']
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';
         }))->willReturn($this->expectedResult);
         $addresses = [
             "smtp:foo@foo.bar",

@@ -13,6 +13,7 @@ namespace spec\LdapTools\AttributeConverter;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\DomainConfiguration;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -125,10 +126,12 @@ class ConvertGPLinkSpec extends ObjectBehavior
             return $operation->getFilter() == '(&(|(displayName=Foo)(displayName=Bar)))';
         }))->willReturn($this->expectedDNResult);
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=ou=foo,dc=foo,dc=bar))';
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getBaseDn() == 'ou=foo,dc=foo,dc=bar';
         }))->willReturn($this->expectedCurrentValueResult);
 
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('ou=foo,dc=foo,dc=bar');

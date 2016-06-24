@@ -14,7 +14,7 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
-use LdapTools\Operation\QueryOperation;
+use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -59,6 +59,7 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
     }
 
     function it_is_initializable()
@@ -87,8 +88,9 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
     {
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))' 
-                && $operation->getAttributes() == ['userWorkstations'];
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getAttributes() == ['userWorkstations']
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';
         }))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);

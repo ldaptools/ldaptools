@@ -11,13 +11,19 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertUserAccountControlSpec extends ObjectBehavior
 {
+    /**
+     * @var LdapConnectionInterface
+     */
     protected $connection;
 
     /**
@@ -25,6 +31,9 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
      */
     protected $expectedSearch;
 
+    /**
+     * @var array
+     */
     protected $expectedResult = [
         'count' => 1,
         0 => [
@@ -37,6 +46,9 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         ],
     ];
 
+    /**
+     * @var array
+     */
     protected $expectedDisabledResult = [
         'count' => 1,
         0 => [
@@ -48,14 +60,22 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
             'dn' => "CN=foo,DC=foo,DC=bar",
         ],
     ];
+    
+    /** 
+     * @var callable
+     */
+    protected $expectedOp;
 
     /**
      * @param \LdapTools\Connection\LdapConnectionInterface $connection
      */
     function let($connection)
     {
+        $config = new DomainConfiguration('foo.bar');
+        $config->setBaseDn('dc=foo,dc=bar');
         $this->connection = $connection;
-        $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
+        $this->connection->getConfig()->willReturn($config);
+        $this->connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $options = [
             'uacMap' => [
                 'disabled' => '2',
@@ -74,6 +94,12 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
+        
+        $this->expectedOp = function($operation) {
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getAttributes() == ['userAccountControl']
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';
+        };
     }
 
     function it_is_initializable()
@@ -124,10 +150,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-                && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($this->expectedResult);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('disabled');
@@ -144,10 +167,6 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-            && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('enabled');
@@ -164,10 +183,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-            && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($result);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
@@ -179,10 +195,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-            && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($result);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
@@ -191,13 +204,10 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 
     function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
     {
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-            && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn(['count' => 0]);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
-        $this->shouldThrow(new \RuntimeException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
+        $this->shouldThrow(new AttributeConverterException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
     }
 
     function it_should_error_when_a_dn_is_not_set_and_a_modification_type_is_requested()
@@ -213,10 +223,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(distinguishedName=cn=foo,dc=foo,dc=bar))'
-            && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($result);
+        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('DisaBleD');

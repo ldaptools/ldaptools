@@ -416,6 +416,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
      */
     function it_should_generate_operations_to_remove_all_current_groups_on_a_modify_reset_operation($connection, $operation)
     {
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $batch = new Batch(Batch::TYPE['REMOVE_ALL'], 'groups');
         $dn = 'cn=foo,dc=foo,dc=bar';
         $this->setOptions(['groups' => [
@@ -435,7 +436,8 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $this->setBatch($batch);
 
         $connection->execute(Argument::that(function($operation) use ($dn) {
-            return $operation->getFilter() == "(&(distinguishedName=$dn))" 
+            return $operation->getFilter() == "(&(objectClass=*))"
+                && $operation->getBaseDn() == $dn
                 && $operation->getAttributes() == ['memberOf'];
         }))->willReturn($this->expectedResult);
         foreach ($this->expectedResult[0]['memberOf'] as $groupDn) {
@@ -460,6 +462,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
      */
     function it_should_generate_operations_to_remove_all_current_groups_and_add_new_ones_on_a_modify_set_operation($connection, $operation)
     {
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $group1 = 'cn=foo,dc=example,dc=local';
         $group2 = 'cn=bar,dc=example,dc=local';
         $batch = new Batch(Batch::TYPE['REPLACE'], 'groups', [$group1, $group2]);
@@ -490,8 +493,8 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
                 $batches = [new Batch(Batch::TYPE['REMOVE'], 'member', [$dn])];
 
                 return $op instanceof BatchModifyOperation
-                && $op->getBatchCollection()->toArray() == $batches
-                && $op->getBatchCollection()->getDn() == $groupDn;
+                    && $op->getBatchCollection()->toArray() == $batches
+                    && $op->getBatchCollection()->getDn() == $groupDn;
             }))->shouldBeCalled();
         }
         foreach ([$group1, $group2] as $groupDn) {

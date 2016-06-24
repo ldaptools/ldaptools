@@ -13,6 +13,8 @@ namespace LdapTools\Utilities;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Exception\EmptyResultException;
 use LdapTools\Query\LdapQueryBuilder;
 
 /**
@@ -85,29 +87,27 @@ trait ConverterUtilitiesTrait
     /**
      * This can be called to retrieve the current value of an attribute from LDAP.
      *
-     * @param string $attribute The attribute name to query for.
-     * @param string $dn The name LDAP expects for the distinguished name attribute.
-     * @return array|string
+     * @param string $attribute The attribute name to query for a value from the converter context
+     * @return array|string|null
+     * @throws AttributeConverterException
      */
-    protected function getCurrentLdapAttributeValue($attribute, $dn = 'distinguishedName')
+    protected function getCurrentLdapAttributeValue($attribute)
     {
         if (!$this->getDn() || !$this->getLdapConnection()) {
             throw new \RuntimeException(sprintf('Unable to query for the current "%s" attribute.', $attribute));
         }
 
         $query = new LdapQueryBuilder($this->getLdapConnection());
-        $result = $query->select($attribute)
-            ->where([$dn => $this->getDn()])
-            ->getLdapQuery()
-            ->execute();
-
-        if ($result->count() == 0) {
-            throw new \RuntimeException(sprintf('Unable to find LDAP object: %s', $this->getDn()));
+        try {
+            return $query->select($attribute)
+                ->where($query->filter()->present('objectClass'))
+                ->setBaseDn($this->getDn())
+                ->setScopeBase()
+                ->getLdapQuery()
+                ->getSingleScalarOrNullResult();
+        } catch(EmptyResultException $e) {
+            throw new AttributeConverterException(sprintf('Unable to find LDAP object: %s', $this->getDn()));
         }
-        /** @var \LdapTools\Object\LdapObject $object */
-        $object = $result->toArray()[0];
-
-        return $object->has($attribute) ? $object->get($attribute) : null;
     }
 
     /**
