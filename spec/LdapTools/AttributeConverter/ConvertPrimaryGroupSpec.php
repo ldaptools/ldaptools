@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -38,8 +39,9 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
         $groupSidHex = $this->groupSidHex;
         
         $connection->execute(Argument::that(function($operation) use ($dn) {
-            return $operation->getFilter() == '(&(distinguishedName='.$dn.'))'
-                && $operation->getAttributes() == ['objectSid'];
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getAttributes() == ['objectSid']
+                && $operation->getBaseDn() == $dn;
         }))->willReturn([
             'count' => 1, [
                 "objectsid" => [
@@ -83,6 +85,7 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
             return $operation->getFilter() == '(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))'
                 && $operation->getAttributes() == ['objectSid'];
         }))->willReturn([ 'count' => 0]);
+        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
     }
 
     function it_is_initializable()

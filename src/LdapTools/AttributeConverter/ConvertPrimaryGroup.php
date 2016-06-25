@@ -14,6 +14,7 @@ use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Exception\EmptyResultException;
 use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Utilities\ConverterUtilitiesTrait;
 
 /**
  * Given the primaryGroupID (The RID), convert it to the readable group name or convert a group name back into its RID.
@@ -22,7 +23,7 @@ use LdapTools\Query\LdapQueryBuilder;
  */
 class ConvertPrimaryGroup implements AttributeConverterInterface
 {
-    use AttributeConverterTrait;
+    use AttributeConverterTrait, ConverterUtilitiesTrait;
 
     /**
      * {@inheritdoc}
@@ -37,8 +38,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
          * for all users in a domain or is very, very unlikely to ever change. Perhaps find a way to cache this or speed
          * it up?
          */
-        $query = new LdapQueryBuilder($this->getLdapConnection());
-        $userSid = $query->select('objectSid')->where(['distinguishedName' => $this->getDn()])->getLdapQuery()->getSingleScalarResult();
+        $userSid = $this->getCurrentLdapAttributeValue('objectSid');
         $groupSid = preg_replace('/\d+$/', $value, (new ConvertWindowsSid())->fromLdap($userSid));
 
         return (new LdapQueryBuilder($this->getLdapConnection()))
