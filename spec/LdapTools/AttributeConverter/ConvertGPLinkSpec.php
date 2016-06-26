@@ -131,7 +131,6 @@ class ConvertGPLinkSpec extends ObjectBehavior
         }))->willReturn($this->expectedCurrentValueResult);
 
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('ou=foo,dc=foo,dc=bar');

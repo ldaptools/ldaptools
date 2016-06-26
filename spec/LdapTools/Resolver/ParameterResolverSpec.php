@@ -157,6 +157,15 @@ class ParameterResolverSpec extends ObjectBehavior
 
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringResolve();
     }
+    
+    function it_should_check_if_a_value_has_parameters()
+    {
+        $this::hasParameters('ou=test,%foo%')->shouldBeEqualTo(true);
+        $this::hasParameters(['ou=test,%foo%', 'ou=test,dc=foo,dc=bar'])->shouldBeEqualTo(true);
+        
+        $this::hasParameters('ou=test,dc=foo,dc=bar')->shouldBeEqualTo(false);
+        $this::hasParameters(['foo', 'ou=test,dc=foo,dc=bar'])->shouldBeEqualTo(false);
+    }
 
     public function getMatchers()
     {

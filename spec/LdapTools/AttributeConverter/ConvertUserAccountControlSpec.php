@@ -75,7 +75,6 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $config->setBaseDn('dc=foo,dc=bar');
         $this->connection = $connection;
         $this->connection->getConfig()->willReturn($config);
-        $this->connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $options = [
             'uacMap' => [
                 'disabled' => '2',

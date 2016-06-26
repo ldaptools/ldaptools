@@ -85,7 +85,6 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
             return $operation->getFilter() == '(&(objectClass=group)(cn=Domain Users)(member=foo)(groupType:1.2.840.113556.1.4.803:=2147483648))'
                 && $operation->getAttributes() == ['objectSid'];
         }))->willReturn([ 'count' => 0]);
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
     }
 
     function it_is_initializable()

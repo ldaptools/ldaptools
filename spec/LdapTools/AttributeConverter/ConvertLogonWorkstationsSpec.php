@@ -59,7 +59,6 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
     }
 
     function it_is_initializable()

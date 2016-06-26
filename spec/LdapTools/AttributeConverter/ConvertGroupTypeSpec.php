@@ -57,7 +57,6 @@ class ConvertGroupTypeSpec extends ObjectBehavior
     function let($connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->connection = $connection;
         $options = [
             'defaultValue' => '-2147483646',

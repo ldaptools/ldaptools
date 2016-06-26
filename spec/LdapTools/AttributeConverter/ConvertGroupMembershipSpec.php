@@ -416,7 +416,6 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
      */
     function it_should_generate_operations_to_remove_all_current_groups_on_a_modify_reset_operation($connection, $operation)
     {
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $batch = new Batch(Batch::TYPE['REMOVE_ALL'], 'groups');
         $dn = 'cn=foo,dc=foo,dc=bar';
         $this->setOptions(['groups' => [
@@ -462,7 +461,6 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
      */
     function it_should_generate_operations_to_remove_all_current_groups_and_add_new_ones_on_a_modify_set_operation($connection, $operation)
     {
-        $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $group1 = 'cn=foo,dc=example,dc=local';
         $group2 = 'cn=bar,dc=example,dc=local';
         $batch = new Batch(Batch::TYPE['REPLACE'], 'groups', [$group1, $group2]);

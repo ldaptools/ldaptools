@@ -53,7 +53,6 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->setOptions($options);
         $this->setLdapConnection($connection);
-        $this->connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
         $this->setDn('cn=foo,dc=foo,dc=bar');
     }
 

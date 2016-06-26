@@ -72,6 +72,17 @@ class ParameterResolver
     }
 
     /**
+     * Check whether the value has any parameters in it.
+     * 
+     * @param array|string $value
+     * @return bool
+     */
+    public static function hasParameters($value)
+    {
+        return (bool) self::getParametersInValue($value);        
+    }
+
+    /**
      * Iterates over each requirement to resolve the parameters it contains.
      */
     protected function resolveAllParameters()
@@ -102,7 +113,7 @@ class ParameterResolver
         }
 
         $this->doResolveParametersForAttribute($attribute, $parameters);
-        $remainingParameters = $this->getParametersInValue($this->attributes[$attribute]);
+        $remainingParameters = self::getParametersInValue($this->attributes[$attribute]);
 
         // A second pass may be required for attributes it depended on that contained parameters not based on attributes
         if (!empty($remainingParameters)) {
@@ -178,7 +189,7 @@ class ParameterResolver
         foreach ($value as $attrValue) {
             $parameters = array_filter(array_merge(
                 $parameters,
-                $this->getParametersInValue($attrValue)
+                self::getParametersInValue($attrValue)
             ));
         }
 
@@ -193,7 +204,7 @@ class ParameterResolver
      * @param string|array $value
      * @return array
      */
-    protected function getParametersInValue($value)
+    protected static function getParametersInValue($value)
     {
         $parameters = [];
         $regex = '/'.self::PARAM_MARKER.'(.*?)'.self::PARAM_MARKER.'/';

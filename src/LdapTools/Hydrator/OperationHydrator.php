@@ -19,6 +19,7 @@ use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\BaseValueResolver;
+use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
@@ -125,7 +126,7 @@ class OperationHydrator extends ArrayHydrator
         }
 
         // Empty check instead of null due to the way the BaseDN is set for a RootDSE query...
-        if (!empty($operation->getBaseDn())) {
+        if (!empty($operation->getBaseDn()) && ParameterResolver::hasParameters($operation->getBaseDn())) {
             $this->setDefaultParameters();
             $operation->setBaseDn($this->resolveParameters(['baseDn' => $operation->getBaseDn()])['baseDn']);
         }
