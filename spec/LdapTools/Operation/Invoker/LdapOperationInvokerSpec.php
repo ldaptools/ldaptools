@@ -111,7 +111,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
 
         // Apparently this is the magic/undocumented way to say that calling this function will return X value on
         // the Nth attempt, where Nth is the argument number passed to willReturn(). *sigh* ... ridiculousness.
-        $this->connection->getServer()->willReturn('foo','foo','bar');
+        $this->connection->getServer()->willReturn('foo','foo', 'foo', 'bar');
 
         $this->addHandler($handler);
         $this->execute($operation);

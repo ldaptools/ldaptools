@@ -50,8 +50,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
 
         if (!$this->shouldSkipOperation($operation)) {
             $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_BEFORE, $operation, $this->connection));
-            $state = new ConnectionState($this->connection);
-            $result = $this->executeOperation($operation, $state, $this->getLogObject($operation));
+            $result = $this->executeOperation($operation, $this->getLogObject($operation));
         }
 
         foreach ($operation->getPostOperations() as $postOperation) {
@@ -65,15 +64,16 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      * Execute a given operation with an operation handler.
      *
      * @param LdapOperationInterface $operation
-     * @param ConnectionState $state
      * @param LogOperation|null $log
      * @return mixed
      * @throws \Throwable
      */
-    protected function executeOperation(LdapOperationInterface $operation,  ConnectionState $state, LogOperation $log = null)
+    protected function executeOperation(LdapOperationInterface $operation, LogOperation $log = null)
     {
+        $lastServer = $this->connection->getServer();
         try {
             $this->connectIfNotBound($operation);
+            $lastServer = $this->connection->getServer();
             $handler = $this->getOperationHandler($operation);
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
@@ -89,7 +89,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
         } finally {
             $this->logEnd($log);
             $this->resetLdapControls($operation);
-            $this->switchServerIfNeeded($this->connection->getServer(), $state->getLastServer(), $operation);
+            $this->switchServerIfNeeded($this->connection->getServer(), $lastServer, $operation);
             $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_AFTER, $operation, $this->connection));
         }
     }
