@@ -1,6 +1,19 @@
 CHANGELOG
 =========
 
+0.21.0 (2016-06-27)
+-------------------
+  * Add a utility class for encoding/decoding userParameters data in AD.
+  * Sanitize non-printable characters in operation data for the logging array.
+  * A lazy-bind/closed connection will now connect when operations are executed.
+  * Add an idle timeout reconnect option to reconnect to LDAP after a specified time.
+  * Fix the Value-to-DN converter for non-AD schemas.
+  * Rename the Exchange Retention Policy to Recipient policy (This is what it was always targeting).
+  * More areas throw AttributeConverterException where it makes sense.
+  * Parameters in the base DN are now only attempted to be resolved if any exist.
+  * Optimize the LDAP queries in some attribute converters.
+  * A few other bug fixes.
+
 0.20.0 (2016-05-10)
 -------------------
   * Add a schema type for searching for deleted LDAP objects (AD Recycle Bin support).
