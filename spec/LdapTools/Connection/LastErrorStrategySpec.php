@@ -24,4 +24,9 @@ class LastErrorStrategySpec extends ObjectBehavior
     {
         $this->shouldHaveType('LdapTools\Connection\LastErrorStrategy');
     }
+    
+    function it_should_get_a_diagnostic_message()
+    {
+        $this->getDiagnosticMessage()->shouldEqual(null);
+    }
 }

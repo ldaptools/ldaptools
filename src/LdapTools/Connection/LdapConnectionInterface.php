@@ -105,6 +105,13 @@ interface LdapConnectionInterface
     public function getExtendedErrorNumber();
 
     /**
+     * Get the full diagnostic message from the LDAP server for the last operation.
+     *
+     * @return string
+     */
+    public function getDiagnosticMessage();
+
+    /**
      * Set the LDAP control for the connection.
      *
      * @param LdapControl $control

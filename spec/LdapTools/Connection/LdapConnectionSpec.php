@@ -90,4 +90,9 @@ class LdapConnectionSpec extends ObjectBehavior
     {
         $this->getIdleTime()->shouldBeEqualTo(0);
     }
+
+    function it_should_get_a_diagnostic_message()
+    {
+        $this->getDiagnosticMessage()->shouldEqual(null);
+    }
 }

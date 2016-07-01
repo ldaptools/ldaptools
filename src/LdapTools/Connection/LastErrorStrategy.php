@@ -82,4 +82,16 @@ class LastErrorStrategy
     {
         return $this->getErrorNumber();
     }
+
+    /**
+     * Get the full diagnostic error message.
+     * 
+     * @return string
+     */
+    public function getDiagnosticMessage()
+    {
+        @ldap_get_option($this->connection, self::DIAGNOSTIC_MESSAGE_OPT, $message);
+        
+        return $message;
+    }
 }
