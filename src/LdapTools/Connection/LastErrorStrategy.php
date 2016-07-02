@@ -20,14 +20,14 @@ use LdapTools\Connection\AD\ADLastErrorStrategy;
 class LastErrorStrategy
 {
     /**
-     * This seems to be an undocumented LDAP_OPT_* constant value for retrieving diagnostic messages from LDAP.
-     */
-    const DIAGNOSTIC_MESSAGE_OPT = 0x0032;
-
-    /**
      * @var resource
      */
     protected $connection;
+
+    /**
+     * @var string
+     */
+    protected $diagnosticOpt = 'LDAP_OPT_ERROR_STRING';
 
     /**
      * @param resource $connection
@@ -35,6 +35,9 @@ class LastErrorStrategy
     public function __construct($connection)
     {
         $this->connection = $connection;
+        if (defined('LDAP_OPT_DIAGNOSTIC_MESSAGE')) {
+            $this->diagnosticOpt = 'LDAP_OPT_DIAGNOSTIC_MESSAGE';
+        }
     }
 
     /**
@@ -90,7 +93,7 @@ class LastErrorStrategy
      */
     public function getDiagnosticMessage()
     {
-        @ldap_get_option($this->connection, self::DIAGNOSTIC_MESSAGE_OPT, $message);
+        @ldap_get_option($this->connection, constant($this->diagnosticOpt)  ,$message);
         
         return $message;
     }
