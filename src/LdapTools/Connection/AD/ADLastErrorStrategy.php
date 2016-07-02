@@ -41,19 +41,11 @@ class ADLastErrorStrategy extends LastErrorStrategy
      */
     public function getExtendedErrorNumber()
     {
-        ldap_get_option($this->connection, self::DIAGNOSTIC_MESSAGE_OPT, $extendedError);
-
         $errorNumber = 0;
-        if (!empty($extendedError)) {
-            $errorNumber = explode(',', $extendedError);
-            if (!isset($errorNumber[2])) {
-                return 0;
-            };
-            $errorNumber = explode(' ', $errorNumber[2]);
-            if (!isset($errorNumber[2])) {
-                return 0;
-            };
-            $errorNumber = hexdec(intval($errorNumber[2]));
+        $extendedError = $this->getDiagnosticMessage();
+
+        if (!empty($extendedError) && preg_match('/, data (\d+),?/', $extendedError, $matches)) {
+            $errorNumber = hexdec(intval($matches[1]));
         }
 
         return $errorNumber;
