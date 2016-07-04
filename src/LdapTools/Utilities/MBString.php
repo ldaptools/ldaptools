@@ -19,6 +19,11 @@ namespace LdapTools\Utilities;
 class MBString
 {
     /**
+     * @var null|\Collator
+     */
+    protected static $collator;
+
+    /**
      * Get the integer value of a specific character.
      *
      * @param $string
@@ -63,6 +68,22 @@ class MBString
     }
 
     /**
+     * Performs a comparison between two values and returns an integer result, like strnatcmp.
+     *
+     * @param string $value1
+     * @param string $value2
+     * @return int
+     */
+    public static function compare($value1, $value2)
+    {
+        if (self::isIntlLoaded()) {
+            return self::getCollator()->compare($value1, $value2);
+        }
+        
+        return strnatcmp($value1, $value2);
+    }
+
+    /**
      * Simple check for the mbstring extension.
      * 
      * @return bool
@@ -70,5 +91,29 @@ class MBString
     protected static function isMbstringLoaded()
     {
         return extension_loaded('mbstring');
+    }
+
+    /**
+     * Simple check for the intl extension.
+     * 
+     * @return bool
+     */
+    protected static function isIntlLoaded()
+    {
+        return extension_loaded('intl');
+    }
+
+    /**
+     * Load and return a collator instance.
+     * 
+     * @return \Collator
+     */
+    protected static function getCollator()
+    {
+        if (!self::$collator) {
+            self::$collator = collator_create('root');
+        }
+        
+        return self::$collator;
     }
 }

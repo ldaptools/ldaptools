@@ -37,4 +37,15 @@ class MBStringSpec extends ObjectBehavior
         $this::str_split('foo')->shouldEqual(['f', 'o', 'o']);
         $this::str_split('bár')->shouldEqual(['b', 'á', 'r']);
     }
+    
+    function it_should_compare_two_strings_and_return_an_integer_value()
+    {
+        $this::compare('foo', 'bar')->shouldBeEqualTo(1);
+        $this::compare('bar', 'foo')->shouldBeEqualTo(-1);
+        $this::compare('foo', 'foo')->shouldBeEqualTo(0);
+
+        $this::compare('Böb', 'Ädam')->shouldBeEqualTo(1);
+        $this::compare('Ädam', 'Böb')->shouldBeEqualTo(-1);
+        $this::compare('Ädam', 'Ädam')->shouldBeEqualTo(0);
+    }
 }

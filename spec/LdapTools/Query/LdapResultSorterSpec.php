@@ -70,7 +70,25 @@ class LdapResultSorterSpec extends ObjectBehavior
             'name' => 'Environmental',
             'description' => 'Waste Disposal Specialists',
         ],
-    ];    
+    ];
+
+    protected $toSortUtf8 = [
+        [
+            'name' => 'Böb',
+        ],
+        [
+            'name' => 'Tim',
+        ],
+        [
+            'name' => 'Müller',
+        ],
+        [
+            'name' => 'Mike',
+        ],
+        [
+            'name' => 'Ädam',
+        ],
+    ];
 
     protected $orderBy = [
         'firstName' => 'ASC'
@@ -171,6 +189,33 @@ class LdapResultSorterSpec extends ObjectBehavior
         $this->sort(array_merge($this->toSort, $this->toSortGroups))->shouldHaveLastValue('lastName','Peterson');
         $this->sort($this->collection)->first()->get('name')->shouldBeEqualTo('Accounting');
         $this->sort($this->collection)->last()->get('lastName')->shouldBeEqualTo('Peterson');
+    }
+
+    function it_should_sort_UTF8_data()
+    {
+        $this->collection = new LdapObjectCollection();
+        foreach ($this->toSortUtf8 as $sort) {
+            $this->collection->add(new LdapObject($sort, 'user'));
+        }
+        $this->beConstructedWith(['name' => 'ASC']);
+        
+        $this->sort($this->toSortUtf8)->shouldEqual([
+            [
+                'name' => "Ädam",
+            ],
+            [
+                'name' => "Böb",
+            ],
+            [
+                'name' => "Mike",
+            ],
+            [
+                'name' => "Müller",
+            ],
+            [
+                'name' => "Tim",
+            ],
+        ]);
     }
 
     public function getMatchers()

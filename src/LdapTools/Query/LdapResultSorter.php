@@ -13,6 +13,7 @@ namespace LdapTools\Query;
 use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\MBString;
 
 /**
  * Sorts LDAP results by specified attributes and direction (ASC, DESC).
@@ -101,7 +102,7 @@ class LdapResultSorter
         } elseif (empty($compare[1]) && !empty($compare[0])) {
             return $direction == LdapQuery::ORDER['ASC'] ? -1 : 1;
         } else {
-            return strnatcmp(...$compare);
+            return MBString::compare(...$compare);
         }
     }
 

@@ -20,7 +20,9 @@
     },
     "suggest": {
         "tedivm/stash": "Provides the cache_type 'stash' to help increase performance.",
-        "doctrine/cache": "Provides the cache_type 'doctrine' to help increase performance."
+        "doctrine/cache": "Provides the cache_type 'doctrine' to help increase performance.",
+        "ext-mbstring": "Better UTF-8 handling.",
+        "ext-intl": "Better UTF-8 handling."
     },
     "require-dev": {
         "phpspec/phpspec": "~2.5",
