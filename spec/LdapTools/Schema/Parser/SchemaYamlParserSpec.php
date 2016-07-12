@@ -215,6 +215,15 @@ class SchemaYamlParserSpec extends ObjectBehavior
             ->shouldContain('name');
     }
 
+    function it_should_parse_a_schema_with_an_object_that_extends_a_schema_from_the_same_directory()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('extends', 'foo')
+            ->getRepository()
+            ->shouldBeEqualTo('\no\type');
+    }
+
     function it_should_parse_a_schema_objects_converter_options()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
