@@ -112,6 +112,7 @@ class OperationHydrator extends ArrayHydrator
         $this->setDefaultParameters();
         $operation->setAttributes(parent::hydrateToLdap($operation->getAttributes()));
         $this->setDnToUse($operation);
+        $operation->setAttributes($this->filterAttributeValues($operation->getAttributes()));
     }
 
     /**
@@ -209,5 +210,23 @@ class OperationHydrator extends ArrayHydrator
     {
         parent::configureValueResolver($valueResolver, $dn);
         $valueResolver->setOperation($this->operation);
+    }
+
+    /**
+     * Remove empty strings and null values from attribute value arrays. This prevents errors when saving to LDAP and
+     * these are present for some reason.
+     *
+     * @param array $attributes
+     * @return array
+     */
+    protected function filterAttributeValues(array $attributes)
+    {
+        return array_filter($attributes, function($value) {
+            if (is_array($value) && empty($value)) {
+                return false;
+            }
+
+            return !($value === '' || $value === null);
+        });
     }
 }
