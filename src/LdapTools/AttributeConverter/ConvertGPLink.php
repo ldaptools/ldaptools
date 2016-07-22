@@ -55,9 +55,13 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     public function fromLdap($gpLink)
     {
+        /**
+         * It's possible for the gpLink attribute to be a single space under some conditions, though it doesn't seem to
+         * be documented anywhere in MSDN. In this case we will return an empty array below.
+         */
         $gpLinks = $this->explodeGPOLinkString(is_array($gpLink) ? reset($gpLink) : $gpLink);
 
-        return $this->getValuesForAttribute($gpLinks, 'distinguishedName', 'displayname');
+        return empty($gpLinks) ? [] : $this->getValuesForAttribute($gpLinks, 'distinguishedName', 'displayname');
     }
 
     /**
@@ -116,9 +120,8 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     protected function explodeGPOLinkString($gpLink)
     {
-        preg_match_all('/(?:\[LDAP\:\/\/(.*?);\d\])/', $gpLink, $matches);
-        if (!isset($matches[1])) {
-            throw new AttributeConverterException(sprintf('Unable to parse gPLink value: %s', $gpLink));
+        if (!preg_match_all('/(?:\[LDAP\:\/\/(.*?);\d\])/', $gpLink, $matches) || !isset($matches[1])) {
+            return [];
         }
 
         return $matches[1];

@@ -152,6 +152,11 @@ class ConvertGPLinkSpec extends ObjectBehavior
         $this->fromLdap($this->gPLinks[0])->shouldBeEqualTo(['Foo']);
     }
 
+    function it_should_convert_an_empty_or_unparsable_gPLink_string_to_an_empty_array()
+    {
+        $this->fromLdap([''])->shouldBeEqualTo([]);
+    }
+
     function it_should_convert_an_array_of_GPO_names_to_a_bracket_encased_dn_string_form_for_ldap()
     {
         $this->connection->execute($this->expectedDNSearch)->willReturn($this->expectedDNResult);
