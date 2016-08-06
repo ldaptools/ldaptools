@@ -40,7 +40,7 @@ class GPOLink
     protected $gpo;
 
     /**
-     * @param string $gpo The GPO (name, DN, SID, or GUID)
+     * @param string|\LdapTools\Object\LdapObject $gpo The GPO (name, DN, SID, GUID, or LdapObject)
      * @param int $options The GPO options bit flags
      */
     public function __construct($gpo, $options = self::FLAGS['NOT_IGNORED_NOT_ENFORCED'])
@@ -52,7 +52,7 @@ class GPOLink
     /**
      * Set the GPO for the link.
      *
-     * @param string $gpo
+     * @param string|\LdapTools\Object\LdapObject $gpo
      * @return $this
      */
     public function setGpo($gpo)
@@ -65,7 +65,7 @@ class GPOLink
     /**
      * Get the GPO for the link.
      *
-     * @return string
+     * @return string|\LdapTools\Object\LdapObject
      */
     public function getGpo()
     {
@@ -160,6 +160,7 @@ class GPOLink
         if ($this->isOptionFlagSet($int) === $action) {
             return $this;
         }
+        $action = $int == self::FLAGS['IGNORED'] ? !$action : $action;
 
         if ($action) {
             $this->options = (int) $this->options | (int) $int;

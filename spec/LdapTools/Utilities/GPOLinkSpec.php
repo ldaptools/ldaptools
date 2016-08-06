@@ -64,6 +64,10 @@ class GPOLinkSpec extends ObjectBehavior
         $this->setIsEnabled(false)->shouldReturnAnInstanceOf('LdapTools\Utilities\GPOLink');
         $this->getIsEnabled()->shouldEqual(false);
         $this->getOptionsFlag()->shouldBeEqualTo(GPOLink::FLAGS['IGNORED']);
+
+        $this->setIsEnabled(true);
+        $this->getIsEnabled()->shouldEqual(true);
+        $this->getOptionsFlag()->shouldNotBeEqualTo(GPOLink::FLAGS['IGNORED']);
     }
 
     function it_should_set_and_get_whether_the_GPO_is_enforced()
