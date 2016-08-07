@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Utilities;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class MBStringSpec extends ObjectBehavior
 {
@@ -47,5 +46,11 @@ class MBStringSpec extends ObjectBehavior
         $this::compare('Böb', 'Ädam')->shouldBeEqualTo(1);
         $this::compare('Ädam', 'Böb')->shouldBeEqualTo(-1);
         $this::compare('Ädam', 'Ädam')->shouldBeEqualTo(0);
+    }
+
+    function it_should_make_a_string_lower_case()
+    {
+        $this::strtolower('Ädam')->shouldEqual('ädam');
+        $this::strtolower('FOO')->shouldEqual('foo');
     }
 }

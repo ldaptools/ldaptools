@@ -84,6 +84,21 @@ class MBString
     }
 
     /**
+     * Make a string lower case.
+     *
+     * @param string $value
+     * @return string
+     */
+    public static function strtolower($value)
+    {
+        if (self::isMbstringLoaded()) {
+            return mb_strtolower($value, 'UTF-8');
+        }
+
+        return strtolower($value);
+    }
+
+    /**
      * Simple check for the mbstring extension.
      * 
      * @return bool
