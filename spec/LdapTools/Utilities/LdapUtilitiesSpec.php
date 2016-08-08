@@ -109,6 +109,7 @@ class LdapUtilitiesSpec extends ObjectBehavior
     {
         $this->isValidAttributeFormat('1.2.840.113556.1.4.221')->shouldBeEqualTo(true);
 
+        $this->isValidAttributeFormat('l')->shouldBeEqualTo(true);
         $this->isValidAttributeFormat('foo-bar')->shouldBeEqualTo(true);
         $this->isValidAttributeFormat('foo1-bar')->shouldBeEqualTo(true);
         $this->isValidAttributeFormat('fooBar')->shouldBeEqualTo(true);
