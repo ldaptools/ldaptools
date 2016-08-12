@@ -83,6 +83,12 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->toLdap(['foo','bar'])->shouldBeEqualTo('foo,bar');
     }
 
+    function it_should_implode_the_values_immediately_for_a_search()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+        $this->toLdap(['foo', 'bar'])->shouldEqual('foo,bar');
+    }
+
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
     {
         $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
@@ -100,6 +106,14 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->toLdap(['foo'])->shouldBeEqualTo('bar,pc1');
         $this->setBatch(new Batch(Batch::TYPE['REPLACE'],'',['bar', 'foo', 'test']));
         $this->toLdap(['bar', 'foo', 'test'])->shouldBeEqualTo('bar,foo,test');
+    }
+
+    function it_should_not_attempt_to_modify_values_on_a_reset()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        $this->setBatch(new Batch(Batch::TYPE['REMOVE_ALL'],'logonWorkstations'));
+
+        $this->toLdap(null)->shouldBeEqualTo('');
     }
 
     function it_should_not_aggregate_values_on_a_search()

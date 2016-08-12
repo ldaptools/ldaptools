@@ -34,6 +34,11 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
      */
     public function toLdap($value)
     {
+        if ($this->getOperationType() == self::TYPE_MODIFY && $this->getBatch()->isTypeRemoveAll()) {
+            return '';
+        } elseif ($this->getOperationType() == self::TYPE_SEARCH_TO) {
+            return $this->implodeLoginList($value);
+        }
         $this->setDefaultLastValue('userWorkstations', '');
         $this->modifyWorkstations($value);
 
@@ -53,6 +58,14 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getShouldAggregateValues()
+    {
+        return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
+    }
+
+    /**
      * Modifies an array of generic address types.
      *
      * @param array $workstations
@@ -62,14 +75,15 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
         $values = array_filter(explode(',', $this->getLastValue())) ?: [];
         $values = $this->modifyMultivaluedAttribute($values, $workstations);
 
-        $this->setLastValue(implode(',', array_filter($values)));
+        $this->setLastValue($this->implodeLoginList($values));
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $values
+     * @return string
      */
-    public function getShouldAggregateValues()
+    protected function implodeLoginList(array $values)
     {
-        return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
+        return implode(',', array_filter($values));
     }
 }
