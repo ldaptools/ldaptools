@@ -94,4 +94,10 @@ class OperatorValueResolverSpec extends ObjectBehavior
         $this->collection->add($this->filter->eq('user.disabled', false));
         $this->toLdap()->toLdapFilter()->shouldEqual('(|(&(&(objectCategory=person)(objectClass=user))(!(userAccountControl:1.2.840.113556.1.4.803:=2)))(&(objectClass=organizationalUnit)))');
     }
+
+    function it_should_properly_convert_values_when_using_a_multivalued_converter()
+    {
+        $this->collection->add($this->filter->contains('user.logonWorkstations', ['foo', 'bar']));
+        $this->toLdap()->toLdapFilter()->shouldEqual('(|(&(&(objectCategory=person)(objectClass=user))(userWorkstations=*foo,bar*))(&(objectClass=organizationalUnit)))');
+    }
 }
