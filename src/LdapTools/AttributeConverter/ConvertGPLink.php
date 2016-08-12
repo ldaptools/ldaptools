@@ -12,12 +12,14 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\Exception\AttributeConverterException;
-use LdapTools\Factory\HydratorFactory;
+use LdapTools\Object\LdapObject;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Query\LdapQueryBuilder;
+use LdapTools\Utilities\GPOLink;
+use LdapTools\Utilities\MBString;
 
 /**
- * Converts a gPLink attribute to an array of GPO human-readable names, and back again for LDAP.
+ * Converts a gPLink attribute to an array of GPOLink objects, and back again for LDAP.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
@@ -26,9 +28,9 @@ class ConvertGPLink implements AttributeConverterInterface
     use AttributeConverterTrait, ConverterUtilitiesTrait;
 
     /**
-     * @var null|array The GPO names to go to LDAP are stored here, as the last value must be a conversion of this.
+     * @var null|GPOLink[] The GPOLinks to go to LDAP are stored here, as the last value must be a conversion of this.
      */
-    protected $gpoNames = null;
+    protected $gpoLinks = null;
 
     public function __construct()
     {
@@ -40,14 +42,18 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     public function toLdap($gpoLinks)
     {
-        $this->setDefaultLastValue('gPLink', '');
-        $this->modifyGPOLinks($gpoLinks);
-
-        if ($this->getOperationType() == self::TYPE_MODIFY) {
-            $this->getBatch()->setModType(Batch::TYPE['REPLACE']);
+        // Let a 'reset' type pass through untouched...
+        if ($this->getOperationType() == self::TYPE_MODIFY && $this->getBatch()->isTypeRemoveAll()) {
+            $gpoString =  '';
+        // On a search we just translate the objects to a string link...
+        } elseif ($this->getOperationType() == self::TYPE_SEARCH_TO) {
+            $this->validateGPOLinks($gpoLinks);
+            $gpoString = $this->implodeGPOLinks($gpoLinks);
+        } else {
+            $gpoString = $this->createOrModifyGPOLinks($gpoLinks);
         }
 
-        return $this->getLastValue();
+        return $gpoString;
     }
 
     /**
@@ -55,13 +61,9 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     public function fromLdap($gpLink)
     {
-        /**
-         * It's possible for the gpLink attribute to be a single space under some conditions, though it doesn't seem to
-         * be documented anywhere in MSDN. In this case we will return an empty array below.
-         */
-        $gpLinks = $this->explodeGPOLinkString(is_array($gpLink) ? reset($gpLink) : $gpLink);
+        $gpoInfo = $this->explodeGPOLinkString(is_array($gpLink) ? reset($gpLink) : $gpLink);
 
-        return empty($gpLinks) ? [] : $this->getValuesForAttribute($gpLinks, 'distinguishedName', 'displayname');
+        return empty($gpoInfo) ? [] : $this->getGPOLinkArray($gpoInfo);
     }
 
     /**
@@ -70,6 +72,69 @@ class ConvertGPLink implements AttributeConverterInterface
     public function getShouldAggregateValues()
     {
         return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
+    }
+
+    /**
+     * @param array $gpoLinks
+     * @return string
+     */
+    protected function createOrModifyGPOLinks(array $gpoLinks)
+    {
+        $this->setDefaultLastValue('gPLink', '');
+        $this->modifyGPOLinks($gpoLinks);
+        if ($this->getOperationType() == self::TYPE_MODIFY) {
+            $this->getBatch()->setModType(Batch::TYPE['REPLACE']);
+        }
+
+        /**
+         * If all GPO links are removed on modification, the value should be a single space. This is what AD actually
+         * does anyway, not sure why it doesn't just unset the attribute value.
+         */
+        return $this->getLastValue() === '' && $this->getBatch() ? ' ' : $this->getLastValue();
+    }
+
+    /**
+     * Modify the current GPO links based on value modifications requested.
+     *
+     * @param array $GPOs
+     */
+    protected function modifyGPOLinks(array $GPOs)
+    {
+        if (is_null($this->gpoLinks) && $this->getOperationType() != self::TYPE_CREATE) {
+            $this->gpoLinks = $this->fromLdap($this->getLastValue());
+        } elseif (is_null($this->gpoLinks)) {
+            $this->gpoLinks = [];
+        }
+        $this->validateGPOLinks($GPOs);
+        $this->gpoLinks = $this->modifyMultivaluedAttribute($this->gpoLinks, $GPOs);
+        $this->setLastValue($this->implodeGPOLinks($this->gpoLinks));
+    }
+
+    /**
+     * @param array $gpoInfo
+     * @return GPOLink[]
+     */
+    protected function getGPOLinkArray(array $gpoInfo)
+    {
+        $GPOs = $this->getValuesForAttribute(array_keys($gpoInfo), 'distinguishedName', ['displayname', 'objectGuid']);
+        $gpoLinks = [];
+
+        // Doing one at a time to keep the order of the GPOs...
+        foreach ($gpoInfo as $dn => $options) {
+            foreach ($GPOs as $GPO) {
+                if (MBString::strtolower($GPO->get('dn')) == MBString::strtolower($dn)) {
+                    $attributes = [
+                        'dn' => $GPO->get('dn'),
+                        'guid' => (new ConvertWindowsGuid())->fromLdap($GPO->get('objectGuid')),
+                        'name' => $GPO->get('displayname'),
+                    ];
+                    $gpoLinks[] = new GPOLink(new LdapObject($attributes), $options, $dn);
+                    break;
+                }
+            }
+        }
+
+        return $gpoLinks;
     }
 
     /**
@@ -90,25 +155,7 @@ class ConvertGPLink implements AttributeConverterInterface
         }
         $query->select($toSelect)->where($or);
 
-        return array_column($query->getLdapQuery()->execute(HydratorFactory::TO_ARRAY), $toSelect);
-    }
-
-    /**
-     * Modify the current GPO links based on value modifications requested.
-     *
-     * @param array $GPOs
-     */
-    protected function modifyGPOLinks(array $GPOs)
-    {
-        if (is_null($this->gpoNames) && $this->getOperationType() != self::TYPE_CREATE) {
-            $this->gpoNames = $this->fromLdap($this->getLastValue());
-        } elseif (is_null($this->gpoNames)) {
-            $this->gpoNames = [];
-        }
-        $this->gpoNames = $this->modifyMultivaluedAttribute($this->gpoNames, $GPOs);
-
-        // Unfortunately this will make round-trips to LDAP on each aggregate. How to avoid this?
-        $this->setLastValue($this->implodeGPOLinks($this->gpoNames));
+        return $query->getLdapQuery()->getResult();
     }
 
     /**
@@ -120,28 +167,110 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     protected function explodeGPOLinkString($gpLink)
     {
-        if (!preg_match_all('/(?:\[LDAP\:\/\/(.*?);\d\])/', $gpLink, $matches) || !isset($matches[1])) {
+        /**
+         * It's possible for the gpLink attribute to be a single space under some conditions, though it doesn't seem to
+         * be documented anywhere in MSDN. In this case we will return an empty array below.
+         */
+        if (!preg_match_all('/(?:\[LDAP\:\/\/(.*?);(\d)\])/', $gpLink, $matches) || !isset($matches[1])) {
             return [];
         }
 
-        return $matches[1];
+        // GPO link data is stored in reverse order in the string, hence the array_reverse
+        return array_combine(array_reverse($matches[1]), array_reverse($matches[2]));
     }
 
     /**
-     * Given an array of GPO names, transform them back into a single GPO link string.
+     * Given an array of GPOLink objects, transform them back into a single gpLink string.
      *
-     * @param array $gpoLinks
+     * @param GPOLink[] $gpoLinks
      * @return string
      */
     protected function implodeGPOLinks(array $gpoLinks)
     {
-        $distinguishedNames = $this->getValuesForAttribute($gpoLinks, 'displayName', 'distinguishedname');
+        // The GPO link string stores the order in reverse, so we need to reverse it when going back to LDAP...
+        $gpoLinks = array_reverse($gpoLinks);
 
         $gpoLink = '';
-        foreach ($distinguishedNames as $dn) {
-            $gpoLink .= '[LDAP://'.$dn.';0]';
+        /** @var GPOLink $gpo */
+        foreach ($gpoLinks as $gpo) {
+            $dn = $this->getGPOLinkDN($gpo);
+            $gpoLink .= '[LDAP://'.$dn.';'.$gpo->getOptionsFlag().']';
         }
 
         return $gpoLink;
+    }
+
+    /**
+     * @param array $GPOs
+     * @throws AttributeConverterException
+     */
+    protected function validateGPOLinks(array $GPOs)
+    {
+        foreach ($GPOs as $GPO) {
+            if (!$GPO instanceof GPOLink) {
+                throw new AttributeConverterException('GPO links going to LDAP must be an instance of \LdapTools\Utilities\GPOLink');
+            }
+        }
+    }
+
+    /**
+     * Modifies a multivalued attribute array based off the original values, the new values, and the modification type.
+     *
+     * @param array $values
+     * @param array $newValues
+     * @return array
+     */
+    protected function modifyMultivaluedAttribute(array $values, array $newValues)
+    {
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_CREATE || ($this->getBatch() && $this->getBatch()->isTypeAdd())) {
+            $values = array_merge($values, $newValues);
+        } elseif ($this->getBatch() && $this->getBatch()->isTypeReplace()) {
+            $values = $newValues;
+        } elseif ($this->getBatch() && $this->getBatch()->isTypeRemove()) {
+            $values = $this->removeGPOLinksFromArray($values, $newValues);
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param GPOLink[] $values
+     * @param GPOLink[] $toRemove
+     * @return GPOLink[]
+     */
+    protected function removeGPOLinksFromArray(array $values, array $toRemove)
+    {
+        foreach ($toRemove as $value) {
+            $dn = $this->getGPOLinkDN($value);
+            foreach ($values as $index => $originalValue) {
+                if (MBString::strtolower($originalValue->getGpo()->get('dn')) == MBString::strtolower($dn)) {
+                    unset($values[$index]);
+                    break;
+                }
+            }
+        }
+
+        return $values;
+    }
+
+    /**
+     * @param GPOLink $gpoLink
+     * @return string
+     */
+    protected function getGPOLinkDN(GPOLink $gpoLink)
+    {
+        $toDn = new ConvertValueToDn();
+        $toDn->setAttribute('gpoLink');
+        $toDn->setLdapConnection($this->connection);
+        $toDn->setOptions([
+            'gpoLink' => [
+                'attribute' => 'displayName',
+                'filter' => [
+                    'objectClass' => 'groupPolicyContainer'
+                ]
+            ]
+        ]);
+
+        return $toDn->toLdap($gpoLink->getGpo());
     }
 }

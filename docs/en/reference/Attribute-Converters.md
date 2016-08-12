@@ -86,9 +86,9 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `fromLdap`: Depending on the attribute, does a bitwise conversion to set a specific type as true or false.
 
 #### *gpo_link*
-  * `toLdap`: Takes an array of GPO names, retrieves their DNs, and returns a valid string for the gPLink attribute.
+  * `toLdap`: Takes an array of `\LdapTools\Utilities\GPOLink` objects to resolve GPOs by name/GUID/DN/LdapObject, and returns a valid string for the gPLink attribute.
 
-  * `fromLdap`: Takes a gPLink attribute string, splits it into the distinct GPOs, and returns an array of GPO names.
+  * `fromLdap`: Takes a gPLink attribute string, splits it into the distinct GPOs, and returns an array of `\LdapTools\Utilities\GPOLink` objects.
 
 #### *value_to_dn*
   * `toLdap`: Takes an objects GUID, SID, DN, or name and returns the full distinguished name after validating it exists.

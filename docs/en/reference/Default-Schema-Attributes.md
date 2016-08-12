@@ -219,7 +219,7 @@ These are typical LDAP OU objects.
 | created | whenCreated | `\DateTime` | When date the OU was created |
 | description | description | string | The description of the OU |
 | dn | dn | string | The full distinguished name of the OU |
-| gpoLinks | gPLink | array | All of the GPO names linked to this OU |
+| gpoLinks | gPLink | GPOLink[] | All of the GPOs linked to this OU |
 | gpoInheritanceBlocked | gpOptions | bool | Whether or not GPO inheritance is blocked for this OU |
 | guid | objectGuid | string | The OU's GUID |
 | modified | whenModified | `\DateTime` | The date the OU was last modified |
