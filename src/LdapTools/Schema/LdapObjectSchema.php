@@ -14,6 +14,7 @@ use LdapTools\Cache\CacheableItemInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Query\Operator\BaseOperator;
+use LdapTools\Utilities\MBString;
 
 /**
  * Describes the attributes for a LDAP object from a schema definition.
@@ -206,7 +207,7 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function hasConverter($attributeName)
     {
-        return array_key_exists(strtolower($attributeName), array_change_key_case($this->converterMap));
+        return array_key_exists(MBString::strtolower($attributeName), MBString::array_change_key_case($this->converterMap));
     }
 
     /**
@@ -221,7 +222,7 @@ class LdapObjectSchema implements CacheableItemInterface
             throw new InvalidArgumentException(sprintf('No converter exists for attribute "%s".', $attributeName));
         }
 
-        return array_change_key_case($this->converterMap)[strtolower($attributeName)];
+        return MBString::array_change_key_case($this->converterMap)[MBString::strtolower($attributeName)];
     }
 
     /**
@@ -292,7 +293,7 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function hasAttribute($attribute)
     {
-        return array_key_exists(strtolower($attribute), array_change_key_case($this->attributeMap));
+        return array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($this->attributeMap));
     }
 
     /**
@@ -303,7 +304,9 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function hasNamesMappedToAttribute($attribute)
     {
-        return (bool) array_search(strtolower($attribute), array_map('strtolower', $this->attributeMap));
+        return (bool) array_search(MBString::strtolower($attribute), array_map(function($value) {
+            return MBString::strtolower($value);
+        }, $this->attributeMap));
     }
 
     /**
@@ -315,7 +318,9 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function getNamesMappedToAttribute($attribute)
     {
-        return array_keys(array_map('strtolower', $this->attributeMap), strtolower($attribute));
+        return array_keys(array_map(function($value) {
+            return MBString::strtolower($value);
+        }, $this->attributeMap), MBString::strtolower($attribute));
     }
 
     /**
@@ -327,7 +332,7 @@ class LdapObjectSchema implements CacheableItemInterface
     public function getAttributeToLdap($attribute)
     {
         return $this->hasAttribute($attribute) ?
-            array_change_key_case($this->attributeMap)[strtolower($attribute)] : $attribute;
+            MBString::array_change_key_case($this->attributeMap)[MBString::strtolower($attribute)] : $attribute;
     }
 
     /**
@@ -498,7 +503,9 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function isMultivaluedAttribute($attribute)
     {
-        return in_array(strtolower($attribute), array_map('strtolower', $this->multivaluedAttributes));
+        return in_array(MBString::strtolower($attribute), array_map(function($value) {
+            return MBString::strtolower($value);
+        }, $this->multivaluedAttributes));
     }
 
     /**
