@@ -133,7 +133,7 @@ class LdapServerPool
      */
     protected function isServerAvailable($server)
     {
-        $result = $this->tcp->connect($server, $this->config->getPort());
+        $result = $this->tcp->connect($server, $this->config->getPort(), $this->config->getConnectTimeout());
         if ($result) {
             $this->tcp->close();
         }

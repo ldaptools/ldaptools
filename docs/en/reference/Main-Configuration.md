@@ -310,3 +310,17 @@ domains:
 ```
 
 **Default**: `600` (10 minutes)
+
+-------------------------------
+#### connect_timeout
+
+The elapsed time (in seconds) to attempt the initial connection to the LDAP server. If a connection cannot be established
+within this time the server will be considered unreachable/down.
+
+```yaml
+domains:
+    example:
+        connect_timeout: 5
+```
+
+**Default**: `1`

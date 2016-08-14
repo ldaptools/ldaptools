@@ -57,7 +57,8 @@ class DomainConfiguration
         'encoding' => 'encoding',
         'bind_format' => 'bindFormat',
         'ldap_options' => 'ldapOptions',
-        'idle_reconnect' => 'idleReconnect'
+        'idle_reconnect' => 'idleReconnect',
+        'connect_timeout' => 'connectTimeout',
     ];
 
     /**
@@ -95,6 +96,7 @@ class DomainConfiguration
             LDAP_OPT_REFERRALS => 0,
         ],
         'idleReconnect' => 600,
+        'connectTimeout' => 1,
     ];
 
     /**
@@ -565,6 +567,31 @@ class DomainConfiguration
     public function getIdleReconnect()
     {
         return $this->config['idleReconnect'];
+    }
+
+    /**
+     * Set the initial connection timeout value (seconds). This is how long it will wait when making the initial
+     * connection attempt to the LDAP server before it considers it unreachable/down.
+     *
+     * @param int
+     * @return $this
+     */
+    public function setConnectTimeout($seconds)
+    {
+        $this->config['connectTimeout'] = $this->validateInteger($seconds, "connect timeout");
+
+        return $this;
+    }
+
+    /**
+     * Get the initial connection timeout value (seconds). This is how long it will wait when making the initial
+     * connection attempt to the LDAP server before it considers it unreachable/down.
+     *
+     * @return int
+     */
+    public function getConnectTimeout()
+    {
+        return $this->config['connectTimeout'];
     }
 
     /**

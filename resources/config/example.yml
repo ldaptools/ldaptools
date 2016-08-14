@@ -68,6 +68,9 @@ domains:
         # Optional: The elapsed time a connection can be idle before it is closed and reconnected. Default: 600. To
         #   To disable this altogether set it to 0.
         idle_reconnect: 600
+        # Optional: The elapsed time (in seconds) to attempt the initial connection to the LDAP server. If it cannot
+        #   establish a connection within this time it will consider the server unreachable/down. Default: 1
+        connect_timeout: 5
     # Any number of additional domains can be added.
     test:
         domain_name: "test.local"

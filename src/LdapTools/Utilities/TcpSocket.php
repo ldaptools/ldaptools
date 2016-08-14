@@ -27,11 +27,12 @@ class TcpSocket
      *
      * @param string $host
      * @param int $port
+     * @param int $timeout
      * @return bool
      */
-    public function connect($host, $port)
+    public function connect($host, $port, $timeout = 1)
     {
-        $this->socket = @fsockopen($host, $port, $errorNumber, $errorMessage, 1);
+        $this->socket = @fsockopen($host, $port, $errorNumber, $errorMessage, $timeout);
 
         return (bool) $this->socket;
     }

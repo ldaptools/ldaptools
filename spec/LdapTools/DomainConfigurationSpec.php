@@ -209,6 +209,13 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getIdleReconnect()->shouldBeEqualTo(0);
     }
 
+    function it_should_set_the_connect_timeout_time()
+    {
+        $this->getConnectTimeout()->shouldBeEqualTo(1);
+        $this->setConnectTimeout(5);
+        $this->getConnectTimeout()->shouldBeEqualTo(5);
+    }
+
     function it_should_return_self_when_calling_the_setters()
     {
         $this->setUsePaging(true)->shouldReturnAnInstanceOf('\LdapTools\DomainConfiguration');

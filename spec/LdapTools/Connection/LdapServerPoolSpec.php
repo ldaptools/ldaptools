@@ -13,9 +13,7 @@ namespace spec\LdapTools\Connection;
 use LdapTools\Connection\LdapServerPool;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\LdapConnectionException;
-use PhpSpec\Exception\Example\SkippingException;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapServerPoolSpec extends ObjectBehavior
 {
@@ -81,7 +79,7 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_throw_an_exception_when_no_servers_are_available($tcp)
     {
-        $tcp->connect('foo', 389)->willReturn(false);
+        $tcp->connect('foo', 389, 1)->shouldBeCalled()->willReturn(false);
         $config = new DomainConfiguration('example.com');
         $config->setServers(['foo']);
         $this->beConstructedWith($config, $tcp);
@@ -95,8 +93,10 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_lookup_servers_via_dns_if_no_servers_are_defined($tcp, $dns)
     {
-        $tcp->connect('foo.example.com', 389)->willReturn(false);
-        $tcp->connect('bar.example.com', 389)->willReturn(true);
+        $tcp->connect('bar.example.com', 389, 1)->shouldBeCalled()->willReturn(false);
+        $tcp->connect('test.example.com', 389, 1)->shouldBeCalled()->willReturn(false);
+        $tcp->connect('foo.example.com', 389, 1)->shouldBeCalled()->willReturn(true);
+
         $tcp->close()->willReturn(null);
         $srvRecords = [
             [
@@ -135,7 +135,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $config = new DomainConfiguration('example.com');
         $this->beConstructedWith($config, $tcp, $dns);
 
-        $this->getServer()->shouldBeEqualTo('bar.example.com');
+        $this->getServer()->shouldBeEqualTo('foo.example.com');
     }
 
     /**
@@ -157,18 +157,26 @@ class LdapServerPoolSpec extends ObjectBehavior
      */
     function it_should_adjust_the_port_if_it_changes_in_the_domain_config($tcp)
     {
-        $tcp->connect('foo', 389)->willReturn(true);
+        $tcp->connect('foo', 389, 1)->shouldBeCalled()->willReturn(true);
         $tcp->close()->shouldBeCalled();
         $config = new DomainConfiguration('example.com');
         $config->setServers(['foo']);
         $this->beConstructedWith($config, $tcp);
 
-
         $this->getServer()->shouldReturn('foo');
         $config->setPort(9001);
 
-        $tcp->connect('foo', 9001)->shouldBeCalled();
-        $tcp->connect('foo', 9001)->willReturn(true);
+        $tcp->connect('foo', 9001, 1)->shouldBeCalled()->willReturn(true);
+
+        $this->getServer()->shouldReturn('foo');
+    }
+
+    function it_should_use_the_connect_timeout_value_from_the_config(\LdapTools\Utilities\TcpSocket $tcp)
+    {
+        $tcp->connect('foo', 389, 5)->shouldBeCalled()->willReturn(true);
+        $tcp->close()->shouldBeCalled();
+        $config = (new DomainConfiguration('example.com'))->setConnectTimeout(5)->setServers(['foo']);
+        $this->beConstructedWith($config, $tcp);
 
         $this->getServer()->shouldReturn('foo');
     }
