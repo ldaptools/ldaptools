@@ -113,6 +113,11 @@ class LdapResultSorterSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Query\LdapResultSorter');
     }
 
+    function it_should_be_set_to_case_insensitive_by_default()
+    {
+        $this->getIsCaseSensitive()->shouldBeEqualTo(false);
+    }
+
     function it_should_sort_an_array_of_results_ascending_by_first_name()
     {
         $this->sort($this->toSort)->shouldHaveFirstValue('firstName','Amy');
@@ -208,6 +213,87 @@ class LdapResultSorterSpec extends ObjectBehavior
             ],
             [
                 'name' => "Mike",
+            ],
+            [
+                'name' => "Müller",
+            ],
+            [
+                'name' => "Tim",
+            ],
+        ]);
+    }
+
+    function it_should_sort_case_insensitive_by_default()
+    {
+        $results = $this->toSortUtf8;
+        array_push($results, ['name' => 'mike']);
+        array_unshift($results, ['name' => 'mIkE']);
+        array_push($results, ['name' => 'MikE']);
+        $this->collection = new LdapObjectCollection();
+        foreach ($results as $sort) {
+            $this->collection->add(new LdapObject($sort, 'user'));
+        }
+        $this->beConstructedWith(['name' => 'ASC']);
+
+        $this->sort($results, true)->shouldBeEqualTo([
+            [
+                'name' => "Ädam",
+            ],
+            [
+                'name' => "Böb",
+            ],
+            [
+                'name' => "mIkE",
+            ],
+            [
+                'name' => "Mike",
+            ],
+            [
+                'name' => "mike",
+            ],
+            [
+                'name' => "MikE",
+            ],
+            [
+                'name' => "Müller",
+            ],
+            [
+                'name' => "Tim",
+            ],
+        ]);
+    }
+
+    function it_should_sort_case_sensitive_if_specified()
+    {
+        $results = $this->toSortUtf8;
+        array_push($results, ['name' => 'mike']);
+        array_unshift($results, ['name' => 'mIkE']);
+        array_push($results, ['name' => 'MikE']);
+        $this->collection = new LdapObjectCollection();
+        foreach ($results as $sort) {
+            $this->collection->add(new LdapObject($sort, 'user'));
+        }
+        $this->beConstructedWith(['name' => 'ASC']);
+
+        $this->setIsCaseSensitive(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapResultSorter');
+        $this->sort($results)->shouldBeEqualTo([
+            [
+                'name' => "Ädam",
+            ],
+            [
+                'name' => "Böb",
+            ],
+            [
+                'name' => "mike",
+            ],
+            [
+                'name' => "mIkE",
+            ],
+            [
+                'name' => "Mike",
+            ],
+            [
+                'name' => "MikE",
             ],
             [
                 'name' => "Müller",

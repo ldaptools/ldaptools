@@ -33,6 +33,11 @@ class LdapResultSorter
     protected $aliases = [];
 
     /**
+     * @var bool
+     */
+    protected $caseSensitive = false;
+
+    /**
      * @param array $orderBy
      * @param \LdapTools\Schema\LdapObjectSchema[] $aliases The aliases used, if any (in the form of ['alias' => LdapObjectSchema])
      */
@@ -40,6 +45,29 @@ class LdapResultSorter
     {
         $this->orderBy = $orderBy;
         $this->aliases = $aliases;
+    }
+
+    /**
+     * Set whether or not the results will be sorted case-sensitive.
+     *
+     * @param bool $caseSensitive
+     * @return $this
+     */
+    public function setIsCaseSensitive($caseSensitive)
+    {
+        $this->caseSensitive = (bool) $caseSensitive;
+
+        return $this;
+    }
+
+    /**
+     * Get whether or not the results will be sorted case-sensitive.
+     *
+     * @return bool
+     */
+    public function getIsCaseSensitive()
+    {
+        return $this->caseSensitive;
     }
 
     /**
@@ -102,8 +130,25 @@ class LdapResultSorter
         } elseif (empty($compare[1]) && !empty($compare[0])) {
             return $direction == LdapQuery::ORDER['ASC'] ? -1 : 1;
         } else {
-            return MBString::compare(...$compare);
+            return $this->compare(...$compare);
         }
+    }
+
+    /**
+     * Taking into account case-sensitivity compare the 2 string values.
+     *
+     * @param string $value1
+     * @param string $value2
+     * @return int
+     */
+    protected function compare($value1, $value2)
+    {
+        if (!$this->caseSensitive) {
+            $value1 = MBString::strtolower($value1);
+            $value2 = MBString::strtolower($value2);
+        }
+
+        return MBString::compare($value1, $value2);
     }
 
     /**

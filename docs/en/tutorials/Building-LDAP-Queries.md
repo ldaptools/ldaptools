@@ -286,7 +286,21 @@ overwrites any already set orderBy statements. To stack multiple order statement
 // Order results by last name (ascending).
 $users = $lqb->fromUsers()
     ->where(['firstName' => 'John'])
-    ->orderBy('lastName') 
+    ->orderBy('lastName')
+    ->getLdapQuery()
+    ->getResult();
+```
+
+By default the results are ordered in a case-insensitive manner. The order results using a case-sensitive manner use the
+`setIsCaseSensitiveSort()` method of the `LdapQuery` class:
+
+```php
+// Order results in a case-sensitive manner.
+$users = $lqb->fromUsers()
+    ->where(['firstName' => 'John'])
+    ->orderBy('lastName')
+    ->getLdapQuery()
+    ->setIsCaseSensitiveSort(true)
     ->getResult();
 ```
 

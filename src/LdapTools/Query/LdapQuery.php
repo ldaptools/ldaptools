@@ -67,6 +67,11 @@ class LdapQuery
     protected $orderBy = [];
 
     /**
+     * @var bool
+     */
+    protected $caseSensitive = false;
+
+    /**
      * @param LdapConnectionInterface $ldap
      */
     public function __construct(LdapConnectionInterface $ldap)
@@ -258,6 +263,29 @@ class LdapQuery
     }
 
     /**
+     * Set whether or not the results should be sorted in a case-sensitive way.
+     *
+     * @param bool $caseSensitive
+     * @return $this
+     */
+    public function setIsCaseSensitiveSort($caseSensitive)
+    {
+        $this->caseSensitive = (bool) $caseSensitive;
+
+        return $this;
+    }
+
+    /**
+     * Get whether or not the results should be sorted in a case-sensitive way.
+     *
+     * @return bool
+     */
+    public function getIsCaseSensitiveSort()
+    {
+        return $this->caseSensitive;
+    }
+
+    /**
      * @param mixed $results
      * @return mixed $results
      */
@@ -273,7 +301,9 @@ class LdapQuery
         $selected = $this->getSelectedForAllAliases($aliases);
         $orderBy = $this->getFormattedOrderBy($selected, $aliases);
 
-        return (new LdapResultSorter($orderBy, $aliases))->sort($results);
+        return (new LdapResultSorter($orderBy, $aliases))
+            ->setIsCaseSensitive($this->caseSensitive)
+            ->sort($results);
     }
 
     /**

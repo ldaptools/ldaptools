@@ -778,7 +778,29 @@ class LdapQuerySpec extends ObjectBehavior
 
         $this->getResult();
     }
-    
+
+    function it_should_sort_case_insensitive_by_default()
+    {
+        $this->getIsCaseSensitiveSort()->shouldBeEqualTo(false);
+    }
+
+    function it_should_sort_case_sensitive_if_specified()
+    {
+        $this->setIsCaseSensitiveSort(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapQuery');
+        $this->operation->setAttributes(['givenName', 'sn', 'whenCreated']);
+        $this->setOrderBy(['givenName' => 'ASC']);
+
+        $entries = $this->sortEntries;
+        $entries[1]['givenname'][0] = 'archie';
+        $this->ldap->execute(Argument::that(function($op) {
+            return $op->getAttributes() == ['givenName', 'sn', 'whenCreated'];
+        }))->willReturn($entries);
+
+        $this->getResult()->shouldHaveFirstValue('givenName', 'archie');
+        $this->setOrderBy(['givenName' => 'DESC']);
+        $this->getResult()->shouldHaveFirstValue('givenName', 'Archie');
+    }
+
     public function getMatchers()
     {
         return [
