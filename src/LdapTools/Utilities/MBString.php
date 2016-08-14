@@ -119,11 +119,6 @@ class MBString
         }
     }
 
-    public static function foo($values)
-    {
-        return $values;
-    }
-
     /**
      * Simple check for the mbstring extension.
      * 
