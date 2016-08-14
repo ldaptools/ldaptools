@@ -99,6 +99,32 @@ class MBString
     }
 
     /**
+     * Change the keys in an array to their lower-case values.
+     *
+     * @param array $values
+     * @return array
+     */
+    public static function array_change_key_case(array $values)
+    {
+        if (self::isMbstringLoaded()) {
+            $newValues = [];
+
+            foreach ($values as $key => $value) {
+                $newValues[self::strtolower($key)] = $value;
+            }
+
+            return $newValues;
+        } else {
+            return array_change_key_case($values);
+        }
+    }
+
+    public static function foo($values)
+    {
+        return $values;
+    }
+
+    /**
      * Simple check for the mbstring extension.
      * 
      * @return bool

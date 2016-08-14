@@ -53,4 +53,11 @@ class MBStringSpec extends ObjectBehavior
         $this::strtolower('Ädam')->shouldEqual('ädam');
         $this::strtolower('FOO')->shouldEqual('foo');
     }
+
+    function it_should_change_the_case_of_the_keys_for_an_array()
+    {
+        $this::array_change_key_case(['Ädam' => 'Foo', 'Böb' => 'foo', 'foO' => 'foo'])->shouldBeEqualTo(
+           ['ädam' => 'Foo', 'böb' => 'foo', 'foo' => 'foo']
+        );
+    }
 }
