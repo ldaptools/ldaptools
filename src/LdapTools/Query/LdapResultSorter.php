@@ -74,13 +74,23 @@ class LdapResultSorter
      * Reorganize the array to the desired orderBy methods passed to the class.
      *
      * @param array|LdapObjectCollection $results The unsorted result set.
-     * @return array The sorted result set.
+     * @return array|LdapObjectCollection The sorted result set.
      */
     public function sort($results)
     {
         $isCollection = $results instanceof LdapObjectCollection;
         $results = $isCollection ? $results->toArray() : $results;
-        usort($results, array($this, 'resultSortCallback'));
+
+        // We need to track the index when sorting to ensure a stable sort. This is essentially how PHP 7+ handles
+        // things, but not PHP 5.6. I think this would be the expected order, especially for tests/specs...
+        foreach ($results as $index => &$item) {
+            $item = [$index + 1, $item];
+        }
+        usort($results, [$this, 'resultSortCallback']);
+        // Sort done, so remove the index tracking from the results...
+        foreach ($results as &$item) {
+            $item = $item[1];
+        }
 
         return $isCollection ? new LdapObjectCollection(...$results) : $results;
     }
@@ -97,12 +107,12 @@ class LdapResultSorter
         $retVal = 0;
 
         foreach ($this->orderBy as $attribute => $direction) {
-            if ($retVal == 0) {
-                $retVal = $this->getUsortReturnValue($attribute, $direction, $a, $b);
+            if ($retVal === 0) {
+                $retVal = $this->getUsortReturnValue($attribute, $direction, $a[1], $b[1]);
             }
         }
 
-        return $retVal;
+        return $retVal === 0 ? $a[0] - $b[0] : $retVal;
     }
 
     /**
@@ -169,8 +179,8 @@ class LdapResultSorter
         if (is_array($entry) && isset($entry[$attribute])) {
             $value = $entry[$attribute];
         // Be forgiving if they are hydrating to an array and the case of the attribute was not correct.
-        } elseif (is_array($entry) && array_key_exists(strtolower($attribute), array_change_key_case($entry))) {
-            $value = array_change_key_case($entry)[strtolower($attribute)];
+        } elseif (is_array($entry) && array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($entry))) {
+            $value = MBString::array_change_key_case($entry)[MBString::strtolower($attribute)];
         // Only get the value if there is no alias requested, or if an alias was requested the object type must match the alias.    
         } elseif (($entry instanceof LdapObject) && (!$alias || $entry->isType($this->aliases[$alias]->getObjectType())) && $entry->has($attribute)) {
             $value = $entry->get($attribute);

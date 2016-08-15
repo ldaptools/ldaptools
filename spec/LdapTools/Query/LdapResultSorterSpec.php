@@ -14,7 +14,6 @@ use LdapTools\Object\LdapObject;
 use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapResultSorterSpec extends ObjectBehavior
 {
@@ -203,8 +202,8 @@ class LdapResultSorterSpec extends ObjectBehavior
             $this->collection->add(new LdapObject($sort, 'user'));
         }
         $this->beConstructedWith(['name' => 'ASC']);
-        
-        $this->sort($this->toSortUtf8)->shouldEqual([
+
+        $arrayResult = [
             [
                 'name' => "Ädam",
             ],
@@ -220,7 +219,14 @@ class LdapResultSorterSpec extends ObjectBehavior
             [
                 'name' => "Tim",
             ],
-        ]);
+        ];
+        $objectResult = new LdapObjectCollection();
+        foreach ($arrayResult as $entry) {
+            $objectResult->add(new LdapObject($entry, 'user'));
+        }
+
+        $this->sort($this->toSortUtf8)->shouldEqual($arrayResult);
+        $this->sort($this->collection)->shouldBeLike($objectResult);
     }
 
     function it_should_sort_case_insensitive_by_default()
@@ -229,13 +235,13 @@ class LdapResultSorterSpec extends ObjectBehavior
         array_push($results, ['name' => 'mike']);
         array_unshift($results, ['name' => 'mIkE']);
         array_push($results, ['name' => 'MikE']);
+        $this->beConstructedWith(['name' => 'ASC']);
         $this->collection = new LdapObjectCollection();
         foreach ($results as $sort) {
             $this->collection->add(new LdapObject($sort, 'user'));
         }
-        $this->beConstructedWith(['name' => 'ASC']);
 
-        $this->sort($results, true)->shouldBeEqualTo([
+        $arrayResult = [
             [
                 'name' => "Ädam",
             ],
@@ -260,7 +266,14 @@ class LdapResultSorterSpec extends ObjectBehavior
             [
                 'name' => "Tim",
             ],
-        ]);
+        ];
+        $objectResult = new LdapObjectCollection();
+        foreach ($arrayResult as $entry) {
+            $objectResult->add(new LdapObject($entry, 'user'));
+        }
+
+        $this->sort($results)->shouldBeEqualTo($arrayResult);
+        $this->sort($this->collection)->shouldBeLike($objectResult);
     }
 
     function it_should_sort_case_sensitive_if_specified()
@@ -275,8 +288,7 @@ class LdapResultSorterSpec extends ObjectBehavior
         }
         $this->beConstructedWith(['name' => 'ASC']);
 
-        $this->setIsCaseSensitive(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapResultSorter');
-        $this->sort($results)->shouldBeEqualTo([
+        $arrayResult = [
             [
                 'name' => "Ädam",
             ],
@@ -301,7 +313,15 @@ class LdapResultSorterSpec extends ObjectBehavior
             [
                 'name' => "Tim",
             ],
-        ]);
+        ];
+        $objectResult = new LdapObjectCollection();
+        foreach ($arrayResult as $entry) {
+            $objectResult->add(new LdapObject($entry, 'user'));
+        }
+
+        $this->setIsCaseSensitive(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapResultSorter');
+        $this->sort($results)->shouldBeEqualTo($arrayResult);
+        $this->sort($this->collection)->shouldBeLike($objectResult);
     }
 
     public function getMatchers()
