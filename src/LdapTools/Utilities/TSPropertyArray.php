@@ -94,7 +94,7 @@ class TSPropertyArray
      */
     public function has($propName)
     {
-        return array_key_exists(strtolower($propName), array_change_key_case($this->tsProperty));
+        return array_key_exists(MBString::strtolower($propName), MBString::array_change_key_case($this->tsProperty));
     }
 
     /**
@@ -132,7 +132,7 @@ class TSPropertyArray
     public function remove($propName)
     {
         foreach (array_keys($this->tsProperty) as $property) {
-            if (strtolower($propName) == strtolower($property)) {
+            if (MBString::strtolower($propName) == MBString::strtolower($property)) {
                 unset($this->tsProperty[$property]);
             }
         }
@@ -243,7 +243,7 @@ class TSPropertyArray
      */
     protected function getTsPropObj($propName)
     {
-        return array_change_key_case($this->tsProperty)[strtolower($propName)];
+        return MBString::array_change_key_case($this->tsProperty)[MBString::strtolower($propName)];
     }
     
     /**

@@ -67,7 +67,7 @@ trait ConverterUtilitiesTrait
      */
     protected function validateCurrentAttribute(array $options)
     {
-        if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($options))) {
+        if (!array_key_exists(MBString::strtolower($this->getAttribute()), MBString::array_change_key_case($options))) {
             throw new AttributeConverterException(
                 sprintf('You must first define "%s" in the options for this converter.', $this->getAttribute())
             );
@@ -82,7 +82,7 @@ trait ConverterUtilitiesTrait
      */
     protected function getArrayValue(array $options, $key)
     {
-        return array_change_key_case($options)[strtolower($key)];
+        return MBString::array_change_key_case($options)[MBString::strtolower($key)];
     }
 
     /**

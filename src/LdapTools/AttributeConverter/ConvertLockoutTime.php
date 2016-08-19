@@ -12,6 +12,7 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Query\Builder\FilterBuilder;
+use LdapTools\Utilities\MBString;
 
 /**
  * Converts the lockoutTime to either a bool or a DateTime object.
@@ -69,7 +70,7 @@ class ConvertLockoutTime implements AttributeConverterInterface
      */
     protected function expectsBool()
     {
-        return strtolower($this->getOptions()['bool']) == strtolower($this->getAttribute());
+        return MBString::strtolower($this->getOptions()['bool']) == MBString::strtolower($this->getAttribute());
     }
 
     /**

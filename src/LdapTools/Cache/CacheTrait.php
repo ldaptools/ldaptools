@@ -10,6 +10,8 @@
 
 namespace LdapTools\Cache;
 
+use LdapTools\Utilities\MBString;
+
 /**
  * Removes some duplication for some common cache functionality.
  * 
@@ -51,6 +53,6 @@ trait CacheTrait
      */
     protected function getCacheName($itemType, $itemName)
     {
-        return strtolower($this->cachePrefix.'/'.$itemType.'/'.$itemName);
+        return MBString::strtolower($this->cachePrefix.'/'.$itemType.'/'.$itemName);
     }
 }

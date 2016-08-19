@@ -311,23 +311,4 @@ class LdapUtilities
         
         return [$alias, $attribute];
     }
-
-    /**
-     * Looks up an array value in a case-insensitive way and return it how it appears in the array.
-     *
-     * @param string $needle
-     * @param array $haystack
-     * @return string
-     */
-    public static function getValueCaseInsensitive($needle, array $haystack)
-    {
-        $lcNeedle = strtolower($needle);
-        $lcKeys = array_change_key_case(array_flip($haystack));
-        
-        if (!isset($lcKeys[$lcNeedle])) {
-            throw new InvalidArgumentException(sprintf('Value "%s" not found in array.', $needle));
-        }
-
-        return $haystack[$lcKeys[$lcNeedle]];
-    }
 }

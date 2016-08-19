@@ -23,6 +23,7 @@ use LdapTools\Object\LdapObjectCollection;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\MBString;
 
 /**
  * Executes and hydrates a LDAP query.
@@ -412,7 +413,7 @@ class LdapQuery
             $orderBy = [];
             foreach ($this->orderBy as $attribute => $direction) {
                 list($alias, $attr) = LdapUtilities::getAliasAndAttribute($attribute);
-                $orderAttr = LdapUtilities::getValueCaseInsensitive($attr, $selected);
+                $orderAttr = MBString::array_search_get_value($attr, $selected);
                 $orderAttr = $alias ? "$alias.$orderAttr" : $orderAttr;
                 $orderBy[$orderAttr] = $direction;
             }

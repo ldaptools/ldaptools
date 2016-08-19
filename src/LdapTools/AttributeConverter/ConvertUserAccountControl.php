@@ -14,6 +14,7 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\UserAccountControlFlags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
+use LdapTools\Utilities\MBString;
 
 /**
  * Uses a User Account Control Mapping from the schema and the current attribute/last value context to properly convert
@@ -131,6 +132,6 @@ class ConvertUserAccountControl implements AttributeConverterInterface
      */
     protected function shouldInvertValue()
     {
-        return in_array(strtolower($this->getAttribute()), array_map('strtolower', $this->getOptions()['invert']));
+        return in_array(MBString::strtolower($this->getAttribute()), MBString::array_change_value_case($this->getOptions()['invert']));
     }
 }

@@ -16,6 +16,7 @@ use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\MBString;
 
 /**
  * Takes a common string value and converts it into a full distinguished name.
@@ -164,7 +165,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
      */
     protected function validateCurrentAttribute()
     {
-        if (!array_key_exists(strtolower($this->getAttribute()), array_change_key_case($this->getOptions()))) {
+        if (!array_key_exists(MBString::strtolower($this->getAttribute()), MBString::array_change_key_case($this->getOptions()))) {
             throw new AttributeConverterException(
                 sprintf('Attribute "%s" must be defined in the converter options.', $this->getAttribute())
             );

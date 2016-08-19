@@ -14,6 +14,7 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
+use LdapTools\Utilities\MBString;
 
 /**
  * Converts the groupType bitmask value to a PHP bool, or a bool for a specific bit back to the value for LDAP.
@@ -116,7 +117,7 @@ class ConvertGroupType implements AttributeConverterInterface
     {
         if ($value) {
             foreach ($this->getOptions()['types']['scope'] as $attribute) {
-                if (strtolower($attribute) == strtolower($this->getAttribute())) {
+                if (MBString::strtolower($attribute) == MBString::strtolower($this->getAttribute())) {
                     continue;
                 }
                 if (((int)$lastValue & (int)$this->getOptions()['typeMap'][$attribute])) {
@@ -157,7 +158,7 @@ class ConvertGroupType implements AttributeConverterInterface
      */
     protected function shouldInvertValue()
     {
-        return strtolower($this->getAttribute()) == strtolower($this->getOptions()['distribution']);
+        return MBString::strtolower($this->getAttribute()) == MBString::strtolower($this->getOptions()['distribution']);
     }
 
     /**
@@ -166,7 +167,7 @@ class ConvertGroupType implements AttributeConverterInterface
      */
     protected function getBitForAttribute($attribute)
     {
-        $bit = array_change_key_case($this->getOptions()['typeMap'])[strtolower($attribute)];
+        $bit = MBString::array_change_key_case($this->getOptions()['typeMap'])[MBString::strtolower($attribute)];
         $bit = in_array($this->getAttribute(), $this->getOptions()['types']['type']) ? -1 * abs($bit) : $bit;
 
         return $bit;

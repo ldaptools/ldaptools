@@ -12,6 +12,7 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
+use LdapTools\Utilities\MBString;
 
 /**
  * Converts the Exchange proxyAddress attribute by keeping a type map and transforming the address with the needed
@@ -109,7 +110,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      */
     protected function isDefaultValueAttribute()
     {
-        return in_array(strtolower($this->getAttribute()), array_map('strtolower', $this->getOptions()['default']));
+        return in_array(MBString::strtolower($this->getAttribute()), MBString::array_change_value_case($this->getOptions()['default']));
     }
 
     /**
@@ -175,7 +176,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
         $values = is_array($this->getLastValue()) ? $this->getLastValue() : [$this->getLastValue()];
 
         $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
-        $isAddressInArray = in_array(strtolower($defaultAddress), array_map('strtolower', $values));
+        $isAddressInArray = in_array(MBString::strtolower($defaultAddress), MBString::array_change_value_case($values));
 
         $length = strlen($addressType);
         foreach ($values as $index => $address) {
@@ -183,7 +184,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
             if ((substr($address, 0, $length) === strtoupper($addressType)) && ($address !== $defaultAddress)) {
                 $values[$index] = substr_replace($address, $addressType, 0, $length);
             // If the address is the one we are looking for but is not the default, then make it the default.
-            } elseif ($isAddressInArray && (strtolower($address) == strtolower($defaultAddress))) {
+            } elseif ($isAddressInArray && (MBString::strtolower($address) == MBString::strtolower($defaultAddress))) {
                 $values[$index] = $defaultAddress;
             }
         }

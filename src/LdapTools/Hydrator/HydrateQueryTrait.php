@@ -12,6 +12,7 @@ namespace LdapTools\Hydrator;
 
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\MBString;
 
 /**
  * Some common functions needed in both the operation hydrator and the LdapQuery. Need to completely separate them at
@@ -34,7 +35,7 @@ trait HydrateQueryTrait
         if (!$this->isWildCardSelection() && !empty($this->orderBy)) {
             $orderBy = $this->getAttributesForAlias(array_keys($this->orderBy), $alias);
             foreach ($orderBy as $attribute) {
-                if (!in_array(strtolower($attribute), array_map('strtolower', $attributes))) {
+                if (!in_array(MBString::strtolower($attribute), MBString::array_change_value_case($attributes))) {
                     $attributes[] = $attribute;
                 }
             }

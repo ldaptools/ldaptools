@@ -192,11 +192,4 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::getAliasAndAttribute('foo.bar')->shouldBeEqualTo(['foo', 'bar']);
         $this::getAliasAndAttribute('foobar')->shouldBeEqualTo([null, 'foobar']);
     }
-
-    function it_should_find_a_value_in_an_array_and_return_it_in_its_original_case()
-    {
-        $this::getValueCaseInsensitive('foo', ['FoO', 'bar'])->shouldBeEqualTo('FoO');
-        $this::getValueCaseInsensitive('foo', ['foo', 'bar'])->shouldBeEqualTo('foo');
-        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->during('getValueCaseInsensitive', ['foobar', ['foo', 'bar']]);
-    }
 }

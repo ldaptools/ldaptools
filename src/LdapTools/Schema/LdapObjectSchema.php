@@ -304,9 +304,7 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function hasNamesMappedToAttribute($attribute)
     {
-        return (bool) array_search(MBString::strtolower($attribute), array_map(function($value) {
-            return MBString::strtolower($value);
-        }, $this->attributeMap));
+        return (bool) array_search(MBString::strtolower($attribute), MBString::array_change_value_case($this->attributeMap));
     }
 
     /**
@@ -318,9 +316,7 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function getNamesMappedToAttribute($attribute)
     {
-        return array_keys(array_map(function($value) {
-            return MBString::strtolower($value);
-        }, $this->attributeMap), MBString::strtolower($attribute));
+        return array_keys(MBString::array_change_value_case($this->attributeMap), MBString::strtolower($attribute));
     }
 
     /**
@@ -503,9 +499,7 @@ class LdapObjectSchema implements CacheableItemInterface
      */
     public function isMultivaluedAttribute($attribute)
     {
-        return in_array(MBString::strtolower($attribute), array_map(function($value) {
-            return MBString::strtolower($value);
-        }, $this->multivaluedAttributes));
+        return in_array(MBString::strtolower($attribute), MBString::array_change_value_case($this->multivaluedAttributes));
     }
 
     /**

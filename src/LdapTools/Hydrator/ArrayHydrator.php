@@ -19,6 +19,7 @@ use LdapTools\Resolver\AttributeNameResolver;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Utilities\MBString;
 
 /**
  * Hydrates a LDAP entry to/from LDAP in array form.
@@ -277,7 +278,7 @@ class ArrayHydrator implements HydratorInterface
         $missing = [];
 
         foreach ($this->schema->getRequiredAttributes() as $attribute) {
-            if (!array_key_exists(strtolower($attribute), array_change_key_case($attributes))) {
+            if (!array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($attributes))) {
                 $missing[] = $attribute;
             }
         }
