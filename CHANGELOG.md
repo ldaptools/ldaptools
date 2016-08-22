@@ -1,6 +1,18 @@
 CHANGELOG
 =========
 
+0.22.0 (2016-08-22)
+-------------------
+  * Add a connect_timeout option for more control over the initial connection test timeout value.
+  * Sorting is now done case-insensitive by default. It can be toggled on the LdapQuery class.
+  * Redesign the GPO Link converter to respect link order and enable/enforce options on specific links.
+  * Fix the attribute validation for the query builder so single character attributes are allowed.
+  * Empty arrays and null values are now ignored on LDAP object creation.
+  * The schema 'extend' directive now works as expected.
+  * UTF-8 characters will now sort properly when using orderBy in the query builder.
+  * Consistent UTF-8 support across the library.
+  * Fix non-standard port usage when connecting to LDAP.
+
 0.21.0 (2016-06-27)
 -------------------
   * Add a utility class for encoding/decoding userParameters data in AD.
