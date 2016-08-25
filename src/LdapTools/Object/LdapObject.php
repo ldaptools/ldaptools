@@ -13,6 +13,7 @@ namespace LdapTools\Object;
 use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Utilities\MBString;
 
 /**
  * Represents a LDAP Object.
@@ -89,7 +90,7 @@ class LdapObject
      */
     public function has($attribute, $value = null)
     {
-        if (!array_key_exists(strtolower($attribute), array_change_key_case($this->attributes))) {
+        if (!array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($this->attributes))) {
             return false;
         }
 
@@ -105,7 +106,7 @@ class LdapObject
     public function get($attribute)
     {
         if ($this->has($attribute)) {
-            return array_change_key_case($this->attributes)[strtolower($attribute)];
+            return MBString::array_change_key_case($this->attributes)[MBString::strtolower($attribute)];
         } else {
             throw new InvalidArgumentException(
                 sprintf('Attribute "%s" is not defined for this LDAP object.', $attribute)

@@ -20,6 +20,7 @@ use LdapTools\Operation\Handler\AuthenticationOperationHandler;
 use LdapTools\Operation\Handler\OperationHandler;
 use LdapTools\Operation\Handler\QueryOperationHandler;
 use LdapTools\Operation\LdapOperationInterface;
+use LdapTools\Utilities\MBString;
 
 /**
  * Invokes the correct handler for a given operation, as well as handling logging.
@@ -143,7 +144,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
      */
     protected function switchServerIfNeeded($currentServer, $wantedServer, LdapOperationInterface $operation)
     {
-        if ($operation instanceof AuthenticationOperation || strtolower($currentServer) == strtolower($wantedServer)) {
+        if ($operation instanceof AuthenticationOperation || MBString::strtolower($currentServer) == MBString::strtolower($wantedServer)) {
             return;
         }
         if ($this->connection->isBound()) {
