@@ -114,7 +114,9 @@ class LdapObject
     }
 
     /**
-     * Set a value for an attribute. If a value already exists it will be replaced.
+     * Set a value for an attribute.
+     * If a value already exists it will be replaced.
+     * If the value is empty the attribute will be cleared/reset
      *
      * @param string $attribute
      * @param mixed $value
@@ -122,6 +124,10 @@ class LdapObject
      */
     public function set($attribute, $value)
     {
+        if($value === [] || $value === '' || $value === null) {
+            return $this->reset($attribute);
+        }
+
         if ($this->has($attribute)) {
             $attribute = $this->resolveAttributeName($attribute);
             $this->attributes[$attribute] = $value;

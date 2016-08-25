@@ -325,4 +325,22 @@ class LdapObjectSpec extends ObjectBehavior
         $this->getEmailAddress()->shouldBeEqualTo([]);
 
     }
+
+    function it_should_remove_an_attribute_completely_when_calling_set_with_an_empty_string_empty_array_or_null()
+    {
+        $attributes = $this->attributes;
+        $attributes['foo1'] = 'bar';
+        $attributes['foo2'] = 'bar';
+        $attributes['foo3'] = 'bar';
+        $this->refresh($attributes);
+
+        $this->set('foo1', '');
+        $this->has('foo1')->shouldBeEqualTo(false);
+
+        $this->set('foo2', []);
+        $this->has('foo2')->shouldBeEqualTo(false);
+
+        $this->set('foo3', null);
+        $this->has('foo3')->shouldBeEqualTo(false);
+    }
 }
