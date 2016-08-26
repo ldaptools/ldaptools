@@ -93,7 +93,7 @@ class LastErrorStrategy
      */
     public function getDiagnosticMessage()
     {
-        @ldap_get_option($this->connection, constant($this->diagnosticOpt)  ,$message);
+        @ldap_get_option($this->connection, constant($this->diagnosticOpt), $message);
         
         return $message;
     }

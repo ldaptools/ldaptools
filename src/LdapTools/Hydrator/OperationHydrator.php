@@ -221,7 +221,7 @@ class OperationHydrator extends ArrayHydrator
      */
     protected function filterAttributeValues(array $attributes)
     {
-        return array_filter($attributes, function($value) {
+        return array_filter($attributes, function ($value) {
             if (is_array($value) && empty($value)) {
                 return false;
             }

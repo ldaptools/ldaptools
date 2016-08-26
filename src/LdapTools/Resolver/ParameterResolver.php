@@ -80,7 +80,7 @@ class ParameterResolver
      */
     public static function hasParameters($value)
     {
-        return (bool) self::getParametersInValue($value);        
+        return (bool) self::getParametersInValue($value);
     }
 
     /**

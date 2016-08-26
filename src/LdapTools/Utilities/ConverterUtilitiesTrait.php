@@ -106,7 +106,7 @@ trait ConverterUtilitiesTrait
                 ->setScopeBase()
                 ->getLdapQuery()
                 ->getSingleScalarOrNullResult();
-        } catch(EmptyResultException $e) {
+        } catch (EmptyResultException $e) {
             throw new AttributeConverterException(sprintf('Unable to find LDAP object: %s', $this->getDn()));
         }
     }

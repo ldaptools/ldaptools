@@ -129,7 +129,7 @@ class MBString
      */
     public static function array_change_value_case(array $values)
     {
-       return array_map(self::class.'::strtolower', $values);
+        return array_map(self::class.'::strtolower', $values);
     }
 
     /**
