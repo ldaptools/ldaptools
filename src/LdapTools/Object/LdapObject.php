@@ -117,7 +117,7 @@ class LdapObject
     /**
      * Set a value for an attribute.
      * If a value already exists it will be replaced.
-     * If the value is empty the attribute will be cleared/reset
+     * If the value is empty the attribute will be cleared/reset.
      *
      * @param string $attribute
      * @param mixed $value
@@ -125,7 +125,7 @@ class LdapObject
      */
     public function set($attribute, $value)
     {
-        if($value === [] || $value === '' || $value === null) {
+        if ($value === [] || $value === '' || $value === null) {
             return $this->reset($attribute);
         }
 
