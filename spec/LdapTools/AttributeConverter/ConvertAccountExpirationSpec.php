@@ -12,7 +12,6 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ConvertAccountExpirationSpec extends ObjectBehavior
 {

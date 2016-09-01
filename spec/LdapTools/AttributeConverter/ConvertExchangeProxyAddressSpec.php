@@ -13,14 +13,11 @@ namespace spec\LdapTools\AttributeConverter;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\DomainConfiguration;
-use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 {
-    protected $connection;
-
     protected $expectedResult = [
         'count' => 1,
         0 => [
@@ -35,12 +32,8 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         ],
     ];
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
-        $this->connection = $connection;
         $options = [
             'addressType' => [
                 'exchangeSmtpAddress' => 'smtp',
@@ -50,7 +43,7 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
                 'exchangeDefaultSmtpAddress'
             ],
         ];
-        $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
+        $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
@@ -98,9 +91,9 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         $this->toLdap(['foo2@bar.com'])->shouldBeEqualTo(['smtp:foo@bar.com', 'smtp:foo.bar@foo.com','SMTP:foo2@bar.com']);
     }
 
-    function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
+    function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification($connection)
     {
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=*))'
                 && $operation->getAttributes() == ['proxyAddresses']
                 && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';

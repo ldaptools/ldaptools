@@ -12,7 +12,6 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\Utilities\ADTimeSpan;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ConvertADTimeSpanSpec extends ObjectBehavior
 {

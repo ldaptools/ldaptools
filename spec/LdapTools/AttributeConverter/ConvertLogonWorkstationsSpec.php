@@ -51,12 +51,8 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         ],
     ];
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
-        $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
     }
@@ -89,10 +85,10 @@ class ConvertLogonWorkstationsSpec extends ObjectBehavior
         $this->toLdap(['foo', 'bar'])->shouldEqual('foo,bar');
     }
 
-    function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification()
+    function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_modification($connection)
     {
-        $this->connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=*))'
                 && $operation->getAttributes() == ['userWorkstations']
                 && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar';

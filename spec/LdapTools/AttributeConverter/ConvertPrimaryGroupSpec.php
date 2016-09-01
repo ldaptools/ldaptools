@@ -12,27 +12,20 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\DomainConfiguration;
-use LdapTools\Object\LdapObject;
-use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertPrimaryGroupSpec extends ObjectBehavior
 {
-    protected $connection;
     protected $dn = 'cn=foo,dc=foo,dc=bar';
     protected $groupSidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\01\02\00\00';
     protected $userSidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\c7\04\00\00';
     protected $groupSid = 'S-1-5-21-1004336348-1177238915-682003330-513';
     protected $userSid = 'S-1-5-21-1004336348-1177238915-682003330-1223';
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $this->connection = $connection;
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $dn = $this->dn;
@@ -110,9 +103,9 @@ class ConvertPrimaryGroupSpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('Domain Users');
     }
 
-    function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification()
+    function it_should_not_validate_group_membership_when_going_to_ldap_if_the_op_type_is_not_modification($connection)
     {
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=group)(cn=Domain Users)(groupType:1.2.840.113556.1.4.803:=2147483648))'
                 && $operation->getAttributes() == ['objectSid'];
         }))->willReturn([

@@ -51,13 +51,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         ],
     ];
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $this->connection = $connection;
         $options = [
             'defaultValue' => '-2147483646',
             'distribution' =>'typeDistribution',
@@ -132,9 +128,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->getShouldAggregateValues()->shouldBeEqualTo(false);
     }
 
-    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
+    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('typeDistribution');
@@ -145,9 +141,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->toLdap(true)->shouldBeEqualTo('-2147483640');
     }
 
-    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation()
+    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
@@ -159,11 +155,11 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->toLdap(true)->shouldBeEqualTo('-2147483640');
     }
 
-    function it_should_not_modify_the_value_if_the_bit_is_already_set()
+    function it_should_not_modify_the_value_if_the_bit_is_already_set($connection)
     {
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
@@ -172,9 +168,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->toLdap(true)->shouldBeEqualTo('-2147483646');
     }
 
-    function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
+    function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeSecurity');
@@ -189,9 +185,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->shouldThrow(new AttributeConverterException('Unable to query for the current "groupType" attribute.'))->duringToLdap(true);
     }
 
-    function it_should_be_case_insensitive_to_the_current_attribute_name()
+    function it_should_be_case_insensitive_to_the_current_attribute_name($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('TypeSecuritY');

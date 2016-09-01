@@ -12,7 +12,6 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\Connection\AD\ExchangeRoleTypes;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ConvertExchangeRolesSpec extends ObjectBehavior
 {

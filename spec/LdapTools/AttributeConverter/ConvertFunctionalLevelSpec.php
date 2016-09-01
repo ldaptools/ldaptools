@@ -12,7 +12,6 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\Connection\AD\ADFunctionalLevelType;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ConvertFunctionalLevelSpec extends ObjectBehavior
 {

@@ -12,7 +12,6 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class EncodeWindowsPasswordSpec extends ObjectBehavior
 {
@@ -31,10 +30,7 @@ class EncodeWindowsPasswordSpec extends ObjectBehavior
         $this->fromLdap('foo')->shouldBeNull();
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_throw_an_exception_if_ssl_or_tls_is_not_enabled($connection)
+    function it_should_throw_an_exception_if_ssl_or_tls_is_not_enabled(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $this->toLdap('test')->shouldNotThrow('\LdapTools\Exception\LdapConnectionException');
 

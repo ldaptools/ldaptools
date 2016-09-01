@@ -11,21 +11,14 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\AttributeConverterException;
-use LdapTools\Object\LdapObject;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class ConvertUserAccountControlSpec extends ObjectBehavior
 {
-    /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
     /**
      * @var QueryOperation
      */
@@ -66,15 +59,11 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
      */
     protected $expectedOp;
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $config = new DomainConfiguration('foo.bar');
         $config->setBaseDn('dc=foo,dc=bar');
-        $this->connection = $connection;
-        $this->connection->getConfig()->willReturn($config);
+        $connection->getConfig()->willReturn($config);
         $options = [
             'uacMap' => [
                 'disabled' => '2',
@@ -147,9 +136,9 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->getShouldAggregateValues()->shouldBeEqualTo(false);
     }
 
-    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification()
+    function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_modification($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
         $this->setAttribute('disabled');
@@ -177,33 +166,33 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->toLdap(true)->shouldBeEqualTo('66050');
     }
 
-    function it_should_not_modify_the_value_if_the_bit_is_already_set()
+    function it_should_not_modify_the_value_if_the_bit_is_already_set($connection)
     {
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->toLdap(true)->shouldBeEqualTo('514');
     }
 
-    function it_should_remove_the_bit_if_requested_and_the_bit_is_already_set()
+    function it_should_remove_the_bit_if_requested_and_the_bit_is_already_set($connection)
     {
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($result);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->toLdap(false)->shouldBeEqualTo('512');
     }
 
-    function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried()
+    function it_should_error_on_modifcation_when_the_existing_LDAP_object_cannot_be_queried($connection)
     {
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('disabled');
         $this->shouldThrow(new AttributeConverterException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
@@ -217,12 +206,12 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
         $this->shouldThrow(new AttributeConverterException('Unable to query for the current "userAccountControl" attribute.'))->duringToLdap(true);
     }
 
-    function it_should_be_case_insensitive_to_the_current_attribute_name()
+    function it_should_be_case_insensitive_to_the_current_attribute_name($connection)
     {
         $result = $this->expectedResult;
         $result[0]['userAccountControl'][0] = ['514'];
 
-        $this->connection->execute(Argument::that($this->expectedOp))->willReturn($result);
+        $connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('DisaBleD');

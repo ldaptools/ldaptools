@@ -11,7 +11,6 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ConvertLdapObjectTypeSpec extends ObjectBehavior
 {
