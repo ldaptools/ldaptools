@@ -10,9 +10,9 @@
 
 namespace spec\LdapTools\Hydrator;
 
+use LdapTools\Object\LdapObject;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ArrayHydratorSpec extends ObjectBehavior
 {
@@ -209,6 +209,11 @@ class ArrayHydratorSpec extends ObjectBehavior
 
         $this->setLdapObjectSchema($schema);
         $this->shouldThrow('\LogicException')->duringHydrateToLdap($this->objectToLdap);
+    }
+
+    function it_should_error_hydrating_to_ldap_if_an_array_is_not_used()
+    {
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringHydrateToLdap(new LdapObject(['foo' => 'bar']));
     }
 
     function it_should_merge_default_attributes_to_ldap()

@@ -13,6 +13,7 @@ namespace LdapTools\Hydrator;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Exception\LogicException;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\AttributeNameResolver;
@@ -166,7 +167,7 @@ class ArrayHydrator implements HydratorInterface
     public function hydrateToLdap($attributes)
     {
         if (!is_array($attributes)) {
-            throw new \InvalidArgumentException('Expects an array to convert data to LDAP.');
+            throw new InvalidArgumentException('Expects an array to convert data to LDAP.');
         }
         $attributes = $this->mergeDefaultAttributes($attributes);
         $this->validateAttributesToLdap($attributes);
