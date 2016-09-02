@@ -93,7 +93,9 @@ scenes.
 ------------------------
 #### set($attribute, $value)
 
-Replaces any value that might exist in the attribute with the value you specify.
+Replaces any value that might exist in the attribute with the value you specify. If you pass `null`, an empty string, or
+an empty array, then the call will perform a reset of the attribute (which clears an existing value), which is identical
+to calling `reset($attribute)`.
 
 ------------------------
 #### add($attribute, ...$value)

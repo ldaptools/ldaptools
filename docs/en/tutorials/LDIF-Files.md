@@ -94,9 +94,15 @@ use LdapTools\Ldif\Ldif;
 $ldif = new Ldif();
 
 $ldif->addEntry(
-    $ldif->entry()->add('cn=Some Group,dc=foo,dc=bar', [ 'sAMAccountName' => 'Some Group', 'objectClass' => 'group']),
+    $ldif->entry()->add('cn=Some Group,dc=foo,dc=bar', [
+        'sAMAccountName' => 'Some Group',
+        'objectClass' => 'group'
+    ]),
     $ldif->entry()->delete('cn=Some User,dc=foo,dc=bar'),
-    $ldif->entry()->move('cn=Frank,dc=foo,dc=bar', 'ou=Employees,dc=foo,dc=bar')
+    $ldif->entry()->move(
+        'cn=Frank,dc=foo,dc=bar',
+        'ou=Employees,dc=foo,dc=bar'
+    )
 );
 
 // Output the LDIF object as a string to a file.
@@ -118,7 +124,8 @@ use LdapTools\Ldif\Ldif;
 // Construct the LDIF object...
 $ldif = new Ldif();
 
-// By default the LDIF version is set to '1' to follow the RFC. You can remove it by setting it to null.
+// By default the LDIF version is set to '1' to follow the RFC. 
+// You can remove it by setting it to null.
 $ldif->setVersion(null);
 
 // Add a few comments to appear at the top of the LDIF...
@@ -138,7 +145,7 @@ echo $ldifData;
 
 ### The LDIF Delete Entry Type
 
-The delete entry type is a 'delete' changetype in LDIF. It is used to delete an object from LDAP. All you need to
+The delete entry type is a `delete` changetype in LDIF. It is used to delete an object from LDAP. All you need to
 do is pass it the full DN of the object you'd like to delete.
 
 ```php
