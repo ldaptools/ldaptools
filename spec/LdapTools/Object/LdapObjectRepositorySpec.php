@@ -11,7 +11,7 @@
 namespace spec\LdapTools\Object;
 
 use LdapTools\Configuration;
-use LdapTools\Connection\LdapConnection;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
@@ -75,25 +75,19 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         ]
     ];
 
-    protected $ldap;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
-     */
-    public function let($ldap)
+    public function let(LdapConnectionInterface $connection)
     {
         $config = new Configuration();
         $config->setCacheType('none');
-        $this->ldap = $ldap;
-        $ldap->execute(Argument::any())->willReturn($this->ldapEntries);
-        $ldap->getConfig()->willReturn(new DomainConfiguration('example.local'));
+        $connection->execute(Argument::any())->willReturn($this->ldapEntries);
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
 
         $cache = CacheFactory::get($config->getCacheType(), $config->getCacheOptions());
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $dispatcher = new SymfonyEventDispatcher();
         $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
-        $this->beConstructedWith($schemaFactory->get('ad', 'user'), $ldap);
+        $this->beConstructedWith($schemaFactory->get('ad', 'user'), $connection);
     }
 
     function it_is_initializable()
@@ -101,13 +95,13 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Object\LdapObjectRepository');
     }
 
-    function it_should_call_findOneByGuid_and_return_a_LdapObject()
+    function it_should_call_findOneByGuid_and_return_a_LdapObject($connection)
     {
         $results = $this->ldapEntries;
         $results['count'] = 1;
         unset($results[1]);
         $this->setAttributes(['guid']);
-        $this->ldap->execute(Argument::any())->willReturn($results);
+        $connection->execute(Argument::any())->willReturn($results);
         $this->findOneByGuid('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 

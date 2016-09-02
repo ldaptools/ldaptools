@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Resolver;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ParameterResolverSpec extends ObjectBehavior
 {

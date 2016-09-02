@@ -14,7 +14,6 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class AttributeConverterFactorySpec extends ObjectBehavior
 {
@@ -165,10 +164,7 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this->shouldThrow('\Exception')->duringGet('foo_bar');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
-     */
-    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter($ldap)
+    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
     {
         $this->get('windows_guid')->setLdapConnection($ldap)->shouldBeNull();
     }

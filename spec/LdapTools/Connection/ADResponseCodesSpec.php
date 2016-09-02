@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Connection;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ADResponseCodesSpec extends ObjectBehavior
 {

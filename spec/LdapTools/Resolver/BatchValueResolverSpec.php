@@ -51,19 +51,11 @@ class BatchValueResolverSpec extends ObjectBehavior
     protected $schema;
 
     /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
      * @var array
      */
     protected $ldapObjectOpts = [['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user'];
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(LdapConnectionInterface $connection)
     {
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([
@@ -110,7 +102,6 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->schema = $schema;
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
-        $this->connection = $connection;
     }
 
     function it_is_initializable()
@@ -119,7 +110,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Resolver\BatchValueResolver');
     }
 
-    function it_should_convert_values_to_ldap_with_a_batch_modification()
+    function it_should_convert_values_to_ldap_with_a_batch_modification($connection)
     {
         $ldapObject = new LdapObject(...$this->ldapObjectOpts);
         $ldapObject->set('disabled', true);
@@ -153,13 +144,13 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=*))'
                 && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
                 && $operation->getAttributes() == ['userAccountControl'];
         }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
+        $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $this->toLdap()->getBatchArray()->shouldHaveCount(5);
         $this->toLdap()->getBatchArray()->shouldContain($uacBatch);
@@ -169,39 +160,39 @@ class BatchValueResolverSpec extends ObjectBehavior
         $this->toLdap()->getBatchArray()->shouldContain($pagerBatch);
     }
 
-    public function it_should_error_trying_to_do_a_non_set_method_on_a_single_aggregated_value()
+    public function it_should_error_trying_to_do_a_non_set_method_on_a_single_aggregated_value($connection)
     {
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->remove('disabled', true);
 
         $batch = $ldapObject->getBatchCollection();
-        $this->connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
+        $connection->execute($this->expectedSearch)->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
+        $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $this->shouldThrow(new LogicException('Unable to modify "disabled". The "REMOVE" action is not allowed.'))
             ->duringToLdap();
     }
 
-    public function it_should_error_trying_to_do_a_non_set_method_on_many_aggregated_values()
+    public function it_should_error_trying_to_do_a_non_set_method_on_many_aggregated_values($connection)
     {
         $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
         $ldapObject->set('disabled', true);
         $ldapObject->add('trustedForAllDelegation', true);
 
         $batch = $ldapObject->getBatchCollection();
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=*))'
                 && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
                 && $operation->getAttributes() == ['userAccountControl'];
         }))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
-        $this->setLdapConnection($this->connection);
+        $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $this->shouldThrow(new \LogicException('Unable to modify "trustedForAllDelegation". The "ADD" action is not allowed.'))->duringToLdap();
     }
     
-    function it_should_remove_batches_when_specified_by_a_converter_implementing_OperationGeneratorInterface()
+    function it_should_remove_batches_when_specified_by_a_converter_implementing_OperationGeneratorInterface($connection)
     {
         $dn = 'cn=Chad,dc=foo,dc=bar';
         $batch = new BatchCollection($dn);
@@ -211,7 +202,7 @@ class BatchValueResolverSpec extends ObjectBehavior
         
         $this->beConstructedWith($this->schema, $batch, AttributeConverterInterface::TYPE_MODIFY);
         
-        $this->setLdapConnection($this->connection);
+        $this->setLdapConnection($connection);
         $this->setDn($dn);
         $this->setOperation($operation);
         

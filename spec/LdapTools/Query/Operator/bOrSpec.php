@@ -15,7 +15,6 @@ use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\Wildcard;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class bOrSpec extends ObjectBehavior
 {

@@ -14,7 +14,6 @@ use LdapTools\Utilities\DialInData;
 use LdapTools\Utilities\TSPropertyArray;
 use LdapTools\Utilities\UserParameters;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class UserParametersSpec extends ObjectBehavior
 {

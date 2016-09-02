@@ -12,7 +12,6 @@ namespace spec\LdapTools\Object;
 
 use LdapTools\BatchModify\BatchCollection;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectSpec extends ObjectBehavior
 {

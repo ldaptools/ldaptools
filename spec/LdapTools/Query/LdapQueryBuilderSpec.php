@@ -37,11 +37,6 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     protected $schema;
 
     /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
      * @var LdapObjectSchema
      */
     protected $objectSchema;
@@ -64,10 +59,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         ],
     ];
     
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(LdapConnectionInterface $connection)
     {
         $config = new Configuration();
         $domain = new DomainConfiguration('example.com');
@@ -83,7 +75,6 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $dispatcher);
 
         $this->fb = new FilterBuilder();
-        $this->connection = $connection;
         $this->schema = $schemaFactory;
         $this->objectSchema = $schema = new LdapObjectSchema('ad', 'user');
         $this->objectSchema->setFilter($this->fb->bAnd($this->fb->eq('objectCategory', 'person'), $this->fb->eq('objectClass', 'user')));
@@ -338,9 +329,9 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->getServer()->shouldBeEqualTo('foo');
     }
     
-    function it_should_hydrate_properly_getting_the_ldap_filter()
+    function it_should_hydrate_properly_getting_the_ldap_filter($connection)
     {
-        $this->connection->execute(Argument::that(function($operation) {
+        $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(&(objectClass=group))(sAMAccountName=bar))';
         }))->willReturn($this->singleGroupEntry);
         

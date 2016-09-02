@@ -13,7 +13,6 @@ namespace spec\LdapTools\Hydrator;
 use LdapTools\Object\LdapObject;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectHydratorSpec extends ObjectBehavior
 {

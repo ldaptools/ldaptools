@@ -12,7 +12,6 @@ namespace spec\LdapTools\Ldif\Entry;
 
 use LdapTools\Connection\LdapControl;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdifEntryModRdnSpec extends ObjectBehavior
 {

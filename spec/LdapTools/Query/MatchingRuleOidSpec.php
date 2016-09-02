@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Query;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class MatchingRuleOidSpec extends ObjectBehavior
 {

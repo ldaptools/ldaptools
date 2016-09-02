@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Factory;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class CacheFactorySpec extends ObjectBehavior
 {

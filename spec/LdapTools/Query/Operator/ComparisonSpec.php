@@ -13,7 +13,6 @@ namespace spec\LdapTools\Query\Operator;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ComparisonSpec extends ObjectBehavior
 {

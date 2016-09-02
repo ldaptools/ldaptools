@@ -10,19 +10,13 @@
 
 namespace spec\LdapTools\Connection;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class PageControlSpec extends ObjectBehavior
 {
-    protected $connection;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    public function let($connection)
+    public function let(LdapConnectionInterface $connection)
     {
-        $this->connection = $connection;
         $this->beConstructedWith($connection);
     }
 
@@ -48,10 +42,10 @@ class PageControlSpec extends ObjectBehavior
         $this->isEnabled()->shouldBeEqualTo(false);
     }
 
-    function it_should_not_call_paging_operations_when_it_is_disabled()
+    function it_should_not_call_paging_operations_when_it_is_disabled($connection)
     {
         $this->setIsEnabled(false);
-        $this->connection->getConnection()->shouldNotBeCalled();
+        $connection->getConnection()->shouldNotBeCalled();
 
         $this->start(10);
         $this->update(null);

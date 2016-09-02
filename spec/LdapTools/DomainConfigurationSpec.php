@@ -13,7 +13,6 @@ namespace spec\LdapTools;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\Connection\LdapServerPool;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class DomainConfigurationSpec extends ObjectBehavior
 {

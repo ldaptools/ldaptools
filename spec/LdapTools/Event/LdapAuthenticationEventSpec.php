@@ -14,7 +14,6 @@ use LdapTools\Event\Event;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\AuthenticationResponse;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapAuthenticationEventSpec extends ObjectBehavior
 {

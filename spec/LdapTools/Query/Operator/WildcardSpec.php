@@ -14,7 +14,6 @@ use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\Wildcard;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class WildcardSpec extends ObjectBehavior
 {

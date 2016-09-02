@@ -15,7 +15,6 @@ use LdapTools\Ldif\Entry\LdifEntryDelete;
 use LdapTools\Ldif\Entry\LdifEntryModify;
 use LdapTools\Ldif\Ldif;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdifSpec extends ObjectBehavior
 {

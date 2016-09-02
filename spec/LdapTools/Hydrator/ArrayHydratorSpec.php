@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Hydrator;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Object\LdapObject;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
@@ -86,10 +87,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->shouldImplement('\LdapTools\Hydrator\HydratorInterface');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_be_able_to_be_constructed_with_a_ldap_connection($connection)
+    function it_should_be_able_to_be_constructed_with_a_ldap_connection(LdapConnectionInterface $connection)
     {
         $this->beConstructedWith($connection);
         $this->shouldHaveType('LdapTools\Hydrator\ArrayHydrator');

@@ -12,7 +12,6 @@ namespace spec\LdapTools\Event;
 
 use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectMoveEventSpec extends ObjectBehavior
 {

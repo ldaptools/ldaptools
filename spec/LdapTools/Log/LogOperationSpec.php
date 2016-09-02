@@ -13,7 +13,6 @@ namespace spec\LdapTools\Log;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LogOperationSpec extends ObjectBehavior
 {

@@ -18,7 +18,6 @@ use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class BatchModifyOperationSpec extends ObjectBehavior
 {

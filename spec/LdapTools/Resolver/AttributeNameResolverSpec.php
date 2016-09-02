@@ -12,7 +12,6 @@ namespace spec\LdapTools\Resolver;
 
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class AttributeNameResolverSpec extends ObjectBehavior
 {

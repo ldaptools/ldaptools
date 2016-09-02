@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\BatchModifyOperation;
@@ -75,7 +76,7 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         ],
     ];
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
     }
@@ -222,12 +223,9 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $this->fromLdap('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldBeEqualTo('Foo,=bar');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $ldap
-     */
-    function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute($ldap)
+    function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute($connection)
     {
-        $this->setLdapConnection($ldap);
+        $this->setLdapConnection($connection);
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
     }
 
@@ -307,9 +305,8 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
 
     /**
      * This is quite the mess. Not sure how to better spec this.
-     * @param \LdapTools\Operation\LdapOperationInterface $operation
      */
-    function it_should_generate_add_and_remove_operations_on_a_modify_operation($connection, $operation)
+    function it_should_generate_add_and_remove_operations_on_a_modify_operation($connection, BatchModifyOperation $operation)
     {
         $sid = 'S-1-5-21-1004336348-1177238915-682003330-512';
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';

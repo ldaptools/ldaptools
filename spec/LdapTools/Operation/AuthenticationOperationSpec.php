@@ -15,7 +15,6 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class AuthenticationOperationSpec extends ObjectBehavior
 {

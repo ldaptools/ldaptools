@@ -13,7 +13,6 @@ namespace spec\LdapTools\Utilities;
 use LdapTools\Utilities\TSProperty;
 use LdapTools\Utilities\TSPropertyArray;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class TSPropertyArraySpec extends ObjectBehavior
 {

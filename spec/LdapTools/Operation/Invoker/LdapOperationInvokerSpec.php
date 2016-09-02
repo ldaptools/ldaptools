@@ -11,35 +11,26 @@
 namespace spec\LdapTools\Operation\Invoker;
 
 use LdapTools\BatchModify\BatchCollection;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
+use LdapTools\Log\LdapLoggerInterface;
+use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
+use LdapTools\Operation\Handler\OperationHandler;
 use LdapTools\Operation\Handler\QueryOperationHandler;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class LdapOperationInvokerSpec extends ObjectBehavior
 {
-    protected $connection;
-
-    protected $dispatcher;
-
-    protected $logger;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     * @param \LdapTools\Log\LdapLoggerInterface $logger
-     */
-    function let($connection, $dispatcher, $logger)
+    function let(LdapConnectionInterface $connection, EventDispatcherInterface $dispatcher, LdapLoggerInterface $logger)
     {
-        $this->connection = $connection;
-        $this->dispatcher = $dispatcher;
-        $this->logger = $logger;
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
         $connection->getConnection()->willReturn(null);
         $connection->isBound()->willReturn(true);
@@ -66,19 +57,14 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->addHandler(new QueryOperationHandler());
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     * @param \LdapTools\Operation\Handler\QueryOperationHandler $queryHandler
-     * @param \LdapTools\Operation\DeleteOperation $operation
-     */
-    function it_should_execute_an_operation_with_the_correct_handler($handler, $queryHandler, $operation)
+    function it_should_execute_an_operation_with_the_correct_handler($dispatcher, $connection, OperationHandler $handler, QueryOperationHandler $queryHandler, DeleteOperation $operation)
     {
         $queryHandler->supports($operation)->willReturn(false);
         $queryHandler->execute($operation)->shouldNotBeCalled();
 
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
         $operation->getServer()->willReturn('foo');
@@ -87,149 +73,131 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $operation->getPostOperations()->willReturn([]);
 
         // This should not be called unless a control is explicitly set
-        $this->connection->setControl(Argument::any())->shouldNotBeCalled();
+        $connection->setControl(Argument::any())->shouldNotBeCalled();
 
         $this->addHandler($handler);
         $this->addHandler($queryHandler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_switch_the_server_if_the_operation_requested_it($handler)
+    function it_should_switch_the_server_if_the_operation_requested_it(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = (new DeleteOperation('foo'))->setServer('bar');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
-        $this->connection->close()->shouldBeCalled();
-        $this->connection->connect(null, null, false, 'foo')->shouldBeCalled();
-        $this->connection->connect(null, null, false, 'bar')->shouldBeCalled();
+        $connection->close()->shouldBeCalled();
+        $connection->connect(null, null, false, 'foo')->shouldBeCalled();
+        $connection->connect(null, null, false, 'bar')->shouldBeCalled();
 
         // Apparently this is the magic/undocumented way to say that calling this function will return X value on
         // the Nth attempt, where Nth is the argument number passed to willReturn(). *sigh* ... ridiculousness.
-        $this->connection->getServer()->willReturn('foo','foo', 'foo', 'bar');
+        $connection->getServer()->willReturn('foo','foo', 'foo', 'bar');
 
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_NOT_switch_the_server_if_the_operation_doesnt_request_it($handler)
+    function it_should_NOT_switch_the_server_if_the_operation_doesnt_request_it(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = new DeleteOperation('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->will(function() use ($operation) {
             $operation->setServer('foo');
         });
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect(null, null, false, 'foo')->shouldNotBeCalled();
-        $this->connection->connect(null, null, false, 'bar')->shouldNotBeCalled();
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect(null, null, false, 'foo')->shouldNotBeCalled();
+        $connection->connect(null, null, false, 'bar')->shouldNotBeCalled();
 
-        $this->connection->getServer()->willReturn('foo','foo');
+        $connection->getServer()->willReturn('foo','foo');
 
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_NOT_switch_the_server_if_the_server_is_already_active($handler)
+    function it_should_NOT_switch_the_server_if_the_server_is_already_active(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = (new DeleteOperation('foo'))->setServer('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect(null, null, false, 'foo')->shouldNotBeCalled();
-        $this->connection->getServer()->willReturn('foo');
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect(null, null, false, 'foo')->shouldNotBeCalled();
+        $connection->getServer()->willReturn('foo');
 
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    function it_should_not_connect_before_or_after_an_authentication_operation_with_a_specific_server_set()
+    function it_should_not_connect_before_or_after_an_authentication_operation_with_a_specific_server_set($connection)
     {
         $operation = (new AuthenticationOperation())->setUsername('foo')->setPassword('foo')->setServer('foo');
 
-        $this->connection->close()->willReturn($this->connection);
+        $connection->close()->willReturn($connection);
         // One to close the original connection. Another to close the temp auth connection.
-        $this->connection->close()->shouldBeCalledTimes(2);
-        $this->connection->connect('foo','foo', false, 'foo')->shouldBeCalledTimes(1);
-        $this->connection->connect()->shouldBeCalledTimes(1);
+        $connection->close()->shouldBeCalledTimes(2);
+        $connection->connect('foo','foo', false, 'foo')->shouldBeCalledTimes(1);
+        $connection->connect()->shouldBeCalledTimes(1);
         // This would be called in switch server, which should not be called...
-        $this->connection->connect(null, null, false, Argument::any())->shouldNotBeCalled();
-        $this->connection->getServer()->willReturn('bar');
-        $this->setConnection($this->connection);
+        $connection->connect(null, null, false, Argument::any())->shouldNotBeCalled();
+        $connection->getServer()->willReturn('bar');
+        $this->setConnection($connection);
 
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_set_controls_specified_by_the_operation($handler)
+    function it_should_set_controls_specified_by_the_operation(OperationHandler $handler, $connection, $dispatcher)
     {
         $control = new LdapControl(LdapControlType::SUB_TREE_DELETE);
         $operation = (new DeleteOperation('ou=test,dc=foo,dc=bar'))->addControl($control);
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->close()->shouldBeCalled();
-        $this->connection->connect(null, null, false, null)->shouldBeCalled();
-        $this->connection->setControl($control)->shouldBeCalled();
+        $connection->close()->shouldBeCalled();
+        $connection->connect(null, null, false, null)->shouldBeCalled();
+        $connection->setControl($control)->shouldBeCalled();
 
         $reset = clone $control;
         $reset->setValue(false);
 
         // It should also reset the control too...
-        $this->connection->setControl($reset)->shouldBeCalled();
+        $connection->setControl($reset)->shouldBeCalled();
 
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    function it_should_trigger_an_event_before_and_after_operation_execution()
+    function it_should_trigger_an_event_before_and_after_operation_execution($dispatcher)
     {
         $operation = new DeleteOperation('dc=foo,dc=bar');
 
-        $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_BEFORE))->shouldBeCalled();
-        $this->dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_AFTER))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_BEFORE))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::which('getName', Event::LDAP_OPERATION_EXECUTE_AFTER))->shouldBeCalled();
 
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     * @param \LdapTools\Operation\DeleteOperation $operation
-     * @param \LdapTools\Operation\AddOperation $preOperation
-     * @param \LdapTools\Operation\AddOperation $postOperation
-     */
-    function it_should_execute_all_child_operations($handler, $operation, $preOperation, $postOperation)
+    function it_should_execute_all_child_operations($connection, $dispatcher, OperationHandler $handler, DeleteOperation $operation, AddOperation $preOperation, AddOperation $postOperation)
     {
         $handler->supports($operation)->willReturn(true);
         $handler->supports($preOperation)->willReturn(true);
         $handler->supports($postOperation)->willReturn(true);
 
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
 
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->setOperationDefaults($preOperation)->shouldBeCalled();
@@ -255,10 +223,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_skip_batch_operations_that_are_empty($handler)
+    function it_should_skip_batch_operations_that_are_empty(OperationHandler $handler)
     {
         $operation = new BatchModifyOperation('dc=foo,dc=bar', new BatchCollection());
         $handler->execute($operation)->shouldNotBeCalled(true);
@@ -267,103 +232,88 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_reconnect_a_connection_that_has_been_idle_too_long($handler)
+    function it_should_reconnect_a_connection_that_has_been_idle_too_long(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = (new DeleteOperation('foo'))->setServer('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
         
-        $this->connection->getIdleTime()->willReturn(600);
-        $this->connection->close()->shouldBeCalled()->willReturn($this->connection);
-        $this->connection->connect()->shouldBeCalled();
+        $connection->getIdleTime()->willReturn(600);
+        $connection->close()->shouldBeCalled()->willReturn($connection);
+        $connection->connect()->shouldBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_not_reconnect_a_connection_that_hasnt_been_idle_too_long($handler)
+    function it_should_not_reconnect_a_connection_that_hasnt_been_idle_too_long(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = (new DeleteOperation('foo'))->setServer('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->getIdleTime()->willReturn(599);
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect()->shouldNotBeCalled();
+        $connection->getIdleTime()->willReturn(599);
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect()->shouldNotBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_not_idle_reconnect_on_an_authentication_operation($handler)
+    function it_should_not_idle_reconnect_on_an_authentication_operation(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = (new AuthenticationOperation('foo', 'bar'))->setServer('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->getIdleTime()->willReturn(601);
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect()->shouldNotBeCalled();
+        $connection->getIdleTime()->willReturn(601);
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect()->shouldNotBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_connect_if_not_yet_bound_on_execution($handler)
+    function it_should_connect_if_not_yet_bound_on_execution(OperationHandler $handler, $dispatcher, $connection)
     {
         $operation = new DeleteOperation('foo');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->getServer()->willReturn(null);
-        $this->connection->isBound()->willReturn(false);
-        $this->connection->getIdleTime()->willReturn(1);
+        $connection->getServer()->willReturn(null);
+        $connection->isBound()->willReturn(false);
+        $connection->getIdleTime()->willReturn(1);
         
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect()->shouldBeCalled();
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect()->shouldBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }
 
-    /**
-     * @param \LdapTools\Operation\Handler\OperationHandler $handler
-     */
-    function it_should_not_connect_if_not_yet_bound_on_an_AuthenticationOperation($handler)
+    function it_should_not_connect_if_not_yet_bound_on_an_AuthenticationOperation(OperationHandler $handler, $connection, $dispatcher)
     {
         $operation = new AuthenticationOperation('foo', 'bar');
         $handler->supports($operation)->willReturn(true);
-        $handler->setConnection($this->connection)->shouldBeCalled();
-        $handler->setEventDispatcher($this->dispatcher)->shouldBeCalled();
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
         $handler->setOperationDefaults($operation)->shouldBeCalled();
         $handler->execute($operation)->shouldBeCalled();
 
-        $this->connection->getServer()->willReturn(null);
-        $this->connection->isBound()->willReturn(false);
-        $this->connection->getIdleTime()->willReturn(1);
+        $connection->getServer()->willReturn(null);
+        $connection->isBound()->willReturn(false);
+        $connection->getIdleTime()->willReturn(1);
 
-        $this->connection->close()->shouldNotBeCalled();
-        $this->connection->connect()->shouldNotBeCalled();
+        $connection->close()->shouldNotBeCalled();
+        $connection->connect()->shouldNotBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
     }

@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Event;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectCreationEventSpec extends ObjectBehavior
 {

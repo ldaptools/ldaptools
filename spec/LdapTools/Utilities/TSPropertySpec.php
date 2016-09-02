@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Utilities;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class TSPropertySpec extends ObjectBehavior
 {
@@ -82,7 +81,6 @@ class TSPropertySpec extends ObjectBehavior
 
     function it_should_properly_encode_and_decode_values_with_UTF8_characters()
     {
-                  
         $hex = '200e01437478574650726f66696c6550617468e398b6e38da6e38da6e388b6e385a5e388b7e380b0';
         $this->beConstructedWith(hex2bin($hex));
         

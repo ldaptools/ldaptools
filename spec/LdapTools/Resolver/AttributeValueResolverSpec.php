@@ -17,7 +17,6 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class AttributeValueResolverSpec extends ObjectBehavior
 {
@@ -53,23 +52,8 @@ class AttributeValueResolverSpec extends ObjectBehavior
      */
     protected $schema;
 
-    /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * @var AddOperation
-     */
-    protected $operation;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Operation\AddOperation $operation
-     */
-    function let($connection, $operation)
+    function let(LdapConnectionInterface $connection, AddOperation $operation)
     {
-        $this->operation = $operation;
         $schema = new LdapObjectSchema('ad', 'user');
         $schema->setAttributeMap([
             'username' => 'sAMAccountName',
@@ -111,7 +95,6 @@ class AttributeValueResolverSpec extends ObjectBehavior
         ]);
         $this->schema = $schema;
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $this->connection = $connection;
         $this->beConstructedThrough('getInstance', [$schema, $this->entryTo, AttributeConverterInterface::TYPE_CREATE]);
     }
 
@@ -125,21 +108,21 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $this->setDn('cn=foo,dc=foo,dc=bar')->shouldBeNull();
     }
 
-    function it_should_allow_setting_the_ldap_connection()
+    function it_should_allow_setting_the_ldap_connection($connection)
     {
-        $this->setLdapConnection($this->connection);
+        $this->setLdapConnection($connection);
     }
 
-    function it_should_convert_values_to_ldap()
+    function it_should_convert_values_to_ldap($operation)
     {
-        $this->setOperation($this->operation);
+        $this->setOperation($operation);
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','512');
         $this->toLdap()->shouldHaveKeyWithValue('username','chad');
         $this->toLdap()->shouldHaveKeyWithValue('emailAddress','Chad.Sikorra@gmail.com');
         $this->toLdap()->shouldHaveKeyWithValue('passwordMustChange','0');
     }
 
-    function it_should_aggregate_properly_on_creation()
+    function it_should_aggregate_properly_on_creation($operation)
     {
         $entry = $this->entryTo;
         $entry['disabled'] = true;
@@ -147,11 +130,11 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['trustedForAllDelegation'] = true;
 
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
-        $this->setOperation($this->operation);
+        $this->setOperation($operation);
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','590338');
     }
 
-    function it_should_aggregate_properly_on_modification()
+    function it_should_aggregate_properly_on_modification($connection, $operation)
     {
         $entry = $this->entryTo;
         $entry['disabled'] = true;
@@ -159,11 +142,11 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['trustedForAllDelegation'] = true;
         unset($entry['groups']);
 
-        $this->connection->execute(
+        $connection->execute(
             (new QueryOperation())->setFilter('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))')->setAttributes(['userAccountControl']))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
-        $this->setLdapConnection($this->connection);
-        $this->setOperation($this->operation);
+        $this->setLdapConnection($connection);
+        $this->setOperation($operation);
         $this->setDn('cn=foo,dc=foo,dc=bar');
 
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','590338');

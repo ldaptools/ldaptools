@@ -14,7 +14,6 @@ use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\MatchingRuleOid;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class MatchingRuleSpec extends ObjectBehavior
 {

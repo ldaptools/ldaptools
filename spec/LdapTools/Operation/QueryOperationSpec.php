@@ -18,7 +18,6 @@ use LdapTools\Operation\RenameOperation;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\OperatorCollection;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class QueryOperationSpec extends ObjectBehavior
 {

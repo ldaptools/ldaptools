@@ -12,7 +12,6 @@ namespace spec\LdapTools\Connection;
 
 use LdapTools\Connection\LdapControlType;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapControlSpec extends ObjectBehavior
 {

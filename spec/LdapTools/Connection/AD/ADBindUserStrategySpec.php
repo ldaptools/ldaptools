@@ -12,7 +12,6 @@ namespace spec\LdapTools\Connection;
 
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ADBindUserStrategySpec extends ObjectBehavior
 {

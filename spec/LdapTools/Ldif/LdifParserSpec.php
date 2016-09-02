@@ -20,7 +20,6 @@ use LdapTools\Ldif\Entry\LdifEntryModRdn;
 use LdapTools\Ldif\UrlLoader\BaseUrlLoader;
 use LdapTools\Operation\AddOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdifParserSpec extends ObjectBehavior
 {

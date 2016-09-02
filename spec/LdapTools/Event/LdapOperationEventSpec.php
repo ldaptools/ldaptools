@@ -14,7 +14,6 @@ use LdapTools\Connection\LdapConnection;
 use LdapTools\DomainConfiguration;
 use LdapTools\Operation\AddOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapOperationEventSpec extends ObjectBehavior
 {

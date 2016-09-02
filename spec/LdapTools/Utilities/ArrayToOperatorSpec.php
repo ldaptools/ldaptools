@@ -12,7 +12,6 @@ namespace spec\LdapTools\Utilities;
 
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Symfony\Component\Yaml\Yaml;
 
 class ArrayToOperatorSpec extends ObjectBehavior

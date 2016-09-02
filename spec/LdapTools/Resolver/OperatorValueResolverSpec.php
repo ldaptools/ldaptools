@@ -18,7 +18,6 @@ use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Schema\Parser\SchemaYamlParser;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class OperatorValueResolverSpec extends ObjectBehavior
 {

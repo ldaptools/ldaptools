@@ -15,7 +15,6 @@ use LdapTools\Operation\QueryOperation;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectSchemaSpec extends ObjectBehavior
 {

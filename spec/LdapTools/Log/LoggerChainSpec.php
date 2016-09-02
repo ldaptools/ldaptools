@@ -15,7 +15,6 @@ use LdapTools\Log\LdapLoggerInterface;
 use LdapTools\Log\LogOperation;
 use LdapTools\Operation\DeleteOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LoggerChainSpec extends ObjectBehavior
 {
@@ -29,10 +28,6 @@ class LoggerChainSpec extends ObjectBehavior
         $this->addLogger(new EchoLdapLogger());
     }
 
-    /**
-     * @param \LdapTools\Logger\EchoLdapLogger
-     * @param \LdapTools\Logger\EchoLdapLogger
-     */
     function it_should_call_the_loggers_on_start_and_end()
     {
         $operation = new DeleteOperation('foo');

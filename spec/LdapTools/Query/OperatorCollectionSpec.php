@@ -17,11 +17,9 @@ use LdapTools\Query\Operator\bOr;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\MatchingRule;
 use LdapTools\Query\Operator\Wildcard;
-use LdapTools\Query\Operator\From;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class OperatorCollectionSpec extends ObjectBehavior
 {

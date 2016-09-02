@@ -12,7 +12,6 @@ namespace spec\LdapTools\Cache;
 
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class DoctrineCacheSpec extends ObjectBehavior
 {

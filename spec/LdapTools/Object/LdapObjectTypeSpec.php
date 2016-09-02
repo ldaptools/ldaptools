@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Object;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectTypeSpec extends ObjectBehavior
 {

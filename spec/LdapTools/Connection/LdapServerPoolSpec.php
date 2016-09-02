@@ -13,6 +13,8 @@ namespace spec\LdapTools\Connection;
 use LdapTools\Connection\LdapServerPool;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\LdapConnectionException;
+use LdapTools\Utilities\Dns;
+use LdapTools\Utilities\TcpSocket;
 use PhpSpec\ObjectBehavior;
 
 class LdapServerPoolSpec extends ObjectBehavior
@@ -74,10 +76,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getSortedServersArray()->shouldNotBeEqualTo($this->servers);
     }
 
-    /**
-     * @param \LdapTools\Utilities\TcpSocket $tcp
-     */
-    function it_should_throw_an_exception_when_no_servers_are_available($tcp)
+    function it_should_throw_an_exception_when_no_servers_are_available(TcpSocket $tcp)
     {
         $tcp->connect('foo', 389, 1)->shouldBeCalled()->willReturn(false);
         $config = new DomainConfiguration('example.com');
@@ -87,11 +86,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->shouldThrow(new LdapConnectionException('No LDAP server is available.'))->duringGetServer();
     }
 
-    /**
-     * @param \LdapTools\Utilities\TcpSocket $tcp
-     * @param \LdapTools\Utilities\Dns $dns
-     */
-    function it_should_lookup_servers_via_dns_if_no_servers_are_defined($tcp, $dns)
+    function it_should_lookup_servers_via_dns_if_no_servers_are_defined(TcpSocket $tcp, Dns $dns)
     {
         $tcp->connect('bar.example.com', 389, 1)->shouldBeCalled()->willReturn(false);
         $tcp->connect('test.example.com', 389, 1)->shouldBeCalled()->willReturn(false);
@@ -138,11 +133,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getServer()->shouldBeEqualTo('foo.example.com');
     }
 
-    /**
-     * @param \LdapTools\Utilities\TcpSocket $tcp
-     * @param \LdapTools\Utilities\Dns $dns
-     */
-    function it_should_throw_an_error_when_no_servers_are_returned_from_dns($tcp, $dns)
+    function it_should_throw_an_error_when_no_servers_are_returned_from_dns(TcpSocket $tcp, Dns $dns)
     {
         $e = new LdapConnectionException('No LDAP servers found via DNS for "example.com".');
         $dns->getRecord("_ldap._tcp.example.com", DNS_SRV)->willReturn(false);
@@ -152,10 +143,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->shouldThrow($e)->duringGetServer();
     }
 
-    /**
-     * @param \LdapTools\Utilities\TcpSocket $tcp
-     */
-    function it_should_adjust_the_port_if_it_changes_in_the_domain_config($tcp)
+    function it_should_adjust_the_port_if_it_changes_in_the_domain_config(TcpSocket $tcp)
     {
         $tcp->connect('foo', 389, 1)->shouldBeCalled()->willReturn(true);
         $tcp->close()->shouldBeCalled();
@@ -171,7 +159,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getServer()->shouldReturn('foo');
     }
 
-    function it_should_use_the_connect_timeout_value_from_the_config(\LdapTools\Utilities\TcpSocket $tcp)
+    function it_should_use_the_connect_timeout_value_from_the_config(TcpSocket $tcp)
     {
         $tcp->connect('foo', 389, 5)->shouldBeCalled()->willReturn(true);
         $tcp->close()->shouldBeCalled();

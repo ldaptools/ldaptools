@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Ldif;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdifEntryBuilderSpec extends ObjectBehavior
 {

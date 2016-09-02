@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
 use LdapTools\Object\LdapObject;
@@ -62,11 +63,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\LdapManager');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection2
-     */
-    function it_should_allow_ldap_connections_to_be_passed_to_the_constructor($connection, $connection2)
+    function it_should_allow_ldap_connections_to_be_passed_to_the_constructor(LdapConnectionInterface $connection, LdapConnectionInterface $connection2)
     {
         $domainConfig2 = new DomainConfiguration('foo.bar');
         $connection2->getConfig()->willReturn($domainConfig2);
@@ -177,10 +174,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_attempt_to_authenticate_a_username_and_password($connection)
+    function it_should_attempt_to_authenticate_a_username_and_password(LdapConnectionInterface $connection)
     {
         $operation = new AuthenticationOperation();
         $operation->setUsername('foo')->setPassword('bar');
@@ -193,11 +187,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->authenticate('foo','bar')->shouldBeEqualTo(true);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection2
-     */
-    function it_should_set_a_ldap_connection($connection, $connection2)
+    function it_should_set_a_ldap_connection(LdapConnectionInterface $connection, LdapConnectionInterface $connection2)
     {
         $domainConfig = new DomainConfiguration('foo.bar');
         $connection->getConfig()->willReturn($domainConfig);
@@ -249,10 +239,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->getEventDispatcher()->shouldReturnAnInstanceOf('\LdapTools\Event\EventDispatcherInterface');
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_delete_a_ldap_object($connection)
+    function it_should_delete_a_ldap_object(LdapConnectionInterface $connection)
     {
         $domainConfig = new DomainConfiguration('example.local');
         $connection->getConfig()->willReturn($domainConfig);
@@ -270,10 +257,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->delete($ldapObject, true);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function it_should_restore_a_ldap_object($connection)
+    function it_should_restore_a_ldap_object(LdapConnectionInterface $connection)
     {
         $domainConfig = new DomainConfiguration('example.local');
         $connection->getConfig()->willReturn($domainConfig);

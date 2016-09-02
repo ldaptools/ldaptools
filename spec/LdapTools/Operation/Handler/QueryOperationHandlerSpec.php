@@ -26,24 +26,8 @@ use Prophecy\Argument;
 
 class QueryOperationHandlerSpec extends ObjectBehavior
 {
-    /**
-     * @var PageControl
-     */
-    protected $pager;
-
-    /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * @param \LdapTools\Connection\PageControl $pager
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($pager, $connection)
+    function let(PageControl $pager, LdapConnectionInterface $connection)
     {
-        $this->pager = $pager;
-        $this->connection = $connection;
         $this->beConstructedWith($pager);
         $this->setConnection($connection);
     }
@@ -72,7 +56,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $this->supports(new BatchModifyOperation('foo'))->shouldBeEqualTo(false);
     }
 
-    function it_should_enable_paging_when_executing_an_operation_that_uses_paging()
+    function it_should_enable_paging_when_executing_an_operation_that_uses_paging($pager)
     {
         $operation = new QueryOperation();
         $operation->setPageSize(10)
@@ -81,15 +65,15 @@ class QueryOperationHandlerSpec extends ObjectBehavior
             ->setBaseDn('example.local')
             ->setFilter('(sAMAccountName=foo)');
 
-        $this->pager->setIsEnabled(true)->shouldBeCalled();
-        $this->pager->start(10, 0)->shouldBeCalled();
-        $this->pager->next()->shouldBeCalled();
+        $pager->setIsEnabled(true)->shouldBeCalled();
+        $pager->start(10, 0)->shouldBeCalled();
+        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
     }
 
-    function it_should_use_a_size_limit_with_the_pager_when_paging_is_enabled()
+    function it_should_use_a_size_limit_with_the_pager_when_paging_is_enabled($pager)
     {
         $operation = new QueryOperation();
         $operation->setPageSize(10)
@@ -99,15 +83,15 @@ class QueryOperationHandlerSpec extends ObjectBehavior
             ->setBaseDn('example.local')
             ->setFilter('(sAMAccountName=foo)');
 
-        $this->pager->setIsEnabled(true)->shouldBeCalled();
-        $this->pager->start(10, 20)->shouldBeCalled();
-        $this->pager->next()->shouldBeCalled();
+        $pager->setIsEnabled(true)->shouldBeCalled();
+        $pager->start(10, 20)->shouldBeCalled();
+        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
     }
 
-    function it_should_NOT_enable_paging_when_executing_an_operation_that_disables_paging()
+    function it_should_NOT_enable_paging_when_executing_an_operation_that_disables_paging($pager)
     {
         $operation = new QueryOperation();
         $operation->setUsePaging(false)
@@ -115,9 +99,9 @@ class QueryOperationHandlerSpec extends ObjectBehavior
             ->setBaseDn('example.local')
             ->setFilter('(sAMAccountName=foo)');
 
-        $this->pager->setIsEnabled(false)->shouldBeCalled();
-        $this->pager->start(null, 0)->shouldBeCalled();
-        $this->pager->next()->shouldBeCalled();
+        $pager->setIsEnabled(false)->shouldBeCalled();
+        $pager->start(null, 0)->shouldBeCalled();
+        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
@@ -133,37 +117,34 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
     }
 
-    function it_should_set_the_defaults_from_the_rootdse_when_the_basedn_for_the_query_operation_is_not_set()
+    function it_should_set_the_defaults_from_the_rootdse_when_the_basedn_for_the_query_operation_is_not_set($connection)
     {
         $object = new LdapObject(['defaultNamingContext' => 'dc=foo,dc=bar']);
         $config = new DomainConfiguration('foo.bar');
 
-        $this->connection->getConfig()->willReturn($config);
-        $this->connection->getRootDse()->shouldBeCalled();
-        $this->connection->getRootDse()->willReturn($object);
-        $this->connection->getServer()->willReturn('foo');
+        $connection->getConfig()->willReturn($config);
+        $connection->getRootDse()->shouldBeCalled();
+        $connection->getRootDse()->willReturn($object);
+        $connection->getServer()->willReturn('foo');
 
         $this->setOperationDefaults(new QueryOperation());
     }
 
-    function it_should_set_the_defaults_from_the_config_when_the_basedn_for_the_query_operation_is_not_set()
+    function it_should_set_the_defaults_from_the_config_when_the_basedn_for_the_query_operation_is_not_set($connection)
     {
         $config = (new DomainConfiguration('foo.bar'))->setBaseDn('dc=foo,dc=bar');
 
-        $this->connection->getConfig()->willReturn($config);
-        $this->connection->getRootDse()->shouldNotBeCalled();
-        $this->connection->getServer()->willReturn('foo');
+        $connection->getConfig()->willReturn($config);
+        $connection->getRootDse()->shouldNotBeCalled();
+        $connection->getServer()->willReturn('foo');
 
         $this->setOperationDefaults(new QueryOperation());
     }
 
-    /**
-     * @param \LdapTools\DomainConfiguration $config
-     */
-    function it_should_not_set_the_defaults_when_they_are_explicitly_set($config)
+    function it_should_not_set_the_defaults_when_they_are_explicitly_set(DomainConfiguration $config, $connection)
     {
-        $this->connection->getConfig()->willReturn($config);
-        $this->connection->getServer()->shouldNotBeCalled();
+        $connection->getConfig()->willReturn($config);
+        $connection->getServer()->shouldNotBeCalled();
         $config->getBaseDn()->shouldNotBeCalled();
         $config->getUsePaging()->shouldNotBeCalled();
         $config->getPageSize()->shouldNotBeCalled();
@@ -172,13 +153,10 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $this->setOperationDefaults($operation);
     }
 
-    /**
-     * @param \LdapTools\DomainConfiguration $config
-     */
-    function it_should_set_the_defaults_when_they_are_not_explicitly_set($config)
+    function it_should_set_the_defaults_when_they_are_not_explicitly_set(DomainConfiguration $config, $connection)
     {
-        $this->connection->getConfig()->willReturn($config);
-        $this->connection->getServer()->willReturn('foo');
+        $connection->getConfig()->willReturn($config);
+        $connection->getServer()->willReturn('foo');
         $config->getBaseDn()->willReturn('dc=foo,dc=bar');
         $config->getBaseDn()->shouldBeCalled();
         $config->getUsePaging()->shouldBeCalled();
@@ -187,14 +165,14 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $this->setOperationDefaults(new QueryOperation());
     }
 
-    function it_should_throw_an_exception_when_the_base_dn_cannot_be_found()
+    function it_should_throw_an_exception_when_the_base_dn_cannot_be_found($connection)
     {
         $object = new LdapObject([],['user'],'user','user');
         $config = new DomainConfiguration('foo.bar');
 
-        $this->connection->getConfig()->willReturn($config);
-        $this->connection->getRootDse()->shouldBeCalled();
-        $this->connection->getRootDse()->willReturn($object);
+        $connection->getConfig()->willReturn($config);
+        $connection->getRootDse()->shouldBeCalled();
+        $connection->getRootDse()->willReturn($object);
 
         $ex = new LdapConnectionException('The base DN is not defined and could not be found in the RootDSE.');
         $this->shouldThrow($ex)->duringSetOperationDefaults(new QueryOperation());

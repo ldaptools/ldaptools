@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Log;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class EchoLdapLoggerSpec extends ObjectBehavior
 {

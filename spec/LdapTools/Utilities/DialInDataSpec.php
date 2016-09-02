@@ -12,7 +12,6 @@ namespace spec\LdapTools\Utilities;
 
 use LdapTools\Utilities\DialInData;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class DialInDataSpec extends ObjectBehavior
 {

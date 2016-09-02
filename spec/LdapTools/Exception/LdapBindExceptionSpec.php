@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Exception;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapBindExceptionSpec extends ObjectBehavior
 {

@@ -14,7 +14,6 @@ use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class bNotSpec extends ObjectBehavior
 {

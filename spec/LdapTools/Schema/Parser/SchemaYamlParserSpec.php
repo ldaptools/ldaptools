@@ -17,7 +17,6 @@ use LdapTools\Exception\SchemaParserException;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class SchemaYamlParserSpec extends ObjectBehavior
 {

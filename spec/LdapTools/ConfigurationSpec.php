@@ -15,8 +15,7 @@ use LdapTools\Exception\ConfigurationException;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Log\EchoLdapLogger;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
-use \LdapTools\DomainConfiguration;
+use LdapTools\DomainConfiguration;
 
 class ConfigurationSpec extends ObjectBehavior
 {

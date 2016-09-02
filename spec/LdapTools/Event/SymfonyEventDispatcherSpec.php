@@ -12,7 +12,6 @@ namespace spec\LdapTools\Event;
 
 use LdapTools\Event\EventSubscriberInterface;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use Symfony\Component\EventDispatcher\EventDispatcher;
 
 class SymfonyEventDispatcherSpec extends ObjectBehavior

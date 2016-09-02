@@ -18,21 +18,11 @@ use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Operation\RenameOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class OperationHandlerSpec extends ObjectBehavior
 {
-    /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    function let($connection)
+    function let(LdapConnectionInterface $connection)
     {
-        $this->connection = $connection;
         $this->setConnection($connection);
     }
 

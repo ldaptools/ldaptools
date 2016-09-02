@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Utilities;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class TcpSocketSpec extends ObjectBehavior
 {

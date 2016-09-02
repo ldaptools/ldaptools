@@ -10,22 +10,22 @@
 
 namespace spec\LdapTools\Factory;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Configuration;
 use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectSchemaEvent;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObjectType;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Schema\Parser\SchemaParserInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
 class LdapObjectSchemaFactorySpec extends ObjectBehavior
 {
-    /**
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function let($dispatcher)
+    function let(EventDispatcherInterface $dispatcher)
     {
         $config = new Configuration();
         $parser = SchemaParserFactory::get('yml', $config->getSchemaFolder());
@@ -48,12 +48,7 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\SchemaParserException')->duringGet('foo', 'bar');
     }
 
-    /**
-     * @param \LdapTools\Cache\CacheInterface $cache
-     * @param \LdapTools\Schema\Parser\SchemaParserInterface $parser
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_build_the_cache_item_if_it_cannot_be_found($cache, $parser, $dispatcher)
+    function it_should_build_the_cache_item_if_it_cannot_be_found(CacheInterface $cache, SchemaParserInterface $parser, $dispatcher)
     {
         $cache->getUseAutoCache()->willReturn(false);
         $cache->contains(LdapObjectSchema::getCacheType(), 'ad.user')->willReturn(false);
@@ -64,12 +59,7 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->get('ad', LdapObjectType::USER)->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
-    /**
-     * @param \LdapTools\Cache\CacheInterface $cache
-     * @param \LdapTools\Schema\Parser\SchemaParserInterface $parser
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_not_build_the_cache_item_if_it_is_in_the_cache_and_auto_cache_is_not_on($cache, $parser, $dispatcher)
+    function it_should_not_build_the_cache_item_if_it_is_in_the_cache_and_auto_cache_is_not_on(CacheInterface $cache, SchemaParserInterface $parser, $dispatcher)
     {
         $cache->getUseAutoCache()->willReturn(false);
         $cache->contains(LdapObjectSchema::getCacheType(), 'ad.user')->willReturn(true);
@@ -81,12 +71,7 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->get('ad', LdapObjectType::USER);
     }
 
-    /**
-     * @param \LdapTools\Cache\CacheInterface $cache
-     * @param \LdapTools\Schema\Parser\SchemaParserInterface $parser
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_build_the_cache_when_auto_cache_is_enabled_and_the_cache_item_is_out_of_date($cache, $parser, $dispatcher)
+    function it_should_build_the_cache_when_auto_cache_is_enabled_and_the_cache_item_is_out_of_date(CacheInterface $cache, SchemaParserInterface $parser, $dispatcher)
     {
         $cache->getUseAutoCache()->willReturn(true);
         $cache->contains(LdapObjectSchema::getCacheType(), 'ad.user')->willReturn(true);
@@ -100,12 +85,7 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->get('ad', LdapObjectType::USER)->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
-    /**
-     * @param \LdapTools\Cache\CacheInterface $cache
-     * @param \LdapTools\Schema\Parser\SchemaParserInterface $parser
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_not_build_the_cache_when_auto_cache_is_enabled_and_the_cache_item_is_not_out_of_date($cache, $parser, $dispatcher)
+    function it_should_not_build_the_cache_when_auto_cache_is_enabled_and_the_cache_item_is_not_out_of_date(CacheInterface $cache, SchemaParserInterface $parser, $dispatcher)
     {
         $cache->getUseAutoCache()->willReturn(true);
         $cache->contains(LdapObjectSchema::getCacheType(), 'ad.user')->willReturn(true);
@@ -119,9 +99,6 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->get('ad', LdapObjectType::USER)->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
-    /**
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
     function it_should_call_the_load_schema_event($dispatcher)
     {
         $config = new Configuration();
@@ -134,12 +111,7 @@ class LdapObjectSchemaFactorySpec extends ObjectBehavior
         $this->get('ad', LdapObjectType::USER);
     }
 
-    /**
-     * @param \LdapTools\Cache\CacheInterface $cache
-     * @param \LdapTools\Schema\Parser\SchemaParserInterface $parser
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_not_call_the_load_schema_event_when_retrieving_from_the_cache($cache, $parser, $dispatcher)
+    function it_should_not_call_the_load_schema_event_when_retrieving_from_the_cache(CacheInterface $cache, SchemaParserInterface $parser, $dispatcher)
     {
         $cache->getUseAutoCache()->willReturn(true);
         $cache->contains(LdapObjectSchema::getCacheType(), 'ad.user')->willReturn(true);

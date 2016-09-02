@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Ldif\UrlLoader;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class BaseUrlLoaderSpec extends ObjectBehavior
 {

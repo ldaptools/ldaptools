@@ -11,12 +11,12 @@
 namespace spec\LdapTools\Ldif\Entry;
 
 use LdapTools\Configuration;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\DomainConfiguration;
+use LdapTools\Object\LdapObject;
 use LdapTools\Schema\Parser\SchemaYamlParser;
-use PhpSpec\Exception\Example\SkippingException;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdifEntryModifySpec extends ObjectBehavior
 {
@@ -117,11 +117,7 @@ class LdifEntryModifySpec extends ObjectBehavior
         $this->toString()->shouldBeEqualTo($ldif);
     }
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Object\LdapObject $rootdse
-     */
-    function it_should_get_the_ldif_string_representation_in_the_context_of_a_type_and_a_schema($connection, $rootdse)
+    function it_should_get_the_ldif_string_representation_in_the_context_of_a_type_and_a_schema(LdapConnectionInterface $connection, LdapObject $rootdse)
     {
         $domain = new DomainConfiguration('example.local');
         $domain->setUseTls(true);

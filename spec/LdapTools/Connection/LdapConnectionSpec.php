@@ -13,7 +13,6 @@ namespace spec\LdapTools\Connection;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Event\SymfonyEventDispatcher;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use \LdapTools\DomainConfiguration;
 
 class LdapConnectionSpec extends ObjectBehavior

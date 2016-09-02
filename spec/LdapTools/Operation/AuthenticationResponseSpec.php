@@ -11,7 +11,6 @@
 namespace spec\LdapTools\Operation;
 
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class AuthenticationResponseSpec extends ObjectBehavior
 {

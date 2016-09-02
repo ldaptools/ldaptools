@@ -7,6 +7,7 @@ use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
+use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectCreationEvent;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
@@ -15,7 +16,6 @@ use LdapTools\Factory\SchemaParserFactory;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AddOperation;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapObjectCreatorSpec extends ObjectBehavior
 {
@@ -36,11 +36,6 @@ class LdapObjectCreatorSpec extends ObjectBehavior
     ];
 
     /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
      * @var DomainConfiguration
      */
     protected $config;
@@ -57,10 +52,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     protected $dispatcher;
 
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     */
-    public function let($connection)
+    public function let(LdapConnectionInterface $connection)
     {
         $this->config = (new DomainConfiguration('example.com'))->setSchemaName('example');
         $this->config->setUseTls(true);
@@ -77,9 +69,8 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
         $this->attributes['unicodePwd'] = (new EncodeWindowsPassword())->toLdap('12345');
         $this->addOperation = (new AddOperation('foo'))->setDn("cn=somedude,dc=foo,dc=bar")->setAttributes($this->attributes);
-        $this->connection = $connection;
 
-        $this->beConstructedWith($this->connection, $this->schemaFactoryTest, $this->dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactoryTest, $this->dispatcher);
     }
 
     function it_is_initializable()
@@ -142,10 +133,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow('\Exception')->duringCreate('foo');
     }
 
-    function it_should_set_parameters_for_the_attributes_sent_to_ldap()
+    function it_should_set_parameters_for_the_attributes_sent_to_ldap($connection)
     {
         $this->addOperation->setLocation('dc=foo,dc=bar');
-        $this->connection->execute($this->addOperation)->willReturn(true);
+        $connection->execute($this->addOperation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -156,13 +147,13 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->execute();
     }
 
-    function it_should_respect_an_explicitly_set_dn()
+    function it_should_respect_an_explicitly_set_dn($connection)
     {
-        $this->connection->execute($this->addOperation)->willReturn(true);
+        $connection->execute($this->addOperation)->willReturn(true);
         $this->addOperation->setDn('cn=chad,ou=users,dc=foo,dc=bar');
 
         $this->config->setSchemaName('ad');
-        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
@@ -170,16 +161,16 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    function it_should_escape_the_base_dn_name_properly_when_using_a_schema()
+    function it_should_escape_the_base_dn_name_properly_when_using_a_schema($connection)
     {
         $attributes = $this->attributes;
         $attributes['cn'] = 'foo=,bar';
         $operation = new AddOperation('cn=foo\\3d\\2cbar,dc=foo,dc=bar', $attributes);
         $operation->setLocation('dc=foo,dc=bar');
-        $this->connection->execute($operation)->willReturn(true);
+        $connection->execute($operation)->willReturn(true);
 
         $this->config->setSchemaName('ad');
-        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['name' => 'foo=,bar', 'username' => 'somedude', 'password' => '12345'])
@@ -193,24 +184,24 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->shouldThrow(new \LogicException('You must specify a container or OU to place this LDAP object in.'))->duringExecute();
     }
 
-    function it_should_use_a_default_container_defined_in_the_schema()
+    function it_should_use_a_default_container_defined_in_the_schema($connection)
     {
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=foo,ou=bar,dc=example,dc=local');
         $operation->setLocation('ou=foo,ou=bar,dc=example,dc=local');
-        $this->connection->execute($operation)->willReturn(true);
+        $connection->execute($operation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
             ->execute();
     }
 
-    function it_should_allow_a_default_container_to_be_overwritten()
+    function it_should_allow_a_default_container_to_be_overwritten($connection)
     {
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
         $operation->setLocation('ou=employees,dc=example,dc=local');
-        $this->connection->execute($operation)->willReturn(true);
+        $connection->execute($operation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
@@ -218,15 +209,15 @@ class LdapObjectCreatorSpec extends ObjectBehavior
             ->execute();
     }
 
-    function it_should_set_parameters_for_the_container_of_the_ldap_object()
+    function it_should_set_parameters_for_the_container_of_the_ldap_object($connection)
     {
         $operation = clone $this->addOperation;
         $operation->setDn("cn=somedude,ou=Sales,dc=example,dc=com");
         $operation->setLocation('%SalesOU%,%_defaultnamingcontext_%');
-        $this->connection->execute($operation)->willReturn(true);
+        $connection->execute($operation)->willReturn(true);
 
         $this->config->setSchemaName('ad');
-        $this->beConstructedWith($this->connection, $this->schemaFactory, $this->dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -237,13 +228,10 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->execute();
     }
 
-    /**
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function it_should_call_creation_events_when_creating_a_ldap_object($dispatcher)
+    function it_should_call_creation_events_when_creating_a_ldap_object(EventDispatcherInterface $dispatcher, $connection)
     {
         $this->addOperation->setLocation('dc=foo,dc=bar');
-        $this->connection->execute($this->addOperation)->willReturn(true);
+        $connection->execute($this->addOperation)->willReturn(true);
 
         $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
         $beforeEvent->setContainer('dc=foo,dc=bar');
@@ -257,7 +245,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $dispatcher->dispatch($afterEvent)->shouldBeCalled();
 
         $this->config->setSchemaName('ad');
-        $this->beConstructedWith($this->connection, $this->schemaFactory, $dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactory, $dispatcher);
 
         $this->createUser()
             ->with(['username' => '%foo%', 'password' => '%bar%'])
@@ -268,13 +256,13 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->execute();
     }
 
-    function it_should_allow_a_ldap_server_to_be_set()
+    function it_should_allow_a_ldap_server_to_be_set($connection)
     {
         $operation = clone $this->addOperation;
         $operation->setLocation('ou=employees,dc=example,dc=local');
         $operation->setDn('cn=somedude,ou=employees,dc=example,dc=local');
         $operation->setServer('foo');
-        $this->connection->execute($operation)->willReturn(true);
+        $connection->execute($operation)->willReturn(true);
 
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
@@ -290,7 +278,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->getServer()->shouldBeEqualTo('foo');
     }
 
-    function it_should_filter_out_empty_strings_and_null_values_before_the_operation_is_executed()
+    function it_should_filter_out_empty_strings_and_null_values_before_the_operation_is_executed($connection)
     {
         $operation = clone $this->addOperation;
         $attributes = $this->attributes;
@@ -300,7 +288,7 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $operation->setLocation('cn=users,dc=example,dc=local');
         $operation->setAttributes($attributes);
         
-        $this->connection->execute($operation)->shouldBeCalled();
+        $connection->execute($operation)->shouldBeCalled();
         $this->createUser()
             ->with([
                 'name' => ' ',

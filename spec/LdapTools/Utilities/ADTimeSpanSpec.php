@@ -12,7 +12,6 @@ namespace spec\LdapTools\Utilities;
 
 use LdapTools\Utilities\ADTimeSpan;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class ADTimeSpanSpec extends ObjectBehavior
 {

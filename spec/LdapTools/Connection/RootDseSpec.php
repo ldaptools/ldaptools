@@ -10,8 +10,9 @@
 
 namespace spec\LdapTools\Connection;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
-use LdapTools\Operation\QueryOperation;
+use LdapTools\Event\EventDispatcherInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -34,15 +35,7 @@ class RootDseSpec extends ObjectBehavior
         ],
     ];
 
-    protected $connection;
-
-    protected $dispatcher;
-
-    /**
-     * @param \LdapTools\Connection\LdapConnectionInterface $connection
-     * @param \LdapTools\Event\EventDispatcherInterface $dispatcher
-     */
-    function let($connection, $dispatcher)
+    function let(LdapConnectionInterface $connection, EventDispatcherInterface $dispatcher)
     {
         $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == "(&(objectClass=*))" && $operation->getBaseDn() == "";
@@ -51,8 +44,6 @@ class RootDseSpec extends ObjectBehavior
         $connection->isBound()->willReturn(false);
         $connection->connect('','', true)->willReturn(null);
 
-        $this->connection = $connection;
-        $this->dispatcher = $dispatcher;
         $this->beConstructedWith($connection, $dispatcher);
     }
 
@@ -77,9 +68,9 @@ class RootDseSpec extends ObjectBehavior
         $this->get()->getDefaultNamingContext()->shouldBeEqualTo("dc=example,dc=local");
     }
 
-    function it_should_call_the_schema_load_event_when_getting_the_rootdse_schema()
+    function it_should_call_the_schema_load_event_when_getting_the_rootdse_schema($dispatcher)
     {
-        $this->dispatcher->dispatch(Argument::type('\LdapTools\Event\LdapObjectSchemaEvent'))->shouldBeCalled();
+        $dispatcher->dispatch(Argument::type('\LdapTools\Event\LdapObjectSchemaEvent'))->shouldBeCalled();
         $this->get();
     }
 }

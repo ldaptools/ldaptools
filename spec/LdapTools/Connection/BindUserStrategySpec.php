@@ -13,7 +13,6 @@ namespace spec\LdapTools\Connection;
 use LdapTools\Connection\LdapConnection;
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class BindUserStrategySpec extends ObjectBehavior
 {

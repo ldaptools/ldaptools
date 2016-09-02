@@ -12,7 +12,6 @@ namespace spec\LdapTools\BatchModify;
 
 use LdapTools\Exception\InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 use LdapTools\BatchModify\Batch;
 
 class BatchSpec extends ObjectBehavior

@@ -12,7 +12,6 @@ namespace spec\LdapTools\Utilities;
 
 use LdapTools\Utilities\LdapUtilities;
 use PhpSpec\ObjectBehavior;
-use Prophecy\Argument;
 
 class LdapUtilitiesSpec extends ObjectBehavior
 {
