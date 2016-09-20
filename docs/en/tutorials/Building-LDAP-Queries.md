@@ -7,7 +7,7 @@ takes care of escaping all values passed to it when generating the filter.
 
 * [LdapQueryBuilder Methods](#ldapquerybuilder-methods)
 * [Filter Method Shortcuts](#filter-method-shortcuts)
-* [Using Aliases](#using-aliases-in-queries)
+* [Using Aliases](#using-aliases)
 * [Retrieving Query Results](#ldapquery-methods-to-retrieve-ldap-results)
 
 ## Generating LDAP Filters Without LdapManager
