@@ -62,6 +62,7 @@ class QueryOperationHandler implements OperationHandlerInterface
             $this->paging()->update($result);
         } while ($this->paging()->isActive());
         $this->paging()->end();
+        @ldap_free_result($result);
 
         return $allEntries;
     }
