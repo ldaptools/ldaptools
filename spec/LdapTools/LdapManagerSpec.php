@@ -13,6 +13,7 @@ namespace spec\LdapTools;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
+use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\AuthenticationResponse;
@@ -94,7 +95,9 @@ class LdapManagerSpec extends ObjectBehavior
 
     function it_should_error_when_trying_to_get_a_connection_that_doesnt_exist()
     {
-        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetConnection('foo');
+        $e = new InvalidArgumentException('Domain "foo" is not valid. Valid domains are: example.com, test.com');
+
+        $this->shouldThrow($e)->duringGetConnection('foo');
     }
 
     function it_should_return_a_LdapQueryBuilder_when_calling_buildLdapQuery()

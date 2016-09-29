@@ -386,7 +386,11 @@ class LdapManager
     protected function validateDomainName($domain)
     {
         if (!array_key_exists($domain, $this->domains)) {
-            throw new InvalidArgumentException(sprintf('Domain "%s" is not valid.', $domain));
+            throw new InvalidArgumentException(sprintf(
+                'Domain "%s" is not valid. Valid domains are: %s',
+                $domain,
+                implode(', ', array_keys($this->domains))
+            ));
         }
     }
 
