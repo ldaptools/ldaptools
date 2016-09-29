@@ -54,7 +54,9 @@ trait ConfigurationParseTrait
         }
         $existingConfig = array_merge($existingConfig, $parsedConfig);
 
-        return array_filter($existingConfig);
+        return array_filter($existingConfig, function($v) {
+            return $v !== null && $v !== '';
+        });
     }
 
     /**

@@ -254,6 +254,7 @@ class DomainConfigurationSpec extends ObjectBehavior
             'password' => '12345',
             'servers' => ['test'],
             'ldap_options' => ['ldap_opt_protocol_version' => 2],
+            'use_paging' => false
         ];
         $this->load($config)->shouldReturnAnInstanceOf('LdapTools\DomainConfiguration');
         $this->getDomainName()->shouldBeEqualTo('example.local');
@@ -261,6 +262,7 @@ class DomainConfigurationSpec extends ObjectBehavior
         $this->getPassword()->shouldBeEqualTo('12345');
         $this->getServers()->shouldReturn(['test']);
         $this->getLdapOptions()->shouldHaveKeyWithValue(LDAP_OPT_PROTOCOL_VERSION, 2);
+        $this->getUsePaging()->shouldBeEqualTo(false);
     }
 
     function it_should_error_when_missing_required_config_values()
