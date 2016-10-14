@@ -53,6 +53,11 @@ class ADFunctionalLevelType
     const WIN2012R2 = 6;
 
     /**
+     * Windows Server 2016
+     */
+    const WIN2016 = 7;
+
+    /**
      * Maps the types to their readable names.
      */
     const TYPES = [
@@ -63,5 +68,6 @@ class ADFunctionalLevelType
         self::WIN2008R2 => 'Windows Server 2008 R2',
         self::WIN2012 => 'Windows Server 2012',
         self::WIN2012R2 => 'Windows Server 2012 R2',
+        self::WIN2016 => 'Windows Server 2016',
     ];
 }

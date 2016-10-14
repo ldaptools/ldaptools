@@ -29,6 +29,7 @@ class ConvertFunctionalLevelSpec extends ObjectBehavior
         $this->fromLdap('4')->shouldBeEqualTo(ADFunctionalLevelType::TYPES[4]);
         $this->fromLdap('5')->shouldBeEqualTo(ADFunctionalLevelType::TYPES[5]);
         $this->fromLdap('6')->shouldBeEqualTo(ADFunctionalLevelType::TYPES[6]);
+        $this->fromLdap('7')->shouldBeEqualTo(ADFunctionalLevelType::TYPES[7]);
     }
 
     function it_should_return_unknown_if_the_level_is_not_a_valid_type()

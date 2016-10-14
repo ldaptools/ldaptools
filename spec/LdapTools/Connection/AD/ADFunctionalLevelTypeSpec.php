@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools\Connection;
+namespace spec\LdapTools\Connection\AD;
 
 use PhpSpec\ObjectBehavior;
 
@@ -52,6 +52,11 @@ class ADFunctionalLevelTypeSpec extends ObjectBehavior
     function it_should_have_a_WIN2012R2_constant()
     {
         $this->shouldHaveConstant('WIN2012R2');
+    }
+
+    function it_should_have_a_WIN2016_constant()
+    {
+        $this->shouldHaveConstant('WIN2016');
     }
 
     public function getMatchers()
