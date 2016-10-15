@@ -84,6 +84,7 @@ These are typical LDAP user objects.
 | middleName | middleName | string | A name in addition to the user's first/last name (ie. middle name) |
 | mobilePhone | mobile | string | The user's mobile phone number |
 | modified | whenChanged | `\DateTime` | The date when the account was last modified |
+| notes | info | string | Any additional information/notes for the user |
 | office | physicalDeliveryOfficeName  | string | The user's office name |
 | organization | o | string | The user's organization name |
 | otherFaxes | otherFacsimileTelephoneNumber | array | Additional fax telephone numbers for the user |
@@ -141,6 +142,7 @@ These are typical LDAP group objects.
 | members | member | array| All of the members of the group (not recursive) |
 | modified | whenChanged | `\DateTime` | The date when the group was last modified |
 | name | cn | string | The common name (RDN) of the group |
+| notes | info | string | Any additional information/notes for the group |
 | scopeDomainLocal | groupType | bool | Whether or not the group's scope is domain local |
 | scopeGlobal | groupType | bool | Whether or not the group's scope is global |
 | scopeUniversal | groupType | bool | Whether or not the group's scope is universal |
@@ -171,6 +173,7 @@ These are typical LDAP computer objects.
 | location | location | string | The location of the computer (such as office name) |
 | modified |whenModified | `\DateTime` | The date the computer was last modified |
 | name | cn | string | The common name (RDN) of the computer |
+| notes | info | string | Any additional information/notes for the computer |
 | os | operatingSystem | string | The operating system name for the computer object |
 | osServicePack | operatingSystemServicePack | string | The name of the operating system service pack |
 | osVersion | operatingSystemVersion | string | The operating system version number (ie. 6.0) |
@@ -202,6 +205,7 @@ These are typical LDAP contact objects.
 | lastName | sn | string | The contact's last name |
 | manager | manager | string | The common name of the contact's manager |
 | modified | whenModified | `\DateTime` | The date the contact was last modified |
+| notes | info | string | Any additional information/notes for the contact |
 | phoneNumber | telephoneNumber | string | The contact's telephone number |
 | sid | objectSid | string | The contact's SID (Security Identifier) |
 

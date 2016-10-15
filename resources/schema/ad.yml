@@ -160,6 +160,7 @@ objects:
             mobilePhone: mobile
             modified: whenChanged
             name: cn
+            notes: info
             office: physicalDeliveryOfficeName
             organization: o
             otherFaxes: otherFacsimileTelephoneNumber
@@ -313,6 +314,7 @@ objects:
             members: member
             modified: whenChanged
             name: cn
+            notes: info
             sid: objectSid
             typeBuiltin: groupType
             typeSecurity: groupType
@@ -383,6 +385,7 @@ objects:
             location: location
             modified: whenChanged
             name: cn
+            notes: info
             os: operatingSystem
             osServicePack: operatingSystemServicePack
             osVersion: operatingSystemVersion
@@ -462,6 +465,7 @@ objects:
             manager: manager
             modified: whenChanged
             name: cn
+            notes: info
             phoneNumber: telephoneNumber
             sid: objectSid
         multivalued_attributes:
