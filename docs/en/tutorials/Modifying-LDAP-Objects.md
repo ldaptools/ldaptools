@@ -111,9 +111,9 @@ attribute then an exception will be thrown during persist. It's best to wrap per
 method is also variadic, so you can pass as many values you want as arguments to this function.
 
 ------------------------
-#### reset($attribute)
+#### reset(...$attributes)
 
-Resets an attribute by removing any values it may contain.
+Resets an attribute (or attributes) by removing any values it may contain.
 
 ------------------------
 #### has($attribute, $value = null)

@@ -174,6 +174,10 @@ class LdapObjectSpec extends ObjectBehavior
     {
         $this->reset('firstName');
         $this->has('firstName')->shouldBeEqualTo(false);
+
+        $this->reset('lastName', 'emailAddress');
+        $this->has('lastName')->shouldBeEqualTo(false);
+        $this->has('emailAddress')->shouldBeEqualTo(false);
     }
 
     function it_should_be_case_insensitive_when_calling_reset()

@@ -163,16 +163,18 @@ class LdapObject
     /**
      * Resets the attribute, which effectively removes any values it may have.
      *
-     * @param string $attribute
+     * @param string ...$attributes
      * @return $this
      */
-    public function reset($attribute)
+    public function reset(...$attributes)
     {
-        if ($this->has($attribute)) {
-            $attribute = $this->resolveAttributeName($attribute);
-            unset($this->attributes[$attribute]);
+        foreach ($attributes as $attribute) {
+            if ($this->has($attribute)) {
+                $attribute = $this->resolveAttributeName($attribute);
+                unset($this->attributes[$attribute]);
+            }
+            $this->batches->add(new Batch(Batch::TYPE['REMOVE_ALL'], $attribute));
         }
-        $this->batches->add(new Batch(Batch::TYPE['REMOVE_ALL'], $attribute));
 
         return $this;
     }
