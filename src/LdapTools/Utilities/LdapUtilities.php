@@ -277,6 +277,54 @@ class LdapUtilities
     }
 
     /**
+     * Get an array containing the SSL certificates of the LDAP server. This runs over the standard LDAP port and
+     * initiates a TlsStart operation.
+     *
+     * @param string $server The server name to connect to
+     * @param int $port The standard LDAP port
+     * @return array In the form of ['peer_certificate' => '', 'peer_certificate_chain' => []]
+     */
+    public static function getLdapSslCertificates($server, $port = 389)
+    {
+        // This is the hex encoded extendedRequest for the STARTTLS operation...
+        $startTls = hex2bin("301d02010177188016312e332e362e312e342e312e313436362e3230303337");
+        $certificates = [
+            'peer_certificate' => '',
+            'peer_certificate_chain' => [],
+        ];
+
+        $tcpSocket = new TcpSocket([
+            'ssl' => [
+                'capture_peer_cert' => true,
+                'capture_peer_cert_chain' => true,
+                'allow_self_signed' => true,
+                'verify_peer' => false,
+                'verify_peer_name' => false,
+            ],
+        ]);
+        $tcpSocket->connect($server, $port, 5);
+        $tcpSocket->setOperationTimeout(2);
+        $tcpSocket->write($startTls);
+        $tcpSocket->read(10240);
+        $tcpSocket->enableEncryption(STREAM_CRYPTO_METHOD_TLS_CLIENT);
+
+        $info = $tcpSocket->getParams();
+        if (!$info) {
+            return $certificates;
+        }
+        openssl_x509_export($info['options']['ssl']['peer_certificate'], $certificates['peer_certificate']);
+
+        foreach ($info['options']['ssl']['peer_certificate_chain'] as $cert) {
+            $certChain = '';
+            openssl_x509_export($cert, $certChain);
+            $certificates['peer_certificate_chain'][] = $certChain;
+        }
+        $tcpSocket->close();
+
+        return $certificates;
+    }
+
+    /**
      * Given a full escaped DN return the RDN in escaped form.
      *
      * @param string $dn
