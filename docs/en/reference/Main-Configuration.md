@@ -246,6 +246,8 @@ However, be warned that using `TLS_REQCERT never` can be a bit of a security ris
 Consider copying your domain CA cert to `/etc/ssl/certs` then reference it in your `ldap.conf` with the `TLS_CACERT /etc/ssl/certs/ca.pem`
 option combined with `TLS_REQCERT hard`.
 
+For more information on obtaining/using your LDAP SSL certificates, see [this cookbook doc](../cookbook/Getting-Your-LDAP-SSL-Certificate.md).
+
 **Default**: `false`
 
 -------------------------------
