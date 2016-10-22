@@ -36,7 +36,7 @@ use LdapTools\Utilities\LdapUtilities;
 $certificates = LdapUtilities::getLdapSslCertificates('dc1.example.local');
 
 // You can use the above to create a certificate bundle containing all your needed LDAP SSL certificates...
-$bundle = $certificate['peer_certificate'];
+$bundle = $certificates['peer_certificate'];
 foreach($certificates['peer_certificate_chain'] as $cert) {
     $bundle .= $cert;
 }
