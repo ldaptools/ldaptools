@@ -92,14 +92,6 @@ trait AttributeConverterTrait
     }
 
     /**
-     * @return string
-     */
-    public function getAttributeName()
-    {
-        return $this->attribute;
-    }
-
-    /**
      * @param array $options
      */
     public function setOptions(array $options)
