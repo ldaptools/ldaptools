@@ -379,7 +379,7 @@ $results = $query
     ->getResult();
 
 foreach ($results as $result) {
-    if ($user->isType(LdapObjectType::USER)) {
+    if ($result->isType(LdapObjectType::USER)) {
         echo "User: ".$result->getName();
     } else {
         echo "Group: ".$result->getName();
