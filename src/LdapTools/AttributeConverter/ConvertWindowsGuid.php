@@ -47,14 +47,17 @@ class ConvertWindowsGuid implements AttributeConverterInterface
      */
     public function toLdap($guid)
     {
-        $hexOctetString = '';
+        $data = '';
 
         $guid = str_replace('-', '', $guid);
         foreach ($this->octetSections as $section) {
-            $hexOctetString .= $this->parseSection($guid, $section, true);
+            $data .= $this->parseSection($guid, $section, true);
+        }
+        if ($this->getOperationType() == self::TYPE_CREATE || $this->getOperationType() == self::TYPE_MODIFY) {
+            $data = hex2bin(str_replace('\\', '', $data));
         }
 
-        return $hexOctetString;
+        return $data;
     }
 
     /**

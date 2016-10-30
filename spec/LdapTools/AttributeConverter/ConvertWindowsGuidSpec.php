@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use PhpSpec\ObjectBehavior;
 
 class ConvertWindowsGuidSpec extends ObjectBehavior
@@ -36,5 +37,16 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
     function it_should_return_a_string_guid_from_binary_when_calling_fromLdap()
     {
         $this->fromLdap(pack('H*', str_replace('\\', '', $this->guidHex)))->shouldBeEqualTo($this->guidString);
+    }
+
+    function it_should_return_binary_data_when_calling_toLdap_on_create_or_modify()
+    {
+        $expected = hex2bin(str_replace('\\', '', $this->guidHex));
+
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+        $this->toLdap($this->guidString)->shouldBeEqualTo($expected);
+
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        $this->toLdap($this->guidString)->shouldBeEqualTo($expected);
     }
 }
