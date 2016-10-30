@@ -157,7 +157,7 @@ class LdapUtilities
     public static function encode($value, $toEncoding)
     {
         // If the encoding is already UTF-8, and that's what was requested, then just send the value back.
-        if ($toEncoding == 'UTF-8' && preg_match('//u', $value)) {
+        if ($toEncoding == 'UTF-8' && self::isBinary($value)) {
             return $value;
         }
 

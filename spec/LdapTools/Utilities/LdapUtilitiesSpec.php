@@ -94,8 +94,8 @@ class LdapUtilitiesSpec extends ObjectBehavior
 
     function it_should_encode_values_to_the_desired_type()
     {
-        // How to properly test this?
         $this::encode('foo', 'UTF-8')->shouldBeEqualTo('foo');
+        $this::encode('fóó', 'UTF-8')->shouldBeEqualTo('fóó');
     }
 
     function it_should_check_whether_a_dn_is_a_valid_ldap_object()
