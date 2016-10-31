@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\AttributeConverter\AttributeConverterInterface;
 use PhpSpec\ObjectBehavior;
 
 class ConvertWindowsSidSpec extends ObjectBehavior
@@ -62,5 +63,20 @@ class ConvertWindowsSidSpec extends ObjectBehavior
     {
         $this->fromLdap(pack('H*', str_replace('\\', '', $this->sidBuiltinHex)))->shouldBeEqualTo($this->sidBuiltinString);
         $this->fromLdap(pack('H*', str_replace('\\', '', $this->sidNobodyHex)))->shouldBeEqualTo($this->sidNobodyString);
+    }
+
+    function it_should_return_binary_data_when_going_to_ldap_for_creation_or_modification()
+    {
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+
+        $this->toLdap($this->sidString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidHex)));
+        $this->toLdap($this->sidBuiltinString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidBuiltinHex)));
+        $this->toLdap($this->sidNobodyString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidNobodyHex)));
+
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+
+        $this->toLdap($this->sidString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidHex)));
+        $this->toLdap($this->sidBuiltinString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidBuiltinHex)));
+        $this->toLdap($this->sidNobodyString)->shouldBeEqualTo(hex2bin(str_replace('\\', '', $this->sidNobodyHex)));
     }
 }

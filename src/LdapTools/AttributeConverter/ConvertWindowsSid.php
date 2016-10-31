@@ -45,10 +45,15 @@ class ConvertWindowsSid implements AttributeConverterInterface
                 str_split(str_pad(dechex($subAuth), 8, '0', STR_PAD_LEFT), 2))
             );
         }
-        // All hex parts must have a leading backslash for the search.
-        $sidHex = str_split($sidHex, '2');
 
-        return '\\'.implode('\\', $sidHex);
+        if ($this->getOperationType() == self::TYPE_CREATE || $this->getOperationType() == self::TYPE_MODIFY) {
+            $sidData = hex2bin($sidHex);
+        } else {
+            // All hex parts must have a leading backslash for the search.
+            $sidData = '\\'.implode('\\', str_split($sidHex, '2'));
+        }
+
+        return $sidData;
     }
 
     /**
