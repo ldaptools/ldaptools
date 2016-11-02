@@ -212,7 +212,7 @@ class ParameterResolver
         $value = is_array($value) ? $value : [$value];
 
         foreach ($value as $attrValue) {
-            if (preg_match_all($regex, $attrValue, $matches) && isset($matches[1])) {
+            if (is_string($attrValue) && preg_match_all($regex, $attrValue, $matches) && isset($matches[1])) {
                 $parameters = array_merge($parameters, $matches[1]);
             }
         }

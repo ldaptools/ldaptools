@@ -166,6 +166,20 @@ class ParameterResolverSpec extends ObjectBehavior
         $this::hasParameters(['foo', 'ou=test,dc=foo,dc=bar'])->shouldBeEqualTo(false);
     }
 
+    function it_should_only_check_strings_for_parameters()
+    {
+        $attributes = [
+            'displayName' => new \DateTime(),
+        ];
+        $parameters = [
+            'foo' => 'bar',
+        ];
+        $this->beConstructedWith($attributes, $parameters);
+
+        $this->resolve();
+        $this::hasParameters($attributes)->shouldBeEqualTo(false);
+    }
+
     public function getMatchers()
     {
         return [
