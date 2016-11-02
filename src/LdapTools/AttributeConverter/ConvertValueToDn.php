@@ -92,6 +92,9 @@ class ConvertValueToDn implements  AttributeConverterInterface
         } else {
             $query->where($eq);
         }
+        if (isset($options['base_dn'])) {
+            $query->setBaseDn($options['base_dn']);
+        }
 
         return $query->getLdapQuery()->getSingleScalarResult();
     }

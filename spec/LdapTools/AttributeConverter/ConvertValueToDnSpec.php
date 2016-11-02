@@ -187,4 +187,23 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->setLdapConnection($connection);
         $this->toLdap('Foo')->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
     }
+
+    function it_should_use_a_base_dn_option($connection)
+    {
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getBaseDn() == 'ou=user,dc=foo,dc=bar';
+        }))->shouldBeCalled()->willReturn($this->entry);
+
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+            'base_dn' => 'ou=user,dc=foo,dc=bar',
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $this->toLdap('Foo');
+    }
 }
