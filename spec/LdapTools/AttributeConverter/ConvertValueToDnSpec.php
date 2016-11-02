@@ -11,6 +11,7 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\DomainConfiguration;
+use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -244,5 +245,20 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->toLdap('Foo')->shouldBeEqualTo('bar');
         $this->toLdap(new LdapObject(['foo' => 'bar']))->shouldBeEqualTo('bar');
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new LdapObject(['dn' => 'foo']));
+    }
+
+    function it_should_throw_a_useful_message_if_a_value_cannot_be_converted_from_searching_ldap($connection)
+    {
+        $connection->execute(Argument::any())->willReturn([]);
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $this->shouldThrow(new AttributeConverterException('Unable to convert value "Bar" to a dn for attribute "foo"'))->duringToLdap('Bar');
     }
 }

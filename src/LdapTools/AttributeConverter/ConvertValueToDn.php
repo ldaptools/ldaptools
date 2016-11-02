@@ -11,6 +11,7 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Exception\EmptyResultException;
 use LdapTools\Object\LdapObject;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\Operator\bOr;
@@ -104,7 +105,16 @@ class ConvertValueToDn implements  AttributeConverterInterface
             $query->setBaseDn($options['base_dn']);
         }
 
-        return $query->getLdapQuery()->getSingleScalarResult();
+        try {
+            return $query->getLdapQuery()->getSingleScalarResult();
+        } catch (EmptyResultException $e) {
+            throw new AttributeConverterException(sprintf(
+                'Unable to convert value "%s" to a %s for attribute "%s"',
+                $value,
+                $toSelect,
+                $this->getAttribute()
+            ));
+        }
     }
 
     /**
