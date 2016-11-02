@@ -61,27 +61,35 @@ class ConvertValueToDn implements  AttributeConverterInterface
      */
     protected function getDnFromValue($value)
     {
-        if ($value instanceof LdapObject && !$value->has('dn')) {
-            throw new AttributeConverterException('The LdapObject must have a DN defined.');
+        $options = $this->getOptionsArray();
+        $toSelect = (isset($options['select']) ? $options['select'] : 'dn');
+
+        if ($value instanceof LdapObject && !$value->has($toSelect)) {
+            throw new AttributeConverterException(sprintf(
+                'The LdapObject must have a "%s" defined when used in "%s".',
+                $toSelect,
+                $this->getAttribute()
+            ));
         } elseif ($value instanceof LdapObject) {
-            $value = $value->get('dn');
+            $value = $value->get($toSelect);
         } elseif (!LdapUtilities::isValidLdapObjectDn($value) && !is_null($this->getLdapConnection())) {
-            $value = $this->getDnFromLdapQuery($value);
+            $value = $this->getAttributeFromLdapQuery($value, $toSelect);
         }
 
         return $value;
     }
 
     /**
-     * Attempt to look-up the DN from a LDAP query based on the value.
+     * Attempt to look-up the attribute from a LDAP query based on the value.
      *
      * @param string $value
+     * @param string $toSelect
      * @return string The distinguished name.
      */
-    protected function getDnFromLdapQuery($value)
+    protected function getAttributeFromLdapQuery($value, $toSelect)
     {
         $options = $this->getOptionsArray();
-        $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']));
+        $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']), $toSelect);
 
         $bOr = $this->getQueryOrStatement($query, $value);
         $eq = $query->filter()->eq($options['attribute'], $value);
@@ -104,12 +112,13 @@ class ConvertValueToDn implements  AttributeConverterInterface
      *
      * @param array $filter
      * @param bool $isOrFilter
+     * @param string $toSelect
      * @return LdapQueryBuilder
      */
-    protected function buildLdapQuery(array $filter, $isOrFilter)
+    protected function buildLdapQuery(array $filter, $isOrFilter, $toSelect)
     {
         $query = new LdapQueryBuilder($this->connection);
-        $query->select('dn');
+        $query->select($toSelect);
 
         $statement = $isOrFilter ? $query->filter()->bOr() : $query->filter()->bAnd();
         foreach ($filter as $attribute => $values) {

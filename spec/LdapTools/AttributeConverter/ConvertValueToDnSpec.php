@@ -30,6 +30,24 @@ class ConvertValueToDnSpec extends ObjectBehavior
         ],
     ];
 
+    protected $entryWithSelect = [
+        'count' => 1,
+        0 => [
+            "distinguishedname" => [
+                "count" => 1,
+                0 => "CN=Foo,DC=bar,DC=foo",
+            ],
+            0 => "distinguishedName",
+            "foo" => [
+                "count" => 1,
+                0 => "bar",
+            ],
+            1 => "foo",
+            'count' => 2,
+            'dn' => "CN=Foo,DC=bar,DC=foo",
+        ],
+    ];
+
     function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
@@ -205,5 +223,26 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->setAttribute('foo');
 
         $this->toLdap('Foo');
+    }
+
+    function it_should_allow_specifying_the_attribute_to_select_when_converting($connection)
+    {
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getAttributes() == ['foo'];
+        }))->shouldBeCalled()->willReturn($this->entryWithSelect);
+
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+            'select' => 'foo',
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $this->toLdap('Foo')->shouldBeEqualTo('bar');
+        $this->toLdap(new LdapObject(['foo' => 'bar']))->shouldBeEqualTo('bar');
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new LdapObject(['dn' => 'foo']));
     }
 }
