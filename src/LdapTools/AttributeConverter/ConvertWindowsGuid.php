@@ -10,16 +10,22 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Utilities\LdapUtilities;
+
 /**
- * Converts a binary objectGuid to a string representation and also from it's string representation back to hex for
- * searches. The back to hex structure is slightly unusual in that the 3 GUID sections are reverse hex-pair ordered
- * for the search.
+ * Converts a binary objectGuid to a string representation and also from it's string representation back to hex/binary
+ * for LDAP. The back to hex/binary structure is slightly unusual due to the endianness required.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class ConvertWindowsGuid implements AttributeConverterInterface
 {
     use AttributeConverterTrait;
+
+    /**
+     * Used to specify that a GUID should be randomly generated and passed to LDAP.
+     */
+    const AUTO = 'auto';
 
     /**
      * @var array The guid structure in order by section to parse using substr().
@@ -48,6 +54,7 @@ class ConvertWindowsGuid implements AttributeConverterInterface
     public function toLdap($guid)
     {
         $data = '';
+        $guid = strtolower($guid) === self::AUTO ? LdapUtilities::uuid4() : $guid;
 
         $guid = str_replace('-', '', $guid);
         foreach ($this->octetSections as $section) {

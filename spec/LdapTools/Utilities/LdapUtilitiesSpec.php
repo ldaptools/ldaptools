@@ -191,4 +191,10 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::getAliasAndAttribute('foo.bar')->shouldBeEqualTo(['foo', 'bar']);
         $this::getAliasAndAttribute('foobar')->shouldBeEqualTo([null, 'foobar']);
     }
+
+    function it_should_generate_a_UUIDv4_string()
+    {
+        $this::uuid4()->shouldBeString();
+        $this::uuid4()->shouldMatch(LdapUtilities::MATCH_GUID);
+    }
 }

@@ -49,4 +49,27 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->toLdap($this->guidString)->shouldBeEqualTo($expected);
     }
+
+    function it_should_accept_the_term_auto_to_generate_a_guid_going_to_ldap()
+    {
+        $escapedHex = '/^(\\\[0-9a-fA-F]{2})+$/';
+
+        $this->toLdap('auto')->shouldMatch($escapedHex);
+        $this->toLdap('AUTO')->shouldMatch($escapedHex);
+
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+        $this->toLdap('auto')->shouldHaveBinaryGuid();
+
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        $this->toLdap('auto')->shouldHaveBinaryGuid();
+    }
+
+    public function getMatchers()
+    {
+        return [
+            'haveBinaryGuid' => function ($subject) {
+                return strlen(bin2hex($subject)) === 32;
+            },
+        ];
+    }
 }

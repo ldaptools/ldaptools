@@ -11,6 +11,7 @@
 namespace LdapTools\Utilities;
 
 use LdapTools\Exception\InvalidArgumentException;
+use Ramsey\Uuid\Uuid;
 
 /**
  * Some common helper LDAP functions.
@@ -336,6 +337,16 @@ class LdapUtilities
         $rdn = explode('=', $rdn, 2);
 
         return $rdn[0].'='.self::escapeValue($rdn[1], null, LDAP_ESCAPE_DN);
+    }
+
+    /**
+     * Generate a UUIDv4 string.
+     *
+     * @return string
+     */
+    public static function uuid4()
+    {
+        return Uuid::uuid4()->toString();
     }
 
     /**
