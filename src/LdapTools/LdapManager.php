@@ -187,15 +187,21 @@ class LdapManager
     /**
      * Get a LdapObjectCreator object.
      *
+     * @param string|null $type
      * @return LdapObjectCreator
      */
-    public function createLdapObject()
+    public function createLdapObject($type = null)
     {
-        return new LdapObjectCreator(
+        $creator = new LdapObjectCreator(
             $this->getConnection(),
             $this->getSchemaFactory(),
             $this->config->getEventDispatcher()
         );
+        if ($type) {
+            $creator->create($type);
+        }
+
+        return $creator;
     }
 
     /**

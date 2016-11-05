@@ -177,6 +177,19 @@ class LdapManagerSpec extends ObjectBehavior
         $this->createLdapObject()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCreator');
     }
 
+    function it_should_allow_specifying_the_object_type_to_create_when_calling_createLdapObject(LdapConnectionInterface $connection)
+    {
+        $domain = (new DomainConfiguration('foo.bar'))->setBaseDn('dc=foo,dc=bar')->setUseTls(true);
+        $connection->getConfig()->willReturn($domain);
+        $connection->getRootDse()->willReturn(new LdapObject(['dc' => '']));
+        $this->beConstructedWith(new Configuration(), $connection);
+
+        $connection->execute(Argument::that(function($operation) {
+            return array_key_exists('samaccountname', array_change_key_case($operation->getAttributes()));
+        }))->shouldBeCalled();
+        $this->createLdapObject('user')->with(['username' => 'foo', 'password' => 'bar'])->in('dc=foo,dc=bar')->execute();
+    }
+
     function it_should_attempt_to_authenticate_a_username_and_password(LdapConnectionInterface $connection)
     {
         $operation = new AuthenticationOperation();

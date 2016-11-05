@@ -8,6 +8,14 @@ It also supports setting parameters within attribute values to avoid repetition.
 To get an instance of the object creator class and create some objects:
 
 ```php
+use LdapTools\Object\LdapObjectType;
+
+// Optionally pass an object type directly when getting the creator instance...
+$ldap->createLdapObject(LdapObjectType::USER)
+    ->with(['username' => 'foo', 'password' => 'bar'])
+    ->in('dc=example,dc=local')
+    ->execute();
+
 $ldapObject = $ldap->createLdapObject();
 
 // Creating a user account (enabled by default)
