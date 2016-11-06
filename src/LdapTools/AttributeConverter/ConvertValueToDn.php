@@ -152,7 +152,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
 
         if (preg_match(LdapUtilities::MATCH_GUID, $value)) {
             $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->toLdap($value)));
-        } elseif (preg_match(LdapUtilities::MATCH_SID, $value)) {
+        } elseif (LdapUtilities::isValidSid($value)) {
             $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->toLdap($value)));
         }
 

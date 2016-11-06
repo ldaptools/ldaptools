@@ -28,7 +28,7 @@ class LdapUtilities
     /**
      * Regex to match a Windows SID.
      */
-    const MATCH_SID = '/^S-\d-(\d+-){1,14}\d+$/i';
+    const MATCH_SID = '/^S-\d(-\d{1,10}){1,16}$/i';
 
     /**
      * Regex to match an OID.
@@ -195,6 +195,17 @@ class LdapUtilities
     public static function isValidAttributeFormat($value)
     {
         return (preg_match(self::MATCH_DESCRIPTOR, $value) || preg_match(self::MATCH_OID, $value));
+    }
+
+    /**
+     * Determine whether a value is in SID format.
+     *
+     * @param $value
+     * @return bool
+     */
+    public static function isValidSid($value)
+    {
+        return (bool) preg_match(self::MATCH_SID, $value);
     }
 
     /**

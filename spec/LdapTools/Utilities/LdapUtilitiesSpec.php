@@ -124,6 +124,34 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this->isValidAttributeFormat('名(字')->shouldBeEqualTo(false);
     }
 
+    function it_should_check_if_a_value_is_a_valid_SID()
+    {
+        $SIDs = [
+            'S-1-5-21-1004336348-1177238915-682003330-512',
+            'S-1-5-32-544',
+            'S-1-0-0',
+            'S-1-0',
+            'S-1-1',
+            'S-1-5-10',
+            's-1-5-10',
+            'S-1-5-21-123-12-123-12-123-12-123-12-123-12-123-123-12-15'
+        ];
+
+        foreach ($SIDs as $sid) {
+            $this::isValidSid($sid)->shouldBeEqualTo(true);
+        }
+
+        $this::isValidSid('S-1')->shouldBeEqualTo(false);
+        $this::isValidSid('S')->shouldBeEqualTo(false);
+        $this::isValidSid('S--')->shouldBeEqualTo(false);
+        $this::isValidSid('S-1-5-23-')->shouldBeEqualTo(false);
+        $this::isValidSid('foo')->shouldBeEqualTo(false);
+        // A max of 15 sub authorities are allowed
+        $this::isValidSid('S-1-5-21-123-12-123-12-123-12-123-12-123-12-123-123-12-15-16')->shouldBeEqualTo(false);
+        // Sub authorities are unsigned 32bit integers, max char length of 10
+        $this::isValidSid('S-1-5-21-123-12345678910')->shouldBeEqualTo(false);
+    }
+
     function it_should_get_the_rdn_from_a_dn()
     {
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');
