@@ -32,7 +32,7 @@ class ADBindUserStrategy extends BindUserStrategy
      */
     public function getUsername($username)
     {
-        if (preg_match(LdapUtilities::MATCH_GUID, $username)) {
+        if (LdapUtilities::isValidGuid($username)) {
             $username = '{'.$username.'}';
         } elseif (!(LdapUtilities::isValidSid($username) || $this->isValidUserDn($username) || $this->isInUpnForm($username))) {
             $username = parent::getUsername($username);

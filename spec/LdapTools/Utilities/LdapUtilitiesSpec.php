@@ -152,6 +152,16 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::isValidSid('S-1-5-21-123-12345678910')->shouldBeEqualTo(false);
     }
 
+    function it_should_check_if_a_value_is_a_valid_GUID()
+    {
+        $this::isValidGuid(LdapUtilities::uuid4())->shouldBeEqualTo(true);
+        $this::isValidGuid('bc7d93d1-3d4d-4535-88bb-d61758684700')->shouldBeEqualTo(true);
+
+        $this::isValidGuid('bc7d93d1-3d4d-4535-88bb')->shouldBeEqualTo(false);
+        $this::isValidGuid('bc7d93d-3d4-4535-88bb-d6175868470')->shouldBeEqualTo(false);
+        $this::isValidGuid('foo')->shouldBeEqualTo(false);
+    }
+
     function it_should_get_the_rdn_from_a_dn()
     {
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');

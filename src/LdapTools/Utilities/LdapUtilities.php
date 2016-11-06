@@ -200,12 +200,23 @@ class LdapUtilities
     /**
      * Determine whether a value is in SID format.
      *
-     * @param $value
+     * @param string $value
      * @return bool
      */
     public static function isValidSid($value)
     {
         return (bool) preg_match(self::MATCH_SID, $value);
+    }
+
+    /**
+     * Determine whether a value is in valid GUID format.
+     *
+     * @param string $value
+     * @return bool
+     */
+    public static function isValidGuid($value)
+    {
+        return (bool) preg_match(self::MATCH_GUID, $value);
     }
 
     /**
