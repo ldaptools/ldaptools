@@ -31,19 +31,13 @@ class ConvertWindowsSid implements AttributeConverterInterface
         $revLevel = array_shift($sid);
         $authIdent = array_shift($sid);
         $subAuthCount = count($sid);
-        $id = array_shift($sid);
 
         $sidHex = str_pad(dechex($revLevel), 2, '0', STR_PAD_LEFT);
         $sidHex .= str_pad(dechex($subAuthCount), 2, '0', STR_PAD_LEFT);
         $sidHex .= str_pad(dechex($authIdent), 12, '0', STR_PAD_LEFT);
-        $sidHex .= str_pad(dechex($id), 8, '0', STR_PAD_RIGHT);
 
         foreach ($sid as $subAuth) {
-            // little endian, so reverse the hex order.
-            $sidHex .= implode('', array_reverse(
-                // After going from dec to hex, pad it and split it into hex chunks so it can be reversed.
-                str_split(str_pad(dechex($subAuth), 8, '0', STR_PAD_LEFT), 2))
-            );
+            $sidHex .= $this->leDec2hex($subAuth);
         }
 
         if ($this->getOperationType() == self::TYPE_CREATE || $this->getOperationType() == self::TYPE_MODIFY) {
@@ -59,15 +53,34 @@ class ConvertWindowsSid implements AttributeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function fromLdap($sid)
+    public function fromLdap($value)
     {
-        // How to unpack all of this in one statement to avoid resorting to hexdec? Is it even possible?
-        $sidHex = unpack('H*hex', $sid)['hex'];
-        $subAuths = unpack('H2/H2/n/N/V*', $sid);
+        $sidHex = bin2hex($value);
 
         $revLevel = hexdec(substr($sidHex, 0, 2));
+        $subAuthCount = hexdec(substr($sidHex, 2, 2));
         $authIdent = hexdec(substr($sidHex, 4, 12));
 
-        return 'S-'.$revLevel.'-'.$authIdent.'-'.implode('-', $subAuths);
+        $sid = 'S-'.$revLevel.'-'.$authIdent;
+        if ($subAuthCount > 0) {
+            $subAuths = unpack('V*', hex2bin(substr($sidHex, 16)));
+            $sid .= '-'.implode('-', $subAuths);
+        }
+
+        return $sid;
+    }
+
+    /**
+     * Converts a decimal to little-endian hex form.
+     *
+     * @param int $dec
+     * @return string
+     */
+    protected function leDec2hex($dec)
+    {
+        return implode('', array_reverse(
+            // After going from dec to hex, pad it and split it into hex chunks so it can be reversed.
+            str_split(str_pad(str_pad(dechex($dec), 2, '0', STR_PAD_LEFT), 8, '0', STR_PAD_LEFT), 2))
+        );
     }
 }
