@@ -54,6 +54,8 @@ class ConvertWindowsSidSpec extends ObjectBehavior
 
     function it_should_return_a_searchable_hex_sid_when_calling_toLdap()
     {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
         $this->toLdap($this->sidString)->shouldBeEqualTo($this->sidHex);
     }
 
@@ -64,6 +66,8 @@ class ConvertWindowsSidSpec extends ObjectBehavior
 
     function it_should_return_a_searchable_hex_sid_for_well_known_sids_when_calling_toLdap()
     {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
         $this->toLdap($this->sidBuiltinString)->shouldBeEqualTo($this->sidBuiltinHex);
         $this->toLdap($this->sidNobodyString)->shouldBeEqualTo($this->sidNobodyHex);
         $this->toLdap($this->sidSelfString)->shouldBeEqualTo($this->sidSelfHex);
@@ -95,7 +99,13 @@ class ConvertWindowsSidSpec extends ObjectBehavior
 
     function it_should_convert_a_self_sid()
     {
-        $this->toLdap('S-1-5-10')->shouldBeEqualTo('\01\01\00\00\00\00\00\05\0a\00\00\00');
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
 
+        $this->toLdap('S-1-5-10')->shouldBeEqualTo('\01\01\00\00\00\00\00\05\0a\00\00\00');
+    }
+
+    function it_should_throw_an_exception_if_an_invalid_SID_is_passed_to_LDAP()
+    {
+        $this->shouldThrow('LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
     }
 }

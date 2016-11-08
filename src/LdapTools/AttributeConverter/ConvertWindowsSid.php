@@ -10,9 +10,12 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Exception\AttributeConverterException;
+use LdapTools\Security\SID;
+use LdapTools\Utilities\LdapUtilities;
+
 /**
- * Converts a binary objectSid to a string representation and also from it's string representation back to hex for
- * searches.
+ * Converts an objectSid between binary form and the friendly string form.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
@@ -25,29 +28,20 @@ class ConvertWindowsSid implements AttributeConverterInterface
      */
     public function toLdap($sid)
     {
-        $sid = ltrim($sid, 'S-');
-        $sid = explode('-', $sid);
-
-        $revLevel = array_shift($sid);
-        $authIdent = array_shift($sid);
-        $subAuthCount = count($sid);
-
-        $sidHex = str_pad(dechex($revLevel), 2, '0', STR_PAD_LEFT);
-        $sidHex .= str_pad(dechex($subAuthCount), 2, '0', STR_PAD_LEFT);
-        $sidHex .= str_pad(dechex($authIdent), 12, '0', STR_PAD_LEFT);
-
-        foreach ($sid as $subAuth) {
-            $sidHex .= $this->leDec2hex($subAuth);
+        if (!LdapUtilities::isValidSid($sid)) {
+            throw new AttributeConverterException(sprintf(
+                'Expected a string SID but got "%s".',
+                $sid
+            ));
         }
+        $sid = (new SID($sid))->toBinary();
 
-        if ($this->getOperationType() == self::TYPE_CREATE || $this->getOperationType() == self::TYPE_MODIFY) {
-            $sidData = hex2bin($sidHex);
-        } else {
+        if ($this->getOperationType() == self::TYPE_SEARCH_TO) {
             // All hex parts must have a leading backslash for the search.
-            $sidData = '\\'.implode('\\', str_split($sidHex, '2'));
+            $sid = '\\'.implode('\\', str_split(bin2hex($sid), '2'));
         }
 
-        return $sidData;
+        return $sid;
     }
 
     /**
@@ -55,32 +49,6 @@ class ConvertWindowsSid implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $sidHex = bin2hex($value);
-
-        $revLevel = hexdec(substr($sidHex, 0, 2));
-        $subAuthCount = hexdec(substr($sidHex, 2, 2));
-        $authIdent = hexdec(substr($sidHex, 4, 12));
-
-        $sid = 'S-'.$revLevel.'-'.$authIdent;
-        if ($subAuthCount > 0) {
-            $subAuths = unpack('V*', hex2bin(substr($sidHex, 16)));
-            $sid .= '-'.implode('-', $subAuths);
-        }
-
-        return $sid;
-    }
-
-    /**
-     * Converts a decimal to little-endian hex form.
-     *
-     * @param int $dec
-     * @return string
-     */
-    protected function leDec2hex($dec)
-    {
-        return implode('', array_reverse(
-            // After going from dec to hex, pad it and split it into hex chunks so it can be reversed.
-            str_split(str_pad(str_pad(dechex($dec), 2, '0', STR_PAD_LEFT), 8, '0', STR_PAD_LEFT), 2))
-        );
+        return (new SID($value))->toString();
     }
 }
