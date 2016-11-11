@@ -69,10 +69,13 @@ trait AttributeConverterTrait
      * Sets the current LdapConnection for access by the converter.
      *
      * @param LdapConnectionInterface|null $connection
+     * @return $this
      */
     public function setLdapConnection(LdapConnectionInterface $connection = null)
     {
         $this->connection = $connection;
+
+        return $this;
     }
 
     /**
@@ -85,18 +88,24 @@ trait AttributeConverterTrait
 
     /**
      * @param string $attribute
+     * @return $this
      */
     public function setAttributeName($attribute)
     {
         $this->attribute = $attribute;
+
+        return $this;
     }
 
     /**
      * @param array $options
+     * @return $this
      */
     public function setOptions(array $options)
     {
         $this->options = array_merge($this->options, $options);
+
+        return $this;
     }
 
     /**
@@ -109,10 +118,13 @@ trait AttributeConverterTrait
 
     /**
      * @param int $type
+     * @return $this
      */
     public function setOperationType($type)
     {
         $this->type = $type;
+
+        return $this;
     }
 
     /**
@@ -125,10 +137,13 @@ trait AttributeConverterTrait
 
     /**
      * @param string $dn
+     * @return $this
      */
     public function setDn($dn)
     {
         $this->dn = $dn;
+
+        return $this;
     }
 
     /**
@@ -141,10 +156,13 @@ trait AttributeConverterTrait
 
     /**
      * @param string
+     * @return $this
      */
     public function setAttribute($attribute)
     {
         $this->attribute = $attribute;
+
+        return $this;
     }
 
     /**
@@ -165,10 +183,13 @@ trait AttributeConverterTrait
 
     /**
      * @param mixed
+     * @return $this
      */
     public function setLastValue($value)
     {
         $this->lastValue = $value;
+
+        return $this;
     }
 
     /**
@@ -197,10 +218,13 @@ trait AttributeConverterTrait
 
     /**
      * @param Batch $batch
+     * @return $this
      */
     public function setBatch(Batch $batch)
     {
         $this->batch = $batch;
+
+        return $this;
     }
 
     /**
