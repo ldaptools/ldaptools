@@ -166,52 +166,33 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
     {
-        $this->get('windows_guid')->setLdapConnection($ldap)->shouldBeNull();
+        $this->get('windows_guid')->setLdapConnection($ldap)->getLdapConnection()->shouldEqual($ldap);
     }
 
     function it_should_let_me_set_the_converter_options_on_a_returned_converter()
     {
-        $this->get('windows_guid')->setOptions(['foo' => 'bar'])->shouldBeNull();
+        $this->get('windows_guid')->setOptions(['foo' => 'bar'])->getOptions()->shouldEqual(['foo' => 'bar']);
     }
 
     function it_should_let_me_set_the_converter_operation_type_on_a_returned_converter()
     {
-        $this->get('windows_guid')->setOperationType(AttributeConverterInterface::TYPE_MODIFY)->shouldBeNull();
-    }
-
-    function it_should_let_me_get_the_converter_operation_type_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->getOperationType()->shouldBeEqualTo(AttributeConverterInterface::TYPE_SEARCH_FROM);
+        $this->get('windows_guid')->setOperationType(AttributeConverterInterface::TYPE_MODIFY)->getOperationType()->shouldEqual(AttributeConverterInterface::TYPE_MODIFY);
     }
 
     function it_should_let_me_set_the_dn_on_a_returned_converter()
     {
-        $this->get('windows_guid')->setDn('cn=foo,dc=foo,dc=bar')->shouldBeNull();
-    }
-
-    function it_should_let_me_get_the_dn_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->getDn()->shouldBeNull();
-    }
-
-    function it_should_let_me_get_the_last_value_returned_converter()
-    {
-        $this->get('windows_guid')->getLastValue()->shouldBeNull();
+        $this->get('windows_guid')->setDn('cn=foo,dc=foo,dc=bar')->getDn()->shouldEqual('cn=foo,dc=foo,dc=bar');
     }
 
     function it_should_let_me_set_the_last_value_returned_converter()
     {
-        $this->get('windows_guid')->setLastValue('foo')->shouldBeNull();
+        $this->get('windows_guid')->setLastValue('foo')->getLastValue()->shouldEqual('foo');
     }
 
     function it_should_let_me_set_the_batch_on_a_returned_converter()
     {
-        $this->get('windows_guid')->setBatch(new Batch(1, 'foo', 'bar'))->shouldBeNull();
-    }
-
-    function it_should_let_me_get_the_batch_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->getBatch()->shouldBeNull();
+        $batch = new Batch(1, 'foo', 'bar');
+        $this->get('windows_guid')->setBatch($batch)->getBatch()->shouldEqual($batch);
     }
 
     function it_should_let_me_check_a_batch_is_supported_on_the_converter()
