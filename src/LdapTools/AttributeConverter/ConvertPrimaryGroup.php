@@ -43,7 +43,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
 
         return (new LdapQueryBuilder($this->getLdapConnection()))
             ->select('cn')
-            ->where(['objectSid' => (new ConvertWindowsSid())->toLdap($groupSid)])
+            ->where(['objectSid' => (new ConvertWindowsSid())->setOperationType(self::TYPE_SEARCH_TO)->toLdap($groupSid)])
             ->getLdapQuery()
             ->getSingleScalarResult();
     }
@@ -57,7 +57,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
             return $value;
         }
         $groupSid = $this->validateAndGetGroupSID($value);
-        $groupSid = explode('-', (new ConvertWindowsSid())->fromLdap($groupSid));
+        $groupSid = explode('-', (new ConvertWindowsSid())->setOperationType(self::TYPE_SEARCH_FROM)->fromLdap($groupSid));
 
         return end($groupSid);
     }
