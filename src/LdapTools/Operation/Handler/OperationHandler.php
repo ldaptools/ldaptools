@@ -39,9 +39,9 @@ class OperationHandler implements OperationHandlerInterface
 
         if ($result === false) {
             throw new LdapConnectionException(sprintf(
-                'LDAP %s Operation Error: %s',
+                'LDAP %s Operation Error. Diagnostic message: "%s"',
                 $operation->getName(),
-                $this->connection->getLastError()
+                $this->connection->getDiagnosticMessage()
             ));
         }
 
