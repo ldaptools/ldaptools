@@ -86,6 +86,7 @@ class ConvertValueToDn implements  AttributeConverterInterface
      * @param string $value
      * @param string $toSelect
      * @return string The distinguished name.
+     * @throws AttributeConverterException
      */
     protected function getAttributeFromLdapQuery($value, $toSelect)
     {
@@ -150,10 +151,11 @@ class ConvertValueToDn implements  AttributeConverterInterface
     {
         $bOr = $query->filter()->bOr();
 
+        $opType = AttributeConverterInterface::TYPE_SEARCH_TO;
         if (LdapUtilities::isValidGuid($value)) {
-            $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->toLdap($value)));
+            $bOr->add($query->filter()->eq('objectGuid', (new ConvertWindowsGuid())->setOperationType($opType)->toLdap($value)));
         } elseif (LdapUtilities::isValidSid($value)) {
-            $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->toLdap($value)));
+            $bOr->add($query->filter()->eq('objectSid', (new ConvertWindowsSid())->setOperationType($opType)->toLdap($value)));
         }
 
         return $bOr;
