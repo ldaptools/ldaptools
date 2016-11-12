@@ -29,8 +29,9 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
         $this->shouldImplement('\LdapTools\AttributeConverter\AttributeConverterInterface');
     }
 
-    function it_should_return_a_searchable_hex_guid_when_calling_toLdap()
+    function it_should_return_a_searchable_hex_guid_when_calling_toLdap_on_a_search()
     {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $this->toLdap($this->guidString)->shouldBeEqualTo($this->guidHex);
     }
 
@@ -54,6 +55,7 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
     {
         $escapedHex = '/^(\\\[0-9a-fA-F]{2})+$/';
 
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $this->toLdap('auto')->shouldMatch($escapedHex);
         $this->toLdap('AUTO')->shouldMatch($escapedHex);
 
@@ -62,6 +64,11 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->toLdap('auto')->shouldHaveBinaryGuid();
+    }
+
+    function it_should_throw_an_exception_when_an_invalid_guid_is_being_sent_to_LDAP()
+    {
+        $this->shouldThrow('LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
     }
 
     public function getMatchers()

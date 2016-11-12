@@ -102,7 +102,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         unset($results[1]);
         $this->setAttributes(['guid']);
         $connection->execute(Argument::any())->willReturn($results);
-        $this->findOneByGuid('foo')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
+        $this->findOneByGuid('8E1F85EB-4882-4920-88A5-CF52F31D8D31')->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObject');
     }
 
     function it_should_call_findByFirstName()

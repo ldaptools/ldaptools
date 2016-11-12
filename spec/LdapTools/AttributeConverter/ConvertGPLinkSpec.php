@@ -11,10 +11,10 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\AttributeConverter\ConvertWindowsGuid;
 use LdapTools\BatchModify\Batch;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
+use LdapTools\Security\GUID;
 use LdapTools\Utilities\GPOLink;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -104,9 +104,9 @@ class ConvertGPLinkSpec extends ObjectBehavior
     function let(\LdapTools\Connection\LdapConnectionInterface $connection)
     {
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
-        $this->expectedDisplayResult[0]['objectguid'][0] = pack('H*', str_replace('\\', '', (new ConvertWindowsGuid())->toLdap('8E1F85EB-4882-4920-88A5-CF52F31D8D31')));
-        $this->expectedDisplayResult[1]['objectguid'][0] = pack('H*', str_replace('\\', '', (new ConvertWindowsGuid())->toLdap('B261DB28-5EA3-4D69-B79D-5C22E8018183')));
-        $this->expectedSingleDisplayResult[0]['objectguid'][0] = pack('H*', str_replace('\\', '', (new ConvertWindowsGuid())->toLdap('8E1F85EB-4882-4920-88A5-CF52F31D8D31')));
+        $this->expectedDisplayResult[0]['objectguid'][0] = (new GUID('8E1F85EB-4882-4920-88A5-CF52F31D8D31'))->toBinary();
+        $this->expectedDisplayResult[1]['objectguid'][0] = (new GUID('B261DB28-5EA3-4D69-B79D-5C22E8018183'))->toBinary();
+        $this->expectedSingleDisplayResult[0]['objectguid'][0] = (new GUID('8E1F85EB-4882-4920-88A5-CF52F31D8D31'))->toBinary();
 
         $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(|(distinguishedName=cn={B261DB28-5EA3-4D69-B79D-5C22E8018183},cn=policies,cn=system,DC=example,DC=local)(distinguishedName=cn={8E1F85EB-4882-4920-88A5-CF52F31D8D31},cn=policies,cn=system,DC=example,DC=local)))';
