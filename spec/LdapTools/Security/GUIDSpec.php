@@ -39,4 +39,9 @@ class GUIDSpec extends ObjectBehavior
     {
         $this->toBinary()->shouldBeEqualTo(hex2bin('d0b40d279d24a7469cc5eb695d9af9ac'));
     }
+
+    function it_should_throw_an_exception_if_the_binary_guid_was_not_valid()
+    {
+        $this->shouldThrow('\UnexpectedValueException')->during('__construct', [hex2bin('0101010101')]);
+    }
 }

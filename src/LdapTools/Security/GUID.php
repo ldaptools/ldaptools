@@ -93,8 +93,7 @@ class GUID
     }
 
     /**
-     * @param $guid
-     * @return string
+     * @param string $guid
      */
     protected function decodeFromBinary($guid)
     {
@@ -104,8 +103,16 @@ class GUID
         foreach ($this->guidSections as $section) {
             $guidStrings[] = $this->parseSection($hex, $section);
         }
+        $guid = implode('-', $guidStrings);
 
-        $this->guid = implode('-', $guidStrings);
+        if (!LdapUtilities::isValidGuid($guid)) {
+            throw new \UnexpectedValueException(sprintf(
+                'The GUID with value "%s" is not valid.',
+                $guid
+            ));
+        }
+
+        $this->guid = $guid;
     }
 
     /**
