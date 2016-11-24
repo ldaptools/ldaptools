@@ -172,4 +172,32 @@ class SIDSpec extends ObjectBehavior
     {
         $this->shouldThrow('\UnexpectedValueException')->during('__construct', ['foo']);
     }
+
+    function it_should_get_the_SID_short_name()
+    {
+        $this->beConstructedWith(SID::WELL_KNOWN['PRINCIPAL_SELF']);
+
+        $this->getShortName()->shouldBeEqualTo('PS');
+    }
+
+    function it_should_be_constructed_with_the_short_name()
+    {
+        $this->beConstructedWith('PS');
+
+        $this->toString()->shouldBeEqualTo(SID::WELL_KNOWN['PRINCIPAL_SELF']);
+    }
+
+    function it_should_get_the_short_name_for_a_well_known_SID_needing_the_domain_SID()
+    {
+        $this->beConstructedWith('S-1-5-21-1263317781-1938881490-3107577794-512');
+
+        $this->getShortName()->shouldBeEqualTo('DA');
+    }
+
+    function it_should_get_the_short_name_for_a_well_known_SID_needing_the_root_domain_SID()
+    {
+        $this->beConstructedWith('S-1-5-21-1263317781-1938881490-3107577794-519');
+
+        $this->getShortName()->shouldBeEqualTo('EA');
+    }
 }
