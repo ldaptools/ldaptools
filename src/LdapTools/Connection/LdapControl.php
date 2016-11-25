@@ -130,4 +130,15 @@ class LdapControl
 
         return $control;
     }
+
+    /**
+     * A simple helper to BER encode an int for an ASN.1 structure for a basic LDAP control value.
+     *
+     * @param int $int
+     * @return string The BER encoded ASN.1 structure to use for the LDAP control value.
+     */
+    public static function berEncodeInt($int)
+    {
+        return sprintf("%c%c%c%c%c", 48, 3, 2, 1, $int);
+    }
 }

@@ -89,4 +89,10 @@ class LdapControlSpec extends ObjectBehavior
             'value' => false
         ]);
     }
+
+    function it_should_encode_a_simple_int_control_value_with_the_helper_berEncodeInt()
+    {
+        $this::berEncodeInt(7)->shouldBeEqualTo(hex2bin('3003020107'));
+    }
+
 }
