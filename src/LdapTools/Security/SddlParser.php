@@ -124,7 +124,6 @@ class SddlParser
         } else {
             $sd->setSacl($acl);
         }
-        $sd->getControlFlags()->add(ControlFlags::FLAG[$aclType.'ACL_PRESENT']);
     }
 
     /**
