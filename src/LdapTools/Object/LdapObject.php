@@ -144,7 +144,7 @@ class LdapObject
      * Remove a specific value, or multiple values, from an attribute.
      *
      * @param string $attribute
-     * @param mixed $values
+     * @param mixed[] ...$values
      * @return $this
      */
     public function remove($attribute, ...$values)
@@ -183,7 +183,7 @@ class LdapObject
      * Add an additional value, or values, to an attribute.
      *
      * @param string $attribute
-     * @param mixed $values
+     * @param mixed[] ...$values
      * @return $this
      */
     public function add($attribute, ...$values)
