@@ -31,4 +31,11 @@ class LdapControlType
      * Used to specify that all children of a LDAP object should be removed during a delete operation.
      */
     const SUB_TREE_DELETE = '1.2.840.113556.1.4.805';
+
+    /**
+     * Used to control what part of a Windows Security descriptor is selected/used on searches/modifications/adds.
+     *
+     * @see https://msdn.microsoft.com/en-us/library/cc223323.aspx
+     */
+    const SD_FLAGS_CONTROL = '1.2.840.113556.1.4.801';
 }
