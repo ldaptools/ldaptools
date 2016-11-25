@@ -190,13 +190,7 @@ class SecurityDescriptor
     {
         $this->dacl = $dacl;
 
-        if ($this->dacl) {
-            $this->controlFlags->add(ControlFlags::FLAG['DACL_PRESENT']);
-        } else {
-            $this->controlFlags->remove(ControlFlags::FLAG['DACL_PRESENT']);
-        }
-
-        return $this;
+        return $this->toggleAclPresent((bool) $dacl, Dacl::SDDL_CHAR);
     }
 
     /**
@@ -219,13 +213,7 @@ class SecurityDescriptor
     {
         $this->sacl = $sacl;
 
-        if ($this->sacl) {
-            $this->controlFlags->add(ControlFlags::FLAG['SACL_PRESENT']);
-        } else {
-            $this->controlFlags->remove(ControlFlags::FLAG['SACL_PRESENT']);
-        }
-
-        return $this;
+        return $this->toggleAclPresent((bool) $sacl, Sacl::SDDL_CHAR);
     }
 
     /**
@@ -365,5 +353,21 @@ class SecurityDescriptor
         if ($offsetDacl !== 0) {
             $this->dacl = new Dacl(hex2bin(substr($descriptor, $offsetDacl)));
         }
+    }
+
+    /**
+     * @param bool $present
+     * @param string $identifier
+     * @return $this
+     */
+    protected function toggleAclPresent($present, $identifier)
+    {
+        if ($present) {
+            $this->controlFlags->add(ControlFlags::FLAG[$identifier.'ACL_PRESENT']);
+        } else {
+            $this->controlFlags->remove(ControlFlags::FLAG[$identifier.'ACL_PRESENT']);
+        }
+
+        return $this;
     }
 }
