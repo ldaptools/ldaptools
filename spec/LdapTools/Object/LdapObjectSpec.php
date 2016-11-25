@@ -346,4 +346,10 @@ class LdapObjectSpec extends ObjectBehavior
         $this->set('foo3', null);
         $this->has('foo3')->shouldBeEqualTo(false);
     }
+
+    function it_should_have_a_string_representation()
+    {
+        $this->__toString()->shouldBeEqualTo('CN=chad,DC=example,DC=com');
+        $this->reset('dn')->__toString()->shouldBeEqualTo('');
+    }
 }

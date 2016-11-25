@@ -310,6 +310,14 @@ class LdapObject
     }
 
     /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->has('dn') ? $this->get('dn') : '';
+    }
+
+    /**
      * Check if an attribute has a specific value. Called only when the attribute is known to exist already.
      *
      * @param string $attribute
