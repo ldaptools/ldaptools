@@ -163,7 +163,7 @@ class LdapObject
     /**
      * Resets the attribute, which effectively removes any values it may have.
      *
-     * @param string ...$attributes
+     * @param string[] ...$attributes
      * @return $this
      */
     public function reset(...$attributes)
