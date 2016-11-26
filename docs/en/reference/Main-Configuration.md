@@ -1,6 +1,11 @@
 # Main Configuration
 --------------------
 
+* [Manual Configuration](#manual-configuration)
+* [YAML Configuration](#yaml-configuration)
+* [Main Configuration Options](#general-section)
+* [Domain Configuration Options](#domain-section)
+
 You can either choose to configure your settings via a file (YAML) or directly using the methods on the `Configuration` 
 and `DomainConfiguration` classes. Once you have an instance of the configuration, you can pass it to the `LdapManager`
 class.

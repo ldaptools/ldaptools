@@ -6,6 +6,14 @@ return an object that allows you to get all the entries it contains. From the ob
 represented by those entries and enter them into LDAP. You also have the ability to build a LDIF file in an 
 object-oriented way and then output the result to a LDIF string.
 
+* [LDIF Parsing](#LDIF-Parsing)
+* [LDIF URL Loaders](#LDIF-URL-Loaders)
+* [LDIF Creation](#LDIF-Creation)
+* [The LDIF Object](#The-LDIF-Object)
+* [LDIF Line Endings](#LDIF-Line-Endings)
+* [Line Folding and Max Line Length](#Line-Folding-and-Max-Line-Length)
+
+
 ## LDIF Parsing
 
 To parse a LDIF file you can pass the contents of it to the parser then do what you need with the LDIF object returned:

@@ -1,6 +1,9 @@
 # Creating LDAP Objects
 -----------------------
 
+* [Using Parameters](#using-parameters-in-attribute-values)
+* [Creator Methods](#ldapobjectcreator-methods)
+
 The `LdapObjectCreator` class provides an easy method for creating LDAP objects. It can accessed directly from the LDAP
 Manager and provides shortcuts and helpers for creating Users, Groups, Contacts, and Computers using the default schema.
 It also supports setting parameters within attribute values to avoid repetition.
@@ -47,6 +50,13 @@ $ldapObject->createOU()
     ->in('dc=example,dc=local')
     ->with(['name' => 'Employees'])
     ->execute();
+    
+// Create an object by passing the schema type name to the create method...
+$ldapObject->create('user')
+    ->in('dc=example,dc=local')
+    ->with(['username' => 'Foo', 'password' => 'correct-horse-battery-staple'])
+    ->execute();
+
 ```
 
 ## Using Parameters in Attribute Values

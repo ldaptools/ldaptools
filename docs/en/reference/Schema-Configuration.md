@@ -1,6 +1,10 @@
 # Schema Configuration
 ----------------------
 
+* [Schema File Structure](#schema-file-structure-yaml)
+* [General Schema File Options](#schema-configuration-options)
+* [Schema Object Type Options](#schema-object-configuration-options)
+
 LdapTools uses a schema definition to describe various LDAP objects in your directory service. This allows you to easily
 create and modify any part of the schema to suit your needs. Default schema definitions are included in the 
 `resources/schema` directory in the root of this library. Both OpenLDAP and Active Directory have default schema files.

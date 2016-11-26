@@ -1,6 +1,15 @@
 # Using the LdapManager Class
 -----------------------------
 
+* [The LDAP Query Builder](#getting-a-ldapquerybuilder-instance)
+* [LDAP Object Repositories](#getting-a-repository-object-for-a-ldap-type)
+* [Switching Domains](#switching-domains)
+* [The LDAP Connection](#getting-the-ldapconnection)
+* [Modifying LDAP Objects](#modifying-ldap-objects)
+* [Deleting LDAP Objects](#deleting-ldap-objects)
+* [Moving LDAP Objects](#moving-ldap-objects)
+* [Restoring LDAP Objects](#restoring-ldap-objects)
+
 The `LdapManager` provides an easy point of access into the different parts of this library after you have setup the
 [configuration](../reference/Main-Configuration.md). You can use the `LdapManager` to generate LDAP queries for a
 certain domain, get a "Repository" for a specific LDAP type in your schema, switch between domains when you have 
@@ -10,22 +19,24 @@ multiple defined in your configuration, and retrieve a `LdapConnection` object f
 ---------------------------------------
 
 You can retrieve a `LdapQueryBuilder` for a specific domain. For example, the below query will select all users with 
-the first name 'John', last name starts with a 'S', and whose accounts are not disabled.
+the first name 'John', last name starts with a 'S', and whose accounts are enabled.
 
 ```php
 $query = $ldapManager->buildLdapQuery();
 
-$users = $query->select(['username', 'city', 'state', 'guid'])
+$users = $query
+    ->select(['username', 'city', 'state', 'guid'])
     ->fromUsers()
     ->where(
+        $query->filter()->eq('enabled', true)
         $query->filter()->eq('firstName', 'John'),
         $query->filter()->startsWith('lastName', 'S'),
-        // 'accountIsDisabled' is an Active Directory specific filter method. Negate a statement using 'not'.
-        $query->filter()->not($query->filter()->accountIsDisabled())
     )
     ->getLdapQuery()
-    ->execute();
+    ->getResult();
 ```
+
+For more information on building LDAP queries, see [the docs for it](./Building-LDAP-Queries.md).
 
 ### Getting a Repository Object for a LDAP Type
 -----------------------------------------------
@@ -122,6 +133,8 @@ try {
     echo "Error saving object to LDAP: ".$e->getMessage();
 }
 ```
+
+For more information on modifying LDAP objects [see the docs for it](./Modifying-LDAP-Objects.md).
 
 ### Deleting LDAP Objects
 --------------------------

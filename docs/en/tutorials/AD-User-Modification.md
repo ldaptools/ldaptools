@@ -1,6 +1,12 @@
 # AD User Modification
 ----------------------
 
+* [User Account Properties](#user-account-properties)
+* [Group Membership](#group-membership)
+* [Log-On-To Workstations List](#user-log-on-to-workstations-list)
+* [Account Expiration Date](#account-expiration-date)
+* [Manager Modification](#manager-modification)
+
 Modifying an Active Directory user is really no different than modifying any other LDAP object, but there are a few
 things to note. For example, using a few simple statements you can modify many of the user's properties typically seen
 in the "Account" tab in the "AD Users and Computers" tool:
@@ -15,7 +21,7 @@ $repository = $ldapManager->getRepository(LdapObjectType::USER);
 $user = $repository->findOneByUsername('chad');
 
 // Make sure the user account is set to enabled.
-$user->setDisabled(false);
+$user->setEnabled(true);
 // Set their password to never expire.
 $user->setPasswordNeverExpires(true);
 
@@ -28,13 +34,14 @@ try {
 
 With the above statement you have just the user account to be enabled and set the password to never expire.
 
-## AD User Account Properties
+## User Account Properties
 
 This table contains many useful AD attributes you can toggle with a simple `true` or `false` value like above.
 
 | Property Name  | Description |
 | --------------- | -------------- |
-| disabled | Disable (true) or enable (false) the account. |
+| disabled | Whether or not the account is disabled. |
+| enabled | Whether or not the account is enabled. |
 | passwordIsReversible | Legacy AD setting. Should NOT be used. |
 | passwordMustChange | Set that the user's password must change on the next login. |
 | passwordNeverExpires | Set the user's password to never expire. |

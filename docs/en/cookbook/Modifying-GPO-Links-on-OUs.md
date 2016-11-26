@@ -71,7 +71,7 @@ try {
 You can also use GPOLink objects in queries to check if a link exists on an OU. You can even get as granular as setting
 whether the GPOLink is enforced/enabled or not.
 
-```
+```php
 use LdapTools\Utilities\GPOLink;
 
 $query = $ldap->buildLdapQuery()->fromOU();
@@ -94,7 +94,7 @@ getting all of the details regarding the link.
 
 A GPOLink can be constructed use a name, GUID, DN, or LdapObject:
 
-```
+```php
 use LdapTools\Utilities\GPOLink;
 
 // Create a link for a GPO named "Server Baseline"...
@@ -130,7 +130,7 @@ $ldap->persist($ou);
 
 When searching for OUs you can inspect their GPO links to determine information about them:
 
-```
+```php
 // Query for the GPO links for an OU...
 $ou = $ldap->buildLdapQuery()
     ->fromOU()
@@ -162,7 +162,7 @@ foreach ($ou->get('gpoLinks') as $gpoLink) {
 In the above example, if during the loop you want to modify any of the GPOLink objects you should set all of the GPO
 links back to the OU and then persist it back to LDAP:
 
-```
+```php
 // Query for the GPO links for an OU...
 $ou = $ldap->buildLdapQuery()
     ->fromOU()

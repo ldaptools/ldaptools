@@ -1,6 +1,17 @@
 # Events
 --------
 
+* [Adding Event Listeners](#adding-event-listeners)
+* [Adding Event Subscribers](#adding-event-subscribers)
+* [Event Names](#event-names)
+* [The LDAP Object Creation Event](#the-ldap-object-creation-event)
+* [The LDAP Object Deletion and Modification Events](#the-ldap-object-deletiong-and-modification-events)
+* [The LDAP Object Restore Event](#the-ldap-object-restore-event)
+* [The LDAP Object Schema Event](#the-ldap-object-schema-event)
+* [The LDAP Authentication Event](#the-ldap-authentication-event)
+* [The LDAP Operation Event](#the-ldap-operation-event)
+* [Using a Custom Event Dispatcher](#using-a-customspecific-event-dispatcher)
+
 There are many events you can hook into to extend, and take action on, many common tasks (LDAP deletion, creation, modification, etc).
 This is done by using a event dispatcher system (the `symfony/event-dispatcher` by default).
  
