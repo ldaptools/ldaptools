@@ -1,13 +1,13 @@
 # Modifying LDAP Objects
 ------------------------
 
-* [Automatic Setters and Getters](#Automatic-Setters-and-Getters)
-* [Automatic Property Access](#Automatic-Property-Access)
+* [Automatic Setters and Getters](#automatic-setters-and-getters)
+* [Automatic Property Access](#automatic-property-access)
 * [Set an Attribute Value](#setattribute-value)
 * [Add an Attribute Value](#addattribute-value)
 * [Remove an Attribute Value](#removeattribute-value)
 * [Reset an Attribute Value](#resetattributes)
-* [Check if an Attribute Exists](#hasattribute-value-null)
+* [Check if an Attribute Exists](#hasattribute-value--null)
 
 Modifying an existing LDAP object is as easy as searching for it, making your changes to the object via either the 
 setters/properties then sending the object back to the `LdapManager` class with the `persist()` method. All the changes

@@ -1,18 +1,17 @@
 # LDIF Files
 ------------------------
 
+* [LDIF Parsing](#ldif-parsing)
+* [LDIF URL Loaders](#ldif-url-loaders)
+* [LDIF Creation](#ldif-creation)
+* [The LDIF Object](#the-ldif-object)
+* [LDIF Line Endings](#ldif-line-endings)
+* [Line Folding and Max Line Length](#line-folding-and-max-line-length)
+
 LdapTools provides an easy method to both parse and create LDIF files. The parser is able to take a LDIF string and
 return an object that allows you to get all the entries it contains. From the object you can get all the LDAP operations
 represented by those entries and enter them into LDAP. You also have the ability to build a LDIF file in an 
 object-oriented way and then output the result to a LDIF string.
-
-* [LDIF Parsing](#LDIF-Parsing)
-* [LDIF URL Loaders](#LDIF-URL-Loaders)
-* [LDIF Creation](#LDIF-Creation)
-* [The LDIF Object](#The-LDIF-Object)
-* [LDIF Line Endings](#LDIF-Line-Endings)
-* [Line Folding and Max Line Length](#Line-Folding-and-Max-Line-Length)
-
 
 ## LDIF Parsing
 

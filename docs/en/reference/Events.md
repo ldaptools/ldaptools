@@ -3,9 +3,9 @@
 
 * [Adding Event Listeners](#adding-event-listeners)
 * [Adding Event Subscribers](#adding-event-subscribers)
-* [Event Names](#event-names)
+* [Event Names](#the-event-names)
 * [The LDAP Object Creation Event](#the-ldap-object-creation-event)
-* [The LDAP Object Deletion and Modification Events](#the-ldap-object-deletiong-and-modification-events)
+* [The LDAP Object Deletion and Modification Events](#the-ldap-object-deletion-and-modification-events)
 * [The LDAP Object Restore Event](#the-ldap-object-restore-event)
 * [The LDAP Object Schema Event](#the-ldap-object-schema-event)
 * [The LDAP Authentication Event](#the-ldap-authentication-event)
