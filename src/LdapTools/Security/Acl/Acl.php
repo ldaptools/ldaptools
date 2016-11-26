@@ -169,7 +169,7 @@ abstract class Acl
     {
         foreach ($aces as $ace) {
             $this->validateAce($ace);
-            if (!in_array($ace, $this->aces, true)) {
+            if (!$this->hasAce($ace)) {
                 $this->aces[] = $ace;
             }
         }
@@ -186,12 +186,29 @@ abstract class Acl
     public function removeAce(Ace ...$aces)
     {
         foreach ($aces as $ace) {
-            if (in_array($ace, $this->aces, true)) {
-                unset($this->aces[array_search($ace, $this->aces, true)]);
+            if ($this->hasAce($ace)) {
+                unset($this->aces[array_search($ace, $this->aces)]);
             }
         }
 
         return $this;
+    }
+
+    /**
+     * Check if an ACE, or multiple ACEs, exist within this ACL.
+     *
+     * @param Ace[] ...$aces
+     * @return bool
+     */
+    public function hasAce(Ace ...$aces)
+    {
+        foreach ($aces as $ace) {
+            if (!in_array($ace, $this->aces)) {
+                return false;
+            }
+        }
+
+        return empty($aces) ? false : true;
     }
 
     /**

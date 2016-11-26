@@ -150,4 +150,19 @@ class DaclSpec extends ObjectBehavior
         $this->toBinary(false)->shouldBeEqualTo(hex2bin('0400300002000000000014000000000001010000000000050a000000010014000000000001010000000000050a000000'));
         $this->toBinary()->shouldBeEqualTo(hex2bin('0400300002000000010014000000000001010000000000050a000000000014000000000001010000000000050a000000'));
     }
+
+    function it_should_check_if_the_ace_exists()
+    {
+        $deny = (new Ace('D'))->setSid(new SID('PS'));
+        $deny2 = (new Ace('D'))->setSid(new SID('PS'));
+        $deny3 = (new Ace('D'))->setSid(new SID('AO'));
+        $this->addAce($deny);
+
+        $this->hasAce($deny)->shouldBeEqualTo(true);
+        $this->hasAce($deny2)->shouldBeEqualTo(true);
+        $this->hasAce($deny, $deny2)->shouldBeEqualTo(true);
+        $this->hasAce($deny3)->shouldBeEqualTo(false);
+        $this->hasAce($deny, $deny3)->shouldBeEqualTo(false);
+        $this->hasAce(...[])->shouldBeEqualTo(false);
+    }
 }
