@@ -88,7 +88,7 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_add_an_ace()
     {
-        $ace = (new Ace('D'))->setSid(new SID('PS'));;
+        $ace = (new Ace('D'))->setTrustee(new SID('PS'));;
 
         $this->getAces()->shouldNotContain($ace);
         $this->addAce($ace)->getAces()->shouldContain($ace);
@@ -96,7 +96,7 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_remove_an_ace()
     {
-        $ace = (new Ace('D'))->setSid(new SID('PS'));
+        $ace = (new Ace('D'))->setTrustee(new SID('PS'));
 
         $this->addAce($ace)->getAces()->shouldContain($ace);
         $this->removeAce($ace)->getAces()->shouldNotContain($ace);
@@ -105,18 +105,18 @@ class DaclSpec extends ObjectBehavior
     function it_should_tell_whether_the_ACEs_are_canonical_when_calling_isCanonical()
     {
         $this->isCanonical()->shouldBeEqualTo(true);
-        $this->addAce((new Ace('D'))->setSid(new SID('PS')))->isCanonical()->shouldBeEqualTo(false);
+        $this->addAce((new Ace('D'))->setTrustee(new SID('PS')))->isCanonical()->shouldBeEqualTo(false);
     }
 
     function it_should_order_the_ace_canonically_if_specified()
     {
         $this->beConstructedWith(null);
 
-        $deny = (new Ace('D'))->setSid(new SID('PS'));;
-        $allow = (new Ace('A'))->setSid(new SID('PS'));;
-        $denyObj = (new Ace('OD'))->setSid(new SID('PS'));;
-        $allowObj = (new Ace('OA'))->setSid(new SID('PS'));;
-        $inherited = (new Ace('D'))->setSid(new SID('PS'));;
+        $deny = (new Ace('D'))->setTrustee(new SID('PS'));;
+        $allow = (new Ace('A'))->setTrustee(new SID('PS'));;
+        $denyObj = (new Ace('OD'))->setTrustee(new SID('PS'));;
+        $allowObj = (new Ace('OA'))->setTrustee(new SID('PS'));;
+        $inherited = (new Ace('D'))->setTrustee(new SID('PS'));;
         $inherited->getFlags()->add(AceFlags::FLAG['INHERITED']);
         $this->addAce($inherited, $allowObj, $allow, $deny, $denyObj);
 
@@ -132,8 +132,8 @@ class DaclSpec extends ObjectBehavior
     function it_should_order_the_aces_non_canonically_to_sddl_if_specified()
     {
         $this->beConstructedWith(null);
-        $deny = (new Ace('D'))->setSid(new SID('PS'));
-        $allow = (new Ace('A'))->setSid(new SID('PS'));;
+        $deny = (new Ace('D'))->setTrustee(new SID('PS'));
+        $allow = (new Ace('A'))->setTrustee(new SID('PS'));;
         $this->addAce($allow, $deny);
 
         $this->toSddl(false)->shouldBeEqualTo('(A;;;;;PS)(D;;;;;PS)');
@@ -143,8 +143,8 @@ class DaclSpec extends ObjectBehavior
     function it_should_order_the_aces_non_canonically_to_binary_if_specified()
     {
         $this->beConstructedWith(null);
-        $deny = (new Ace('D'))->setSid(new SID('PS'));
-        $allow = (new Ace('A'))->setSid(new SID('PS'));;
+        $deny = (new Ace('D'))->setTrustee(new SID('PS'));
+        $allow = (new Ace('A'))->setTrustee(new SID('PS'));;
         $this->addAce($allow, $deny);
 
         $this->toBinary(false)->shouldBeEqualTo(hex2bin('0400300002000000000014000000000001010000000000050a000000010014000000000001010000000000050a000000'));
@@ -153,9 +153,9 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_check_if_the_ace_exists()
     {
-        $deny = (new Ace('D'))->setSid(new SID('PS'))->setSid(new SID('PS'));
-        $deny2 = (new Ace('D'))->setSid(new SID('PS'))->setSid(new SID('PS'));
-        $deny3 = (new Ace('D'))->setSid(new SID('AO'))->setSid(new SID('PS'));
+        $deny = (new Ace('D'))->setTrustee(new SID('PS'));
+        $deny2 = (new Ace('D'))->setTrustee(new SID('PS'));
+        $deny3 = (new Ace('D'))->setTrustee(new SID('AO'));
         $this->addAce($deny, $deny3);
 
         $this->hasAce($deny)->shouldBeEqualTo(true);
