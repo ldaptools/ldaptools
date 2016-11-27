@@ -1,6 +1,23 @@
 CHANGELOG
 =========
 
+0.23.0 (2016-11-27)
+-------------------
+  * Add a Windows Security Descriptor/SDDL parser and encoder. Provides easy read/writing of AD ACLs/ACEs.
+  * Add a string representation of the DN to the LDAP objects.
+  * The reset method for an LdapObject is now variadic, so multiple attributes can be reset with one command.
+  * When setting an attribute value to an empty string or array it will now perform a reset operation instead.
+  * Operation error messages now contain the full diagnostic message for easier troubleshooting.
+  * The LDAP object type can now be passed directly to the `createLdapObject` method of the LdapManager.
+  * Provide a better error message when trying to convert a value (SID, GUID, etc) to a DN and it fails.
+  * Provide a better error message when attempting to switch domains on the LdapManager and it fails.
+  * LDAP query results are now freed at the end of a query operation.
+  * Binary data will now be ignored for the encoding process when going to LDAP.
+  * Added Windows Server 2016 to the recognized domain/forest functional levels in the RootDSE.
+  * Fix parameter resolution for new objects that contain values that are objects (such as another LdapObject).
+  * Fix SID encoding/decoding under certain circumstances.
+  * Fix setting the use_paging option when resolving configuration settings. 
+
 0.22.0 (2016-08-22)
 -------------------
   * Add a connect_timeout option for more control over the initial connection test timeout value.
