@@ -40,9 +40,9 @@ class Ace
     protected $aceRights;
 
     /**
-     * @var SID The SID this ACE relates to.
+     * @var SID The trustee SID this ACE relates to.
      */
-    protected $sid;
+    protected $trustee;
 
     /**
      * @var null|GUID The object GUID, if present.
@@ -105,24 +105,24 @@ class Ace
     }
 
     /**
-     * Get the SID this ACE applies to.
+     * Get the trustee SID this ACE applies to.
      *
      * @return SID
      */
-    public function getSid()
+    public function getTrustee()
     {
-        return $this->sid;
+        return $this->trustee;
     }
 
     /**
-     * Set the SID this ACE applies to.
+     * Set the trustee SID this ACE applies to.
      *
      * @param SID|string $sid
      * @return $this
      */
-    public function setSid($sid)
+    public function setTrustee($sid)
     {
-        $this->sid = $sid instanceof SID ? $sid : new SID($sid);
+        $this->trustee = $sid instanceof SID ? $sid : new SID($sid);
 
         return $this;
     }
@@ -140,12 +140,12 @@ class Ace
     /**
      * Set the GUID object type this ACE applies to.
      *
-     * @param GUID|null $guid
+     * @param GUID|string|null $guid
      * @return $this
      */
-    public function setObjectType(GUID $guid = null)
+    public function setObjectType($guid)
     {
-        $this->objectType = $guid;
+        $this->objectType = ($guid instanceof GUID || $guid === null) ? $guid : new GUID($guid);
 
         return $this->toggleObjectStatus($guid, AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT']);
     }
@@ -163,12 +163,12 @@ class Ace
     /**
      * Set the inherited GUID object type this ACE applies to.
      *
-     * @param GUID|null $guid
+     * @param GUID|string|null $guid
      * @return $this
      */
-    public function setInheritedObjectType(GUID $guid = null)
+    public function setInheritedObjectType($guid)
     {
-        $this->inheritedObjectType = $guid;
+        $this->inheritedObjectType = ($guid instanceof GUID || $guid === null) ? $guid : new GUID($guid);
 
         return $this->toggleObjectStatus($guid, AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT']);
     }
@@ -284,7 +284,7 @@ class Ace
         if ($this->inheritedObjectType) {
             $binary .= $this->inheritedObjectType->toBinary();
         }
-        $binary .= $this->sid->toBinary();
+        $binary .= $this->trustee->toBinary();
         if ($this->applciationData) {
             $binary .= $this->applciationData;
         }
@@ -343,7 +343,7 @@ class Ace
             $this->aceRights,
             $this->objectType,
             $this->inheritedObjectType,
-            $this->sid->getShortName() ?: $this->sid,
+            $this->trustee->getShortName() ?: $this->trustee,
         ]).')';
     }
 
@@ -360,8 +360,8 @@ class Ace
      */
     protected function validateSid()
     {
-        if (!$this->sid) {
-            throw new LogicException('The ACE must have a SID defined.');
+        if (!$this->trustee) {
+            throw new LogicException('The ACE must have a trustee defined.');
         }
         if (!$this->type) {
             throw new LogicException('The ACE must have a type defined.');
@@ -394,8 +394,8 @@ class Ace
             }
         }
 
-        $this->sid = new SID(hex2bin(substr($ace, $position)));
-        $position += strlen(bin2hex($this->sid->toBinary()));
+        $this->trustee = new SID(hex2bin(substr($ace, $position)));
+        $position += strlen(bin2hex($this->trustee->toBinary()));
 
         $size = $this->hexUShort16Le2Int(substr($ace, 4, 4));
         if ($position < ($size * 2)) {

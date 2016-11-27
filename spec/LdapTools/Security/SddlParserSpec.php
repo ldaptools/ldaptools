@@ -53,7 +53,7 @@ class SddlParserSpec extends ObjectBehavior
         $ace = (new Ace(new AceType('A')))
             ->setFlags((new AceFlags())->add(AceFlags::SHORT_NAME['CI']))
             ->setRights((new AceRights())->add(AceRights::SHORT_NAME['RC'])->add(AceRights::SHORT_NAME['CC']))
-            ->setSid(new SID('PS'));
+            ->setTrustee(new SID('PS'));
         $acl->addAce($ace);
         $sd->setDacl($acl);
 

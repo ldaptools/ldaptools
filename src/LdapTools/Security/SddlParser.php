@@ -144,14 +144,14 @@ class SddlParser
 
         $objectType = empty($matches[4]) ? null : new GUID($matches[4]);
         $inheritedObjectType = empty($matches[5]) ? null : new GUID($matches[5]);
-        $sid = $this->getSid($matches[6], 'ACE SID');
+        $sid = $this->getSid($matches[6], 'ACE trustee');
 
         return (new Ace($type))
             ->setFlags($flags)
             ->setRights($rights)
             ->setObjectType($objectType)
             ->setInheritedObjectType($inheritedObjectType)
-            ->setSid($sid);
+            ->setTrustee($sid);
     }
 
     /**

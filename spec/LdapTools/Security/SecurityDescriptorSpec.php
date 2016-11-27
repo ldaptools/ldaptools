@@ -122,7 +122,7 @@ class SecurityDescriptorSpec extends ObjectBehavior
 
     function it_should_respect_the_canonicalization_choice_to_sddl_if_specified()
     {
-        $this->getDacl()->addAce((new Ace(new AceType('D')))->setSid(new SID('PS')));
+        $this->getDacl()->addAce((new Ace(new AceType('D')))->setTrustee(new SID('PS')));
 
         $this->toSddl(false)->shouldBeEqualTo('O:PSG:PSD:(A;CI;RCCC;;;PS)(D;;;;;PS)');
         $this->toSddl()->shouldBeEqualTo('O:PSG:PSD:(D;;;;;PS)(A;CI;RCCC;;;PS)');
@@ -130,7 +130,7 @@ class SecurityDescriptorSpec extends ObjectBehavior
 
     function it_should_respect_the_canonicalization_choice_to_binary_if_specified()
     {
-        $this->getDacl()->addAce((new Ace(new AceType('D')))->setSid(new SID('PS')));
+        $this->getDacl()->addAce((new Ace(new AceType('D')))->setTrustee(new SID('PS')));
 
         $this->toBinary(false)->shouldBeEqualTo(hex2bin('010004801400000020000000000000002c00000001010000000000050a00000001010000000000050a0000000400300002000000000214000100020001010000000000050a000000010014000000000001010000000000050a000000'));
         $this->toBinary()->shouldBeEqualTo(hex2bin('010004801400000020000000000000002c00000001010000000000050a00000001010000000000050a0000000400300002000000010014000000000001010000000000050a000000000214000100020001010000000000050a000000'));

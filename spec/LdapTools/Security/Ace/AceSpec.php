@@ -64,16 +64,16 @@ class AceSpec extends ObjectBehavior
         $this->getRights()->shouldBeEqualTo($aceRights);
     }
 
-    function it_should_parse_the_sid_and_contain_a_sid_object()
+    function it_should_parse_the_trustee_and_contain_a_sid_object()
     {
-        $this->getSid()->shouldReturnAnInstanceOf('LdapTools\Security\SID');
-        $this->getSid()->toString()->shouldBeEqualTo('S-1-5-21-1263317781-1938881490-3107577794-1116');
+        $this->getTrustee()->shouldReturnAnInstanceOf('LdapTools\Security\SID');
+        $this->getTrustee()->toString()->shouldBeEqualTo('S-1-5-21-1263317781-1938881490-3107577794-1116');
     }
 
-    function it_should_be_able_to_set_the_sid(SID $sid)
+    function it_should_be_able_to_set_the_trustee(SID $sid)
     {
-        $this->setSid($sid)->shouldReturnAnInstanceOf('LdapTools\Security\Ace\Ace');
-        $this->getSid()->shouldBeEqualTo($sid);
+        $this->setTrustee($sid)->shouldReturnAnInstanceOf('LdapTools\Security\Ace\Ace');
+        $this->getTrustee()->shouldBeEqualTo($sid);
     }
 
     function it_should_parse_the_type_and_contain_an_AceType_object()
@@ -148,7 +148,7 @@ class AceSpec extends ObjectBehavior
         $this->beConstructedWith(null);
 
         $this->shouldThrow('LdapTools\Exception\LogicException')->duringToSddl();
-        $this->setSid(new SID('PS'));
+        $this->setTrustee(new SID('PS'));
         $this->shouldThrow('LdapTools\Exception\LogicException')->duringToSddl();
         $this->setType(new AceType('D'));
         $this->shouldNotThrow('LdapTools\Exception\LogicException')->duringToSddl();
@@ -209,5 +209,19 @@ class AceSpec extends ObjectBehavior
         $this->setInheritedObjectType(null);
         $this->getObjectFlags()->has(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
         $this->getObjectFlags()->has(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
+    }
+
+    function it_should_allow_setting_the_trustee_by_a_string_sid()
+    {
+        $this->setTrustee('PS')->getTrustee()->toString()->shouldBeEqualTo(SID::SHORT_NAME['PS']);
+    }
+
+    function it_should_allow_setting_object_types_by_a_string_guid()
+    {
+        $this->setObjectType(null)->getObjectType()->shouldBeEqualTo(null);
+        $this->setObjectType(AceRights::EXTENDED['CHANGE_PASSWORD'])->getObjectType()->toString()->shouldBeEqualTo(AceRights::EXTENDED['CHANGE_PASSWORD']);
+
+        $this->setInheritedObjectType(null)->getInheritedObjectType()->shouldBeEqualTo(null);
+        $this->setInheritedObjectType(AceRights::EXTENDED['CHANGE_PASSWORD'])->getInheritedObjectType()->toString()->shouldBeEqualTo(AceRights::EXTENDED['CHANGE_PASSWORD']);
     }
 }
