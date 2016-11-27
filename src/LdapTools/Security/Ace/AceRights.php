@@ -24,6 +24,21 @@ class AceRights extends Flags
     use FlagsSddlTrait;
 
     /**
+     * Some of the possible/useful extended rights for a control access right.
+     *
+     * @see https://msdn.microsoft.com/en-us/library/ms683985(v=vs.85).aspx
+     */
+    const EXTENDED = [
+        'APPLY_GROUP_POLICY' => 'edacfd8f-ffb3-11d1-b41d-00a0c968f939',
+        'REANIMATE_TOMBSTONES' => '45ec5156-db7e-47bb-b53f-dbeb2d03c40f',
+        'CHANGE_PASSWORD' => 'ab721a53-1e2f-11d0-9819-00aa0040529b',
+        'RESET_PASSWORD' => '00299570-246d-11d0-a768-00aa006e0529',
+        'EXCHANGE_SEND_AS' => 'ab721a54-1e2f-11d0-9819-00aa0040529b',
+        'EXCHANGE_SEND_TO' => 'ab721a55-1e2f-11d0-9819-00aa0040529b',
+        'EXCHANGE_RECEIVE_AS' => 'ab721a56-1e2f-11d0-9819-00aa0040529b',
+    ];
+
+    /**
      * AceRights for DS
      */
     const FLAG = [
