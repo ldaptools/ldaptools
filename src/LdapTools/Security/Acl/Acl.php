@@ -202,13 +202,13 @@ abstract class Acl
      */
     public function hasAce(Ace ...$aces)
     {
+        $inArray = false;
+
         foreach ($aces as $ace) {
-            if (!in_array($ace, $this->aces, true)) {
-                return false;
-            }
+            $inArray = in_array($ace, $this->aces, true);
         }
 
-        return empty($aces) ? false : true;
+        return $inArray;
     }
 
     /**
