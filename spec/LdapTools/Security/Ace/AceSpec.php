@@ -188,4 +188,26 @@ class AceSpec extends ObjectBehavior
         $this->setType(new AceType('A'));
         $this->isObjectAce()->shouldBeEqualTo(false);
     }
+
+    function it_should_toggle_the_object_type_flags_automatically()
+    {
+        $this->beConstructedWith('OA');
+        $this->getObjectFlags()->shouldBeNull();
+
+        $this->setObjectType(new GUID(AceRights::EXTENDED['CHANGE_PASSWORD']));
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(true);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
+
+        $this->setInheritedObjectType(new GUID(AceRights::EXTENDED['CHANGE_PASSWORD']));
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(true);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(true);
+
+        $this->setObjectType(null);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(true);
+
+        $this->setInheritedObjectType(null);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
+        $this->getObjectFlags()->has(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT'])->shouldBeEqualTo(false);
+    }
 }

@@ -145,19 +145,10 @@ class SddlParser
         $objectType = empty($matches[4]) ? null : new GUID($matches[4]);
         $inheritedObjectType = empty($matches[5]) ? null : new GUID($matches[5]);
         $sid = $this->getSid($matches[6], 'ACE SID');
-        $objectFlags = $objectType || $inheritedObjectType ? new AceObjectFlags() : null;
-
-        if ($objectFlags && $objectType) {
-            $objectFlags->add(AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT']);
-        }
-        if ($objectFlags && $inheritedObjectType) {
-            $objectFlags->add(AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT']);
-        }
 
         return (new Ace($type))
             ->setFlags($flags)
             ->setRights($rights)
-            ->setObjectFlags($objectFlags)
             ->setObjectType($objectType)
             ->setInheritedObjectType($inheritedObjectType)
             ->setSid($sid);

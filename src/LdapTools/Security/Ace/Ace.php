@@ -147,7 +147,7 @@ class Ace
     {
         $this->objectType = $guid;
 
-        return $this;
+        return $this->toggleObjectStatus($guid, AceObjectFlags::FLAG['OBJECT_TYPE_PRESENT']);
     }
 
     /**
@@ -170,7 +170,7 @@ class Ace
     {
         $this->inheritedObjectType = $guid;
 
-        return $this;
+        return $this->toggleObjectStatus($guid, AceObjectFlags::FLAG['INHERITED_OBJECT_TYPE_PRESENT']);
     }
 
     /**
@@ -421,5 +421,28 @@ class Ace
     protected function endsWith($needle, $haystack)
     {
         return substr($haystack, -strlen($needle)) === $needle;
+    }
+
+    /**
+     * @param GUID|null $object
+     * @param int $type
+     * @return $this
+     */
+    protected function toggleObjectStatus($object, $type)
+    {
+        if (!$object && !$this->objectFlags) {
+            return $this;
+        }
+        if ($object && !$this->objectFlags) {
+            $this->objectFlags = new AceObjectFlags();
+        }
+
+        if ($object) {
+            $this->objectFlags->add($type);
+        } else {
+            $this->objectFlags->remove($type);
+        }
+
+        return $this;
     }
 }
