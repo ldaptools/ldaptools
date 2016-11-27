@@ -426,10 +426,10 @@ Set the SID of the trustee for this ACE. This can be either a SID object, a stri
 
 ```php
 // Set the trustee SID by short name...
-$ace->setSid('PS');
+$ace->setTrustee('PS');
 
 // Set the trustee SID by using a string SID...
-$ace->setSid('S-1-5-21-1263317781-1938881490-3107577794-512');
+$ace->setTrustee('S-1-5-21-1263317781-1938881490-3107577794-512');
 ```
 
 ------------------------
