@@ -88,7 +88,7 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_add_an_ace()
     {
-        $ace = new Ace('D');
+        $ace = (new Ace('D'))->setSid(new SID('PS'));;
 
         $this->getAces()->shouldNotContain($ace);
         $this->addAce($ace)->getAces()->shouldContain($ace);
@@ -96,7 +96,7 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_remove_an_ace()
     {
-        $ace = new Ace('D');
+        $ace = (new Ace('D'))->setSid(new SID('PS'));
 
         $this->addAce($ace)->getAces()->shouldContain($ace);
         $this->removeAce($ace)->getAces()->shouldNotContain($ace);
@@ -105,18 +105,18 @@ class DaclSpec extends ObjectBehavior
     function it_should_tell_whether_the_ACEs_are_canonical_when_calling_isCanonical()
     {
         $this->isCanonical()->shouldBeEqualTo(true);
-        $this->addAce(new Ace('D'))->isCanonical()->shouldBeEqualTo(false);
+        $this->addAce((new Ace('D'))->setSid(new SID('PS')))->isCanonical()->shouldBeEqualTo(false);
     }
 
     function it_should_order_the_ace_canonically_if_specified()
     {
         $this->beConstructedWith(null);
 
-        $deny = new Ace('D');
-        $allow = new Ace('A');
-        $denyObj = new Ace('OD');
-        $allowObj = new Ace('OA');
-        $inherited = new Ace('D');
+        $deny = (new Ace('D'))->setSid(new SID('PS'));;
+        $allow = (new Ace('A'))->setSid(new SID('PS'));;
+        $denyObj = (new Ace('OD'))->setSid(new SID('PS'));;
+        $allowObj = (new Ace('OA'))->setSid(new SID('PS'));;
+        $inherited = (new Ace('D'))->setSid(new SID('PS'));;
         $inherited->getFlags()->add(AceFlags::FLAG['INHERITED']);
         $this->addAce($inherited, $allowObj, $allow, $deny, $denyObj);
 
@@ -153,16 +153,15 @@ class DaclSpec extends ObjectBehavior
 
     function it_should_check_if_the_ace_exists()
     {
-        $deny = (new Ace('D'))->setSid(new SID('PS'));
-        $deny2 = (new Ace('D'))->setSid(new SID('PS'));
-        $deny3 = (new Ace('D'))->setSid(new SID('AO'));
-        $this->addAce($deny);
+        $deny = (new Ace('D'))->setSid(new SID('PS'))->setSid(new SID('PS'));
+        $deny2 = (new Ace('D'))->setSid(new SID('PS'))->setSid(new SID('PS'));
+        $deny3 = (new Ace('D'))->setSid(new SID('AO'))->setSid(new SID('PS'));
+        $this->addAce($deny, $deny3);
 
         $this->hasAce($deny)->shouldBeEqualTo(true);
-        $this->hasAce($deny2)->shouldBeEqualTo(true);
-        $this->hasAce($deny, $deny2)->shouldBeEqualTo(true);
-        $this->hasAce($deny3)->shouldBeEqualTo(false);
-        $this->hasAce($deny, $deny3)->shouldBeEqualTo(false);
+        $this->hasAce($deny2)->shouldBeEqualTo(false);
+        $this->hasAce($deny, $deny2)->shouldBeEqualTo(false);
+        $this->hasAce($deny, $deny3)->shouldBeEqualTo(true);
         $this->hasAce(...[])->shouldBeEqualTo(false);
     }
 }
