@@ -135,4 +135,16 @@ class SecurityDescriptorSpec extends ObjectBehavior
         $this->toBinary(false)->shouldBeEqualTo(hex2bin('010004801400000020000000000000002c00000001010000000000050a00000001010000000000050a0000000400300002000000000214000100020001010000000000050a000000010014000000000001010000000000050a000000'));
         $this->toBinary()->shouldBeEqualTo(hex2bin('010004801400000020000000000000002c00000001010000000000050a00000001010000000000050a0000000400300002000000010014000000000001010000000000050a000000000214000100020001010000000000050a000000'));
     }
+
+    function it_should_set_the_owner_SID()
+    {
+        $this->setOwner(new SID('PS'))->getOwner()->toString()->shouldBeEqualTo(SID::SHORT_NAME['PS']);
+        $this->setOwner(SID::SHORT_NAME['BA'])->getOwner()->toString()->shouldBeEqualTo(SID::SHORT_NAME['BA']);
+    }
+
+    function it_should_set_the_group_SID()
+    {
+        $this->setGroup(new SID('PS'))->getGroup()->toString()->shouldBeEqualTo(SID::SHORT_NAME['PS']);
+        $this->setGroup(SID::SHORT_NAME['BA'])->getGroup()->toString()->shouldBeEqualTo(SID::SHORT_NAME['BA']);
+    }
 }

@@ -127,12 +127,12 @@ class SecurityDescriptor
     /**
      * Set the owner SID for the security descriptor.
      *
-     * @param SID $owner
+     * @param SID|string $owner
      * @return $this
      */
-    public function setOwner(SID $owner)
+    public function setOwner($owner)
     {
-        $this->owner = $owner;
+        $this->owner = $owner instanceof SID ? $owner : new SID($owner);
 
         return $this;
     }
@@ -150,12 +150,12 @@ class SecurityDescriptor
     /**
      * Set the group SID for the security descriptor.
      *
-     * @param SID $group
+     * @param SID|string $group
      * @return $this
      */
-    public function setGroup(SID $group)
+    public function setGroup($group)
     {
-        $this->group = $group;
+        $this->group = $group instanceof SID ? $group : new SID($group);
 
         return $this;
     }
