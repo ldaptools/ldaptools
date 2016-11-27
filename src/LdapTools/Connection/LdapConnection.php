@@ -235,6 +235,11 @@ class LdapConnection implements LdapConnectionInterface
      */
     public function setControl(LdapControl $control)
     {
+        // To set a a server control we must first be bound...
+        if (!$this->isBound()) {
+            $this->connect();
+        }
+
         if (!@ldap_set_option($this->connection, LDAP_OPT_SERVER_CONTROLS, [$control->toArray()]) && $control->getCriticality()) {
             throw new LdapConnectionException(sprintf('Unable to set control for OID "%s".', $control->getOid()));
         }
