@@ -690,7 +690,7 @@ Security Descriptor Definition Language (SDDL) is a string representation of a S
 library contains a SDDL parser capable of taking a SDDL string and producing a SecurityDescriptor object that contains
 everything represented in the SDDL:
 
-```
+```php
 use LdapTools\Security\SddlParser;
 use LdapTools\Exception\SddlParserException;
 
