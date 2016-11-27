@@ -4,14 +4,13 @@
 LdapTools is a feature-rich LDAP library for PHP 5.6+. It was designed to be customizable for use with pretty much any 
 directory service, but contains default attribute converters and schemas for Active Directory and OpenLDAP. 
  
- * A fluent and easy to understand syntax for generating LDAP queries.
- * Easily create common LDAP objects (Users, Groups, Contacts, Computers, OUs).
- * Easily modify LDAP objects with automatic setters/getters/properties/etc.
+ * A fluent and easy to understand syntax for [generating LDAP queries](#searching-ldap).
+ * Easily [create](#creating-ldap-objects)/[modify](#modifying-ldap-objects)/[delete](#deleting-ldap-objects)/[restore](/docs/en/tutorials/Using-the-LDAP-Manager.md#restoring-ldap-objects) common LDAP objects (Users, Groups, Contacts, Computers, OUs).
  * Retrieve LDAP objects as either a simple array or an object with automagic setters/getters.
- * A dynamic and customizable attribute converter system to translate data between LDAP and PHP.
- * An event system for further customization, extensibility, and integration.
- * Active Directory specific features to help ease development of applications.
- * Includes a comprehensive set of specs for the code.
+ * A [logging mechanism](/docs/en/reference/Logging.md) for all LDAP operations
+ * An [event system](/docs/en/reference/Events.md) for further customization, extensibility, and integration.
+ * Parse and create [LDIF files](/docs/en/tutorials/LDIF-Files.md).
+ * View and modify [Active Directory permissions](/docs/en/tutorials/AD-Permissions.md).
 
 ### Installation
 
@@ -99,7 +98,7 @@ $user = $userRepository->findOneByUsername('jsmith');
 echo "First name ".$user->getFirstName()." and last name ".$user->getLastName();
 ```
 
-The query syntax is very similar to [Doctrine ORM](http://www.doctrine-project.org).
+See [the docs](/docs/en/tutorials/Building-LDAP-Queries.md) for more information on building LDAP queries.
 
 ### Modifying LDAP Objects
 
@@ -128,9 +127,9 @@ if ($user->disabled) {
 }
 
 // Add a value to an attribute...
-$user->addIpPhone('#001-5555');
+$user->addOtherIpPhones('#001-5555');
 // Add a few values at one time...
-$user->addIpPhone('#001-4444', '#001-3333', '#001-2222');
+$user->addOtherIpPhones('#001-4444', '#001-3333', '#001-2222');
 
 // Now actually save the changes back to LDAP...
 try {
@@ -139,6 +138,8 @@ try {
     echo "Error updating user! ".$e->getMessage();
 }
 ```
+
+See [the docs](/docs/en/tutorials/Modifying-LDAP-Objects.md) for more information on modifying LDAP objects.
 
 ### Deleting LDAP Objects
 
@@ -195,6 +196,8 @@ $ldapObject->createOU()
     ->execute();
 ```
 
+See [the docs](/docs/en/tutorials/Creating-LDAP-Objects.md) for more information on creating LDAP objects.
+
 ### Documentation
 
 Browse [the docs folder](/docs/en) for more information about LdapTools.
@@ -206,6 +209,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Creating LDAP Objects](/docs/en/tutorials/Creating-LDAP-Objects.md)
 * [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-Objects.md)
 * [LDIF files](/docs/en/tutorials/LDIF-Files.md)
+* [Active Directory Permissions](/docs/en/tutorials/AD-Permissions.md)
 * [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
 * [The Event System](/docs/en/reference/Events.md)
 
