@@ -60,7 +60,7 @@ foreach ($sd->getDacl()->getAces() as $ace) {
        continue;
    }
    // This will check if the user is setup so they cannot change their own password...
-   if ((string) $ace->getSid() === SID::SHORT_NAME['PS'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
+   if ((string) $ace->getTrustee() === SID::SHORT_NAME['PS'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
        echo "User cannot change their password.".PHP_EOL;
    }
 }
@@ -81,11 +81,11 @@ foreach ($sd->getDacl()->getAces() as $ace) {
        continue;
    }
    // This will get the ACE that applies to the user themselves ('PS' is the SID short name for 'Principal Self')
-   if ((string) $ace->getSid() === SID::SHORT_NAME['PS'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
+   if ((string) $ace->getTrustee() === SID::SHORT_NAME['PS'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
        $sd->getDacl()->removeAce($ace);
    }
    // This flips the ACE type to allow for the 'WD' SID ('WD' is the SID short name for "Everyone").
-   if ((string) $ace->getSid() === SID::SHORT_NAME['WD'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
+   if ((string) $ace->getTrustee() === SID::SHORT_NAME['WD'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
        $ace->setType(new AceType('A'));
    }
 }
