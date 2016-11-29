@@ -91,6 +91,17 @@ class AceRights extends Flags
     ];
 
     /**
+     * Check or set the ability to perform a delete-tree operation on the object.
+     *
+     * @param null|bool $action
+     * @return $this|bool
+     */
+    public function deleteTree($action = null)
+    {
+        return $this->hasOrSet(self::FLAG['DS_DELETE_TREE'], $action);
+    }
+
+    /**
      * Check or set the ability to read a specific property.
      *
      * @param null|bool $action
@@ -146,14 +157,14 @@ class AceRights extends Flags
     }
 
     /**
-     * Check or set the ability to delete objects of a certain type (all if objectType on the ACE is empty).
+     * Check or set the ability to delete the object.
      *
      * @param null|bool $action
      * @return $this|bool
      */
     public function deleteObject($action = null)
     {
-        return $this->hasOrSet(self::FLAG['DS_DELETE_TREE'], $action);
+        return $this->hasOrSet(self::FLAG['DELETE'], $action);
     }
 
     /**
@@ -198,7 +209,7 @@ class AceRights extends Flags
      */
     public function readSecurity($action = null)
     {
-        return $this->hasOrSet(self::FLAG['DS_CONTROL_ACCESS'], $action);
+        return $this->hasOrSet(self::FLAG['READ_CONTROL'], $action);
     }
 
     /**

@@ -157,4 +157,10 @@ class AceRightsSpec extends ObjectBehavior
         $this->synchronize()->shouldBeEqualTo(true);
         $this->synchronize(false)->synchronize()->shouldBeEqualTo(false);
     }
+
+    function it_should_check_or_set_the_ability_to_perform_a_delete_tree_operation()
+    {
+        $this->deleteTree()->shouldBeEqualTo(true);
+        $this->deleteTree(false)->deleteTree()->shouldBeEqualTo(false);
+    }
 }

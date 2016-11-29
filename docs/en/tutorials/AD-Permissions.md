@@ -484,6 +484,11 @@ $rights = $ace->getRights();
 // The below functions can either check for access, or set access (pass a bool true or false to toggle)...
 
 /**
+ * Check or set the ability to perform a delete-tree operation on the object.
+ */
+$rights->deleteTree($action = null);
+
+/**
  * Check or set the ability to read a specific property.
  */
 $rights->readProperty($action = null);
