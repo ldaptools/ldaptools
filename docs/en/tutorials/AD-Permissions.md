@@ -199,7 +199,7 @@ $binary = $sd->toBinary();
 #### toSddl($canonical = true)
 
 Get the Security Descriptor Definition Language (SDDL) string representation of the object. You can optionally pass 
-`false` as a parameter if you want the ACEs represent in a non-canonical form. Typically you do not want to do that.
+`false` as a parameter if you want the ACEs represented in a non-canonical form. Typically you do not want to do that.
 
 ```php
 echo $sd->toSddl();
@@ -215,7 +215,7 @@ use LdapTools\Security\ControlFlags;
 
 $flags = $sd->getControlFlags();
 
-if ($flags->has(ControlFlags::FLAG['SACL_PRESENT']) {
+if ($flags->has(ControlFlags::FLAG['SACL_PRESENT'])) {
    // ...
 }
 ```
@@ -228,7 +228,7 @@ Set the control flags for the Security Descriptor. This must be a ControlFlags o
 ```php
 use LdapTools\Security\ControlFlags;
 
-$sd->setControlFlags(new ControlFlags(ControlFlags::FLAGS['SELF_RELATIVE']);
+$sd->setControlFlags(new ControlFlags(ControlFlags::FLAGS['SELF_RELATIVE']));
 ```
 
 ## DACL and SACL Methods
@@ -257,9 +257,9 @@ Set the ACEs for the ACL. This overwrites any ACEs that might be set on the ACL 
 ```php
 // Set some valid access obviously (not these...)
 $aces = [
-    (new Ace('D')->setTrustee('BA'),
-    (new Ace('A')->setTrustee('PS'),
-]
+    (new Ace('D'))->setTrustee('BA'),
+    (new Ace('A'))->setTrustee('PS'),
+];
 
 $sd->getDacl()->setAces(...$aces);
 ```
@@ -341,7 +341,6 @@ if (!$sd->getDacl()->isCanonical()) {
 Calling this method forces all ACEs in the ACL into canonical form. This is the order that AD expects the ACEs to be in
 when saving it back via LDAP. The ACLs are canonicalized automatically when being converted to binary/SDDL, so you do
 not have to call this each time you make a modification.
-
 
 ## Ace Methods
 
@@ -471,7 +470,7 @@ of value as the `getObjectType()` method. See above.
 #### setInheritedObjectType($guid)
 
 Set the GUID object type that represents the type of child objects that can inherit the ACE. This allows the same type
-of values as the `setInheritedObjectType()` method. See above.
+of values as the `setObjectType()` method. See above.
 
 ------------------------
 #### getRights()
