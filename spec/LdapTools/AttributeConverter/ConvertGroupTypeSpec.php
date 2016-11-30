@@ -70,7 +70,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
                 'scopeUniversal' => '8',
             ],
         ];
-        $this->expectedSearch = (new QueryOperation())->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')->setAttributes(['groupType']);
+        $this->expectedSearch = new QueryOperation('(&(distinguishedName=cn=foo,dc=foo,dc=bar))', ['groupType']);
         $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');

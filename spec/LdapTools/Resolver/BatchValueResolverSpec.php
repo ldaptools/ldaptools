@@ -96,9 +96,7 @@ class BatchValueResolverSpec extends ObjectBehavior
                 ],
             ],
         ]);
-        $this->expectedSearch = (new QueryOperation())
-            ->setFilter('(&(distinguishedName=cn=foo,dc=foo,dc=bar))')
-            ->setAttributes(['userAccountControl']);
+        $this->expectedSearch = new QueryOperation('(&(distinguishedName=cn=foo,dc=foo,dc=bar))', ['userAccountControl']);
         $this->schema = $schema;
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));

@@ -219,9 +219,9 @@ class LdapQuerySpec extends ObjectBehavior
         ];
         $rootDse = new LdapObject($attribbutes);
 
-        $this->operation = new QueryOperation();
         $this->filter = new OperatorCollection();
         $this->filter->add(new Comparison('foo','=','bar'));
+        $this->operation = new QueryOperation($this->filter);
         $this->operation->setFilter($this->filter);
 
         $this->operation->setAttributes(["cn", "givenName", "foo"]);

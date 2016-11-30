@@ -54,10 +54,10 @@ class QueryOperation implements LdapOperationInterface
     ];
 
     /**
-     * @param null|string|OperatorCollection $filter
+     * @param string|OperatorCollection $filter
      * @param array $attributes
      */
-    public function __construct($filter = null, array $attributes = [])
+    public function __construct($filter, array $attributes = [])
     {
         $this->properties['filter'] = $filter;
         $this->properties['attributes'] = $attributes;
@@ -242,6 +242,9 @@ class QueryOperation implements LdapOperationInterface
             $this->properties['attributes'],
             0,
         ];
+        if (empty($args[1])) {
+            throw new LdapQueryException('The filter for the LDAP query cannot be empty.');
+        }
         
         if ($this->properties['sizeLimit'] && !$this->properties['usePaging']) {
             array_push($args, $this->properties['sizeLimit']);

@@ -44,7 +44,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
     function it_should_support_a_query_operation()
     {
-        $this->supports(new QueryOperation())->shouldBeEqualTo(true);
+        $this->supports(new QueryOperation('(foo=bar)'))->shouldBeEqualTo(true);
     }
 
     function it_should_not_support_other_operations()
@@ -58,12 +58,8 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
     function it_should_enable_paging_when_executing_an_operation_that_uses_paging($pager)
     {
-        $operation = new QueryOperation();
-        $operation->setPageSize(10)
-            ->setUsePaging(true)
-            ->setAttributes(['cn'])
-            ->setBaseDn('example.local')
-            ->setFilter('(sAMAccountName=foo)');
+        $operation = new QueryOperation('(sAMAccountName=foo)', ['cn']);
+        $operation->setPageSize(10)->setUsePaging(true)->setBaseDn('example.local');
 
         $pager->setIsEnabled(true)->shouldBeCalled();
         $pager->start(10, 0)->shouldBeCalled();
@@ -75,13 +71,11 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
     function it_should_use_a_size_limit_with_the_pager_when_paging_is_enabled($pager)
     {
-        $operation = new QueryOperation();
+        $operation = new QueryOperation('(sAMAccountName=foo)', ['cn']);
         $operation->setPageSize(10)
             ->setSizeLimit(20)
             ->setUsePaging(true)
-            ->setAttributes(['cn'])
-            ->setBaseDn('example.local')
-            ->setFilter('(sAMAccountName=foo)');
+            ->setBaseDn('example.local');
 
         $pager->setIsEnabled(true)->shouldBeCalled();
         $pager->start(10, 20)->shouldBeCalled();
@@ -93,11 +87,8 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
     function it_should_NOT_enable_paging_when_executing_an_operation_that_disables_paging($pager)
     {
-        $operation = new QueryOperation();
-        $operation->setUsePaging(false)
-            ->setAttributes(['cn'])
-            ->setBaseDn('example.local')
-            ->setFilter('(sAMAccountName=foo)');
+        $operation = new QueryOperation('(sAMAccountName=foo)', ['cn']);
+        $operation->setUsePaging(false)->setBaseDn('example.local');
 
         $pager->setIsEnabled(false)->shouldBeCalled();
         $pager->start(null, 0)->shouldBeCalled();
@@ -106,12 +97,8 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
 
-        $operation = new QueryOperation();
-        $operation->setScope(QueryOperation::SCOPE['BASE'])
-            ->setUsePaging(true)
-            ->setAttributes(['cn'])
-            ->setBaseDn('example.local')
-            ->setFilter('(sAMAccountName=foo)');
+        $operation = new QueryOperation('(sAMAccountName=foo)', ['cn']);
+        $operation->setScope(QueryOperation::SCOPE['BASE'])->setUsePaging(true)->setBaseDn('example.local');
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
@@ -127,7 +114,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $connection->getRootDse()->willReturn($object);
         $connection->getServer()->willReturn('foo');
 
-        $this->setOperationDefaults(new QueryOperation());
+        $this->setOperationDefaults(new QueryOperation('(foo=bar)'));
     }
 
     function it_should_set_the_defaults_from_the_config_when_the_basedn_for_the_query_operation_is_not_set($connection)
@@ -138,7 +125,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $connection->getRootDse()->shouldNotBeCalled();
         $connection->getServer()->willReturn('foo');
 
-        $this->setOperationDefaults(new QueryOperation());
+        $this->setOperationDefaults(new QueryOperation('(foo=bar)'));
     }
 
     function it_should_not_set_the_defaults_when_they_are_explicitly_set(DomainConfiguration $config, $connection)
@@ -149,7 +136,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $config->getUsePaging()->shouldNotBeCalled();
         $config->getPageSize()->shouldNotBeCalled();
 
-        $operation = (new QueryOperation())->setUsePaging(true)->setPageSize(10)->setBaseDn('ou=users,dc=foo,dc=bar')->setServer('foo');
+        $operation = (new QueryOperation('(foo=bar)'))->setUsePaging(true)->setPageSize(10)->setBaseDn('ou=users,dc=foo,dc=bar')->setServer('foo');
         $this->setOperationDefaults($operation);
     }
 
@@ -162,7 +149,7 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $config->getUsePaging()->shouldBeCalled();
         $config->getPageSize()->shouldBeCalled();
 
-        $this->setOperationDefaults(new QueryOperation());
+        $this->setOperationDefaults(new QueryOperation('(foo=bar)'));
     }
 
     function it_should_throw_an_exception_when_the_base_dn_cannot_be_found($connection)
@@ -175,6 +162,6 @@ class QueryOperationHandlerSpec extends ObjectBehavior
         $connection->getRootDse()->willReturn($object);
 
         $ex = new LdapConnectionException('The base DN is not defined and could not be found in the RootDSE.');
-        $this->shouldThrow($ex)->duringSetOperationDefaults(new QueryOperation());
+        $this->shouldThrow($ex)->duringSetOperationDefaults(new QueryOperation('(foo=bar)'));
     }
 }

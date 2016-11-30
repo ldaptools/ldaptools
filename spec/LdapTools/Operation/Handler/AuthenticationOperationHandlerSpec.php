@@ -44,7 +44,7 @@ class AuthenticationOperationHandlerSpec extends ObjectBehavior
         $this->supports(new DeleteOperation('foo'))->shouldBeEqualTo(false);
         $this->supports(new RenameOperation('foo'))->shouldBeEqualTo(false);
         $this->supports(new BatchModifyOperation('foo'))->shouldBeEqualTo(false);
-        $this->supports(new QueryOperation())->shouldBeEqualTo(false);
+        $this->supports(new QueryOperation('(foo=bar)'))->shouldBeEqualTo(false);
     }
 
     function it_should_support_authentication_operations()

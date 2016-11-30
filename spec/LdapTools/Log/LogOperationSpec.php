@@ -23,10 +23,9 @@ class LogOperationSpec extends ObjectBehavior
 
     public function let()
     {
-        $this->operation = new QueryOperation();
+        $this->operation = new QueryOperation('(foo=bar)');
         $this->operation->setAttributes(['foo'])
             ->setBaseDn('foo')
-            ->setFilter('(foo=bar)')
             ->setPageSize(2000)
             ->setScope(QueryOperation::SCOPE['SUBTREE']);
         $this->beConstructedWith($this->operation);

@@ -142,8 +142,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['trustedForAllDelegation'] = true;
         unset($entry['groups']);
 
-        $connection->execute(
-            (new QueryOperation())->setFilter('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))')->setAttributes(['userAccountControl']))->willReturn($this->expectedResult);
+        $connection->execute(new QueryOperation('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))', ['userAccountControl']))->willReturn($this->expectedResult);
         $this->beConstructedWith($this->schema, $entry, AttributeConverterInterface::TYPE_CREATE);
         $this->setLdapConnection($connection);
         $this->setOperation($operation);

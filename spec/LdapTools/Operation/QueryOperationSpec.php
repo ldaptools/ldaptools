@@ -21,6 +21,11 @@ use PhpSpec\ObjectBehavior;
 
 class QueryOperationSpec extends ObjectBehavior
 {
+    function let()
+    {
+        $this->beConstructedWith('(foo=bar)');
+    }
+
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Operation\QueryOperation');
@@ -196,5 +201,13 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getSizeLimit()->shouldBeEqualTo(0);
         $this->setSizeLimit(5);
         $this->getSizeLimit()->shouldBeEqualTo(5);
+    }
+
+    function it_should_throw_an_exception_if_the_filter_is_empty_when_getting_the_arguments()
+    {
+        $this->setFilter('');
+        $this->shouldThrow('LdapTools\Exception\LdapQueryException')->duringGetArguments();
+        $this->setFilter(new OperatorCollection());
+        $this->shouldThrow('LdapTools\Exception\LdapQueryException')->duringGetArguments();
     }
 }

@@ -42,6 +42,6 @@ class OperationHandlerSpec extends ObjectBehavior
     function it_should_not_support_query_or_authentication_operations()
     {
         $this->supports(new AuthenticationOperation())->shouldBeEqualTo(false);
-        $this->supports(new QueryOperation())->shouldBeEqualTo(false);
+        $this->supports(new QueryOperation('(foo=bar)'))->shouldBeEqualTo(false);
     }
 }
