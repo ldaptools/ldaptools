@@ -38,4 +38,18 @@ class LdapControlType
      * @see https://msdn.microsoft.com/en-us/library/cc223323.aspx
      */
     const SD_FLAGS_CONTROL = '1.2.840.113556.1.4.801';
+
+    /**
+     * Used to enforce password policy requirements when resetting a password in AD (2012 or higher).
+     *
+     * @see https://msdn.microsoft.com/en-us/library/hh128228.aspx
+     */
+    const PASSWORD_POLICY_HINTS = '1.2.840.113556.1.4.2239';
+
+    /**
+     * Used to enforce password policy requirements when resetting a password in AD (2008R2 or lower)
+     *
+     * @see https://msdn.microsoft.com/en-us/library/jj216527.aspx
+     */
+    const PASSWORD_POLICY_HINTS_DEPRECATED = '1.2.840.113556.1.4.2066';
 }
