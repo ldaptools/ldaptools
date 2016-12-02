@@ -88,8 +88,8 @@ class LdapConnection implements LdapConnectionInterface
 
     /**
      * @param DomainConfiguration $config
-     * @param EventDispatcherInterface $dispatcher
-     * @param LdapLoggerInterface $logger
+     * @param EventDispatcherInterface|null $dispatcher
+     * @param LdapLoggerInterface|null $logger
      */
     public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null)
     {
