@@ -10,9 +10,9 @@
 
 namespace spec\LdapTools;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\ConfigurationException;
-use LdapTools\Factory\CacheFactory;
 use LdapTools\Log\EchoLdapLogger;
 use PhpSpec\ObjectBehavior;
 use LdapTools\DomainConfiguration;
@@ -130,17 +130,6 @@ class ConfigurationSpec extends ObjectBehavior
         $this->getCacheType()->shouldBeString();
     }
 
-    function it_should_return_the_correct_cache_type_after_calling_setCacheType()
-    {
-        $this->setCacheType(CacheFactory::TYPE_STASH);
-        $this->getCacheType()->shouldBeEqualTo(CacheFactory::TYPE_STASH);
-    }
-
-    function it_should_throw_ConfigurationException_when_setting_invalid_cache_type()
-    {
-        $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringSetCacheType('foo.bar');
-    }
-
     function it_should_throw_ConfigurationException_when_loading_a_domain_config_with_an_unknown_option()
     {
         $e = new ConfigurationException('Error in domain config section: Option "user" not recognized.');
@@ -175,5 +164,10 @@ class ConfigurationSpec extends ObjectBehavior
         $this->getLogger()->shouldBeEqualTo(null);
         $this->setLogger(new EchoLdapLogger())->shouldReturnAnInstanceOf('\LdapTools\Configuration');
         $this->getLogger()->shouldReturnAnInstanceOf('\LdapTools\Log\EchoLdapLogger');
+    }
+
+    function it_should_set_and_get_the_cache(CacheInterface $cache)
+    {
+        $this->setCache($cache)->getCache()->shouldBeEqualTo($cache);
     }
 }

@@ -350,11 +350,12 @@ class LdapManager
      */
     public function getCache()
     {
-        if (!$this->cache) {
-            $this->cache = CacheFactory::get($this->config->getCacheType(), $this->config->getCacheOptions());
+        if (!$this->config->getCache()) {
+            // This will be removed eventually. The default cache will be instantiated directly in the config class.
+            $this->config->setCache(CacheFactory::get($this->config->getCacheType(), $this->config->getCacheOptions()));
         }
 
-        return $this->cache;
+        return $this->config->getCache();
     }
 
     /**

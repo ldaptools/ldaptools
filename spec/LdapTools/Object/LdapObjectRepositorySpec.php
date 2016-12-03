@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Object;
 
+use LdapTools\Cache\NoCache;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
@@ -78,7 +79,7 @@ class LdapObjectRepositorySpec extends ObjectBehavior
     public function let(LdapConnectionInterface $connection)
     {
         $config = new Configuration();
-        $config->setCacheType('none');
+        $config->setCache(new NoCache());
         $connection->execute(Argument::any())->willReturn($this->ldapEntries);
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
 

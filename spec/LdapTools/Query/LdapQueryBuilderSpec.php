@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Query;
 
+use LdapTools\Cache\NoCache;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
@@ -68,7 +69,7 @@ class LdapQueryBuilderSpec extends ObjectBehavior
             ->setLazyBind(true)
             ->setPageSize(500);
         $connection->getConfig()->willReturn($domain);
-        $config->setCacheType('none');
+        $config->setCache(new NoCache());
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get($config->getCacheType(), []);
         $dispatcher = new SymfonyEventDispatcher();

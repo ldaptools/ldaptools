@@ -10,6 +10,7 @@
 
 namespace LdapTools;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\ConfigurationException;
@@ -69,6 +70,11 @@ class Configuration
     protected $logger;
 
     /**
+     * @var CacheInterface|null The cache that should be used.
+     */
+    protected $cache;
+
+    /**
      * @param DomainConfiguration ...$domain
      */
     public function __construct(DomainConfiguration ...$domains)
@@ -120,9 +126,12 @@ class Configuration
      *
      * @param array
      * @return $this
+     * @deprecated This function will be removed in a later version. Use setCache() instead.
      */
     public function setCacheOptions($options)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use setCache() instead.', E_USER_DEPRECATED);
+
         $this->config['cacheOptions'] = $options;
 
         return $this;
@@ -132,6 +141,7 @@ class Configuration
      * Get the cache options for the cache type.
      *
      * @return array
+     * @deprecated This function will be removed in a later version.
      */
     public function getCacheOptions()
     {
@@ -189,14 +199,40 @@ class Configuration
     }
 
     /**
+     * Set the cache to use.
+     *
+     * @param CacheInterface|null $cache
+     * @return $this
+     */
+    public function setCache(CacheInterface $cache = null)
+    {
+        $this->cache = $cache;
+
+        return $this;
+    }
+
+    /**
+     * Get the Cache to use.
+     *
+     * @return CacheInterface|null
+     */
+    public function getCache()
+    {
+        return $this->cache;
+    }
+
+    /**
      * Set the cache type to use.
      *
      * @param $type
      * @return $this
      * @throws ConfigurationException
+     * @deprecated This function will be removed in a later version. Use setCache() instead.
      */
     public function setCacheType($type)
     {
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use setCache() instead.', E_USER_DEPRECATED);
+
         if (!defined('\LdapTools\Factory\CacheFactory::TYPE_'.strtoupper($type))) {
             throw new ConfigurationException(sprintf('Unknown cache type "%s".', $type));
         }
@@ -208,6 +244,7 @@ class Configuration
     /**
      * Get the configured cache type.
      *
+     * @deprecated This function will be removed in a later version.
      * @return string
      */
     public function getCacheType()
@@ -348,12 +385,16 @@ class Configuration
         }
 
         if (isset($config['general'])) {
+            $general = $config['general'];
             $generalConfig = $this->getParsedConfig(
-                $config['general'],
+                $general,
                 $this->config,
                 $this->yamlConfigMap,
                 []
             );
+            $this->setCache(CacheFactory::get($generalConfig['cacheType'], $generalConfig['cacheOptions']));
+            unset($generalConfig['cacheType']);
+            unset($generalConfig['cacheOptions']);
             $this->setParsedConfig($generalConfig);
         }
 
