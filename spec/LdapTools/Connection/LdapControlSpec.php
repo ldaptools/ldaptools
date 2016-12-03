@@ -50,27 +50,27 @@ class LdapControlSpec extends ObjectBehavior
 
     function it_should_set_the_oid()
     {
-        $this->setOid(LdapControlType::SHOW_DELETED);
-        $this->getOid()->shouldBeEqualTo(LdapControlType::SHOW_DELETED);
+        $this->setOid(LdapControlType::SHOW_DELETED)->getOid()->shouldBeEqualTo(LdapControlType::SHOW_DELETED);
     }
 
     function it_should_set_the_criticality()
     {
-        $this->setCriticality(true);
-        $this->getCriticality()->shouldBeEqualTo(true);
+        $this->setCriticality(true)->getCriticality()->shouldBeEqualTo(true);
     }
 
     function it_should_set_the_value()
     {
-        $this->setValue(false);
-        $this->getValue()->shouldBeEqualTo(false);
+        $this->setValue(false)->getValue()->shouldBeEqualTo(false);
     }
 
-    function it_should_chain_the_setters()
+    function it_should_allow_setting_a_reset_value()
     {
-        $this->setOid(LdapControlType::SHOW_DELETED)->shouldBeAnInstanceOf('LdapTools\Connection\LdapControl');
-        $this->setValue(false)->shouldBeAnInstanceOf('LdapTools\Connection\LdapControl');
-        $this->setCriticality(true)->shouldBeAnInstanceOf('LdapTools\Connection\LdapControl');
+        $this->setResetValue(0)->getResetValue()->shouldBeEqualTo(0);
+    }
+
+    function it_should_have_a_default_reset_vaulue_of_bool_false()
+    {
+        $this->getResetValue()->shouldBeEqualTo(false);
     }
 
     function it_should_get_the_array_structure_of_the_control()

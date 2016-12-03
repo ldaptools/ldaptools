@@ -159,7 +159,9 @@ class LdapOperationInvokerSpec extends ObjectBehavior
     function it_should_set_controls_specified_by_the_operation(OperationHandler $handler, $connection, $dispatcher)
     {
         $control = new LdapControl(LdapControlType::SUB_TREE_DELETE);
-        $operation = (new DeleteOperation('ou=test,dc=foo,dc=bar'))->addControl($control);
+        $control2 = (new LdapControl(LdapControlType::SD_FLAGS_CONTROL, false, LdapControl::berEncodeInt(7)))->setResetValue(LdapControl::berEncodeInt(0));
+
+        $operation = (new DeleteOperation('ou=test,dc=foo,dc=bar'))->addControl($control, $control2);
         $handler->supports($operation)->willReturn(true);
         $handler->setConnection($connection)->shouldBeCalled();
         $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
@@ -168,13 +170,8 @@ class LdapOperationInvokerSpec extends ObjectBehavior
 
         $connection->close()->shouldBeCalled();
         $connection->connect(null, null, false, null)->shouldBeCalled();
-        $connection->setControl($control)->shouldBeCalled();
-
-        $reset = clone $control;
-        $reset->setValue(false);
-
-        // It should also reset the control too...
-        $connection->setControl($reset)->shouldBeCalled();
+        $connection->setControl($control)->shouldBeCalledTimes(2);
+        $connection->setControl($control2)->shouldBeCalledTimes(2);
 
         $this->addHandler($handler);
         $this->execute($operation);

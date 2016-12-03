@@ -204,9 +204,10 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
     protected function resetLdapControls(LdapOperationInterface $operation)
     {
         foreach ($operation->getControls() as $control) {
-            $reset = clone $control;
-            $reset->setValue(false);
-            $this->connection->setControl($reset);
+            $value = $control->getValue();
+            $control->setValue($control->getResetValue());
+            $this->connection->setControl($control);
+            $control->setValue($value);
         }
     }
 

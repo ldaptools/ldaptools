@@ -33,6 +33,11 @@ class LdapControl
     protected $value;
 
     /**
+     * @var mixed The value to send to reset the control at the end of an operation.
+     */
+    protected $resetValue = false;
+
+    /**
      * @param string $oid
      * @param bool $criticality
      * @param mixed|null $value
@@ -111,6 +116,29 @@ class LdapControl
     public function getValue()
     {
         return $this->value;
+    }
+
+    /**
+     * Set the value for the control upon reset at the end of an operation. Defaults to bool false.
+     *
+     * @param mixed $value
+     * @return $this
+     */
+    public function setResetValue($value)
+    {
+        $this->resetValue = $value;
+
+        return $this;
+    }
+
+    /**
+     * Get the value for the control to use upon reset at the end of an operation. Defaults to bool false.
+     *
+     * @return mixed
+     */
+    public function getResetValue()
+    {
+        return $this->resetValue;
     }
 
     /**
