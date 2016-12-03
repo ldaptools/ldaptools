@@ -42,7 +42,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function accountExpires()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "accountExpirationDate" schema attribute instead (bool true).', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "accountExpirationDate" schema attribute instead (bool true).', E_USER_DEPRECATED);
 
         return $this->bAnd(
             $this->gte(self::ATTR['ACCOUNT_EXPIRES'], '1'),
@@ -72,7 +72,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function accountIsDisabled()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "disabled" schema attribute instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "disabled" schema attribute instead.', E_USER_DEPRECATED);
 
         return $this->bitwiseAnd(self::ATTR['UAC'], UserAccountControlFlags::DISABLED);
     }
@@ -85,7 +85,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function accountIsLocked()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "locked" schema attribute instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "locked" schema attribute instead.', E_USER_DEPRECATED);
 
         return $this->gte(self::ATTR['LOCKOUT_TIME'], 1);
     }
@@ -100,7 +100,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function groupIsType($flag)
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "groupType" schema attributes instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "groupType" schema attributes instead.', E_USER_DEPRECATED);
 
         return $this->bitwiseAnd(self::ATTR['GROUP_TYPE'], $flag);
     }
@@ -168,7 +168,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function passwordNeverExpires()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "passwordNeverExpires" schema attribute instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "passwordNeverExpires" schema attribute instead.', E_USER_DEPRECATED);
 
         return $this->bitwiseAnd(self::ATTR['UAC'], UserAccountControlFlags::PASSWORD_NEVER_EXPIRES);
     }
@@ -181,7 +181,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function passwordMustChange()
     {
-        @trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "passwordMustChange" schema attribute instead.', E_USER_DEPRECATED);
+        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use the "passwordMustChange" schema attribute instead.', E_USER_DEPRECATED);
 
         return $this->eq(self::ATTR['PASSWORD_LAST_SET'], 0);
     }
