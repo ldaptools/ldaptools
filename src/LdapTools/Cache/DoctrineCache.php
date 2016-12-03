@@ -10,6 +10,7 @@
 
 namespace LdapTools\Cache;
 
+use Doctrine\Common\Cache\Cache;
 use Doctrine\Common\Cache\FilesystemCache;
 
 /**
@@ -31,9 +32,12 @@ class DoctrineCache implements CacheInterface
      */
     protected $cache;
 
-    public function __construct()
+    public function __construct(Cache $cache = null)
     {
         $this->cacheFolder = sys_get_temp_dir().'/ldaptools';
+        if ($cache) {
+            $this->cache = $cache;
+        }
     }
 
     /**
@@ -43,8 +47,6 @@ class DoctrineCache implements CacheInterface
     {
         $this->parseOptions($options);
     }
-
-
 
     /**
      * The location to where the cache will be kept.
@@ -69,19 +71,19 @@ class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function get($itemType, $itemName)
+    public function get($key)
     {
-        if (!$this->contains($itemType, $itemName)) {
+        if (!$this->contains($key)) {
             return null;
         }
 
-        return $this->getCache()->fetch($this->getCacheName($itemType, $itemName));
+        return new CacheItem($key, $this->getCache()->fetch($this->getCacheName($key)));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheCreationTime($itemType, $itemName)
+    public function getCacheCreationTime($key)
     {
         return false;
     }
@@ -97,30 +99,32 @@ class DoctrineCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($itemType, $itemName)
+    public function contains($key)
     {
-        return $this->getCache()->contains($this->getCacheName($itemType, $itemName));
+        return $this->getCache()->contains($this->getCacheName($key));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function set(CacheableItemInterface $cacheableItem)
+    public function set(CacheItem $cacheItem)
     {
+        $lifeTime = $cacheItem->getExpiresAt() ? $cacheItem->getExpiresAt()->getTimestamp() - time() : 0;
         $this->getCache()->save(
-            $this->getCacheName($cacheableItem->getCacheType(), $cacheableItem->getCacheName()),
-            $cacheableItem
+            $this->getCacheName($cacheItem->getKey()),
+            $cacheItem->getValue(),
+            $lifeTime
         );
 
-        return $cacheableItem;
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete($type, $name)
+    public function delete($key)
     {
-        return $this->getCache()->delete($this->getCacheName($type, $name));
+        return $this->getCache()->delete($this->getCacheName($key));
     }
 
     /**

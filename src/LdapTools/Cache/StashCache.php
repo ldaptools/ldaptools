@@ -11,6 +11,7 @@
 namespace LdapTools\Cache;
 
 use Stash\Driver\FileSystem;
+use Stash\Interfaces\PoolInterface;
 use Stash\Pool;
 
 /**
@@ -37,8 +38,11 @@ class StashCache implements CacheInterface
      */
     protected $useAutoCache = true;
 
-    public function __construct()
+    public function __construct(PoolInterface $pool = null)
     {
+        if ($pool) {
+            $this->pool = $pool;
+        }
         $this->setCacheFolder(sys_get_temp_dir().$this->cachePrefix);
     }
 
@@ -73,29 +77,30 @@ class StashCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($itemType, $itemName)
+    public function contains($key)
     {
-        return !$this->getCacheItem($itemType, $itemName)->isMiss();
+        return !$this->getCacheItem($key)->isMiss();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function get($itemType, $itemName)
+    public function get($key)
     {
-        if (!$this->contains($itemType, $itemName)) {
+        if (!$this->contains($key)) {
             return null;
         }
+        $item = $this->getCacheItem($key);
 
-        return $this->getCacheItem($itemType, $itemName)->get();
+        return new CacheItem($key, $item->get(), $item->getExpiration());
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCacheCreationTime($itemType, $itemName)
+    public function getCacheCreationTime($key)
     {
-        return $this->getCacheItem($itemType, $itemName)->getCreation();
+        return $this->getCacheItem($key)->getCreation();
     }
 
     /**
@@ -109,27 +114,24 @@ class StashCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set(CacheableItemInterface $cacheableItem)
+    public function set(CacheItem $cacheItem)
     {
-        $item = $this->getCacheItem($cacheableItem->getCacheType(), $cacheableItem->getCacheName());
-        $data = $item->get();
+        $item = $this->getCacheItem($cacheItem->getKey());
+        $item->get();
+        $item->lock();
+        $item->expiresAt($cacheItem->getExpiresAt());
+        $this->getPool()->save($item->set($cacheItem->getValue()));
+        $cacheItem->setExpiresAt($item->getExpiration());
 
-        if ($item->isMiss()) {
-            $item->lock();
-            $this->getPool()->save($item->set($cacheableItem));
-        } else {
-            $cacheableItem = $data;
-        }
-
-        return $cacheableItem;
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete($type, $name)
+    public function delete($key)
     {
-        return $this->getPool()->getItem($this->getCacheName($type, $name))->clear();
+        return $this->getPool()->getItem($this->getCacheName($key))->clear();
     }
 
     /**
@@ -159,13 +161,12 @@ class StashCache implements CacheInterface
     }
 
     /**
-     * @param string $itemType
-     * @param string $itemName
+     * @param string $key
      * @return \Stash\Interfaces\ItemInterface
      */
-    protected function getCacheItem($itemType, $itemName)
+    protected function getCacheItem($key)
     {
-        return $this->getPool()->getItem($this->getCacheName($itemType, $itemName));
+        return $this->getPool()->getItem($this->getCacheName($key));
     }
 
     /**

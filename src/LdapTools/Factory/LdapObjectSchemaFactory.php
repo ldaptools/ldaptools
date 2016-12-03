@@ -11,6 +11,7 @@
 namespace LdapTools\Factory;
 
 use LdapTools\Cache\CacheInterface;
+use LdapTools\Cache\CacheItem;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectSchemaEvent;
@@ -60,14 +61,14 @@ class LdapObjectSchemaFactory
      */
     public function get($schemaName, $objectType)
     {
-        $cacheItem = $schemaName.'.'.$objectType;
+        $key = CacheItem::TYPE['SCHEMA_OBJECT'].'.'.$schemaName.'.'.$objectType;
 
-        if ($this->shouldBuildCacheItem($schemaName, $cacheItem)) {
+        if ($this->shouldBuildCacheItem($key, $schemaName)) {
             $ldapObjectSchema = $this->parser->parse($schemaName, $objectType);
             $this->dispatcher->dispatch(new LdapObjectSchemaEvent(Event::LDAP_SCHEMA_LOAD, $ldapObjectSchema));
-            $this->cache->set($ldapObjectSchema);
+            $this->cache->set(new CacheItem($key, $ldapObjectSchema));
         } else {
-            $ldapObjectSchema = $this->cache->get(LdapObjectSchema::getCacheType(), $cacheItem);
+            $ldapObjectSchema = $this->cache->get($key)->getValue();
         }
 
         return $ldapObjectSchema;
@@ -76,19 +77,19 @@ class LdapObjectSchemaFactory
     /**
      * Whether or not the item needs to be parsed and cached.
      *
-     * @param string $schemaName
-     * @param string $cacheItem
+     * @param string $key The cache key.
+     * @param string $schemaName The schema name.
      * @return bool
      */
-    protected function shouldBuildCacheItem($schemaName, $cacheItem)
+    protected function shouldBuildCacheItem($key, $schemaName)
     {
         $cacheOutOfDate = false;
         if ($this->cache->getUseAutoCache()) {
             $lastModTime = $this->parser->getSchemaModificationTime($schemaName);
-            $cacheCreationTime = $this->cache->getCacheCreationTime(LdapObjectSchema::getCacheType(), $cacheItem);
+            $cacheCreationTime = $this->cache->getCacheCreationTime($key);
             $cacheOutOfDate = (!$lastModTime || ($lastModTime > $cacheCreationTime));
         }
 
-        return ($cacheOutOfDate || !$this->cache->contains(LdapObjectSchema::getCacheType(), $cacheItem));
+        return ($cacheOutOfDate || !$this->cache->contains($key));
     }
 }

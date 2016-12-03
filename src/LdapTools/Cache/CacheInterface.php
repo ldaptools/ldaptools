@@ -28,21 +28,18 @@ interface CacheInterface
      * Retrieve an item from the cache. If it is not in the cache it should return null. However, you should call the
      * contains method first rather than relying on that value.
      *
-     * @param $itemType
-     * @param $itemName
-     * @return mixed
+     * @param string $key
+     * @return CacheItem|null
      */
-    public function get($itemType, $itemName);
+    public function get($key);
 
     /**
      * Retrieve the time a cache item was created. Return false if there is no item in the cache.
      *
-     * @param $itemType
-     * @param $itemName
+     * @param string $key
      * @return bool|\DateTime
      */
-    public function getCacheCreationTime($itemType, $itemName);
-
+    public function getCacheCreationTime($key);
 
     /**
      * Whether to auto refresh cache based on creation/modification times instead of a manual process.
@@ -54,27 +51,26 @@ interface CacheInterface
     /**
      * Cache an item.
      *
-     * @param CacheableItemInterface $item
+     * @param CacheItem $cacheItem
+     * @return $this
      */
-    public function set(CacheableItemInterface $item);
+    public function set(CacheItem $cacheItem);
 
     /**
-     * Whether the item is in the cache.
+     * Check whether the item is in the cache by the key name.
      *
-     * @param string $itemType
-     * @param string $itemName
+     * @param string $key
      * @return bool
      */
-    public function contains($itemType, $itemName);
+    public function contains($key);
 
     /**
-     * Delete a specific item from the cache.
+     * Delete a specific item from the cache by the key name.
      *
-     * @param string $type The item type.
-     * @param string $name The item name.
+     * @param string $key The key name for the cache item.
      * @param bool
      */
-    public function delete($type, $name);
+    public function delete($key);
 
     /**
      * Delete all items from the cache.

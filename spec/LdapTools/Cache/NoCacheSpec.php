@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Cache;
 
+use LdapTools\Cache\CacheItem;
 use LdapTools\Schema\LdapObjectSchema;
 use PhpSpec\ObjectBehavior;
 
@@ -27,21 +28,20 @@ class NoCacheSpec extends ObjectBehavior
 
     public function it_should_always_return_null_when_calling_get()
     {
-        $item = new LdapObjectSchema('foo','bar');
+        $item = new CacheItem(CacheItem::TYPE['SCHEMA_OBJECT'].'.foo.bar', new LdapObjectSchema('foo', 'bar'));
 
-        $this->get($item->getCacheType(), $item->getSchemaName().'.'.$item->getObjectType())->shouldBeNull();
+        $this->get($item->getKey())->shouldBeNull();
     }
 
     public function it_should_never_cache_when_calling_set()
     {
-        $item = new LdapObjectSchema('foo','bar');
-        $this->set($item)->shouldBeEqualTo($item);
-        $this->get($item->getCacheType(), $item->getSchemaName().'.'.$item->getObjectType())->shouldBeNull();
+        $item = new CacheItem(CacheItem::TYPE['SCHEMA_OBJECT'].'.foo.bar', new LdapObjectSchema('foo', 'bar'));
+        $this->set($item)->get($item->getKey())->shouldBeNull();
     }
 
     public function it_should_return_true_when_calling_delete()
     {
-        $this->delete('foo', 'bar')->shouldBeEqualTo(true);
+        $this->delete('foo.bar')->shouldBeEqualTo(true);
     }
 
     public function it_should_return_true_when_calling_delete_all()
@@ -51,7 +51,7 @@ class NoCacheSpec extends ObjectBehavior
 
     public function it_should_return_false_when_calling_getCacheCreationTime()
     {
-        $this->getCacheCreationTime('foo', 'bar')->shouldBeEqualTo(false);
+        $this->getCacheCreationTime('foo.bar')->shouldBeEqualTo(false);
     }
 
     public function it_should_return_false_when_calling_getUseAutoCache()
@@ -61,6 +61,6 @@ class NoCacheSpec extends ObjectBehavior
 
     public function it_should_return_false_when_calling_contains()
     {
-        $this->contains('foo','bar')->shouldBeEqualTo(false);
+        $this->contains('foo.bar')->shouldBeEqualTo(false);
     }
 }

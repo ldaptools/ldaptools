@@ -47,12 +47,11 @@ trait CacheTrait
     /**
      * Form the "name" string that the cache uses to refer to this item.
      *
-     * @param string $itemType
-     * @param string $itemName
+     * @param string $key
      * @return string
      */
-    protected function getCacheName($itemType, $itemName)
+    protected function getCacheName($key)
     {
-        return MBString::strtolower($this->cachePrefix.'/'.$itemType.'/'.$itemName);
+        return MBString::strtolower($this->cachePrefix.'/'.$key);
     }
 }

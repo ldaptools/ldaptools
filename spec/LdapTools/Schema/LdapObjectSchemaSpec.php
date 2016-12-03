@@ -28,11 +28,6 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Schema\LdapObjectSchema');
     }
 
-    function it_should_implement_CacheableItemInterface()
-    {
-        $this->shouldImplement('\LdapTools\Cache\CacheableItemInterface');
-    }
-
     function it_should_return_the_correct_schema_name_when_constructed_with_one()
     {
         $this->getSchemaName()->shouldBeEqualTo('ad');

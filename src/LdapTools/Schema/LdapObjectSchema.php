@@ -10,7 +10,6 @@
 
 namespace LdapTools\Schema;
 
-use LdapTools\Cache\CacheableItemInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Query\Operator\BaseOperator;
@@ -21,7 +20,7 @@ use LdapTools\Utilities\MBString;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class LdapObjectSchema implements CacheableItemInterface
+class LdapObjectSchema
 {
     /**
      * @var string The name of the schema this object is from.

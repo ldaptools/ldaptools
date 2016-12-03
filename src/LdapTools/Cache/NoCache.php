@@ -27,7 +27,7 @@ class NoCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function get($itemType, $itemName)
+    public function get($key)
     {
         return null;
     }
@@ -35,15 +35,15 @@ class NoCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function set(CacheableItemInterface $item)
+    public function set(CacheItem $item)
     {
-        return $item;
+        return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function delete($type, $name)
+    public function delete($key)
     {
         return true;
     }
@@ -59,7 +59,7 @@ class NoCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function getCacheCreationTime($itemType, $itemName)
+    public function getCacheCreationTime($key)
     {
         return false;
     }
@@ -75,7 +75,7 @@ class NoCache implements CacheInterface
     /**
      * {@inheritdoc}
      */
-    public function contains($itemType, $itemName)
+    public function contains($key)
     {
         return false;
     }
