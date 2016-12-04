@@ -795,6 +795,32 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getResult()->shouldHaveFirstValue('givenName', 'Archie');
     }
 
+
+    function it_should_set_whether_or_not_to_use_the_cache()
+    {
+        $this->useCache(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapQuery');
+        $this->getQueryOperation()->getUseCache()->shouldBeEqualTo(true);
+    }
+
+    function it_should_set_whether_or_not_to_execute_on_a_cache_miss()
+    {
+        $this->executeOnCacheMiss(false)->shouldReturnAnInstanceOf('LdapTools\Query\LdapQuery');
+        $this->getQueryOperation()->getExecuteOnCacheMiss()->shouldBeEqualTo(false);
+    }
+
+    function it_should_set_whether_or_not_to_invalidate_the_cache()
+    {
+        $this->invalidateCache(true)->shouldReturnAnInstanceOf('LdapTools\Query\LdapQuery');
+        $this->getQueryOperation()->getInvalidateCache()->shouldBeEqualTo(true);
+    }
+
+    function it_should_set_a_cache_expiration()
+    {
+        $date = new \DateTime();
+        $this->expireCacheAt($date)->shouldReturnAnInstanceOf('LdapTools\Query\LdapQuery');
+        $this->getQueryOperation()->getExpireCacheAt()->shouldBeEqualTo($date);
+    }
+
     public function getMatchers()
     {
         return [

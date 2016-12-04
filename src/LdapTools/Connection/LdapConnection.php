@@ -10,6 +10,7 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\SymfonyEventDispatcher;
 use LdapTools\Exception\LdapBindException;
@@ -82,6 +83,11 @@ class LdapConnection implements LdapConnectionInterface
     protected $logger;
 
     /**
+     * @var CacheInterface|null
+     */
+    protected $cache;
+
+    /**
      * @var \DateTime|null
      */
     protected $lastActivity;
@@ -90,14 +96,16 @@ class LdapConnection implements LdapConnectionInterface
      * @param DomainConfiguration $config
      * @param EventDispatcherInterface|null $dispatcher
      * @param LdapLoggerInterface|null $logger
+     * @param CacheInterface|null $cache
      */
-    public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null)
+    public function __construct(DomainConfiguration $config, EventDispatcherInterface $dispatcher = null, LdapLoggerInterface $logger = null, CacheInterface $cache = null)
     {
         $this->usernameFormatter = BindUserStrategy::getInstance($config);
         $this->serverPool = new LdapServerPool($config);
         $this->config = $config;
         $this->dispatcher = $dispatcher ?: new SymfonyEventDispatcher();
         $this->logger = $logger;
+        $this->cache = $cache;
         $this->setupOperationInvoker();
 
         $this->serverPool->setSelectionMethod($config->getServerSelection());
@@ -330,6 +338,9 @@ class LdapConnection implements LdapConnectionInterface
         $this->config->getOperationInvoker()->setConnection($this);
         if ($this->logger) {
             $this->config->getOperationInvoker()->setLogger($this->logger);
+        }
+        if ($this->cache) {
+            $this->config->getOperationInvoker()->setCache($this->cache);
         }
     }
 }

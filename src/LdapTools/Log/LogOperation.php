@@ -30,6 +30,11 @@ class LogOperation
     protected $domain;
 
     /**
+     * @var bool Whether or not the operation used a result from the cache.
+     */
+    protected $usedCachedResult = false;
+
+    /**
      * @var string The error/exception message if issues were encountered during the operation.
      */
     protected $error;
@@ -50,6 +55,25 @@ class LogOperation
     public function __construct(LdapOperationInterface $operation)
     {
         $this->operation = $operation;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getUsedCachedResult()
+    {
+        return $this->usedCachedResult;
+    }
+
+    /**
+     * @param bool $usedCachedResult
+     * @return $this
+     */
+    public function setUsedCachedResult($usedCachedResult)
+    {
+        $this->usedCachedResult = (bool) $usedCachedResult;
+
+        return $this;
     }
 
     /**

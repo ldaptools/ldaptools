@@ -82,6 +82,58 @@ class LdapQuery
     }
 
     /**
+     * Whether the cache should be used for this query.
+     *
+     * @param $useCache
+     * @return $this
+     */
+    public function useCache($useCache)
+    {
+        $this->operation->setUseCache($useCache);
+
+        return $this;
+    }
+
+    /**
+     * Expire the cache at a specific time.
+     *
+     * @param $expireCacheAt
+     * @return $this
+     */
+    public function expireCacheAt($expireCacheAt)
+    {
+        $this->operation->setExpireCacheAt($expireCacheAt);
+
+        return $this;
+    }
+
+    /**
+     * Whether or not the query should execute on a cache miss (ie. Not in the cache yet)
+     *
+     * @param $executeOnCacheMiss
+     * @return $this
+     */
+    public function executeOnCacheMiss($executeOnCacheMiss)
+    {
+        $this->operation->setExecuteOnCacheMiss($executeOnCacheMiss);
+
+        return $this;
+    }
+
+    /**
+     * Invalidate the cache if it exists prior to running the query.
+     *
+     * @param $invalidate
+     * @return $this
+     */
+    public function invalidateCache($invalidate)
+    {
+        $this->operation->setInvalidateCache($invalidate);
+
+        return $this;
+    }
+
+    /**
      * This behaves very similar to getSingleResult(), only if no results are found it will return null instead of
      * throwing an exception.
      *
@@ -348,10 +400,10 @@ class LdapQuery
 
             /**
              * If we received the partial limit of results, re-adjust the next operations limit so we don't go over.
-             * 
+             *
              * @todo This is getting difficult due to multiple operations needed to select all schema types. If this was
              *       a single operation the issue would not exist. But with a single query and multiple types I cannot
-             *       easily determine which result is what type. Unsure of the best way to fix this at the moment. 
+             *       easily determine which result is what type. Unsure of the best way to fix this at the moment.
              */
             if ($operation->getSizeLimit() && count($results) < $operation->getSizeLimit()) {
                 $operation->setSizeLimit($operation->getSizeLimit() - count($results));
@@ -377,7 +429,7 @@ class LdapQuery
 
     /**
      * Get all the attributes that were selected for the query taking into account all of the aliases used.
-     * 
+     *
      * @param array $aliases
      * @return array
      */
@@ -402,7 +454,7 @@ class LdapQuery
     /**
      * This formats the orderBy array to ignore case differences between the orderBy name and the actually selected name,
      * such as for sorting arrays.
-     * 
+     *
      * @param $selected
      * @param $aliases
      * @return array

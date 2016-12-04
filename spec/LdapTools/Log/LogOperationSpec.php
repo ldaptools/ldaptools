@@ -74,4 +74,10 @@ class LogOperationSpec extends ObjectBehavior
         $this->setOperation($op)->shouldBeAnInstanceOf('\LdapTools\Log\LogOperation');
         $this->getOperation()->shouldBeEqualTo($op);
     }
+
+    function it_should_get_whether_the_cache_was_used_for_the_result()
+    {
+        $this->getUsedCachedResult()->shouldBeEqualTo(false);
+        $this->setUsedCachedResult(true)->getUsedCachedResult()->shouldBeEqualTo(true);
+    }
 }

@@ -145,16 +145,21 @@ trait LdapOperationTrait
      */
     protected function mergeLogDefaults(array $log)
     {
+        $defaults = [];
         $controls = [];
         if (!empty($this->controls)) {
             foreach ($this->controls as $control) {
                 $controls[] = $control->toArray();
             }
         }
+        if ($this instanceof CacheableOperationInterface) {
+            $defaults['Use Cache'] = var_export($this->getUseCache(), true);
+            $defaults['Execute on Cache Miss'] = var_export($this->getExecuteOnCacheMiss(), true);
+            $defaults['Invalidate Cache'] = var_export($this->getInvalidateCache(), true);
+        }
+        $defaults['Server'] = $this->server;
+        $defaults['Controls'] = var_export($controls, true);
 
-        return array_merge($log, [
-            'Server' => $this->server,
-            'Controls' => var_export($controls, true),
-        ]);
+        return array_merge($log, $defaults);
     }
 }

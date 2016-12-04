@@ -10,14 +10,18 @@
 
 namespace LdapTools\Operation\Invoker;
 
+use LdapTools\Cache\CacheItem;
 use LdapTools\Event\Event;
 use LdapTools\Event\LdapOperationEvent;
+use LdapTools\Exception\CacheMissException;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Log\LogOperation;
 use LdapTools\Operation\AuthenticationOperation;
 use LdapTools\Operation\BatchModifyOperation;
+use LdapTools\Operation\CacheableOperationInterface;
 use LdapTools\Operation\Handler\AuthenticationOperationHandler;
 use LdapTools\Operation\Handler\OperationHandler;
+use LdapTools\Operation\Handler\OperationHandlerInterface;
 use LdapTools\Operation\Handler\QueryOperationHandler;
 use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Utilities\MBString;
@@ -78,19 +82,22 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $handler = $this->getOperationHandler($operation);
             $handler->setOperationDefaults($operation);
             $this->logStart($log);
-            $this->switchServerIfNeeded($this->connection->getServer(), $operation->getServer(), $operation);
-            $this->idleReconnectIfNeeded($operation);
-            $this->setLdapControls($operation);
+            $this->invalidateCacheIfNeeded($operation);
+            list($result, $usedCache, $cacheKey) = $this->getCacheOrHandlerResult($operation, $handler, $log);
+            $this->cacheResultIfNeeded($operation, $result, $usedCache, $cacheKey);
 
-            return $handler->execute($operation);
+            return $result;
         } catch (\Throwable $e) {
             $this->logExceptionAndThrow($e, $log);
         } catch (\Exception $e) {
             $this->logExceptionAndThrow($e, $log);
         } finally {
             $this->logEnd($log);
-            $this->resetLdapControls($operation);
-            $this->switchServerIfNeeded($this->connection->getServer(), $lastServer, $operation);
+            // It would not have set controls or switched servers if the cache was used...
+            if (isset($usedCache) && $usedCache === false) {
+                $this->resetLdapControls($operation);
+                $this->switchServerIfNeeded($this->connection->getServer(), $lastServer, $operation);
+            }
             $this->dispatcher->dispatch(new LdapOperationEvent(Event::LDAP_OPERATION_EXECUTE_AFTER, $operation, $this->connection));
         }
     }
@@ -136,6 +143,80 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
     }
 
     /**
+     * @param LdapOperationInterface $operation
+     * @param OperationHandlerInterface $handler
+     * @param LogOperation $log
+     * @return array
+     * @throws CacheMissException
+     */
+    protected function getCacheOrHandlerResult(LdapOperationInterface $operation, OperationHandlerInterface $handler, LogOperation $log = null)
+    {
+        /** @var CacheableOperationInterface $operation */
+        $cacheKey = $this->shouldUseCache($operation) ? $this->getCacheKey($operation) : null;
+        $usedCache = false;
+
+        if (!is_null($cacheKey) && $this->cache->contains($cacheKey)) {
+            $result = $this->cache->get($cacheKey)->getValue();
+            $usedCache = true;
+        } elseif (!is_null($cacheKey) && !$operation->getExecuteOnCacheMiss()) {
+            throw new CacheMissException(sprintf('The %s Operation does not exist in the cache.', $operation->getName()));
+        } else {
+            $this->switchServerIfNeeded($this->connection->getServer(), $operation->getServer(), $operation);
+            $this->idleReconnectIfNeeded($operation);
+            $this->setLdapControls($operation);
+            $result = $handler->execute($operation);
+        }
+        if ($log) {
+            $log->setUsedCachedResult($usedCache);
+        }
+
+        return [$result, $usedCache, $cacheKey];
+    }
+
+    /**
+     * @param LdapOperationInterface $operation
+     */
+    protected function invalidateCacheIfNeeded(LdapOperationInterface $operation)
+    {
+        if (!($this->cache && $operation instanceof CacheableOperationInterface && $operation->getInvalidateCache())) {
+            return;
+        }
+        $cacheKey = $this->getCacheKey($operation);
+
+        if ($this->cache->contains($cacheKey)) {
+            $this->cache->delete($cacheKey);
+        }
+    }
+
+    /**
+     * Cache the result of the operation if needed.
+     *
+     * @param LdapOperationInterface $operation
+     * @param mixed $result
+     * @param bool $usedCache
+     * @param string|null $cacheKey
+     * @return mixed
+     */
+    protected function cacheResultIfNeeded(LdapOperationInterface $operation, $result, $usedCache, $cacheKey)
+    {
+        if (!is_null($cacheKey) && !$usedCache) {
+            /** @var CacheableOperationInterface $operation */
+            $this->cache->set(new CacheItem($cacheKey, $result, $operation->getExpireCacheAt()));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param CacheableOperationInterface $operation
+     * @return string
+     */
+    protected function getCacheKey(CacheableOperationInterface $operation)
+    {
+        return $this->connection->getConfig()->getDomainName().$operation->getCacheKey();
+    }
+
+    /**
      * Performs the logic for switching the LDAP server connection.
      *
      * @param string|null $currentServer The server we are currently on.
@@ -156,7 +237,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
     /**
      * If the connection has been open as long as, or longer than, the configured idle reconnect time, then close and
      * reconnect the LDAP connection.
-     * 
+     *
      * @param LdapOperationInterface $operation
      */
     protected function idleReconnectIfNeeded(LdapOperationInterface $operation)
@@ -173,7 +254,7 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
 
     /**
      * If a connection is not bound (such as a lazy bind config) we need to force a connection.
-     * 
+     *
      * @param LdapOperationInterface $operation
      */
     protected function connectIfNotBound(LdapOperationInterface $operation)
@@ -181,6 +262,17 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
         if (!$this->connection->isBound() && !($operation instanceof AuthenticationOperation)) {
             $this->connection->connect();
         }
+    }
+
+    /**
+     * Check whether the cache should be attempted for this operation.
+     *
+     * @param LdapOperationInterface $operation
+     * @return bool
+     */
+    protected function shouldUseCache($operation)
+    {
+        return $operation instanceof CacheableOperationInterface && $operation->getUseCache() && $this->cache;
     }
 
     /**
@@ -210,7 +302,6 @@ class LdapOperationInvoker implements LdapOperationInvokerInterface
             $control->setValue($value);
         }
     }
-
 
     /**
      * It's possible we need to skip an operation. For example, if a batch operation was only for attribute values that

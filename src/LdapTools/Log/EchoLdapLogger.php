@@ -10,6 +10,8 @@
 
 namespace LdapTools\Log;
 
+use LdapTools\Operation\CacheableOperationInterface;
+
 /**
  * A simple logger to output the actions to the console using echo.
  *
@@ -38,6 +40,9 @@ class EchoLdapLogger implements LdapLoggerInterface
     {
         $duration = $log->getStopTime() - $log->getStartTime();
 
+        if ($log->getOperation() instanceof CacheableOperationInterface) {
+            echo "\tCache Hit: ".var_export($log->getUsedCachedResult(), true).PHP_EOL;
+        }
         if (!is_null($log->getError())) {
             echo "\tError: ".$log->getError().PHP_EOL;
         }

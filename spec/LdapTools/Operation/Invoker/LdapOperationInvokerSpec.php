@@ -11,6 +11,8 @@
 namespace spec\LdapTools\Operation\Invoker;
 
 use LdapTools\BatchModify\BatchCollection;
+use LdapTools\Cache\CacheInterface;
+use LdapTools\Cache\CacheItem;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Connection\LdapControlType;
@@ -24,6 +26,7 @@ use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
 use LdapTools\Operation\Handler\OperationHandler;
 use LdapTools\Operation\Handler\QueryOperationHandler;
+use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -313,5 +316,106 @@ class LdapOperationInvokerSpec extends ObjectBehavior
         $connection->connect()->shouldNotBeCalled();
         $this->addHandler($handler);
         $this->execute($operation);
+    }
+
+    function it_should_use_the_cache_if_specified_and_the_item_is_in_the_cache(CacheInterface $cache, OperationHandler $handler, $connection, $dispatcher, $logger)
+    {
+        $query = (new QueryOperation('(foo=bar)', ['cn']))->setServer('foo')->setUseCache(true);
+        $handler->supports($query)->willReturn(true);
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($query)->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->setCache($cache);
+
+        $cacheKey = 'example.local'.$query->getCacheKey();
+        $cache->contains($cacheKey)->shouldBeCalled()->willReturn(true);
+        $cache->get('example.local'.$query->getCacheKey())->shouldBeCalled()->willReturn(new CacheItem($cacheKey, ['foo']));
+        $handler->execute($query)->shouldNotBeCalled();
+
+        $this->execute($query);
+    }
+
+    function it_should_set_the_cache_if_specified_when_the_item_is_not_in_the_cache(CacheInterface $cache, OperationHandler $handler, $connection, $dispatcher)
+    {
+        $expire = new \DateTime();
+        $query = (new QueryOperation('(foo=bar)', ['cn']))->setServer('foo')->setUseCache(true)->setExpireCacheAt($expire);
+        $handler->supports($query)->willReturn(true);
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($query)->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->setCache($cache);
+
+        $result = ['foo'];
+        $cacheKey = 'example.local'.$query->getCacheKey();
+        $cache->contains($cacheKey)->shouldBeCalled()->willReturn(false);
+        $cache->get(Argument::any())->shouldNotBeCalled();
+        $handler->execute($query)->shouldBeCalled()->willReturn($result);
+        $cache->set(new CacheItem($cacheKey, $result, $expire))->shouldBeCalled();
+
+        $this->execute($query);
+    }
+
+    function it_should_invalidate_an_existing_cache_result_if_specified(CacheInterface $cache, OperationHandler $handler, $connection, $dispatcher)
+    {
+        $query = (new QueryOperation('(foo=bar)', ['cn']))->setServer('foo')->setInvalidateCache(true)->setUseCache(true);
+
+        $handler->supports($query)->willReturn(true);
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($query)->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->setCache($cache);
+
+        $result = ['foo'];
+        $cacheKey = 'example.local'.$query->getCacheKey();
+        $cache->contains($cacheKey)->shouldBeCalledTimes(2)->willReturn(true, false);
+        $cache->delete($cacheKey)->shouldBeCalled();
+        $cache->get(Argument::any())->shouldNotBeCalled();
+        $handler->execute(Argument::any())->shouldBeCalled()->willReturn($result);
+        $cache->set(new CacheItem($cacheKey, $result))->shouldBeCalled();
+
+        $this->execute($query);
+    }
+
+    function it_should_invalidate_an_existing_cache_result_even_if_use_cache_is_false(CacheInterface $cache, OperationHandler $handler, $connection, $dispatcher)
+    {
+        $query = (new QueryOperation('(foo=bar)', ['cn']))->setServer('foo')->setInvalidateCache(true)->setUseCache(false);
+
+        $handler->supports($query)->willReturn(true);
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($query)->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->setCache($cache);
+
+        $cacheKey = 'example.local'.$query->getCacheKey();
+        $cache->contains($cacheKey)->shouldBeCalled()->willReturn(true);
+        $cache->delete($cacheKey)->shouldBeCalled();
+        $cache->get(Argument::any())->shouldNotBeCalled();
+        $handler->execute(Argument::any())->shouldBeCalled()->willReturn(['foo']);
+        $cache->set(Argument::any())->shouldNotBeCalled();
+
+        $this->execute($query);
+    }
+
+    function it_should_throw_a_CacheMissException_if_using_cache_and_the_operation_should_not_execute_if_not_in_the_cache(CacheInterface $cache, OperationHandler $handler, $connection, $dispatcher)
+    {
+        $query = (new QueryOperation('(foo=bar)', ['cn']))->setServer('foo')->setUseCache(true)->setExecuteOnCacheMiss(false);
+        $handler->supports($query)->willReturn(true);
+        $handler->setConnection($connection)->shouldBeCalled();
+        $handler->setEventDispatcher($dispatcher)->shouldBeCalled();
+        $handler->setOperationDefaults($query)->shouldBeCalled();
+        $this->addHandler($handler);
+        $this->setCache($cache);
+
+        $cacheKey = 'example.local'.$query->getCacheKey();
+        $cache->contains($cacheKey)->shouldBeCalled()->willReturn(false);
+        $cache->get(Argument::any())->shouldNotBeCalled();
+        $handler->execute(Argument::any())->shouldNotBeCalled();
+        $cache->set(Argument::any())->shouldNotBeCalled();
+
+        $this->shouldThrow('LdapTools\Exception\CacheMissException')->duringExecute($query);
     }
 }

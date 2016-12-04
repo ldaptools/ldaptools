@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation\Invoker;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Log\LdapLoggerInterface;
@@ -39,6 +40,11 @@ trait LdapOperationInvokerTrait
     protected $dispatcher;
 
     /**
+     * @var CacheInterface
+     */
+    protected $cache;
+
+    /**
      * @var OperationHandlerInterface[]
      */
     protected $handler = [];
@@ -65,6 +71,14 @@ trait LdapOperationInvokerTrait
     public function setLogger(LdapLoggerInterface $logger = null)
     {
         $this->logger = $logger;
+    }
+
+    /**
+     * @param CacheInterface $cache
+     */
+    public function setCache(CacheInterface $cache)
+    {
+        $this->cache = $cache;
     }
 
     /**

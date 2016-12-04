@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation\Invoker;
 
+use LdapTools\Cache\CacheInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Log\LdapLoggerInterface;
@@ -37,6 +38,11 @@ interface LdapOperationInvokerInterface
      * @param EventDispatcherInterface $dispatcher
      */
     public function setEventDispatcher(EventDispatcherInterface $dispatcher);
+
+    /**
+     * @param CacheInterface $cache
+     */
+    public function setCache(CacheInterface $cache);
 
     /**
      * @param LdapOperationInterface $operation

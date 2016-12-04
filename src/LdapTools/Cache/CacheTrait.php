@@ -14,7 +14,7 @@ use LdapTools\Utilities\MBString;
 
 /**
  * Removes some duplication for some common cache functionality.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 trait CacheTrait

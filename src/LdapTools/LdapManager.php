@@ -167,7 +167,8 @@ class LdapManager
             $this->connections[$domain] = new LdapConnection(
                 $this->domains[$domain],
                 $this->config->getEventDispatcher(),
-                $this->config->getLogger()
+                $this->config->getLogger(),
+                $this->getCache()
             );
         }
 

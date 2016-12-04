@@ -9,6 +9,7 @@ takes care of escaping all values passed to it when generating the filter.
 * [Filter Method Shortcuts](#filter-method-shortcuts)
 * [Using Aliases](#using-aliases)
 * [Retrieving Query Results](#ldapquery-methods-to-retrieve-ldap-results)
+* [Caching Queries](#caching-queries)
 
 ## Generating LDAP Filters Without LdapManager
 -----------------------
@@ -537,6 +538,66 @@ $title = $lqb->select('title')
 $title = $title ?: 'Unknown';
 
 echo $title;
+```
+
+## Caching Queries
+------------------------
+
+If you have enabled/set a caching a method in your configuration, you can use several different options to cache queries
+going to LDAP. This could save considerable time, as the raw LDAP results will be fetched from the cache for the query
+operation.
+
+```php
+// Retrieve all of the users...
+$allUsers = $ldap
+    ->fromUsers()
+    ->getLdapQuery()
+    // Grab the results from the cache, or cache the result if it does not exist.
+    ->useCache(true)
+    // Expire the cached result in one day (accepts any \DateTimeInterface object...
+    ->expireCacheAt((new \DateTime())->modify('+1 day'))
+    ->getResult();
+```
+
+On the first run of the above query it will grab the results from LDAP, then store it in the cache with an expiration 1
+day from now. To retrieve the results from the cache you need to run the same query with `useCache(true)`.
+
+------------------------
+#### useCache($useCache = false)
+
+Set whether or not the cache should be used for the query. This controls both retrieval and storage of the result in the
+cache. You must set this if you want to retrieve an already cached result from the cache.
+
+------------------------
+#### expireCacheAt(\DateTimeInterface $time = null)
+
+Set this to force the cache to expire at a specific time. This can be any `\DateTimeInterface` object. To never expire
+the cache item set it to `null`.
+
+------------------------
+#### executeOnCacheMiss($executeOnCacheMiss = true)
+
+Set whether or not the query should execute if `useCache()` was set to `true` and the result was not already in the cache.
+If this is set to `false` and the result is not in the cache then a `CacheMissException` will be thrown. By default this
+is set to true, so the item is not in the cache the operation will re-run and re-cache the result.
+
+------------------------
+#### invalidateCache($invalidateCache = false)
+
+Set whether or not to delete a cached result for the query (if it exists in the cache). You do not have to set `useCache()`
+for this to be triggered. However, you can use it in conjunction with `useCache(true)` to force a refresh of an already
+cached item.
+
+```php
+// Retrieve all of the users...
+$allUsers = $ldap
+    ->fromUsers()
+    ->getLdapQuery()
+    // Force any existing cache item to be removed first...
+    ->invalidateCache(true)
+    ->useCache(true)
+    ->expireCacheAt((new \DateTime())->modify('+1 day'))
+    ->getResult();
 ```
 
 ## Filter Method Shortcuts

@@ -36,6 +36,11 @@ class QueryOperationSpec extends ObjectBehavior
         $this->shouldImplement('\LdapTools\Operation\LdapOperationInterface');
     }
 
+    function it_should_implement_CacheableOperationInterface()
+    {
+        $this->shouldImplement('\LdapTools\Operation\CacheableOperationInterface');
+    }
+
     function it_should_set_the_base_dn_for_the_query_operation()
     {
         $dn = 'dc=example,dc=local';
@@ -131,6 +136,9 @@ class QueryOperationSpec extends ObjectBehavior
         $this->getLogArray()->shouldHaveKey('Server');
         $this->getLogArray()->shouldHaveKey('Controls');
         $this->getLogArray()->shouldHaveKey('Size Limit');
+        $this->getLogArray()->shouldHaveKey('Use Cache');
+        $this->getLogArray()->shouldHaveKey('Execute on Cache Miss');
+        $this->getLogArray()->shouldHaveKey('Invalidate Cache');
     }
 
     function it_should_support_being_constructed_with_a_filter_and_attributes()
@@ -199,8 +207,7 @@ class QueryOperationSpec extends ObjectBehavior
     function it_should_set_a_size_limit_for_the_query()
     {
         $this->getSizeLimit()->shouldBeEqualTo(0);
-        $this->setSizeLimit(5);
-        $this->getSizeLimit()->shouldBeEqualTo(5);
+        $this->setSizeLimit(5)->getSizeLimit()->shouldBeEqualTo(5);
     }
 
     function it_should_throw_an_exception_if_the_filter_is_empty_when_getting_the_arguments()
@@ -209,5 +216,30 @@ class QueryOperationSpec extends ObjectBehavior
         $this->shouldThrow('LdapTools\Exception\LdapQueryException')->duringGetArguments();
         $this->setFilter(new OperatorCollection());
         $this->shouldThrow('LdapTools\Exception\LdapQueryException')->duringGetArguments();
+    }
+
+    function it_should_set_whether_or_not_to_use_the_cache()
+    {
+        $this->getUseCache()->shouldBeEqualTo(false);
+        $this->setUseCache(true)->getUseCache()->shouldBeEqualTo(true);
+    }
+
+    function it_should_set_whether_or_not_to_execute_on_a_cache_miss()
+    {
+        $this->getExecuteOnCacheMiss()->shouldBeEqualTo(true);
+        $this->setExecuteOnCacheMiss(false)->getExecuteOnCacheMiss()->shouldBeEqualTo(false);
+    }
+
+    function it_should_set_whether_or_not_to_invalidate_the_cache()
+    {
+        $this->getInvalidateCache()->shouldBeEqualTo(false);
+        $this->setInvalidateCache(true)->getInvalidateCache()->shouldBeEqualTo(true);
+    }
+
+    function it_should_set_a_cache_expiration()
+    {
+        $date = new \DateTime();
+        $this->getExpireCacheAt()->shouldBeNull();
+        $this->setExpireCacheAt($date)->getExpireCacheAt()->shouldBeEqualTo($date);
     }
 }

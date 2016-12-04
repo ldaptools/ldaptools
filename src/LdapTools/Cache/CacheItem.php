@@ -21,7 +21,7 @@ class CacheItem
      * Convenience prefix types for certain cache items.
      */
     const TYPE = [
-        'QUERY' => 'LdapQuery',
+        'OPERATION_RESULT' => 'OperationResult',
         'SCHEMA_OBJECT' => 'SchemaObject',
     ];
 

@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation;
 
+use LdapTools\Cache\CacheItem;
 use LdapTools\Exception\LdapQueryException;
 use LdapTools\Query\OperatorCollection;
 
@@ -18,9 +19,9 @@ use LdapTools\Query\OperatorCollection;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class QueryOperation implements LdapOperationInterface
+class QueryOperation implements LdapOperationInterface, CacheableOperationInterface
 {
-    use LdapOperationTrait;
+    use LdapOperationTrait, CacheableOperationTrait;
 
     /**
      * Scope name to LDAP function mappings.
@@ -283,6 +284,27 @@ class QueryOperation implements LdapOperationInterface
             'Page Size' => $this->properties['pageSize'],
             'Size Limit' => $this->properties['sizeLimit'],
         ]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKey()
+    {
+        $key = CacheItem::TYPE['OPERATION_RESULT'];
+        foreach ($this->controls as $control) {
+            $key .= implode('', $control->toArray());
+        }
+        $key .= $this->server
+            .$this->properties['baseDn']
+            .$this->getLdapFilter()
+            .$this->properties['usePaging']
+            .$this->properties['pageSize']
+            .$this->properties['sizeLimit']
+            .$this->properties['scope']
+            .implode('', $this->properties['attributes']);
+
+        return md5($key);
     }
 
     /**
