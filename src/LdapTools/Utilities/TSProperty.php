@@ -44,7 +44,7 @@ class TSProperty
      * cannot find any information on them in Microsoft documentation. However, their values appear to stay in sync with
      * their non 'W' counterparts. But not doing so when manipulating the data manually does not seem to affect anything.
      * This probably needs more investigation.
-     * 
+     *
      * @var array
      */
     protected $propTypes = [
@@ -143,7 +143,7 @@ class TSProperty
 
     /**
      * Convert the TSProperty name/value back to its binary representation for the userParameters blob.
-     * 
+     *
      * @return string
      */
     public function toBinary()

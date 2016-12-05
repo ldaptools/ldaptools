@@ -249,7 +249,7 @@ class Ace
      */
     public function getApplicationData()
     {
-       return $this->applciationData;
+        return $this->applciationData;
     }
 
     /**

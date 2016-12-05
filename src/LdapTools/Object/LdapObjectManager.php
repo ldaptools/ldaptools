@@ -135,10 +135,10 @@ class LdapObjectManager
     /**
      * Restore a deleted LDAP object. Optionally pass the new location container/OU for the object. If a new location
      * is not provided it will use the lastKnownParent value to determine where it should go.
-     * 
+     *
      * This may require a strategy design at some point, as this is AD specific currently. Unsure as to how other
      * directory services handle deleted object restores. The basic logic for AD to do this is...
-     * 
+     *
      * 1. Reset the 'isDeleted' attribute.
      * 2. Set the DN so the object ends up in a location other than the "Deleted Objects" container.
      *
@@ -182,7 +182,7 @@ class LdapObjectManager
      * It's possible a new location was not explicitly given and the attribute that contains the last know location
      * was not queried for when the object was originally found. In that case attempt to retrieve the last known
      * location from a separate LDAP query.
-     * 
+     *
      * @param LdapObject $ldapObject
      * @param string|null $location
      * @return string

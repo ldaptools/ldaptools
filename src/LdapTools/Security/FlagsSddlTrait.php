@@ -17,7 +17,7 @@ namespace LdapTools\Security;
  */
 trait FlagsSddlTrait
 {
-    abstract function has($value);
+    abstract public function has($value);
 
     /**
      * Get the short names used in SDDL.

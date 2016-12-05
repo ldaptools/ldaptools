@@ -18,7 +18,7 @@ use LdapTools\Utilities\MBString;
  * Some common functions needed in both the operation hydrator and the LdapQuery. Need to completely separate them at
  * some point. This is mostly for logic relating to parsing out different sets of attributes based on alias and schema
  * information.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 trait HydrateQueryTrait
@@ -90,7 +90,7 @@ trait HydrateQueryTrait
      * to LDAP and whether they should be returned as schema translated names.
      *
      * @param array $attributes
-     * @param bool 
+     * @param bool
      * @param LdapObjectSchema|null $schema
      * @param null|string $alias
      * @return array

@@ -358,7 +358,7 @@ class LdapQueryBuilder
 
     /**
      * Add LDAP controls to be used for the query.
-     * 
+     *
      * @param LdapControl[] ...$controls
      * @return $this
      */
@@ -444,7 +444,7 @@ class LdapQueryBuilder
 
     /**
      * Set the size limit for the amount of results returned from LDAP for the query.
-     * 
+     *
      * @param int $sizeLimit
      * @return $this
      */
@@ -457,7 +457,7 @@ class LdapQueryBuilder
 
     /**
      * Get the size limit for the amount of results returned from LDAP for the query.
-     * 
+     *
      * @return int
      */
     public function getSizeLimit()

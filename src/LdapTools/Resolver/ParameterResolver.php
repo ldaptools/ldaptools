@@ -74,7 +74,7 @@ class ParameterResolver
 
     /**
      * Check whether the value has any parameters in it.
-     * 
+     *
      * @param array|string $value
      * @return bool
      */

@@ -181,7 +181,7 @@ class LdapResultSorter
         // Be forgiving if they are hydrating to an array and the case of the attribute was not correct.
         } elseif (is_array($entry) && array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($entry))) {
             $value = MBString::array_change_key_case($entry)[MBString::strtolower($attribute)];
-        // Only get the value if there is no alias requested, or if an alias was requested the object type must match the alias.    
+        // Only get the value if there is no alias requested, or if an alias was requested the object type must match the alias.
         } elseif (($entry instanceof LdapObject) && (!$alias || $entry->isType($this->aliases[$alias]->getObjectType())) && $entry->has($attribute)) {
             $value = $entry->get($attribute);
         }

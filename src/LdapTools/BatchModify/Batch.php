@@ -190,7 +190,7 @@ class Batch
 
     /**
      * Allows for an anonymous function to produce the final value.
-     * 
+     *
      * @param array $values
      * @return array
      */

@@ -46,7 +46,7 @@ abstract class BaseOperator
     protected $translatedAttribute = '';
 
     /**
-     * @var array The attribute name for a specific alias after its schema has been applied. 
+     * @var array The attribute name for a specific alias after its schema has been applied.
      */
     protected $translatedAliasAttribute = [];
 
@@ -166,7 +166,7 @@ abstract class BaseOperator
             $pieces = explode('.', $attribute, 2);
             $this->setAlias($pieces[0]);
             $attribute = $pieces[1];
-        // If an alias was already set then this must be set back to null.    
+        // If an alias was already set then this must be set back to null.
         } else {
             $this->alias = null;
         }
@@ -370,7 +370,7 @@ abstract class BaseOperator
 
     /**
      * Determine whether the operator should actually produce a filter (only if alias is null or matches the current one)
-     * 
+     *
      * @param string|null $alias
      * @return bool
      */

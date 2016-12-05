@@ -503,7 +503,7 @@ class LdapObjectSchema
 
     /**
      * Set the operator that will be used as a filter for querying LDAP for this object type.
-     * 
+     *
      * @param BaseOperator $filter
      */
     public function setFilter(BaseOperator $filter)
@@ -543,7 +543,7 @@ class LdapObjectSchema
 
     /**
      * Set whether paging should be used when querying LDAP for this type.
-     * 
+     *
      * @param bool $usePaging
      */
     public function setUsePaging($usePaging)
@@ -553,7 +553,7 @@ class LdapObjectSchema
 
     /**
      * Get whether paging should be used when querying LDAP for this type.
-     * 
+     *
      * @return bool|null
      */
     public function getUsePaging()
@@ -563,7 +563,7 @@ class LdapObjectSchema
 
     /**
      * Set the scope of the search for queries using this type.
-     * 
+     *
      * @param string|null $scope
      * @return $this
      */
@@ -576,7 +576,7 @@ class LdapObjectSchema
 
     /**
      * Get the scope of the search for queries using this type.
-     * 
+     *
      * @return null|string
      */
     public function getScope()

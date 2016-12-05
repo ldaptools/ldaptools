@@ -137,7 +137,7 @@ class UserParameters
 
     /**
      * Get the binary data that comes after the TSPropertyArray data.
-     * 
+     *
      * @return string
      */
     public function getPostBinary()
@@ -160,7 +160,7 @@ class UserParameters
 
     /**
      * Get the decoded reserved data string, if any is set. These values don't seem to be documented anywhere.
-     * 
+     *
      * @return string
      */
     public function getReservedDataString()
@@ -191,7 +191,7 @@ class UserParameters
 
     /**
      * Encode the string of reserved data that goes in the first 44 bytes.
-     * 
+     *
      * @param string $reserved
      * @return string
      */

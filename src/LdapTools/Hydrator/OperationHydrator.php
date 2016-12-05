@@ -58,7 +58,7 @@ class OperationHydrator extends ArrayHydrator
 
     /**
      * Set the current alias that the operation is targeting (in the context of a query operation).
-     * 
+     *
      * @param null|string $alias
      */
     public function setAlias($alias)

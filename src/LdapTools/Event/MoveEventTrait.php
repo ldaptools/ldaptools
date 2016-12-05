@@ -12,7 +12,7 @@ namespace LdapTools\Event;
 
 /**
  * Helps reduce some duplication between a move and a restore event.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 trait MoveEventTrait

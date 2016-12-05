@@ -15,7 +15,7 @@ use LdapTools\Utilities\MBString;
 
 /**
  * Based off the objectClass of an object, determine what LDAP Object schema type it is.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class ConvertLdapObjectType implements AttributeConverterInterface

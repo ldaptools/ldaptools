@@ -88,7 +88,7 @@ class TSPropertyArray
 
     /**
      * Check if a specific TSProperty exists by its property name.
-     * 
+     *
      * @param string $propName
      * @return bool
      */
@@ -125,7 +125,7 @@ class TSPropertyArray
 
     /**
      * Remove a TSProperty by its property name (ie. CtxMinEncryptionLevel).
-     * 
+     *
      * @param string $propName
      * @return $this
      */
@@ -142,7 +142,7 @@ class TSPropertyArray
 
     /**
      * Set the value for a specific TSProperty by its name.
-     * 
+     *
      * @param string $propName
      * @param mixed $propValue
      * @return $this
@@ -173,7 +173,7 @@ class TSPropertyArray
 
     /**
      * Get a simple associative array containing of all TSProperty names and values.
-     * 
+     *
      * @return array
      */
     public function toArray()
@@ -189,7 +189,7 @@ class TSPropertyArray
     
     /**
      * Get all TSProperty objects.
-     * 
+     *
      * @return TSProperty[]
      */
     public function getTSProperties()
@@ -199,7 +199,7 @@ class TSPropertyArray
 
     /**
      * Get any binary data that was after the decoded binary TSPropertyArray data.
-     * 
+     *
      * @return string
      */
     public function getPostBinary()
@@ -219,7 +219,7 @@ class TSPropertyArray
 
     /**
      * Check whether the signature is valid, thus signifying a valid data structure.
-     * 
+     *
      * @return bool
      */
     public function isSignatureValid()

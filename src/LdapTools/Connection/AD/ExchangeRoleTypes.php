@@ -12,7 +12,7 @@ namespace LdapTools\Connection\AD;
 
 /**
  * The different Exchange Role types.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class ExchangeRoleTypes

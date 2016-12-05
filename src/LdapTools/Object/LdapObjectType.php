@@ -43,7 +43,7 @@ class LdapObjectType
     const OU = 'ou';
 
     /**
-     * A container object. 
+     * A container object.
      */
     const CONTAINER = 'container';
 

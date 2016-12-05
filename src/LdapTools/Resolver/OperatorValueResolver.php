@@ -18,7 +18,7 @@ use LdapTools\Schema\LdapObjectSchema;
 
 /**
  * Parses through an OperatorCollection to convert values.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class OperatorValueResolver extends BaseValueResolver

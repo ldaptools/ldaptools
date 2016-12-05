@@ -30,7 +30,7 @@ class FilterBuilder
 {
     /**
      * Get a FilterBuilder instance based on the connection.
-     * 
+     *
      * @param LdapConnectionInterface|null $connection
      * @return ADFilterBuilder|FilterBuilder
      */

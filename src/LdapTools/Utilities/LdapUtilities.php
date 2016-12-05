@@ -277,7 +277,7 @@ class LdapUtilities
     /**
      * Check if a string contains non-printable, and likely binary, data. There is no easy way to do this, as there can
      * really only be a best effort attempt to detect it.
-     * 
+     *
      * @param string $value
      * @return bool
      */
@@ -374,9 +374,9 @@ class LdapUtilities
     /**
      * Given an attribute, split it between its alias and attribute. This will return an array where the first value
      * is the alias and the second is the attribute name. If there is no alias then the first value will be null.
-     * 
+     *
      * ie. list($alias, $attribute) = LdapUtilities::getAliasAndAttribute($attribute);
-     * 
+     *
      * @param string $attribute
      * @return array
      */

@@ -24,7 +24,7 @@ use LdapTools\Utilities\MBString;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class ConvertValueToDn implements  AttributeConverterInterface
+class ConvertValueToDn implements AttributeConverterInterface
 {
     use AttributeConverterTrait, ConverterUtilitiesTrait;
 

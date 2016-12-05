@@ -111,7 +111,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
 
     /**
      * Transform a bool value into the bitwise operator needed for the LDAP filter.
-     * 
+     *
      * @param bool $value
      * @return \LdapTools\Query\Operator\BaseOperator
      */
@@ -126,7 +126,7 @@ class ConvertUserAccountControl implements AttributeConverterInterface
     }
 
     /**
-     * Check if the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled) 
+     * Check if the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled)
      *
      * @return bool
      */

@@ -45,7 +45,7 @@ class MBString
 
     /**
      * Get the character for a specific integer value.
-     *  
+     *
      * @param $int
      * @return string
      */
@@ -60,7 +60,7 @@ class MBString
 
     /**
      * Split a string into its individual characters and return it as an array.
-     * 
+     *
      * @param string $value
      * @return string[]
      */
@@ -154,7 +154,7 @@ class MBString
 
     /**
      * Simple check for the mbstring extension.
-     * 
+     *
      * @return bool
      */
     protected static function isMbstringLoaded()
@@ -164,7 +164,7 @@ class MBString
 
     /**
      * Simple check for the intl extension.
-     * 
+     *
      * @return bool
      */
     protected static function isIntlLoaded()
@@ -174,7 +174,7 @@ class MBString
 
     /**
      * Load and return a collator instance.
-     * 
+     *
      * @return \Collator
      */
     protected static function getCollator()

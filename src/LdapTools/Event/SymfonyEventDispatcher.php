@@ -18,7 +18,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface as SymfonyEventDi
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class SymfonyEventDispatcher implements  EventDispatcherInterface
+class SymfonyEventDispatcher implements EventDispatcherInterface
 {
     /**
      * @var SymfonyEventDispatcherInterface

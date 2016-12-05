@@ -88,7 +88,7 @@ class LastErrorStrategy
 
     /**
      * Get the full diagnostic error message.
-     * 
+     *
      * @return string
      */
     public function getDiagnosticMessage()

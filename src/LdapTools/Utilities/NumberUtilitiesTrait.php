@@ -15,7 +15,7 @@ namespace LdapTools\Utilities;
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-Trait NumberUtilitiesTrait
+trait NumberUtilitiesTrait
 {
     /**
      * Hex string of signed long 32bit big-endian to int form.

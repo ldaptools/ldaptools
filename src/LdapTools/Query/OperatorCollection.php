@@ -115,7 +115,7 @@ class OperatorCollection implements \IteratorAggregate
 
     /**
      * Get the aliases in the form of ['alias' => LdapObjectSchema]
-     * 
+     *
      * @return string[]
      */
     public function getAliases()

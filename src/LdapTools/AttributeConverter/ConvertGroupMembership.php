@@ -118,7 +118,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
 
     /**
      * Gets the current group membership and generates operations to remove them all.
-     * 
+     *
      * @throws \LdapTools\Exception\AttributeConverterException
      */
     protected function removeCurrentGroups()
@@ -134,7 +134,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
 
     /**
      * Get the batch type for the operation that was specified.
-     * 
+     *
      * @return int
      */
     protected function getBatchTypeForOperation()

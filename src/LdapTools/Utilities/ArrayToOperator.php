@@ -17,7 +17,7 @@ use LdapTools\Schema\LdapObjectSchema;
 
 /**
  * Creates a LDAP operator based off an array
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class ArrayToOperator
@@ -191,7 +191,7 @@ class ArrayToOperator
     }
 
     /**
-     * 
+     *
      * @param mixed $name
      * @param mixed $value
      * @return BaseOperator

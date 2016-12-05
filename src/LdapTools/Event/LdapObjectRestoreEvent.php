@@ -14,7 +14,7 @@ use LdapTools\Object\LdapObject;
 
 /**
  * This event represents a LDAP object being restored.
- * 
+ *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class LdapObjectRestoreEvent extends LdapObjectEvent
