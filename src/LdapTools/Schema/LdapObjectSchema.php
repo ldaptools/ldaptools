@@ -48,9 +48,24 @@ class LdapObjectSchema
     protected $attributeMap = [];
 
     /**
+     * @var array A lower-case equivalent of the attributes map keys.
+     */
+    protected $lcAttributeNameMap = [];
+
+    /**
+     * @var array A lower-case equivalent of the attributes map values.
+     */
+    protected $lcAttributeValueMap = [];
+
+    /**
      * @var array An array of attribute keys and the converter names tied to them.
      */
     protected $converterMap = [];
+
+    /**
+     * @var array A lower-case equivalent of the converter map keys.
+     */
+    protected $lcConverterMap = [];
 
     /**
      * @var array An array of attribute names to select by default when using LdapQueryBuilder or a Repository.
@@ -166,6 +181,8 @@ class LdapObjectSchema
     public function setAttributeMap(array $attributeMap)
     {
         $this->attributeMap = $attributeMap;
+        $this->lcAttributeNameMap = MBString::array_change_key_case($attributeMap);
+        $this->lcAttributeValueMap = MBString::array_change_value_case($attributeMap);
     }
 
     /**
@@ -186,6 +203,7 @@ class LdapObjectSchema
     public function setConverterMap(array $converterMap)
     {
         $this->converterMap = $converterMap;
+        $this->lcConverterMap = MBString::array_change_key_case($converterMap);
     }
 
     /**
@@ -206,7 +224,7 @@ class LdapObjectSchema
      */
     public function hasConverter($attributeName)
     {
-        return array_key_exists(MBString::strtolower($attributeName), MBString::array_change_key_case($this->converterMap));
+        return isset($this->lcConverterMap[MBString::strtolower($attributeName)]);
     }
 
     /**
@@ -221,7 +239,7 @@ class LdapObjectSchema
             throw new InvalidArgumentException(sprintf('No converter exists for attribute "%s".', $attributeName));
         }
 
-        return MBString::array_change_key_case($this->converterMap)[MBString::strtolower($attributeName)];
+        return $this->lcConverterMap[MBString::strtolower($attributeName)];
     }
 
     /**
@@ -292,7 +310,7 @@ class LdapObjectSchema
      */
     public function hasAttribute($attribute)
     {
-        return array_key_exists(MBString::strtolower($attribute), MBString::array_change_key_case($this->attributeMap));
+        return isset($this->lcAttributeNameMap[MBString::strtolower($attribute)]);
     }
 
     /**
@@ -303,7 +321,7 @@ class LdapObjectSchema
      */
     public function hasNamesMappedToAttribute($attribute)
     {
-        return (bool) array_search(MBString::strtolower($attribute), MBString::array_change_value_case($this->attributeMap));
+        return (bool) array_search(MBString::strtolower($attribute), $this->lcAttributeValueMap);
     }
 
     /**
@@ -315,7 +333,7 @@ class LdapObjectSchema
      */
     public function getNamesMappedToAttribute($attribute)
     {
-        return array_keys(MBString::array_change_value_case($this->attributeMap), MBString::strtolower($attribute));
+        return array_keys($this->lcAttributeValueMap, MBString::strtolower($attribute));
     }
 
     /**
@@ -326,8 +344,7 @@ class LdapObjectSchema
      */
     public function getAttributeToLdap($attribute)
     {
-        return $this->hasAttribute($attribute) ?
-            MBString::array_change_key_case($this->attributeMap)[MBString::strtolower($attribute)] : $attribute;
+        return $this->hasAttribute($attribute) ? $this->lcAttributeNameMap[MBString::strtolower($attribute)] : $attribute;
     }
 
     /**
