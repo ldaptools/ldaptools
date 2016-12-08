@@ -86,7 +86,7 @@ foreach ($sd->getDacl()->getAces() as $ace) {
    }
    // This flips the ACE type to allow for the 'WD' SID ('WD' is the SID short name for "Everyone").
    if ((string) $ace->getTrustee() === SID::SHORT_NAME['WD'] && (string) $ace->getObjectType() === AceRights::EXTENDED['CHANGE_PASSWORD']) {
-       $ace->setType(new AceType('A'));
+       $ace->setType('A');
    }
 }
 
@@ -364,11 +364,11 @@ echo $ace->getType()->getShortName();
 ```
 
 ------------------------
-#### setType(AceType $type)
+#### setType($type)
 
-When setting the ACE type explicitly you need to use the AceType object. The ACE type can be one of several types and 
-can be defined by its SDDL short name or one of the constants available on the `LdapTools\Security\Ace\AceType` class.
-Available types defined on the AceType class include:
+When setting the ACE type explicitly you need to use the AceType object or the ACE type shortname. The ACE type can be 
+one of several types and can be defined by its SDDL short name or one of the constants available on the `LdapTools\Security\Ace\AceType` 
+class. Available types defined on the AceType class include:
 
 ```php
     const TYPE = [
@@ -406,6 +406,9 @@ $ace = new Ace('A');
 
 // Set the AceType by object, flipping it to a deny...
 $ace->setType(new AceType('D'));
+
+// Set the type by the shortname to flip it back to an allow...
+$ace->setType('A');
 ```
 
 ------------------------
