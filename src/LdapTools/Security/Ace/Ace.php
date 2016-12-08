@@ -272,7 +272,7 @@ class Ace
      */
     public function toBinary()
     {
-        $this->validateSid();
+        $this->validate();
 
         $binary = '';
         if ($this->objectFlags !== null) {
@@ -335,7 +335,7 @@ class Ace
      */
     public function toSddl()
     {
-        $this->validateSid();
+        $this->validate();
 
         return '('.implode(';', [
             $this->type,
@@ -358,7 +358,7 @@ class Ace
     /**
      * Some quick checks before going to SDDL or binary.
      */
-    protected function validateSid()
+    protected function validate()
     {
         if (!$this->trustee) {
             throw new LogicException('The ACE must have a trustee defined.');
