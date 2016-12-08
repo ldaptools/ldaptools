@@ -84,8 +84,9 @@ class AceSpec extends ObjectBehavior
 
     function it_should_set_the_AceType(AceType $aceType)
     {
-        $this->setType($aceType)->shouldReturnAnInstanceOf('LdapTools\Security\Ace\Ace');
-        $this->getType()->shouldBeEqualTo($aceType);
+        $this->setType($aceType)->getType()->shouldBeEqualTo($aceType);
+        $this->setType('D')->getType()->getShortName()->shouldBeEqualTo('D');
+
     }
 
     function it_should_parse_and_contain_the_object_type_GUID()

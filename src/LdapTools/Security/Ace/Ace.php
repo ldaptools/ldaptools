@@ -97,7 +97,7 @@ class Ace
      * @param AceType|string $type
      * @return $this
      */
-    public function setType(AceType $type)
+    public function setType($type)
     {
         $this->type = $type instanceof AceType ? $type : new AceType($type);
 
