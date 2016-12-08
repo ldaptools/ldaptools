@@ -138,22 +138,6 @@ class LdapObjectSchema
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getCacheName()
-    {
-        return $this->schemaName.'.'.$this->objectType;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public static function getCacheType()
-    {
-        return 'LdapObjectSchema';
-    }
-
-    /**
      * The name of the schema this object definition came from.
      *
      * @param string $schemaName
