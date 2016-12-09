@@ -69,7 +69,12 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Takes an array of email addresses and formats them properly for the proxyAddresses attribute.
   
   * `fromLdap`: Parses through the proxyAddresses attribute to return only the address portion for a specific address type.
+
+#### *exchange_recipient_type*
+  * `toLdap`: Takes an integer and maps it to the friendly display name of the recipient type info.
   
+  * `fromLdap`: Takes a friendly recipient type name and converts it to the integer value.
+
 #### *logon_workstations*
   * `toLdap`: Takes an array of computer names and formats it as a comma-separated list for LDAP.
   
