@@ -152,6 +152,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('exchange_recipient_type')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeRecipientType');
     }
 
+    function it_should_return_an_exchange_object_version_converter()
+    {
+        $this::get('exchange_object_version')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeObjectVersion');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo_bar');

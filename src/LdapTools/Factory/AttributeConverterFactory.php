@@ -48,6 +48,7 @@ class AttributeConverterFactory
         'exchange_version' => '\LdapTools\AttributeConverter\ConvertExchangeVersion',
         'exchange_roles' => '\LdapTools\AttributeConverter\ConvertExchangeRoles',
         'exchange_recipient_type' => '\LdapTools\AttributeConverter\ConvertExchangeRecipientType',
+        'exchange_object_version' => '\LdapTools\AttributeConverter\ConvertExchangeObjectVersion',
         'ldap_type' => '\LdapTools\AttributeConverter\ConvertLdapObjectType',
         'lockout_time' => '\LdapTools\AttributeConverter\ConvertLockoutTime',
     ];

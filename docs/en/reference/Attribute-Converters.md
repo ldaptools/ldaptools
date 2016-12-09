@@ -75,6 +75,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
   
   * `fromLdap`: Takes a friendly recipient type name and converts it to the integer value.
 
+#### *exchange_object_version*
+  * `toLdap`: Takes a friendly Exchange version (ie. 2013, 2016, etc) and maps it to the object version number.
+  
+  * `fromLdap`: Takes an Exchange object version number and maps it to the simple major version (ie. 2010, 2013).
+
 #### *logon_workstations*
   * `toLdap`: Takes an array of computer names and formats it as a comma-separated list for LDAP.
   
