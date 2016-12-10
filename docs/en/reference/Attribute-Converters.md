@@ -85,6 +85,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
   
   * `fromLdap`: Returns the unmodified legacyExchangeDn value.
 
+#### *exchange_recipient_policy*
+  * `toLdap`: Takes a set of recipient policies (dn, GUID, LdapObject) and converts it to the value needed for LDAP.
+  
+  * `fromLdap`: Converts the recipient policy GUIDs to their friendly policy names.
+
 #### *logon_workstations*
   * `toLdap`: Takes an array of computer names and formats it as a comma-separated list for LDAP.
   

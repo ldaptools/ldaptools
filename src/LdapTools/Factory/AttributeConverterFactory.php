@@ -48,6 +48,7 @@ class AttributeConverterFactory
         'exchange_version' => '\LdapTools\AttributeConverter\ConvertExchangeVersion',
         'exchange_roles' => '\LdapTools\AttributeConverter\ConvertExchangeRoles',
         'exchange_recipient_type' => '\LdapTools\AttributeConverter\ConvertExchangeRecipientType',
+        'exchange_recipient_policy' => '\LdapTools\AttributeConverter\ConvertExchangeRecipientPolicy',
         'exchange_object_version' => '\LdapTools\AttributeConverter\ConvertExchangeObjectVersion',
         'exchange_legacy_dn' => '\LdapTools\AttributeConverter\ConvertExchangeLegacyDn',
         'ldap_type' => '\LdapTools\AttributeConverter\ConvertLdapObjectType',
