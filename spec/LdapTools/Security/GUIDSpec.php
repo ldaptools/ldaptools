@@ -30,6 +30,15 @@ class GUIDSpec extends ObjectBehavior
         $this->toString()->shouldBeEqualTo('270db4d0-249d-46a7-9cc5-eb695d9af9ac');
     }
 
+    function it_should_allow_being_constructed_with_a_string_GUID()
+    {
+        $guid = '270db4d0-249d-46a7-9cc5-eb695d9af9ac';
+        $this->beConstructedWith($guid);
+
+        $this->toString()->shouldBeEqualTo($guid);
+        $this->toBinary()->shouldBeEqualTo(hex2bin('d0b40d279d24a7469cc5eb695d9af9ac'));
+    }
+
     function it_should_have_a_magic_to_string_function_that_outputs_the_friendly_string_name()
     {
         $this->__toString()->shouldBeEqualTo('270db4d0-249d-46a7-9cc5-eb695d9af9ac');
