@@ -59,7 +59,12 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Converts a PHP `\DateTime` object into a string representation of Windows time (nanoseconds).
   
   * `fromLdap`: Converts a Windows timestamp into a PHP `\DateTime` object.
+
+#### *windows_security*
+  * `toLdap`: Converts a SDDL string or `LdapTools\Security\SecurityDescriptor` object to binary format.
   
+  * `fromLdap`: Returns a `LdapTools\Security\SecurityDescriptor` object representing the binary data.
+
 #### *encode_windows_password*
   * `toLdap`: Encodes a string to its unicodePwd representation, which is a quote encased UTF-16LE encoded value.
   
