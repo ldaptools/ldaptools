@@ -45,7 +45,7 @@ class ConvertExchangeLegacyDn implements AttributeConverterInterface
             throw new AttributeConverterException('Unable to determine the legacyExchangeDn value. Verify your LDAP account has the correct permissions.');
         }
 
-        return $adminLegacyDn."cn=Recipients/cn=".str_replace('-', '', LdapUtilities::uuid4())."-".substr($value, strlen(self::AUTO));
+        return $adminLegacyDn."/cn=Recipients/cn=".str_replace('-', '', LdapUtilities::uuid4())."-".substr($value, strlen(self::AUTO));
     }
 
     /**

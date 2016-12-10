@@ -49,7 +49,7 @@ class ConvertExchangeLegacyDnSpec extends ObjectBehavior
             0 => [
                 'legacyExchangeDn' => [
                     'count' => 1,
-                    0 => "/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/",
+                    0 => "/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)",
                 ],
                 'count' => 1,
                 'dn' => "CN=foo,DC=foo,DC=bar",
