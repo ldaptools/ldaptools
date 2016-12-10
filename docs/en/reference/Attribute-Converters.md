@@ -80,6 +80,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
   
   * `fromLdap`: Takes an Exchange object version number and maps it to the simple major version (ie. 2010, 2013).
 
+#### *exchange_legacy_dn*
+  * `toLdap`: Should be passed the term `auto:username`. Where `username` is the actual username of the user.
+  
+  * `fromLdap`: Returns the unmodified legacyExchangeDn value.
+
 #### *logon_workstations*
   * `toLdap`: Takes an array of computer names and formats it as a comma-separated list for LDAP.
   
