@@ -32,7 +32,7 @@ class ConvertExchangeRecipientPolicy extends ConvertValueToDn
         $policies = [];
 
         foreach ($values as $value) {
-             $policies[] = (new GUID(parent::toLdap($value)))->toString();
+            $policies[] = (new GUID(parent::toLdap($value)))->toString();
         }
         /**
          * @todo This does not allow removing the auto update of email addresses...
