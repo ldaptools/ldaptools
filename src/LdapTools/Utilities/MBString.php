@@ -21,6 +21,16 @@ use LdapTools\Exception\InvalidArgumentException;
 class MBString
 {
     /**
+     * @var null|bool
+     */
+    protected static $isMbStringLoaded;
+
+    /**
+     * @var null|bool
+     */
+    protected static $isIntlLoaded;
+
+    /**
      * @var null|\Collator
      */
     protected static $collator;
@@ -116,9 +126,9 @@ class MBString
             }
 
             return $newValues;
-        } else {
-            return array_change_key_case($values);
         }
+
+        return array_change_key_case($values);
     }
 
     /**
@@ -129,7 +139,13 @@ class MBString
      */
     public static function array_change_value_case(array $values)
     {
-        return array_map(self::class.'::strtolower', $values);
+        $newValues = [];
+
+        foreach ($values as $key => $value) {
+            $newValues[$key] = self::strtolower($value);
+        }
+
+        return $newValues;
     }
 
     /**
@@ -159,7 +175,11 @@ class MBString
      */
     protected static function isMbstringLoaded()
     {
-        return extension_loaded('mbstring');
+        if (self::$isMbStringLoaded === null) {
+            self::$isMbStringLoaded = extension_loaded('mbstring');
+        }
+
+        return self::$isMbStringLoaded;
     }
 
     /**
@@ -169,7 +189,11 @@ class MBString
      */
     protected static function isIntlLoaded()
     {
-        return extension_loaded('intl');
+        if (self::$isIntlLoaded === null) {
+            self::$isIntlLoaded = extension_loaded('intl');
+        }
+
+        return self::$isIntlLoaded;
     }
 
     /**
