@@ -11,13 +11,14 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
-class ConvertUserAccountControlSpec extends ObjectBehavior
+class ConvertFlagsSpec extends ObjectBehavior
 {
     /**
      * @var QueryOperation
@@ -59,25 +60,28 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
      */
     protected $expectedOp;
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
         $config = new DomainConfiguration('foo.bar');
         $config->setBaseDn('dc=foo,dc=bar');
         $connection->getConfig()->willReturn($config);
         $options = [
-            'uacMap' => [
-                'disabled' => '2',
-                'enabled' => '2',
-                'passwordNeverExpires' => '65536',
-                'smartCardRequired' => '262144',
-                'trustedForAllDelegation' => '262144',
-                'trustedForAnyAuthDelegation' => '16777216',
-                'passwordIsReversible' => '128',
-            ],
-            'defaultValue' => '512',
-            'invert' => [
-                'enabled',
-            ],
+            'userAccountControl' => [
+                'attribute' => 'userAccountControl',
+                'flagMap' => [
+                    'disabled' => '2',
+                    'enabled' => '2',
+                    'passwordNeverExpires' => '65536',
+                    'smartCardRequired' => '262144',
+                    'trustedForAllDelegation' => '262144',
+                    'trustedForAnyAuthDelegation' => '16777216',
+                    'passwordIsReversible' => '128',
+                ],
+                'defaultValue' => '512',
+                'invert' => [
+                    'enabled',
+                ],
+            ]
         ];
         $this->setOptions($options);
         $this->setLdapConnection($connection);
@@ -92,7 +96,7 @@ class ConvertUserAccountControlSpec extends ObjectBehavior
 
     function it_is_initializable()
     {
-        $this->shouldHaveType('LdapTools\AttributeConverter\ConvertUserAccountControl');
+        $this->shouldHaveType('LdapTools\AttributeConverter\ConvertFlags');
     }
 
     function it_should_implement_AttributeConverterInterface()

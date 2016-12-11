@@ -17,18 +17,20 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
-            user_account_control:
-                defaultValue: '512'
-                uacMap:
-                    disabled: '2'
-                    enabled: '2'
-                    passwordIsReversible: '128'
-                    passwordNeverExpires: '65536'
-                    smartCardRequired: '262144'
-                    trustedForAllDelegation: '524288'
-                    trustedForAnyAuthDelegation: '16777216'
-                invert:
-                    - 'enabled'
+            flags:
+                userAccountControl:
+                    attribute: 'userAccountControl'
+                    defaultValue: '512'
+                    flagMap:
+                        disabled: '2'
+                        enabled: '2'
+                        passwordIsReversible: '128'
+                        passwordNeverExpires: '65536'
+                        smartCardRequired: '262144'
+                        trustedForAllDelegation: '524288'
+                        trustedForAnyAuthDelegation: '16777216'
+                    invert:
+                        - 'enabled'
             value_to_dn:
                 exchangeMailboxDatabase:
                     attribute: cn
@@ -89,7 +91,7 @@ objects:
                  - 'modified'
              windows_time:
                  - 'passwordLastSet'
-             user_account_control:
+             flags:
                  - 'disabled'
                  - 'enabled'
                  - 'passwordIsReversible'
@@ -349,7 +351,7 @@ objects:
              windows_generalized_time:
                  - 'created'
                  - 'modified'
-             user_account_control:
+             flags:
                  - 'disabled'
                  - 'enabled'
                  - 'trustedForAllDelegation'
@@ -362,16 +364,18 @@ objects:
                     attribute: sAMAccountName
                     filter:
                         objectClass: group
-            user_account_control:
-                # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
-                defaultValue: '4096'
-                uacMap:
-                    disabled: '2'
-                    enabled: '2'
-                    trustedForAllDelegation: '524288'
-                    trustedForAnyAuthDelegation: '16777216'
-                invert:
-                    - 'enabled'
+            flags:
+                userAccountControl:
+                    # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
+                    defaultValue: '4096'
+                    attribute: 'userAccountControl'
+                    flagMap:
+                        disabled: '2'
+                        enabled: '2'
+                        trustedForAllDelegation: '524288'
+                        trustedForAnyAuthDelegation: '16777216'
+                    invert:
+                        - 'enabled'
         attributes:
             accountName: sAMAccountName
             created: whenCreated

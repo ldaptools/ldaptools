@@ -65,22 +65,26 @@ class AttributeValueResolverSpec extends ObjectBehavior
             'groups' => 'memberOf',
         ]);
         $schema->setConverterMap([
-            'disabled' => 'user_account_control',
+            'disabled' => 'flags',
             'passwordMustChange' => 'password_must_change',
-            'trustedForAllDelegation' => 'user_account_control',
-            'passwordNeverExpires' => 'user_account_control',
+            'trustedForAllDelegation' => 'flags',
+            'passwordNeverExpires' => 'flags',
             'groups' => 'group_membership',
         ]);
         $schema->setConverterOptions([
-            'user_account_control' => [
-                'uacMap' => [
-                    'disabled' => '2',
-                    'passwordNeverExpires' => '65536',
-                    'smartCardRequired' => '262144',
-                    'trustedForAllDelegation' => '524288',
-                    'passwordIsReversible' => '128',
+            'flags' => [
+                'userAccountControl' => [
+                    'flagMap' => [
+                        'disabled' => '2',
+                        'passwordNeverExpires' => '65536',
+                        'smartCardRequired' => '262144',
+                        'trustedForAllDelegation' => '524288',
+                        'passwordIsReversible' => '128',
+                    ],
+                    'defaultValue' => '512',
+                    'attribute' => 'userAccountControl',
+                    'invert' => ['enabled']
                 ],
-                'defaultValue' => '512',
             ],
             'group_membership' => [
                 'groups' => [

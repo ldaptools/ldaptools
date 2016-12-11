@@ -34,7 +34,7 @@ class AttributeConverterFactory
         'windows_security' => '\LdapTools\AttributeConverter\ConvertWindowsSecurity',
         'encode_windows_password' => '\LdapTools\AttributeConverter\EncodeWindowsPassword',
         'password_must_change' => '\LdapTools\AttributeConverter\ConvertPasswordMustChange',
-        'user_account_control' => '\LdapTools\AttributeConverter\ConvertUserAccountControl',
+        'flags' => '\LdapTools\AttributeConverter\ConvertFlags',
         'value_to_dn' => '\LdapTools\AttributeConverter\ConvertValueToDn',
         'exchange_proxy_address' => '\LdapTools\AttributeConverter\ConvertExchangeProxyAddress',
         'logon_workstations' => '\LdapTools\AttributeConverter\ConvertLogonWorkstations',

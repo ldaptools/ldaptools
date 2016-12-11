@@ -29,7 +29,12 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Converts a PHP int to a string.
 
   * `fromLdap`: Converts a LDAP numeric string to a PHP int.
+
+#### *flags*
+  * `toLdap`: Takes a bool for the current attribute and flips the bit of the overall flag value going to LDAP.
   
+  * `fromLdap`: Returns a bool based on whether the current attribute bit is set in the flag value from LDAP.
+
 #### *generalized_time*
   * `toLdap`: Converts a PHP `\DateTime` object to a generalized timestamp string.
 

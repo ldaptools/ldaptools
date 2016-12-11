@@ -5,15 +5,18 @@ objects:
         category: person
         repository: '\Foo\Bar'
         converter_options:
-            user_account_control:
-                defaultValue: '512'
-                uacMap:
-                    disabled: '2'
-                    passwordIsReversible: '128'
-                    passwordNeverExpires: '65536'
-                    smartCardRequired: '262144'
-                    trustedForAllDelegation: '524288'
-                    trustedForAnyAuthDelegation: '16777216'
+            flags:
+                userAccountControl:
+                    attribute: userAccountControl
+                    defaultValue: '512'
+                    invert: [ 'enabled' ]
+                    flagMap:
+                        disabled: '2'
+                        passwordIsReversible: '128'
+                        passwordNeverExpires: '65536'
+                        smartCardRequired: '262144'
+                        trustedForAllDelegation: '524288'
+                        trustedForAnyAuthDelegation: '16777216'
             group_membership:
                 groups:
                     attribute: sAMAccountName
@@ -73,7 +76,7 @@ objects:
                  - 'modified'
              windows_time:
                  - 'passwordLastSet'
-             user_account_control:
+             flags:
                  - 'disabled'
                  - 'passwordIsReversible'
                  - 'passwordNeverExpires'
