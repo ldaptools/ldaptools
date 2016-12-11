@@ -216,6 +216,11 @@ class WildcardSpec extends ObjectBehavior
         $this->toLdapFilter()->shouldEqual('(foobar=stuff)');
     }
 
+    function it_should_get_the_wildcard_type()
+    {
+        $this->getWildcardType()->shouldBeEqualTo(Wildcard::CONTAINS);
+    }
+
     public function getMatchers()
     {
         return [

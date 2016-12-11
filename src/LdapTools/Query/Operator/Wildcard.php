@@ -74,6 +74,16 @@ class Wildcard extends Comparison
     }
 
     /**
+     * Get the wildcard type used by this operator.
+     *
+     * @return string
+     */
+    public function getWildcardType()
+    {
+        return $this->wildcardType;
+    }
+
+    /**
      * @deprecated Use the 'toLdapFilter()' method instead.
      * @param null $alias
      * @return string
