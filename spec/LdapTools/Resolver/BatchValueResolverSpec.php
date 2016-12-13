@@ -46,6 +46,21 @@ class BatchValueResolverSpec extends ObjectBehavior
     ];
 
     /**
+     * @var array
+     */
+    protected $expectedElcResult = [
+        'count' => 1,
+        0 => [
+            'msExchELCMailboxFlags' => [
+                'count' => 1,
+                0 => "2",
+            ],
+            'count' => 1,
+            'dn' => "CN=foo,DC=foo,DC=bar",
+        ],
+    ];
+
+    /**
      * @var LdapObjectSchema
      */
     protected $schema;
@@ -65,6 +80,9 @@ class BatchValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'pwdLastSet',
             'passwordNeverExpires' => 'userAccountControl',
             'trustedForAllDelegation' => 'userAccountControl',
+            'mrmEnabled' => 'msExchELCMailboxFlags',
+            'retentionHoldEnabled' => 'msExchELCMailboxFlags',
+            'litigationHoldEnabled' => 'msExchELCMailboxFlags',
             'groups' => 'memberOf',
         ]);
         $schema->setConverterMap([
@@ -72,6 +90,9 @@ class BatchValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'password_must_change',
             'trustedForAllDelegation' => 'flags',
             'passwordNeverExpires' => 'flags',
+            'litigationHoldEnabled' => 'flags',
+            'retentionHoldEnabled' => 'flags',
+            'mrmEnabled' => 'flags',
             'groups' => 'group_membership',
         ]);
         $schema->setConverterOptions([
@@ -87,7 +108,21 @@ class BatchValueResolverSpec extends ObjectBehavior
                     'attribute' => 'userAccountControl',
                     'invert' => ['enabled'],
                     'defaultValue' => '512',
-                ]
+                ],
+                'msExchELCMailboxFlags' => [
+                    'attribute' => 'msExchELCMailboxFlags',
+                    'defaultValue' => '0',
+                    'flagMap' => [
+                        'retentionHoldEnabled' => '1',
+                        'mrmEnabled' => '2',
+                        'calendarLoggingDisabled' => '4',
+                        'calendarLoggingEnabled' => '4',
+                        'litigationHoldEnabled' => '8',
+                        'singleItemRecoveryEnabled' => '16',
+                        'isArchiveDatabaseValid' => '32',
+                    ],
+                    'invert' => [ 'calendarLoggingEnabled' ],
+                ],
             ],
             'group_membership' => [
                 'groups' => [
@@ -117,6 +152,8 @@ class BatchValueResolverSpec extends ObjectBehavior
         $ldapObject = new LdapObject(...$this->ldapObjectOpts);
         $ldapObject->set('disabled', true);
         $ldapObject->set('trustedForAllDelegation', true);
+        $ldapObject->set('litigationHoldEnabled', true);
+        $ldapObject->set('retentionHoldEnabled', true);
         $ldapObject->set('username', 'foo');
         $ldapObject->add('emailAddress', 'chad.sikorra@gmail.com');
         $ldapObject->remove('phoneNumber','555-5555');
@@ -126,6 +163,11 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'userAccountControl',
             'modtype' => LDAP_MODIFY_BATCH_REPLACE,
             'values' => ["524802"]
+        ];
+        $elcBatch = [
+            'attrib' => 'msExchELCMailboxFlags',
+            'modtype' => LDAP_MODIFY_BATCH_REPLACE,
+            'values' => ["11"]
         ];
         $usernameBatch = [
             'attrib' => 'username',
@@ -146,20 +188,29 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
+
         $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(objectClass=*))'
                 && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
                 && $operation->getAttributes() == ['userAccountControl'];
         }))->willReturn($this->expectedResult);
+
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
+                && $operation->getAttributes() == ['msExchELCMailboxFlags'];
+        }))->willReturn($this->expectedElcResult);
+
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
-        $this->toLdap()->getBatchArray()->shouldHaveCount(5);
+        $this->toLdap()->getBatchArray()->shouldHaveCount(6);
         $this->toLdap()->getBatchArray()->shouldContain($uacBatch);
         $this->toLdap()->getBatchArray()->shouldContain($usernameBatch);
         $this->toLdap()->getBatchArray()->shouldContain($emailBatch);
         $this->toLdap()->getBatchArray()->shouldContain($phoneBatch);
         $this->toLdap()->getBatchArray()->shouldContain($pagerBatch);
+        $this->toLdap()->getBatchArray()->shouldContain($elcBatch);
     }
 
     public function it_should_error_trying_to_do_a_non_set_method_on_a_single_aggregated_value($connection)

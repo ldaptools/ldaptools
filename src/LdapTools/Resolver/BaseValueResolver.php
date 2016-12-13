@@ -182,6 +182,19 @@ abstract class BaseValueResolver
         $this->aggregated[] = $attribute;
         $converterName = $this->schema->getConverter($attribute);
         $toAggregate = array_keys($this->schema->getConverterMap(), $converterName);
+
+        /**
+         * Only aggregate values going back the same LDAP attribute, as it's possible for the a converter to have many
+         * different attributes assigned to it.
+         *
+         * @todo Probably a better way to do this...
+         */
+        $aggregateToLdap = $this->schema->getAttributeToLdap($attribute);
+        foreach ($toAggregate as $i => $aggregate) {
+            if ($this->schema->getAttributeToLdap($aggregate) !== $aggregateToLdap) {
+                unset($toAggregate[$i]);
+            }
+        }
         $values = $this->iterateAggregates($toAggregate, $values, $converter);
 
         return is_array($values) ? $values : [$values];

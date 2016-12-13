@@ -62,6 +62,9 @@ class AttributeValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'pwdLastSet',
             'passwordNeverExpires' => 'userAccountControl',
             'trustedForAllDelegation' => 'userAccountControl',
+            'mrmEnabled' => 'msExchELCMailboxFlags',
+            'retentionHoldEnabled' => 'msExchELCMailboxFlags',
+            'litigationHoldEnabled' => 'msExchELCMailboxFlags',
             'groups' => 'memberOf',
         ]);
         $schema->setConverterMap([
@@ -69,6 +72,9 @@ class AttributeValueResolverSpec extends ObjectBehavior
             'passwordMustChange' => 'password_must_change',
             'trustedForAllDelegation' => 'flags',
             'passwordNeverExpires' => 'flags',
+            'litigationHoldEnabled' => 'flags',
+            'retentionHoldEnabled' => 'flags',
+            'mrmEnabled' => 'flags',
             'groups' => 'group_membership',
         ]);
         $schema->setConverterOptions([
@@ -84,6 +90,20 @@ class AttributeValueResolverSpec extends ObjectBehavior
                     'defaultValue' => '512',
                     'attribute' => 'userAccountControl',
                     'invert' => ['enabled']
+                ],
+                'msExchELCMailboxFlags' => [
+                    'attribute' => 'msExchELCMailboxFlags',
+                    'defaultValue' => '0',
+                    'flagMap' => [
+                        'retentionHoldEnabled' => '1',
+                        'mrmEnabled' => '2',
+                        'calendarLoggingDisabled' => '4',
+                        'calendarLoggingEnabled' => '4',
+                        'litigationHoldEnabled' => '8',
+                        'singleItemRecoveryEnabled' => '16',
+                        'isArchiveDatabaseValid' => '32',
+                    ],
+                    'invert' => [ 'calendarLoggingEnabled' ],
                 ],
             ],
             'group_membership' => [
@@ -144,6 +164,8 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $entry['disabled'] = true;
         $entry['passwordNeverExpires'] = true;
         $entry['trustedForAllDelegation'] = true;
+        $entry['mrmEnabled'] = true;
+        $entry['litigationHoldEnabled'] = true;
         unset($entry['groups']);
 
         $connection->execute(new QueryOperation('(&(distinguishedName=\63\6e\3d\66\6f\6f\2c\64\63\3d\66\6f\6f\2c\64\63\3d\62\61\72)))', ['userAccountControl']))->willReturn($this->expectedResult);
@@ -153,6 +175,7 @@ class AttributeValueResolverSpec extends ObjectBehavior
         $this->setDn('cn=foo,dc=foo,dc=bar');
 
         $this->toLdap()->shouldHaveKeyWithValue('userAccountControl','590338');
+        $this->toLdap()->shouldHaveKeyWithValue('msExchELCMailboxFlags','10');
         $this->toLdap()->shouldHaveKeyWithValue('username','chad');
         $this->toLdap()->shouldHaveKeyWithValue('emailAddress','Chad.Sikorra@gmail.com');
         $this->toLdap()->shouldHaveKeyWithValue('passwordMustChange','0');
