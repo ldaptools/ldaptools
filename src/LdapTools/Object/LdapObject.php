@@ -53,7 +53,7 @@ class LdapObject
      * @param array $attributes
      * @param string $type
      */
-    public function __construct(array $attributes, $type = '')
+    public function __construct(array $attributes = [], $type = '')
     {
         $this->attributes = $attributes;
         $this->type = $type;

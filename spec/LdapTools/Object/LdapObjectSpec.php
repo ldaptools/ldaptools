@@ -32,6 +32,13 @@ class LdapObjectSpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Object\LdapObject');
     }
 
+    function it_should_be_constructable_with_no_attributes()
+    {
+        $this->beConstructedWith();
+
+        $this->toArray()->shouldBeEqualTo([]);
+    }
+
     function it_should_set_the_dn_for_the_batch_collection_on_construction()
     {
         $this->getBatchCollection()->getDn()->shouldBeEqualTo($this->attributes['dn']);
