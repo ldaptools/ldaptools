@@ -167,34 +167,35 @@ class OperationHydrator extends ArrayHydrator
         if (empty($location)) {
             throw new LogicException('You must specify a container or OU to place this LDAP object in.');
         }
-        $rdn = $this->getRdnFromAttributes(array_keys($operation->getAttributes()));
-        $rdnValue = LdapUtilities::escapeValue($operation->getAttributes()[$rdn], null, LDAP_ESCAPE_DN);
-        $location = $this->resolveParameters(['container' => $location])['container'];
-        $operation->setDn($rdn.'='.$rdnValue.','.$location);
+        // Handles a possible multi-valued RDN, where each RDN is pieced together with a '+'
+        $rdn = implode('+', array_map(function($rdn) use ($operation) {
+            return $rdn.'='.LdapUtilities::escapeValue($operation->getAttributes()[$rdn], null, LDAP_ESCAPE_DN);
+        }, $this->getRdnFromAttributes(array_keys($operation->getAttributes()))));
+        $operation->setDn($rdn.','.$this->resolveParameters(['container' => $location])['container']);
     }
 
     /**
      * Get the RDN attribute used to form the DN.
      *
      * @param array $attributes The attribute names.
-     * @return string
+     * @return array
      */
     protected function getRdnFromAttributes(array $attributes) {
-        $rdn = null;
+        $rdn = [];
         $rdnAttributes = MBString::array_change_value_case($this->schema->getRdn());
 
         foreach ($rdnAttributes as $rdnAttribute) {
             $rdnAttribute = $this->schema->getAttributeToLdap($rdnAttribute);
             foreach ($attributes as $attribute) {
                 if (MBString::strtolower($attribute) === $rdnAttribute) {
-                    $rdn = $attribute;
+                    $rdn[] = $attribute;
                 }
             }
         }
-        if (!$rdn) {
+        if (empty($rdn)) {
             throw new LogicException(sprintf(
                 'To create a LDAP object you must use a RDN attribute from the schema. It is needed to form the base of'
-                . ' the distinguished name. Expected one of these attributes: %s',
+                . ' the distinguished name. Expected one, or more, of these attributes: %s',
                 implode(', ', $this->schema->getRdn())
             ));
         }

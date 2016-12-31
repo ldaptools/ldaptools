@@ -97,6 +97,16 @@ class OperationHydratorSpec extends ObjectBehavior
         $this->hydrateToLdap($original1)->getDn()->shouldBeEqualTo('cn=John,ou=employees,dc=example,dc=local');
     }
 
+    function it_should_properly_construct_a_multivalued_RDN_for_an_add_operation($connection)
+    {
+        $this->setLdapObjectSchema((new LdapObjectSchema('foo', 'bar'))->setRdn(['cn', 'mail']));
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+        $this->setLdapConnection($connection);
+        $operation = (new AddOperation(null, ['cn' => 'foo', 'mail' => 'foo@bar.local']))->setLocation('dc=foo,dc=bar');
+
+        $this->hydrateToLdap($operation)->getDn()->shouldBeEqualTo('cn=foo+mail=foo@bar.local,dc=foo,dc=bar');
+    }
+
     function it_should_throw_an_exception_hydrating_an_add_operation_when_the_RDN_attribute_is_not_specified($connection)
     {
         $this->setLdapObjectSchema(new LdapObjectSchema('foo', 'bar'));
