@@ -442,3 +442,9 @@ objects:
             - 'lastKnownLocation'
             - 'lastKnownName'
             - 'sid'
+    custom_rdn:
+        type: CustomRDN
+        class: CustomRDN
+        rdn: foo
+        attributes:
+            name: cn

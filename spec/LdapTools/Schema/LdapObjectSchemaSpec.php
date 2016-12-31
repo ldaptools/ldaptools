@@ -284,4 +284,10 @@ class LdapObjectSchemaSpec extends ObjectBehavior
         $this->setControls($control1, $control2);
         $this->getControls()->shouldBeEqualTo([$control1, $control2]);
     }
+
+    function it_should_set_the_RDN()
+    {
+        $this->getRdn()->shouldBeEqualTo(['name']);
+        $this->setRdn(['foo'])->getRdn()->shouldBeEqualTo(['foo']);
+    }
 }

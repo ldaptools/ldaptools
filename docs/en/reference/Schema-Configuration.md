@@ -139,6 +139,15 @@ objectCategory value (`person`, `computer`, `contact`, etc) and will be used in 
 (along with the `class` definition above) when using this type.
 
 --------------------
+#### rdn
+
+This is the RDN attribute used to form the distinguished name of an object. You can define one or more attributes for
+this role. The attribute can either be the schema attribute name (which is then mapped to the actual LDAP attribute) or 
+just the LDAP attribute name itself.
+
+*Default*: `name` 
+
+--------------------
 #### attributes 
 
 These should be `key: value` pairs. Where the `key` is the name you would like the refer to the LDAP attribute by 

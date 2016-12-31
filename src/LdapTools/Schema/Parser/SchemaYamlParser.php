@@ -57,6 +57,14 @@ class SchemaYamlParser implements SchemaParserInterface
         'base_dn' => 'setBaseDn',
         'paging' => 'setUsePaging',
         'scope' => 'setScope',
+        'rdn' => 'setRdn',
+    ];
+
+    /**
+     * @var array
+     */
+    protected $normalizer = [
+        'rdn' => 'normalizeToArray',
     ];
 
     /**
@@ -138,9 +146,14 @@ class SchemaYamlParser implements SchemaParserInterface
         
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectSchema['type']);
         foreach ($this->optionMap as $option => $setter) {
-            if (array_key_exists($option, $objectSchema)) {
-                $ldapObjectSchema->$setter($objectSchema[$option]);
+            if (!array_key_exists($option, $objectSchema)) {
+                continue;
             }
+            $value = $objectSchema[$option];
+            if (array_key_exists($option, $this->normalizer)) {
+                $value = $this->{$this->normalizer[$option]}($value);
+            }
+            $ldapObjectSchema->$setter($value);
         }
         $ldapObjectSchema->setFilter($this->parseFilter($ldapObjectSchema, $objectSchema));
         $ldapObjectSchema->setAttributeMap(isset($objectSchema['attributes']) ? $objectSchema['attributes'] : []);
@@ -153,7 +166,7 @@ class SchemaYamlParser implements SchemaParserInterface
 
     /**
      * Validates some of the schema values to check that they are allowed.
-     * 
+     *
      * @param LdapObjectSchema $schema
      * @param array $schemaArray
      * @throws SchemaParserException
@@ -424,7 +437,7 @@ class SchemaYamlParser implements SchemaParserInterface
 
     /**
      * Performs the logic for merging one schema object array with another.
-     * 
+     *
      * @param array $parent The parent schema object being extended.
      * @param array $schema The base schema object being defined.
      * @return array
@@ -521,5 +534,14 @@ class SchemaYamlParser implements SchemaParserInterface
         }
 
         return $file;
+    }
+
+    /**
+     * @param mixed $value
+     * @return array
+     */
+    protected function normalizeToArray($value)
+    {
+        return is_array($value) ? $value : [$value];
     }
 }

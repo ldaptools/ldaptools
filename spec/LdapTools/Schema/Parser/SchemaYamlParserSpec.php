@@ -249,7 +249,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parseAll('example')->shouldBeArray();
-        $this->parseAll('example')->shouldHaveCount(14);
+        $this->parseAll('example')->shouldHaveCount(15);
         $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
     }
 
@@ -372,6 +372,19 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parse('example', 'UseR')->getObjectType()->shouldBeEqualTo('user');
+    }
+
+
+    function it_should_set_a_default_RDN_in_the_LdapObjectSchema_when_parsing()
+    {
+        $this->parse('ad', 'user')->getRdn()->shouldBeEqualTo(['name']);
+    }
+
+    function it_should_set_a_RDN_when_specified()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('example', 'CustomRDN')->getRdn()->shouldBeEqualTo(['foo']);
     }
 
     function getMatchers()

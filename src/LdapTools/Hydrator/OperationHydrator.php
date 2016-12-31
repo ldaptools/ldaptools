@@ -21,6 +21,7 @@ use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Utilities\LdapUtilities;
+use LdapTools\Utilities\MBString;
 
 /**
  * Converts LDAP operation data based on a schema and its properties.
@@ -159,32 +160,50 @@ class OperationHydrator extends ArrayHydrator
         if ($operation->getDn()) {
             return;
         }
-
         if (!$this->schema) {
             throw new LogicException("You must explicitly set the DN or specify a schema type.");
         }
-        if (!$this->schema->hasAttribute('name')) {
-            throw new LogicException(
-                'To create an object you must specify the name attribute in the schema. That attribute should typically'
-                .' map to the "cn" attribute, as it will use that as the base of the distinguished name.'
-            );
-        }
-
         $location = $operation->getLocation() ?: $this->schema->getDefaultContainer();
         if (empty($location)) {
             throw new LogicException('You must specify a container or OU to place this LDAP object in.');
         }
-        $attribute = $this->schema->getAttributeToLdap('name');
-        $rdnValue = LdapUtilities::escapeValue($operation->getAttributes()[$attribute], null, LDAP_ESCAPE_DN);
+        $rdn = $this->getRdnFromAttributes(array_keys($operation->getAttributes()));
+        $rdnValue = LdapUtilities::escapeValue($operation->getAttributes()[$rdn], null, LDAP_ESCAPE_DN);
         $location = $this->resolveParameters(['container' => $location])['container'];
+        $operation->setDn($rdn.'='.$rdnValue.','.$location);
+    }
 
-        $operation->setDn($attribute.'='.$rdnValue.','.$location);
+    /**
+     * Get the RDN attribute used to form the DN.
+     *
+     * @param array $attributes The attribute names.
+     * @return string
+     */
+    protected function getRdnFromAttributes(array $attributes) {
+        $rdn = null;
+        $rdnAttributes = MBString::array_change_value_case($this->schema->getRdn());
+
+        foreach ($rdnAttributes as $rdnAttribute) {
+            $rdnAttribute = $this->schema->getAttributeToLdap($rdnAttribute);
+            foreach ($attributes as $attribute) {
+                if (MBString::strtolower($attribute) === $rdnAttribute) {
+                    $rdn = $attribute;
+                }
+            }
+        }
+        if (!$rdn) {
+            throw new LogicException(sprintf(
+                'To create a LDAP object you must use a RDN attribute from the schema. It is needed to form the base of'
+                . ' the distinguished name. Expected one of these attributes: %s',
+                implode(', ', $this->schema->getRdn())
+            ));
+        }
+
+        return $rdn;
     }
 
     /**
      * Set some default parameters based off the connection.
-     *
-     * @return array
      */
     protected function setDefaultParameters()
     {

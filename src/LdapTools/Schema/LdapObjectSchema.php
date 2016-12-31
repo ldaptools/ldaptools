@@ -128,6 +128,11 @@ class LdapObjectSchema
     protected $scope;
 
     /**
+     * @var array
+     */
+    protected $rdn = ['name'];
+
+    /**
      * @param string $schemaName
      * @param string $objectType
      */
@@ -583,5 +588,28 @@ class LdapObjectSchema
     public function getScope()
     {
         return $this->scope;
+    }
+
+    /**
+     * Set the RDN attribute(s).
+     *
+     * @param array $rdn
+     * @return $this
+     */
+    public function setRdn(array $rdn)
+    {
+        $this->rdn = $rdn;
+
+        return $this;
+    }
+
+    /**
+     * Get the RDN attribute(s)
+     *
+     * @return array
+     */
+    public function getRdn()
+    {
+        return $this->rdn;
     }
 }

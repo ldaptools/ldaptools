@@ -39,16 +39,6 @@ class OperationHydratorSpec extends ObjectBehavior
     protected $schema;
 
     /**
-     * @var LdapConnectionInterface
-     */
-    protected $connection;
-
-    /**
-     * @var LdapObject
-     */
-    protected $rootDse;
-
-    /**
      * @var SchemaYamlParser
      */
     protected $parser;
@@ -105,6 +95,26 @@ class OperationHydratorSpec extends ObjectBehavior
         $this->hydrateToLdap($operation)->getAttributes()->shouldBeEqualTo($expected);
         $this->hydrateToLdap($original2)->getPostOperations()->shouldHaveCount(1);
         $this->hydrateToLdap($original1)->getDn()->shouldBeEqualTo('cn=John,ou=employees,dc=example,dc=local');
+    }
+
+    function it_should_throw_an_exception_hydrating_an_add_operation_when_the_RDN_attribute_is_not_specified($connection)
+    {
+        $this->setLdapObjectSchema(new LdapObjectSchema('foo', 'bar'));
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+        $this->setLdapConnection($connection);
+        $operation = (new AddOperation(null, ['foo' => 'bar']))->setLocation('dc=foo,dc=bar');
+
+        $this->shouldThrow('LdapTools\Exception\LogicException')->duringHydrateToLdap($operation);
+    }
+
+    function it_should_throw_an_exception_hydrating_an_add_operation_when_the_location_is_not_specified($connection)
+    {
+        $this->setLdapObjectSchema(new LdapObjectSchema('foo', 'bar'));
+        $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
+        $this->setLdapConnection($connection);
+        $operation = (new AddOperation(null, ['name' => 'foo']));
+
+        $this->shouldThrow('LdapTools\Exception\LogicException')->duringHydrateToLdap($operation);
     }
 
     function it_should_hydrate_a_modify_operation_to_ldap($connection)
