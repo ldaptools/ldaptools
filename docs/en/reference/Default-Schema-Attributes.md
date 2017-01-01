@@ -12,6 +12,7 @@ used when generating queries and returning data from LDAP.
   * [Containers](#ad-container-types)
   * [OUs](#ad-ou-types)
   * [Password Settings Objects](#ad-password-settings-objects-types)
+  * [Deleted Objects](#ad-deleted-objects-types)
 
 #### Exchange Schema
   * [Servers](#exchange-server-types)
