@@ -33,6 +33,29 @@ class LdapObjectCreationEvent extends Event
     protected $dn;
 
     /**
+     * @var null|string
+     */
+    protected $type;
+
+    /**
+     * @param string $name
+     * @param null|string $type
+     */
+    public function __construct($name, $type = null)
+    {
+        $this->type = $type;
+        parent::__construct($name);
+    }
+
+    /**
+     * @return null|string
+     */
+    public function getType()
+    {
+        return $this->type;
+    }
+
+    /**
      * Get the data to be sent to LDAP.
      *
      * @return array

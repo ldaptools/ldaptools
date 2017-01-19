@@ -233,11 +233,11 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $this->addOperation->setLocation('dc=foo,dc=bar');
         $connection->execute($this->addOperation)->willReturn(true);
 
-        $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
+        $beforeEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE, 'user');
         $beforeEvent->setContainer('dc=foo,dc=bar');
         $beforeEvent->setData(['username' => '%foo%', 'password' => '%bar%']);
         $beforeEvent->setDn('');
-        $afterEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE);
+        $afterEvent = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE, 'user');
         $afterEvent->setContainer('dc=foo,dc=bar');
         $afterEvent->setData(['username' => 'somedude', 'password' => '12345']);
         $afterEvent->setDn('cn=somedude,dc=foo,dc=bar');

@@ -125,8 +125,9 @@ $ldap->getEventDispatcher()->addListener(Event::LDAP_OBJECT_BEFORE_CREATE, funct
     $attributes = $event->getData();
     $container = $event->getContainer();
     $dn = $event->getDn();
+    $type = $event->getType();
      
-    if (!isset($attributes['title'])) {
+    if ($type === 'user' && !isset($attributes['title'])) {
         $attributes['title'] = "Pizza Maker";
         $event->setAttributes($attributes);
     }

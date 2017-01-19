@@ -59,4 +59,10 @@ class LdapObjectCreationEventSpec extends ObjectBehavior
         $this->setDn($dn);
         $this->getDn()->shouldBeEqualTo($dn);
     }
+
+    function it_should_get_the_type()
+    {
+        $this->beConstructedWith('foo', 'bar');
+        $this->getType()->shouldBeEqualTo('bar');
+    }
 }

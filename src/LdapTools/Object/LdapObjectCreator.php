@@ -279,7 +279,7 @@ class LdapObjectCreator
      */
     protected function triggerBeforeCreationEvent()
     {
-        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE);
+        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_BEFORE_CREATE, $this->schema ? $this->schema->getObjectType() : null);
         $event->setData($this->attributes);
         $event->setContainer($this->container);
         $event->setDn($this->dn);
@@ -298,7 +298,7 @@ class LdapObjectCreator
      */
     protected function triggerAfterCreationEvent(AddOperation $operation)
     {
-        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE);
+        $event = new LdapObjectCreationEvent(Event::LDAP_OBJECT_AFTER_CREATE, $this->schema ? $this->schema->getObjectType() : null);
         $event->setData((new ParameterResolver($this->attributes, $this->hydrator->getParameters()))->resolve());
         $event->setContainer($operation->getLocation());
         $event->setDn($operation->getDn());
