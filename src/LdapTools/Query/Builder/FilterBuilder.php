@@ -238,6 +238,32 @@ class FilterBuilder
     }
 
     /**
+     * Perform an extensible match.
+     *
+     * @param string|null $attribute
+     * @param string|null $rule
+     * @param mixed $value
+     * @param bool $dnFlag
+     * @return MatchingRule
+     */
+    public function match($attribute, $rule, $value, $dnFlag = false)
+    {
+        return new MatchingRule($attribute, $rule, $value, $dnFlag);
+    }
+
+    /**
+     * Perform a match for a specific DN part and value (ie. 'ou' === 'sales').
+     *
+     * @param string $part
+     * @param string $value
+     * @return MatchingRule
+     */
+    public function matchDn($part, $value)
+    {
+        return new MatchingRule($part, null, $value, true);
+    }
+
+    /**
      * Perform a bitwise AND operation against an attribute.
      *
      * @param string $attribute
@@ -246,7 +272,7 @@ class FilterBuilder
      */
     public function bitwiseAnd($attribute, $value)
     {
-        return new MatchingRule($attribute, MatchingRuleOid::BIT_AND, $value);
+        return $this->match($attribute, MatchingRuleOid::BIT_AND, $value);
     }
 
     /**
@@ -258,6 +284,6 @@ class FilterBuilder
      */
     public function bitwiseOr($attribute, $value)
     {
-        return new MatchingRule($attribute, MatchingRuleOid::BIT_OR, $value);
+        return $this->match($attribute, MatchingRuleOid::BIT_OR, $value);
     }
 }

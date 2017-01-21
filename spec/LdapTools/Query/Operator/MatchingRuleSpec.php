@@ -55,7 +55,7 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_throw_LdapQueryException_when_trying_to_set_the_operator_to_an_invalid_type()
     {
-        $ex = new LdapQueryException('Invalid operator symbol ">=". Valid operator symbols are: =');
+        $ex = new LdapQueryException('Invalid operator symbol ">=". Valid operator symbols are: :=');
         $this->shouldThrow($ex)->duringSetOperatorSymbol('>=');
     }
 
@@ -163,7 +163,51 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->setValue(new Comparison('foobar', '=', 'stuff'));
         $this->toLdapFilter()->shouldEqual('(foobar=stuff)');
     }
-    
+
+    function it_should_set_the_matching_rule()
+    {
+        $this->setRule('caseExactMatch')->getRule()->shouldBeEqualTo('caseExactMatch');
+    }
+
+    function it_should_set_the_dn_flag_when_specified()
+    {
+        $this->getUseDnFlag()->shouldBeEqualTo(false);
+        $this->setUseDnFlag(true)->getUseDnFlag()->shouldBeEqualTo(true);
+    }
+
+    function it_should_allow_for_only_a_rule_with_no_explicit_attribute()
+    {
+        $this->beConstructedWith(null, 'caseExactMatch', 'foo');
+        $this->toLdapFilter()->shouldBeEqualTo('(:caseExactMatch:=foo)');
+    }
+
+    function it_should_allow_for_only_an_attribute_and_value_specified()
+    {
+        $this->beConstructedWith('foo', null, 'bar');
+        $this->toLdapFilter()->shouldBeEqualTo('(foo:=bar)');
+    }
+
+    function it_should_throw_an_exception_if_neither_an_attribute_or_rule_was_specified()
+    {
+        $this->beConstructedWith(null, null, 'foo');
+
+        $this->shouldThrow('LdapTools\Exception\LdapQueryException')->duringToLdapFilter();
+    }
+
+    function it_should_allow_for_a_dn_flag_attribute_and_value()
+    {
+        $this->beConstructedWith('ou', null, 'Sales', true);
+
+        $this->toLdapFilter()->shouldBeEqualTo('(ou:dn:=Sales)');
+    }
+
+    function it_should_allow_for_a_dn_flag_matching_rule_and_value()
+    {
+        $this->beConstructedWith(null, '2.4.8.10', 'America', true);
+
+        $this->toLdapFilter()->shouldBeEqualTo('(:dn:2.4.8.10:=America)');
+    }
+
     public function getMatchers()
     {
         return [

@@ -14,31 +14,89 @@ use LdapTools\Exception\LdapQueryException;
 use LdapTools\Utilities\LdapUtilities;
 
 /**
- * Use LDAP matching rule OIDs.
+ * Represents a matching rule/extensible match.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
 class MatchingRule extends BaseOperator
 {
-    const SYMBOL = '=';
+    const SYMBOL = ':=';
+
+    /**
+     * Used in an extensible match to indicate the rule should operate against the DN RDNs.
+     */
+    const DN_FLAG = ':dn';
 
     /**
      * @var string
      */
-    protected $oid = '';
+    protected $rule;
 
     /**
-     * @param string $attribute
-     * @param string $oid
-     * @param mixed $value
+     * @var bool
      */
-    public function __construct($attribute, $oid, $value)
+    protected $useDnFlag = false;
+
+    /**
+     * @param string|null $attribute
+     * @param string|null $rule
+     * @param mixed $value
+     * @param bool $useDnFlag
+     */
+    public function __construct($attribute, $rule, $value, $useDnFlag = false)
     {
         $this->validOperators = [ self::SYMBOL ];
         $this->operatorSymbol = self::SYMBOL;
         $this->setAttribute($attribute);
         $this->value = $value;
-        $this->oid = $oid;
+        $this->rule = $rule;
+        $this->useDnFlag = $useDnFlag;
+    }
+
+    /**
+     * Get the matching rule.
+     *
+     * @return null|string
+     */
+    public function getRule()
+    {
+        return $this->rule;
+    }
+
+    /**
+     * Set the matching rule.
+     *
+     * @param null|string $rule
+     * @return $this
+     */
+    public function setRule($rule)
+    {
+        $this->rule = $rule;
+
+        return $this;
+    }
+
+    /**
+     * Set whether or not the DN flag should be used.
+     *
+     * @param bool $useDnFlag
+     * @return $this
+     */
+    public function setUseDnFlag($useDnFlag)
+    {
+        $this->useDnFlag = (bool) $useDnFlag;
+
+        return $this;
+    }
+
+    /**
+     * Whether or not the DN flag is being used.
+     *
+     * @return bool
+     */
+    public function getUseDnFlag()
+    {
+        return $this->useDnFlag;
     }
 
     /**
@@ -61,16 +119,20 @@ class MatchingRule extends BaseOperator
         if ($this->skipFilterForAlias($alias)) {
             return '';
         }
-        if (!LdapUtilities::isValidAttributeFormat($this->oid)) {
-            throw new LdapQueryException(sprintf('Matching rule "%s" is not a valid format.', $this->oid));
+        if ($this->rule && !LdapUtilities::isValidAttributeFormat($this->rule)) {
+            throw new LdapQueryException(sprintf('Matching rule "%s" is not a valid format.', $this->rule));
+        }
+        if (!$this->rule && empty($this->getAttribute())) {
+            throw new LdapQueryException('If you do not specify a matching rule, you must specify an attribute.');
         }
         if ($this->getValueForQuery($alias) instanceof BaseOperator) {
             return $this->getValueForQuery($alias)->toLdapFilter($alias);
         }
 
         return self::SEPARATOR_START
-            .$this->getAttributeToQuery($alias)
-            .':'.$this->oid.':'
+            .($this->getAttribute() ? $this->getAttributeToQuery($alias) : '')
+            .($this->useDnFlag ? self::DN_FLAG : '')
+            .($this->rule ? ':'.$this->rule : '')
             .$this->operatorSymbol
             .LdapUtilities::escapeValue($this->getValueForQuery($alias), null, LDAP_ESCAPE_FILTER)
             .self::SEPARATOR_END;

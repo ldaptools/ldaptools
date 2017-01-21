@@ -128,4 +128,15 @@ class FilterBuilderSpec extends ObjectBehavior
     {
         $this->gt('foo', '5')->toLdapFilter()->shouldBeEqualTo('(&(!(foo<=5))(foo=*))');
     }
+
+    function it_should_correctly_format_a_generic_matching_rule()
+    {
+        $this->match('foo', 'caseExact', 'bar')->toLdapFilter()->shouldBeEqualTo('(foo:caseExact:=bar)');
+        $this->match(null, '2.4.8.10', 'America', true)->toLdapFilter()->shouldBeEqualTo('(:dn:2.4.8.10:=America)');
+    }
+
+    function it_should_correctly_format_a_match_dn_filter()
+    {
+        $this->matchDn('ou', 'Sales')->toLdapFilter()->shouldBeEqualTo('(ou:dn:=Sales)');
+    }
 }

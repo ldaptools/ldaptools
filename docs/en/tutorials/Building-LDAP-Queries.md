@@ -701,6 +701,26 @@ $lqb->filter()->geq('badPasswordCount', 3);
 ```
 
 ------------------------
+#### match($attribute, $rule, $value, $dnFlag = false)
+
+Creates an extensible match against an attribute or dn: `(attribute:caseExactMatch:=value)`
+
+```php
+$lqb->filter()->match('name', 'caseExactMatch', 'Chad');
+```
+
+------------------------
+#### matchDn($attribute, $value)
+
+Creates an extensible match with the DN flag. This can help in searching multiple OUs: `(ou:dn:=Sales)`
+
+**Note**: AD Does not support this aspect of the extensible match.
+
+```php
+$lqb->filter()->matchDn('ou', 'Sales');
+```
+
+------------------------
 #### bitwiseAnd($attribute, $value)
 
 Creates a bitwise 'AND' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.803:=value)`
