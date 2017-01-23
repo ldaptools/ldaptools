@@ -49,6 +49,9 @@ use LdapTools\Object\LdapObjectType;
 
 $repository = $ldap->getRepository(LdapObjectType::USER);
 
+// Retrieve all users in this repository.
+$users = $repository->findAll();
+
 // Retrieve the user that has a specific GUID.
 $user = $repository->findOneByGuid('29d46992-a5c4-4dc2-ac51-ac432db2a078');
 
