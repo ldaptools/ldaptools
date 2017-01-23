@@ -72,6 +72,14 @@ class LdapObjectRepository
 
         return  $this->hydrationMode ? $query->getSingleResult($this->hydrationMode) : $query->getSingleResult();
     }
+    
+    /**
+     * @return mixed
+     */
+    public function findAll()
+    {
+        return $this->findBy(array());
+    }
 
     /**
      * Determines which method to actually call.
