@@ -16,20 +16,37 @@ use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Utilities\Dns;
 use LdapTools\Utilities\TcpSocket;
 use PhpSpec\ObjectBehavior;
+use Prophecy\Argument;
 
 class LdapServerPoolSpec extends ObjectBehavior
 {
     protected $servers = [ 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p' ];
 
-    public function let()
+    public function let(TcpSocket $tcp)
     {
+        $tcp->close()->willReturn($tcp);
         $config = new DomainConfiguration('example.com');
-        $this->beConstructedWith($config);
+        $this->beConstructedWith($config, $tcp);
     }
 
     function it_is_initializable()
     {
         $this->shouldHaveType('LdapTools\Connection\LdapServerPool');
+    }
+
+    function it_should_set_the_domain_config($tcp)
+    {
+        $config = (new DomainConfiguration('foo.bar'))->setServers(['foo']);
+        $tcp->connect('foo', Argument::any(), Argument::any())->willReturn(true);
+
+        $this->setConfig($config)->getServer()->shouldBeEqualTo('foo');
+    }
+
+    function it_should_be_able_to_check_if_a_specific_server_is_available($tcp)
+    {
+        $tcp->connect('foobar', Argument::any(), Argument::any())->shouldBeCalled()->willReturn(true);
+
+        $this->isServerAvailable('foobar')->shouldBeEqualTo(true);
     }
 
     function it_should_have_a_SELECT_ORDER_constant()

@@ -67,6 +67,19 @@ class LdapServerPool
     }
 
     /**
+     * Set the domain configuration to use.
+     *
+     * @param DomainConfiguration $config
+     * @return $this
+     */
+    public function setConfig(DomainConfiguration $config)
+    {
+        $this->config = $config;
+
+        return $this;
+    }
+
+    /**
      * Retrieve the first available LDAP server.
      *
      * @return string
@@ -83,6 +96,22 @@ class LdapServerPool
         }
 
         throw new LdapConnectionException('No LDAP server is available.');
+    }
+
+    /**
+     * Check if a LDAP server is up and available.
+     *
+     * @param string $server
+     * @return bool
+     */
+    public function isServerAvailable($server)
+    {
+        $result = $this->tcp->connect($server, $this->config->getPort(), $this->config->getConnectTimeout());
+        if ($result) {
+            $this->tcp->close();
+        }
+
+        return $result;
     }
 
     /**
@@ -123,22 +152,6 @@ class LdapServerPool
         }
 
         return $servers;
-    }
-
-    /**
-     * Check if a LDAP server is up and available.
-     *
-     * @param string $server
-     * @return bool
-     */
-    protected function isServerAvailable($server)
-    {
-        $result = $this->tcp->connect($server, $this->config->getPort(), $this->config->getConnectTimeout());
-        if ($result) {
-            $this->tcp->close();
-        }
-
-        return $result;
     }
 
     /**
