@@ -78,7 +78,9 @@ class LdapObjectRepository
      */
     public function findAll()
     {
-        return $this->findBy(array());
+        $query = $this->buildLdapQuery()->getLdapQuery();
+
+        return  $this->hydrationMode ? $query->execute($this->hydrationMode) : $query->execute();
     }
 
     /**
