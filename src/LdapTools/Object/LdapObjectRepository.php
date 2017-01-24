@@ -105,12 +105,6 @@ class LdapObjectRepository
         $method = $matches[1];
         $attribute = lcfirst($matches[2]);
 
-        if (!$this->schema->hasAttribute($attribute)) {
-            throw new \RuntimeException(
-                sprintf('To call "%s" you must define the attribute "%s" in your schema.', $method, $attribute)
-            );
-        }
-
         if (1 == count($arguments)) {
             return $this->$method([ $attribute => $arguments[0] ]);
         } else {

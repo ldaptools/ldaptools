@@ -116,14 +116,9 @@ class LdapObjectRepositorySpec extends ObjectBehavior
         $this->findAll()->shouldReturnAnInstanceOf('\LdapTools\Object\LdapObjectCollection');
     }
 
-    function it_should_error_when_calling_findOneByFooBar()
+    function it_should_not_error_when_the_attribute_is_not_in_the_schema()
     {
-        $this->shouldThrow('\RuntimeException')->duringfindOneByFooBar('test');
-    }
-
-    function it_should_error_when_calling_findByFooBar()
-    {
-        $this->shouldThrow('\RuntimeException')->duringfindOneByFooBar('test');
+        $this->findByFooBar('test')->shouldHaveCount(2);
     }
 
     function it_should_set_default_attributes_when_calling_setAttributes()
