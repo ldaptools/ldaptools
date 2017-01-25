@@ -166,7 +166,17 @@ class LdapUtilitiesSpec extends ObjectBehavior
     {
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');
     }
-
+    
+    function it_should_get_the_parent_of_a_dn()
+    {
+        $this::getParentDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('dc=example,dc=com');
+    }
+    
+    function it_should_throw_an_error_when_there_is_no_parent_dn()
+    {
+        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->during('getParentDn', ['o=foo']);
+    }
+    
     function it_should_mask_passwords_and_binary_in_an_array_of_attributes_and_values()
     {
         $attributes = [

@@ -362,6 +362,22 @@ class LdapUtilities
     }
 
     /**
+     * Return the parent of a given DN.
+     *
+     * @param string $dn
+     */
+    public function getParentDn($dn)
+    {
+        $parts = self::explodeDn($dn, 0);
+        if (count($parts) === 1) {
+            throw new InvalidArgumentException(sprintf('DN "%s" has no parent.', $dn));
+        }
+        array_shift($parts);
+    
+        return self::implodeDn($parts);
+    }
+    
+    /**
      * Generate a UUIDv4 string.
      *
      * @return string
