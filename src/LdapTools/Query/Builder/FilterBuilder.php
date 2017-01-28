@@ -44,11 +44,11 @@ class FilterBuilder
         
         return $filterBuilder;
     }
-    
+
     /**
      * A logical AND operator.
      *
-     * @param ...$op
+     * @param mixed ...$op
      * @return bAnd
      */
     public function bAnd(...$op)
@@ -59,7 +59,7 @@ class FilterBuilder
     /**
      * A logical OR operator.
      *
-     * @param ...$op
+     * @param array ...$op
      * @return bOr
      */
     public function bOr(...$op)
