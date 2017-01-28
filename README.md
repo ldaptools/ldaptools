@@ -22,7 +22,8 @@ composer require ldaptools/ldaptools
 
 ### Getting Started
 
-The easiest way to get started is by creating a YAML config file. See the [example config](resources/config/example.yml) file for basic usage.
+The easiest way to get started is by creating a YAML config file. See the [example config](resources/config/example.yml) file for basic usage. See the 
+[configuration file reference doc](/docs/en/reference/Main-Configuration.md) for a list of all available options.
 
 Once you have a configuration file defined, you can get up and running by doing the following:
 
