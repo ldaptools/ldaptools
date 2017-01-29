@@ -139,4 +139,9 @@ class FilterBuilderSpec extends ObjectBehavior
     {
         $this->matchDn('ou', 'Sales')->toLdapFilter()->shouldBeEqualTo('(ou:dn:=Sales)');
     }
+
+    function it_should_correctly_format_an_in_filter()
+    {
+        $this->in('id', [1, 2, 3, 4, 5])->toLdapFilter()->shouldBeEqualTo('(|(id=1)(id=2)(id=3)(id=4)(id=5))');
+    }
 }

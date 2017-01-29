@@ -79,6 +79,20 @@ class FilterBuilder
     }
 
     /**
+     * Check if an attribute value matches any of the values in the list of values provided.
+     *
+     * @param string $attribute
+     * @param array $values
+     * @return bOr
+     */
+    public function in($attribute, array $values)
+    {
+        return new bOr(...array_map(function($v) use ($attribute) {
+            return $this->eq($attribute, $v);
+        }, $values));
+    }
+
+    /**
      * An equal-to comparison.
      *
      * @param $attribute

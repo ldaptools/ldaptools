@@ -721,6 +721,16 @@ $lqb->filter()->matchDn('ou', 'Sales');
 ```
 
 ------------------------
+#### in($attribute, array $values)
+
+Check if an attribute value matches any of the values in the list of values provided. This is a shortcut for a multiple
+OR condition: `(|(id=1)(id=2)(id=3)(id=4)(id=5))`
+
+```php
+$lqb->filter()->in('id', [1, 2, 3, 4, 5]);
+```
+
+------------------------
 #### bitwiseAnd($attribute, $value)
 
 Creates a bitwise 'AND' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.803:=value)`
