@@ -1,0 +1,43 @@
+build: off
+shallow_clone: false
+platform: 'x64'
+clone_folder: c:\projects\ldaptools
+
+cache:
+  - '%APPDATA%\Composer'
+
+environment:
+  global:
+    PHP: "C:/PHP"
+  matrix:
+    - PHP_VERSION: "5.6"
+    - PHP_VERSION: "7.0"
+    - PHP_VERSION: "7.1"
+
+matrix:
+  fast_finish: true
+  allow_failures:
+    - PHP_VERSION: "5.6"
+
+install:
+  - ps: appveyor-retry cinst --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $Env:PHP_VERSION | Select-Object -first 1) -replace '[php|]','')
+  - SET PATH=C:\tools\php\;%PATH%
+  - cd c:\tools\php
+  - copy php.ini-development php.ini
+  - echo date.timezone="UTC" >> php.ini
+  - echo extension_dir=ext >> php.ini
+  - echo extension=php_openssl.dll >> php.ini
+  - echo extension=php_intl.dll >> php.ini
+  - echo extension=php_mbstring.dll >> php.ini
+  - echo extension=php_curl.dll >> php.ini
+  - echo extension=php_ldap.dll >> php.ini
+  - cd C:\projects\ldaptools
+  - php -r "readfile('https://getcomposer.org/installer');" | php
+
+before_test:
+  - cd C:\projects\ldaptools
+  - php composer.phar install --no-interaction --no-progress --optimize-autoloader --prefer-source --no-ansi
+
+test_script:
+  - cd C:\projects\ldaptools
+  - bin\phpspec.bat run
