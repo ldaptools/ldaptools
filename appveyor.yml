@@ -20,7 +20,7 @@ matrix:
     - PHP_VERSION: "5.6"
 
 install:
-  - ps: appveyor-retry cinst --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $Env:PHP_VERSION | Select-Object -first 1) -replace '[php|]','')
+  - ps: appveyor-retry cinst --ignore-checksums -y php --version ([string](choco search php --exact --all-versions -r | Select-String -Pattern $Env:PHP_VERSION | % { New-Object System.Version(($_ -split '\|')[1]) } | Sort -Descending | Select-Object -First 1))
   - SET PATH=C:\tools\php\;%PATH%
   - cd c:\tools\php
   - copy php.ini-development php.ini
