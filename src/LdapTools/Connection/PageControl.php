@@ -101,7 +101,7 @@ class PageControl
         if ($this->sizeLimit && ($this->resultNumber + $this->pageSize) > $this->sizeLimit) {
             $this->pageSize = $this->sizeLimit - $this->resultNumber;
         }
-        if (!@ldap_control_paged_result($this->connection->getConnection(), $this->pageSize, false, $this->cookie)) {
+        if (!@ldap_control_paged_result($this->connection->getResource(), $this->pageSize, false, $this->cookie)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to enable paged results: %s',
                 $this->connection->getLastError()
@@ -121,7 +121,7 @@ class PageControl
             return;
         }
         $this->resultNumber += $this->pageSize;
-        if (!@ldap_control_paged_result_response($this->connection->getConnection(), $result, $this->cookie)) {
+        if (!@ldap_control_paged_result_response($this->connection->getResource(), $result, $this->cookie)) {
             throw new LdapConnectionException(
                 sprintf('Unable to set paged results response: %s', $this->connection->getLastError())
             );
@@ -137,7 +137,7 @@ class PageControl
     {
         // Per RFC 2696, to abandon a paged search you should send a size of 0 along with the cookie used in the search.
         // However, testing this it doesn't seem to completely work. Perhaps a PHP bug?
-        if (!@ldap_control_paged_result($this->connection->getConnection(), 0, false, $this->cookie)) {
+        if (!@ldap_control_paged_result($this->connection->getResource(), 0, false, $this->cookie)) {
             throw new LdapConnectionException(sprintf(
                 'Unable to reset paged results control for read operation: %s',
                 $this->connection->getLastError()

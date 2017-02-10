@@ -35,7 +35,7 @@ class LdapOperationInvokerSpec extends ObjectBehavior
     function let(LdapConnectionInterface $connection, EventDispatcherInterface $dispatcher, LdapLoggerInterface $logger)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
-        $connection->getConnection()->willReturn(null);
+        $connection->getResource()->willReturn(null);
         $connection->isBound()->willReturn(true);
         $connection->getServer()->willReturn('foo');
         $connection->getIdleTime()->willReturn(1);

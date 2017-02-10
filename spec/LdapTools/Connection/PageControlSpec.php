@@ -45,7 +45,7 @@ class PageControlSpec extends ObjectBehavior
     function it_should_not_call_paging_operations_when_it_is_disabled($connection)
     {
         $this->setIsEnabled(false);
-        $connection->getConnection()->shouldNotBeCalled();
+        $connection->getResource()->shouldNotBeCalled();
 
         $this->start(10);
         $this->update(null);

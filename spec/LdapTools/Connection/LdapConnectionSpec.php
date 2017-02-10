@@ -77,7 +77,7 @@ class LdapConnectionSpec extends ObjectBehavior
 
     function it_should_have_a_method_to_get_the_connection_resource()
     {
-        $this->getConnection()->shouldBeEqualTo(null);
+        $this->getResource()->shouldBeEqualTo(null);
     }
     
     function it_should_get_an_idle_time_of_0_when_it_has_not_been_connected()

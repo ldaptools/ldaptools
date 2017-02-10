@@ -54,7 +54,7 @@ class QueryOperationHandler implements OperationHandlerInterface
 
             $result = @call_user_func(
                 $operation->getLdapFunction(),
-                $this->connection->getConnection(),
+                $this->connection->getResource(),
                 ...$operation->getArguments()
             );
             $allEntries = $this->processSearchResult($result, $allEntries);
@@ -131,7 +131,7 @@ class QueryOperationHandler implements OperationHandlerInterface
             ));
         }
 
-        $entries = @ldap_get_entries($this->connection->getConnection(), $result);
+        $entries = @ldap_get_entries($this->connection->getResource(), $result);
         if (!$entries) {
             return $allEntries;
         }

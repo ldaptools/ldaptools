@@ -33,7 +33,7 @@ class OperationHandler implements OperationHandlerInterface
     {
         $result = @call_user_func(
             $operation->getLdapFunction(),
-            $this->connection->getConnection(),
+            $this->connection->getResource(),
             ...$operation->getArguments()
         );
 

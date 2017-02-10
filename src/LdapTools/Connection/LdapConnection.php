@@ -125,7 +125,7 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function getConnection()
+    public function getResource()
     {
         return $this->connection;
     }

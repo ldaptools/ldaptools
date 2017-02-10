@@ -33,7 +33,7 @@ interface LdapConnectionInterface
      *
      * @return resource
      */
-    public function getConnection();
+    public function getResource();
 
     /**
      * Connect and bind to LDAP.
