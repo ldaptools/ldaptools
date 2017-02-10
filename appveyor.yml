@@ -5,27 +5,18 @@ clone_folder: c:\projects\ldaptools
 
 environment:
   matrix:
-    - PHP_VERSION: "5.6.17"
-    - PHP_VERSION: "7.0.9"
-    - PHP_VERSION: "7.1.1"
+    - PHP_VERSION: "5.6"
+    - PHP_VERSION: "7.0"
+    - PHP_VERSION: "7.1"
 
 matrix:
   allow_failures:
-    - PHP_VERSION: "5.6.17"
+    - PHP_VERSION: "5.6"
 
 install:
-  - ps: Set-Service wuauserv -StartupType "Automatic"; Start-Service wuauserv
-  - ps: appveyor-retry cinst --ignore-checksums -y php --version $Env:PHP_VERSION
-  - SET PATH=C:\tools\php\;%PATH%
-  - cd c:\tools\php
-  - copy php.ini-development php.ini
-  - echo date.timezone="UTC" >> php.ini
-  - echo extension_dir=ext >> php.ini
-  - echo extension=php_openssl.dll >> php.ini
-  - echo extension=php_intl.dll >> php.ini
-  - echo extension=php_mbstring.dll >> php.ini
-  - echo extension=php_curl.dll >> php.ini
-  - echo extension=php_ldap.dll >> php.ini
+  - ps: Invoke-WebRequest "https://raw.githubusercontent.com/ChadSikorra/ps-install-php/master/Install-PHP.ps1" -OutFile "Install-PHP.ps1"
+  - ps: .\Install-PHP.ps1 -Version $Env:PHP_VERSION -Highest -Arch x64 -Extensions ldap,mbstring,intl,openssl
+  - refreshenv
   - cd C:\projects\ldaptools
   - php -r "readfile('https://getcomposer.org/installer');" | php
 
