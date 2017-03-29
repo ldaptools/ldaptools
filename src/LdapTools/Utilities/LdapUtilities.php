@@ -365,8 +365,9 @@ class LdapUtilities
      * Return the parent of a given DN.
      *
      * @param string $dn
+     * @return string
      */
-    public function getParentDn($dn)
+    public static function getParentDn($dn)
     {
         $parts = self::explodeDn($dn, 0);
         if (count($parts) === 1) {
