@@ -26,6 +26,7 @@ use LdapTools\Factory\LdapObjectSchemaFactory;
 use LdapTools\Hydrator\OperationHydrator;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\DeleteOperation;
+use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Operation\RenameOperation;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Utilities\LdapUtilities;
@@ -175,6 +176,8 @@ class LdapObjectManager
         $operation = new BatchModifyOperation($dn, $ldapObject->getBatchCollection());
         $this->hydrateOperation($operation, $ldapObject->getType());
         $this->connection->execute($operation);
+        $this->refreshDnIfNeeded($operation, $ldapObject);
+
         $ldapObject->setBatchCollection(new BatchCollection($ldapObject->get('dn')));
     }
     
@@ -241,12 +244,43 @@ class LdapObjectManager
     protected function hydrateOperation(BatchModifyOperation $operation, $type)
     {
         $this->hydrator->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        if ($type) {
-            $this->hydrator->setLdapObjectSchema($this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $type));
-        }
+        $this->hydrator->setLdapObjectSchema($type ? $this->schemaFactory->get($this->connection->getConfig()->getSchemaName(), $type) : null);
         $this->hydrator->hydrateToLdap($operation);
-        if ($type) {
-            $this->hydrator->setLdapObjectSchema(null);
+        $this->hydrator->setLdapObjectSchema(null);
+    }
+
+    /**
+     * Based on the operation type, refresh the DN if needed. The order is important here. Older 'pre' operations are
+     * refreshed first, then the operation itself, and finally any 'post' operations.
+     *
+     * @param LdapOperationInterface $operation
+     * @param LdapObject $ldapObject
+     */
+    protected function refreshDnIfNeeded(LdapOperationInterface $operation, LdapObject $ldapObject)
+    {
+        foreach ($operation->getPreOperations() as $childOp) {
+            $this->refreshDnIfNeeded($childOp, $ldapObject);
         }
+
+        if ($operation instanceof RenameOperation) {
+            $ldapObject->refresh(['dn' => $this->getNewDnFromOperation($operation, $ldapObject)]);
+        }
+
+        foreach ($operation->getPostOperations() as $childOp) {
+            $this->refreshDnIfNeeded($childOp, $ldapObject);
+        }
+    }
+
+    /**
+     * @param RenameOperation $operation
+     * @param LdapObject $ldapObject
+     * @return string
+     */
+    protected function getNewDnFromOperation(RenameOperation $operation, LdapObject $ldapObject)
+    {
+        $rdn = $operation->getNewRdn() ?: LdapUtilities::getRdnFromDn($ldapObject->get('dn'));
+        $parentDn = $operation->getNewLocation() ?: LdapUtilities::getParentDn($ldapObject->get('dn'));
+
+        return $rdn.','.$parentDn;
     }
 }

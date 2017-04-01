@@ -22,6 +22,7 @@ use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\QueryOperation;
+use LdapTools\Operation\RenameOperation;
 use LdapTools\Query\Builder\FilterBuilder;
 use LdapTools\Query\LdapQuery;
 use LdapTools\Query\Operator\Comparison;
@@ -368,5 +369,20 @@ class OperationHydratorSpec extends ObjectBehavior
     function it_should_only_support_an_operation_going_to_ldap()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringHydrateToLdap('foo');
+    }
+
+    function it_should_add_rename_operations_when_hydrating_a_batch_operation_with_rdn_changes($connection)
+    {
+        $this->setLdapObjectSchema($this->schema);
+        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
+        $this->setLdapConnection($connection);
+
+        $dn = 'cn=foo,dc=example,dc=local';
+        $batches = new BatchCollection($dn);
+        $batches->add(new Batch(Batch::TYPE['REPLACE'], 'name', 'bar'));
+        $batches->add(new Batch(Batch::TYPE['REMOVE'], 'office', 'foo'));
+        $operation = (new BatchModifyOperation($dn, $batches));
+
+        $this->hydrateToLdap($operation)->getPostOperations()->shouldBeLike([new RenameOperation($dn, 'cn=bar')]);
     }
 }

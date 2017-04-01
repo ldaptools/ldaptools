@@ -317,4 +317,18 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->execute(new BatchModifyOperation($dn, $batch))->shouldBeCalled();
         $this->persist($ldapObject);
     }
+
+    function it_should_perform_rename_operations_when_an_RDN_change_is_persisted($connection)
+    {
+        $dn = 'cn=user,dc=foo,dc=bar';
+        $ldapObject = new LdapObject(['dn' => 'cn=user,dc=foo,dc=bar'], 'user');
+        $ldapObject->set('name', 'The, Dude');
+
+        $batch = new BatchCollection($dn);
+        $operation = new BatchModifyOperation($dn, $batch);
+        $operation->addPostOperation(new RenameOperation($dn, 'cn=The\2c Dude'));
+
+        $connection->execute($operation)->shouldBeCalled();
+        $this->persist($ldapObject);
+    }
 }

@@ -17,6 +17,7 @@ use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\LdapOperationInterface;
 use LdapTools\Operation\QueryOperation;
+use LdapTools\Operation\RenameOperation;
 use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
@@ -95,6 +96,7 @@ class OperationHydrator extends ArrayHydrator
     {
         $batches = $this->convertValuesToLdap($operation->getBatchCollection(), $operation->getDn());
 
+        $this->addRdnRenameOperations($operation);
         foreach ($batches as $batch) {
             /** @var \LdapTools\BatchModify\Batch $batch */
             $batch->setAttribute(
@@ -201,6 +203,34 @@ class OperationHydrator extends ArrayHydrator
         }
 
         return $rdn;
+    }
+
+    /**
+     * @todo Still undecided if this should stay here. Should probably be an Attribute Converter that implements an
+     *       operation generator. However, there is no way to access the schema in a converter. This also only supports
+     *       straight renames. How to handle multivalued RDNs properly?
+     * @param BatchModifyOperation $operation
+     */
+    protected function addRdnRenameOperations(BatchModifyOperation $operation)
+    {
+        if (!$this->schema) {
+            return;
+        }
+
+        foreach ($this->schema->getRdn() as $rdn) {
+            /** @var \LdapTools\BatchModify\Batch $batch */
+            foreach ($operation->getBatchCollection() as $index => $batch) {
+                if (MBString::strtolower($rdn) === MBString::strtolower($batch->getAttribute()) && $batch->isTypeReplace()) {
+                    $newRdn = $this->schema->getAttributeToLdap($rdn).'='.LdapUtilities::escapeValue(
+                        $batch->getValues()[0],
+                        null,
+                        LDAP_ESCAPE_DN
+                    );
+                    $operation->addPostOperation(new RenameOperation($operation->getDn(), $newRdn));
+                    $operation->getBatchCollection()->remove($index);
+                }
+            }
+        }
     }
 
     /**
