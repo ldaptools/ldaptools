@@ -44,6 +44,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
                 0 => "bar",
             ],
             1 => "foo",
+            "cn" => [
+                "count" => 1,
+                0 => "Foo",
+            ],
+            2 => "cn",
             'count' => 2,
             'dn' => "CN=Foo,DC=bar,DC=foo",
         ],
@@ -245,6 +250,26 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->toLdap('Foo')->shouldBeEqualTo('bar');
         $this->toLdap(new LdapObject(['foo' => 'bar']))->shouldBeEqualTo('bar');
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new LdapObject(['dn' => 'foo']));
+    }
+
+    function it_should_use_the_explicitly_selected_attribute_when_converting_from_ldap($connection)
+    {
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+            'select' => 'foo',
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getAttributes() == ['cn']
+                && $operation->getFilter() == '(&(&(objectClass=bar))(foo=bar))';
+        }))->shouldBeCalled()->willReturn($this->entryWithSelect);
+
+        $this->fromLdap('bar');
     }
 
     function it_should_throw_a_useful_message_if_a_value_cannot_be_converted_from_searching_ldap($connection)

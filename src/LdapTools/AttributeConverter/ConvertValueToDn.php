@@ -41,16 +41,19 @@ class ConvertValueToDn implements AttributeConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function fromLdap($dn)
+    public function fromLdap($value)
     {
         $options = $this->getOptionsArray();
+        $displayDn = (isset($options['display_dn']) && $options['display_dn']);
 
-        if (!(isset($options['display_dn']) && $options['display_dn'])) {
-            $dn = LdapUtilities::explodeDn($dn);
-            $dn = reset($dn);
+        if (isset($options['select']) && !$displayDn) {
+            $value = $this->getAttributeFromLdapQuery($value, $options['attribute']);
+        } elseif (!$displayDn) {
+            $value = LdapUtilities::explodeDn($value);
+            $value = reset($value);
         }
 
-        return $dn;
+        return $value;
     }
 
     /**
@@ -94,7 +97,7 @@ class ConvertValueToDn implements AttributeConverterInterface
         $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']), $toSelect);
 
         $bOr = $this->getQueryOrStatement($query, $value);
-        $eq = $query->filter()->eq($options['attribute'], $value);
+        $eq = $query->filter()->eq(!isset($options['select']) ? $options['attribute'] : $options['select'], $value);
 
         if (!empty($bOr->getChildren())) {
             $bOr->add($eq);
