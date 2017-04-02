@@ -22,7 +22,7 @@ class ConvertExchangeRecipientPolicy extends ConvertValueToDn
     /**
      * This GUID represents the auto-update recipient setting.
      */
-    const AUTO_UPDATE = '{26491CFC-9E50-4857-861B-0CB8DF22B5D7}';
+    const AUTO_UPDATE = '{26491cfc-9e50-4857-861b-0cb8df22b5d7}';
 
     /**
      * {@inheritdoc}
