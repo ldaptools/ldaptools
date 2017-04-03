@@ -182,7 +182,7 @@ class LdapUtilities
      */
     public static function isValidLdapObjectDn($dn)
     {
-        return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] > 2);
+        return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] >= 2);
     }
 
     /**

@@ -101,6 +101,7 @@ class LdapUtilitiesSpec extends ObjectBehavior
     function it_should_check_whether_a_dn_is_a_valid_ldap_object()
     {
         $this::isValidLdapObjectDn('cn=foo,dc=example,dc=com')->shouldBeEqualTo(true);
+        $this::isValidLdapObjectDn('dc=example,dc=com')->shouldBeEqualTo(true);
         $this::isValidLdapObjectDn('foo,=bar')->shouldBeEqualTo(false);
     }
 
