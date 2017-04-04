@@ -41,6 +41,11 @@ class LdapUtilities
     const MATCH_DESCRIPTOR = '/^\pL([\pL\pN-]+)?$/iu';
 
     /**
+     * Regex to match an Exchange Legacy DN.
+     */
+    const MATCH_LEGACY_DN = '/^(\/(o|cn|ou)=(.*?))\/?(\/(o|cn|ou)=(.*?)){0,}$/i';
+
+    /**
      * The prefix for a LDAP DNS SRV record.
      */
     const SRV_PREFIX = '_ldap._tcp.';
@@ -146,6 +151,28 @@ class LdapUtilities
         }
 
         return implode(',', $dn);
+    }
+
+    /**
+     * Converts an Exchange Legacy DN into its separate pieces.
+     *
+     * @param string $dn
+     * @param bool $withAttributes
+     * @return array
+     */
+    public static function explodeExchangeLegacyDn($dn, $withAttributes = false)
+    {
+        preg_match(self::MATCH_LEGACY_DN, $dn, $matches);
+
+        if (!isset($matches[2])) {
+            throw new InvalidArgumentException(sprintf('Unable to parse legacy exchange dn "%s".', $dn));
+        }
+        $pieces = [];
+        for ($i = 3; $i < count($matches); $i += 3) {
+            $pieces[] = $withAttributes ? $matches[$i - 1].'='.$matches[$i] : $matches[$i];
+        }
+
+        return $pieces;
     }
 
     /**

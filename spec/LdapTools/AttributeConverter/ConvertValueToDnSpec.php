@@ -252,24 +252,18 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new LdapObject(['dn' => 'foo']));
     }
 
-    function it_should_use_the_explicitly_selected_attribute_when_converting_from_ldap($connection)
+    function it_should_accept_a_legacy_dn_from_ldap_if_specified()
     {
         $this->setOptions(['foo' => [
             'attribute' => 'cn',
             'filter' => [
                 'objectClass' => 'bar'
             ],
-            'select' => 'foo',
+            'legacy_dn' => true,
         ]]);
-        $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
-        $connection->execute(Argument::that(function($operation) {
-            return $operation->getAttributes() == ['cn']
-                && $operation->getFilter() == '(&(&(objectClass=bar))(foo=bar))';
-        }))->shouldBeCalled()->willReturn($this->entryWithSelect);
-
-        $this->fromLdap('bar');
+        $this->fromLdap('/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Foo')->shouldBeEqualTo('Foo');
     }
 
     function it_should_throw_a_useful_message_if_a_value_cannot_be_converted_from_searching_ldap($connection)

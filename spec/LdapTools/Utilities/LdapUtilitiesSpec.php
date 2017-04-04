@@ -163,6 +163,22 @@ class LdapUtilitiesSpec extends ObjectBehavior
         $this::isValidGuid('foo')->shouldBeEqualTo(false);
     }
 
+    function it_should_explode_a_legacy_dn()
+    {
+        $this::explodeExchangeLegacyDn('/o=LdapTools')->shouldBeEqualTo(['LdapTools']);
+        $this::explodeExchangeLegacyDn('/o=LdapTools', true)->shouldBeEqualTo(['o=LdapTools']);
+
+        $this::explodeExchangeLegacyDn('/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)')->shouldBeEqualTo([
+            'LdapTools',
+            'Exchange Administrative Group (FYDIBOHF23SPDLT)'
+        ]);
+        $this::explodeExchangeLegacyDn('/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)', true)->shouldBeEqualTo([
+            'o=LdapTools',
+            'ou=Exchange Administrative Group (FYDIBOHF23SPDLT)'
+        ]);
+        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->during('explodeExchangeLegacyDn', ['dc=foo,dc=bar']);
+    }
+
     function it_should_get_the_rdn_from_a_dn()
     {
         $this::getRdnFromDn('cn=Foo,dc=example,dc=com')->shouldBeEqualTo('cn=Foo');

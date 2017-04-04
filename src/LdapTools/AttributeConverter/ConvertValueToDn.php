@@ -44,11 +44,25 @@ class ConvertValueToDn implements AttributeConverterInterface
     public function fromLdap($value)
     {
         $options = $this->getOptionsArray();
-        $displayDn = (isset($options['display_dn']) && $options['display_dn']);
 
-        if (isset($options['select']) && !$displayDn) {
-            $value = $this->getAttributeFromLdapQuery($value, $options['attribute']);
-        } elseif (!$displayDn) {
+        if (!(isset($options['display_dn']) && $options['display_dn'])) {
+            $value = $this->explodeDnValue($value, $options);
+        }
+
+        return $value;
+    }
+
+    /**
+     * @param string $value
+     * @param array $options
+     * @return array
+     */
+    protected function explodeDnValue($value, array $options)
+    {
+        if (isset($options['legacy_dn']) && $options['legacy_dn']) {
+            $value = LdapUtilities::explodeExchangeLegacyDn($value);
+            $value = end($value);
+        }  else {
             $value = LdapUtilities::explodeDn($value);
             $value = reset($value);
         }
