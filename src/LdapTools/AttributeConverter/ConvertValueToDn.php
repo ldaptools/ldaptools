@@ -111,7 +111,7 @@ class ConvertValueToDn implements AttributeConverterInterface
         $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']), $toSelect);
 
         $bOr = $this->getQueryOrStatement($query, $value);
-        $eq = $query->filter()->eq(!isset($options['select']) ? $options['attribute'] : $options['select'], $value);
+        $eq = $query->filter()->eq($options['attribute'], $value);
 
         if (!empty($bOr->getChildren())) {
             $bOr->add($eq);
