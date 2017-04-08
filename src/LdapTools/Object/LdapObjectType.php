@@ -63,6 +63,11 @@ class LdapObjectType
     const EXCHANGE_DATABASE = 'ExchangeDatabase';
 
     /**
+     * An Exchange Mailbox User object.
+     */
+    const EXCHANGE_MAILBOX_USER = 'ExchangeMailboxUser';
+
+    /**
      * An Exchange ActiveSync Policy object.
      */
     const EXCHANGE_ACTIVESYNC_POLICY = 'ExchangeActiveSyncPolicy';

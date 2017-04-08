@@ -17,6 +17,7 @@ used when generating queries and returning data from LDAP.
 #### Exchange Schema
   * [Servers](#exchange-server-types)
   * [Databases](#exchange-database-types)
+  * [Mailbox User](#exchange-mailbox-user-types)
   * [Recipient Policies](#exchange-recipient-policy-types)
   * [ActiveSync Policies](#exchange-activesync-policy-types)
   * [RBAC Policies](#exchange-rbac-policy-types)
@@ -338,6 +339,54 @@ These are Exchange Databases.
 | modified | whenModified | `\DateTime` | The date the exchange database was last modified |
 | mountOnStartup | msexchedboffline | bool | Whether or not the database should be mounted on startup |
 | sid | objectSid | string | The exchange database's SID (Security Identifier) |
+
+#### Exchange Mailbox User Types
+
+These are mailbox user accounts. They extend the AD User type, so all attributes available there are available here
+along with the attributes below.
+
+* **Type**: `LdapObjectType::EXCHANGE_MAILBOX_USER`
+* **Filter**: `(&(objectClass=user)(objectCategory=person)(msExchMailboxGUID=*))`
+
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| activeSyncPolicy | msExchMobileMailboxPolicyLink | string | The Active Sync policy name |
+| alias | mailNickname | string | The Exchange Mailbox alias | 
+| archiveDatabase | msExchArchiveDatabaseLink | string | The Archive Database name |
+| archiveGuid | msExchArchiveGUID | string | The GUID for the Mailbox archive |
+| archiveHardQuota | msExchArchiveQuota | int | The hard quota for the archive |
+| archiveName | msExchArchiveName | string | The archive name |
+| archiveWarnQuota | msExchArchiveWarnQuota | int | The warning quota for the archive |
+| calendarLoggingDisabled | msExchELCMailboxFlags | bool | Whether calendar logging is disabled |
+| calendarLoggingEnabled | msExchELCMailboxFlags | bool | Whether calendar logging is enabled |
+| defaultSmtpAddress | proxyAddresses | string | The default SMTP address for the mailbox |
+| hideFromAddressBooks | msExchHideFromAddressLists | bool | Whether or not to hide the mailbox from the address books |
+| isArchiveDatabaseValid | msExchELCMailboxFlags | bool | Whether or not the archive DB is considered valid |
+| language | msExchUserCulture | string | The language (ie en-us) for the mailbox |
+| litigationDate | msexchLitigationHoldDate | `\DateTime` | The datetime for litigation hold |
+| litigationEnabled | msExchELCMailboxFlags | bool | Whether or not litigation is enabled |
+| litigationOwner | msexchLitigationHoldOwner | string | The litigation owner name |
+| mailboxDatabase | homeMDB | string | The name of the database where the mailbox resides | 
+| mailboxDisabled | msExchUserAccountControl | bool | Whether or not the mailbox is disabled |
+| mailboxGuid | msExchMailboxGUID | string | The GUID of the mailbox |
+| mailboxSecurity |  msExchMailboxSecurityDescriptor | `SecurityDescriptor` | The mailbox security permissions |
+| mailboxServer | msExchHomeServerName | string | The name of the exchange server where the mailbox resides |
+| mailTips | msExchSenderHintTranslations | string | 
+| mrmEnabled | msExchELCMailboxFlags | bool | Whether or not message records management is enabled |
+| quotaSizeWarning | mDBStorageQuota | int | The quota size warning for the mailbox |
+| quotaSizeProhibitSend | mDBOverQuotaLimit | int | The quota size to limit sends at |
+| quotaSizeProhibitAll | mDBOverHardQuotaLimit | int | The quota size to limit all actions at |
+| rbacPolicy | msExchRBACPolicyLink | string | The RBAC policy name |
+| retentionEnabled |  msExchELCMailboxFlags | bool | Whether or not retention is enabled |
+| retentionPolicy | msExchMailboxTemplateLink | string | The retention policy name |
+| recipientDisplayType | msExchRecipientDisplayType | string | The recipient display type |
+| recipientPolicies | msExchPoliciesIncluded | array | The recipient policy names for the mailbox |
+| recipientTypeDetails | msExchRecipientTypeDetails | string | The recipient type details |
+| sendOnBehalfOf | publicDelegates | array | The users allowed to send-on-behalf of this mailbox |
+| showInAddressBooks | showInAddressBook | array | The address book names where this mailbox should appear |
+| singleItemRecoveryEnabled | msExchELCMailboxFlags | bool | Whether or not single item recovery is enabled |
+| smtpAddresses | proxyAddresses | array | All of the SMTP addresses for the mailbox |
+| useDefaultQuota | mDBUseDefaults | bool | Whether or not the mailbox should use the default quota limits | 
 
 #### Exchange Recipient Policy Types
 
