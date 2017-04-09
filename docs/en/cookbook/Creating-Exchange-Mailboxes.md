@@ -72,7 +72,7 @@ $ldap->createLdapObject(LdapObjectType::EXCHANGE_MAILBOX_USER)
     ->execute();
 ```
 
- For a complete listing of what attributes you can specify in the creation command above [see schema reference doc](../reference/Default-Schema-Attributes.md).
+ For a complete listing of what attributes you can specify in the creation command above [see schema reference doc](../reference/Default-Schema-Attributes.md#exchange-mailbox-user-types).
  Since the Exchange Mailbox User type extends the default AD type, you can also use any attribute from that type on
  creation as well.
  
