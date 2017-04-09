@@ -1,6 +1,29 @@
 CHANGELOG
 =========
 
+0.24.0 (2017-04-09)
+-------------------
+  * You can now create Microsoft Exchange Mailboxes (2007+) using the ExchangeMailboxUser schema type.
+  * You can now rename an LDAP object by setting the 'name' attribute and persisting it.
+  * Add an in() (IN clause equivalent)filter shortcut method for the query builder
+  * Add a match() and matchDn() filter shortcut method for the query builder.
+  * A getParentDn() utility method is now availabe in the LdapUtilities class @markusu49
+  * A findAll() convenience method is now available in the LdapObjectRepository @markusu49
+  * Improve support for all matching rule operations in the MatchingRule query operator.
+  * The schema type is now available in the LDAP object creation event.
+  * Multi-valued RDNs are now supported on creation from a schema object.
+  * The RDN is now a configurable attribute in the schema (defaults to the 'name' attribute mapping)
+  * The User Account Control converter is now a generic flag value converter.
+  * Allow determining the wildcard type from the query operator class.
+  * Add several attribute converters for working with Microsoft Exchange.
+  * Several performance related improvements related to case-insensitive look-ups. 
+  * An ACE type can now be set via a string or object.
+  * Allow LDAP query operation results to be cached.
+  * Allow setting the cache class directly on the Configuration class. 
+  * Redesigned much of the Cache system. 
+  * A query operation with an empty filter will now throw a Query Exception, as it is not valid in LDAP.
+  * Corrected the deleteObject() and readSecurity() AceRights flags to reflect their intended flags.
+
 0.23.0 (2016-11-27)
 -------------------
   * Add a Windows Security Descriptor/SDDL parser and encoder. Provides easy read/writing of AD ACLs/ACEs.
