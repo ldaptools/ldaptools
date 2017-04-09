@@ -211,6 +211,7 @@ Browse [the docs folder](/docs/en) for more information about LdapTools.
 * [Modifying LDAP Objects](/docs/en/tutorials/Modifying-LDAP-Objects.md)
 * [LDIF files](/docs/en/tutorials/LDIF-Files.md)
 * [Active Directory Permissions](/docs/en/tutorials/AD-Permissions.md)
+* [Creating Exchange Mailboxes](/docs/en/cookbook/Creating-Exchange-Mailboxes.md)
 * [Default Schema Attributes](/docs/en/reference/Default-Schema-Attributes.md)
 * [The Event System](/docs/en/reference/Events.md)
 

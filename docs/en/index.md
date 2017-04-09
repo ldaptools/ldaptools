@@ -211,6 +211,7 @@ See [the docs](tutorials/Creating-LDAP-Objects.md) for more information on creat
 * [Creating LDAP Objects](tutorials/Creating-LDAP-Objects.md)
 * [Modifying LDAP Objects](tutorials/Modifying-LDAP-Objects.md)
 * [LDIF files](tutorials/LDIF-Files.md)
+* [Creating Exchange Mailboxes](cookbook/Creating-Exchange-Mailboxes.md)
 * [Active Directory permissions](tutorials/AD-Permissions.md)
 * [Default Schema Attributes](reference/Default-Schema-Attributes.md)
 * [The Event System](reference/Events.md)
