@@ -44,7 +44,12 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Converts a PHP bool to either a -1 (false) or 0 (true). This toggles the "Password Must Change" property.
   
   * `fromLdap`: Converts a LDAP '0' (true - password must change) or '>0' (false - password doesn't have to change).
-   
+
+#### *windows_account_name*
+  * `toLdap`: Removes invalid characters from the account name on creation/modification.
+  
+  * `fromLdap`: Returns the unmodified account name string.
+
 #### *windows_generalized_time*
   * `toLdap`: Converts a PHP `\DateTime` object to the generalized timestamp format string that Active Directory expects.
   

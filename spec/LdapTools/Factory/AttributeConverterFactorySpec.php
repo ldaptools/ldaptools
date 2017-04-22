@@ -172,6 +172,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this::get('windows_security')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertWindowsSecurity');
     }
 
+    function it_should_return_a_windows_account_name_converter()
+    {
+        $this::get('windows_account_name')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertAccountName');
+    }
+
     function it_should_throw_InvalidArgumentException_when_retrieving_an_invalid_converter_name()
     {
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo_bar');
