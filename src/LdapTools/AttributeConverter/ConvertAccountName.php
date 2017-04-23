@@ -39,6 +39,7 @@ class ConvertAccountName implements AttributeConverterInterface
         ';',
         '?',
         '*',
+        ' ',
     ];
 
     /**

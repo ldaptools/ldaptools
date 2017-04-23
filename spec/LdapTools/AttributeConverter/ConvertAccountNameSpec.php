@@ -25,12 +25,12 @@ class ConvertAccountNameSpec extends ObjectBehavior
         $this->setOperationType(ConvertAccountName::TYPE_MODIFY);
 
         $this->toLdap('Foo.Bar.')->shouldBeEqualTo('Foo.Bar');
-        $this->toLdap('Foo=Bar+foo')->shouldBeEqualTo('FooBarfoo');
+        $this->toLdap('Foo=Bar+ foo')->shouldBeEqualTo('FooBarfoo');
 
         $this->setOperationType(ConvertAccountName::TYPE_CREATE);
 
         $this->toLdap('Foo.Bar.')->shouldBeEqualTo('Foo.Bar');
-        $this->toLdap('Foo=Bar+foo')->shouldBeEqualTo('FooBarfoo');
+        $this->toLdap('Foo=Bar+ foo')->shouldBeEqualTo('FooBarfoo');
     }
 
     function it_should_not_remove_unallowed_characters_on_a_search()
@@ -38,12 +38,12 @@ class ConvertAccountNameSpec extends ObjectBehavior
         $this->setOperationType(ConvertAccountName::TYPE_SEARCH_TO);
 
         $this->toLdap('Foo.Bar.')->shouldBeEqualTo('Foo.Bar.');
-        $this->toLdap('Foo=Bar+foo')->shouldBeEqualTo('Foo=Bar+foo');
+        $this->toLdap('Foo=Bar+ foo')->shouldBeEqualTo('Foo=Bar+ foo');
     }
 
     function it_should_not_remove_unallowed_characters_from_ldap()
     {
         $this->fromLdap('Foo.Bar.')->shouldBeEqualTo('Foo.Bar.');
-        $this->fromLdap('Foo=Bar+foo')->shouldBeEqualTo('Foo=Bar+foo');
+        $this->fromLdap('Foo=Bar+ foo')->shouldBeEqualTo('Foo=Bar+ foo');
     }
 }
