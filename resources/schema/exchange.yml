@@ -424,3 +424,95 @@ objects:
             - 'mailboxGuid'
             - 'smtpAddresses'
             - 'defaultSmtpAddress'
+    exchange_contact:
+        type: ExchangeContact
+        extends_default: [ ad, contact ]
+        filter:
+            eq: [ msExchRecipientDisplayType, 6 ]
+        converter_options:
+            exchange_proxy_address:
+                addressType:
+                    smtpAddresses: 'smtp'
+                    defaultSmtpAddress: 'smtp'
+                default:
+                    - 'defaultSmtpAddress'
+            exchange_recipient_type:
+                recipientTypeDetails: 'type_details'
+                recipientDisplayType: 'display_type'
+            exchange_recipient_policy:
+                recipientPolicies:
+                    base_dn: "%_configurationnamingcontext_%"
+                    attribute: cn
+                    select: objectGuid
+                    filter:
+                        objectClass: msExchRecipientPolicy
+            flags:
+                msExchUserAccountControl:
+                    attribute: 'msExchUserAccountControl'
+                    defaultValue: 0
+                    flagMap:
+                        disabled: 2
+            value_to_dn:
+                showInAddressBooks:
+                    base_dn: "%_configurationnamingcontext_%"
+                    attribute: cn
+                    filter:
+                        objectClass: addressBookContainer
+        converters:
+             bool:
+                 - 'hideFromAddressBooks'
+                 - 'isMapiRecipient'
+             value_to_dn:
+                 - 'showInAddressBooks'
+             exchange_proxy_address:
+                 - 'smtpAddresses'
+                 - 'defaultSmtpAddress'
+             exchange_recipient_type:
+                 - 'recipientDisplayType'
+                 - 'recipientTypeDetails'
+             exchange_object_version:
+                 - 'version'
+             exchange_recipient_policy:
+                 - 'recipientPolicies'
+             exchange_legacy_dn:
+                 - 'legacyExchangeDn'
+             flags:
+                 - 'disabled'
+             windows_account_name:
+                 - 'alias'
+        attributes:
+            alias: mailNickname
+            defaultSmtpAddress: proxyAddresses
+            disabled: msExchUserAccountControl
+            hideFromAddressBooks: msExchHideFromAddressLists
+            isMapiRecipient: mAPIRecipient
+            recipientDisplayType: msExchRecipientDisplayType
+            recipientPolicies: msExchPoliciesIncluded
+            recipientTypeDetails:  msExchRecipientTypeDetails
+            showInAddressBooks: showInAddressBook
+            smtpAddresses: proxyAddresses
+            version: msExchVersion
+        multivalued_attributes:
+            - 'smtpAddresses'
+            - 'showInAddressBooks'
+            - 'recipientPolicies'
+        default_values:
+            alias: "%name%"
+            defaultSmtpAddress: "%emailAddress%"
+            internetEncoding: '1310720'
+            isMapiRecipient: false
+            legacyExchangeDn: 'auto:%name%'
+            disabled: false
+            recipientPolicies:
+                - 'Default Policy'
+            recipientDisplayType: 'RemoteMailUser'
+            showInAddressBooks:
+                - 'All Contacts(VLV)'
+                - 'All Recipients(VLV)'
+                - 'All Contacts'
+                - 'Default Global Address List'
+            targetAddress: "SMTP:%defaultSmtpAddress%"
+            version: 'auto'
+        attributes_to_select:
+            - 'smtpAddresses'
+            - 'defaultSmtpAddress'

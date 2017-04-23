@@ -63,6 +63,11 @@ class LdapObjectType
     const EXCHANGE_DATABASE = 'ExchangeDatabase';
 
     /**
+     * An Exchange Contact object.
+     */
+    const EXCHANGE_CONTACT = 'ExchangeContact';
+
+    /**
      * An Exchange Mailbox User object.
      */
     const EXCHANGE_MAILBOX_USER = 'ExchangeMailboxUser';

@@ -17,6 +17,7 @@ used when generating queries and returning data from LDAP.
 #### Exchange Schema
   * [Servers](#exchange-server-types)
   * [Databases](#exchange-database-types)
+  * [Contacts](#exchange-contact-types)
   * [Mailbox User](#exchange-mailbox-user-types)
   * [Recipient Policies](#exchange-recipient-policy-types)
   * [ActiveSync Policies](#exchange-activesync-policy-types)
@@ -387,6 +388,22 @@ along with the attributes below.
 | singleItemRecoveryEnabled | msExchELCMailboxFlags | bool | Whether or not single item recovery is enabled |
 | smtpAddresses | proxyAddresses | array | All of the SMTP addresses for the mailbox |
 | useDefaultQuota | mDBUseDefaults | bool | Whether or not the mailbox should use the default quota limits | 
+
+#### Exchange Contact Types
+
+These are Exchange mail-enabled contact objects.
+
+* **Type**: `LdapObjectType::EXCHANGE_CONTACT`
+* **Filter**: `(&(objectCategory=contact)(msExchRecipientDisplayType=6))`
+
+| LdapTools Name  | LDAP Attribute | Value Type | Description |
+| --------------- | -------------- | ---------- | ----------- |
+| alias | mailNickname | string | The contact's exchange alias |
+| hideFromAddressBook | msExchHideFromAddressLists | bool | Whether the contact should be hidden from the address list |
+| smtpAddresses | proxyAddresses | array | All of the contact's assigned SMTP addresses |
+| defaultSmtpAddress | proxyAddresses | string | The contact's default SMTP address |
+| recipientPolicies | msExchPoliciesIncluded | array | The recipient policy names for the contact |
+| showInAddressBooks | showInAddressBook | array | The address book names where this contact should appear |
 
 #### Exchange Recipient Policy Types
 
