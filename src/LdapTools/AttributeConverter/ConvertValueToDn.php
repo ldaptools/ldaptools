@@ -111,7 +111,7 @@ class ConvertValueToDn implements AttributeConverterInterface
         $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']), $toSelect);
 
         $bOr = $this->getQueryOrStatement($query, $value);
-        $eq = $query->filter()->eq($options['attribute'], $value);
+        $eq = $this->getQueryComparisonStatement($value, $options, $query);
 
         if (!empty($bOr->getChildren())) {
             $bOr->add($eq);
@@ -179,6 +179,23 @@ class ConvertValueToDn implements AttributeConverterInterface
     }
 
     /**
+     * @param string $value
+     * @param array $options
+     * @param LdapQueryBuilder $query
+     * @return \LdapTools\Query\Operator\BaseOperator
+     */
+    protected function getQueryComparisonStatement($value, $options, LdapQueryBuilder $query)
+    {
+        if ($options['allow_wildcard']) {
+            $eq = $query->filter()->like($options['attribute'], $value);
+        } else {
+            $eq = $query->filter()->eq($options['attribute'], $value);
+        }
+
+        return $eq;
+    }
+
+    /**
      * Validates and retrieves the options array for the current attribute.
      *
      * @return array
@@ -195,6 +212,7 @@ class ConvertValueToDn implements AttributeConverterInterface
         if (!isset($options['attribute'])) {
             throw new AttributeConverterException(sprintf('Attribute to search on not defined for "%s"', $this->getAttribute()));
         }
+        $options['allow_wildcard'] = isset($options['allow_wildcard']) ? $options['allow_wildcard'] : false;
 
         return $options;
     }

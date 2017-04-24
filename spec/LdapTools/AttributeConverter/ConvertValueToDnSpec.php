@@ -266,6 +266,43 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $this->fromLdap('/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Foo')->shouldBeEqualTo('Foo');
     }
 
+    function it_should_allow_a_wildcard_if_specified_in_the_options($connection)
+    {
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ],
+            'allow_wildcard' => true,
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo*))';
+        }))->shouldBeCalled()->willReturn($this->entry);
+
+        $this->toLdap('Foo*');
+    }
+
+    function it_should_not_allow_a_wildcard_if_not_specified_in_the_options($connection)
+    {
+        $this->setOptions(['foo' => [
+            'attribute' => 'cn',
+            'filter' => [
+                'objectClass' => 'bar'
+            ]
+        ]]);
+        $this->setLdapConnection($connection);
+        $this->setAttribute('foo');
+
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo\2a))';
+        }))->shouldBeCalled()->willReturn($this->entry);
+
+        $this->toLdap('Foo*');
+    }
+
     function it_should_throw_a_useful_message_if_a_value_cannot_be_converted_from_searching_ldap($connection)
     {
         $connection->execute(Argument::any())->willReturn([]);
