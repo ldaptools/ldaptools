@@ -68,7 +68,7 @@ class ExchangeRecipient
         'ConferenceRoomMailbox' => 7,
         'EquipmentMailbox' => 8,
         'ACLableMailboxUser' => 1073741824,
-        'SecurityDistributionGroup' => 1043741833,
+        'SecurityDistributionGroup' => 1073741833,
         'SyncedMailboxUser' => -2147483642,
         'SyncedUDGasUDG' => -2147483391,
         'SyncedUDGasContact' => -2147483386,
