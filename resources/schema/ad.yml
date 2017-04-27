@@ -215,7 +215,7 @@ objects:
             - 'dn'
             - 'guid'
         default_values:
-            name: %username%
+            name: "%username%"
             displayName: "%username%"
             firstName: "%username%"
             upn: "%username%@%_domainname_%"
