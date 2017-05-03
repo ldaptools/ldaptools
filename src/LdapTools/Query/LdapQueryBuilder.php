@@ -486,19 +486,6 @@ class LdapQueryBuilder
     /**
      * Get the LDAP filter formed by this query.
      *
-     * @deprecated This will be removed in a future version. Use the "toLdapFilter()" method instead.
-     * @return string
-     */
-    public function getLdapFilter()
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use toLdapFilter() instead.', E_USER_DEPRECATED);
-
-        return $this->toLdapFilter();
-    }
-
-    /**
-     * Get the LDAP filter formed by this query.
-     *
      * @return string
      */
     public function toLdapFilter()

@@ -84,18 +84,6 @@ class Wildcard extends Comparison
     }
 
     /**
-     * @deprecated Use the 'toLdapFilter()' method instead.
-     * @param null $alias
-     * @return string
-     */
-    public function getLdapFilter($alias = null)
-    {
-        trigger_error('The '.__METHOD__.' method is deprecated and will be removed in a later version. Use toLdapFilter() instead.', E_USER_DEPRECATED);
-
-        return $this->toLdapFilter($alias);
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function toLdapFilter($alias = null)
