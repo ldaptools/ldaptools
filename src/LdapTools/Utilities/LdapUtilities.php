@@ -38,7 +38,7 @@ class LdapUtilities
     /**
      * Regex to match an attribute descriptor.
      */
-    const MATCH_DESCRIPTOR = '/^\pL([\pL\pN-]+)?$/iu';
+    const MATCH_DESCRIPTOR = '/^\pL([\pL\pN-:]+)?$/iu';
 
     /**
      * Regex to match an Exchange Legacy DN.
