@@ -58,6 +58,10 @@ class AttributeNameResolver
             if ($this->selectedButNotPartOfEntry($attribute, $newEntry)) {
                 $newEntry[MBString::array_search_get_value($attribute, $this->selectedAttributes)] = $value;
             }
+            // include range attributes
+            if ($this->isRangeAttribute($attribute)) {
+                $newEntry[MBString::strtolower($attribute)] = $value;
+            }
         }
         // The DN attribute must be present as it is used in many critical functions.
         $newEntry = $this->addDnFromLdapIfNotPresent($newEntry, $entry);
@@ -115,6 +119,10 @@ class AttributeNameResolver
         $existsInEntry = array_key_exists($lcAttribute, MBString::array_change_key_case($entry));
 
         return ($inSelectedAttributes && !$existsInEntry);
+    }
+
+    protected function isRangeAttribute($attribute) {
+        return strpos($attribute, ';range=') !== false;
     }
 
     /**
