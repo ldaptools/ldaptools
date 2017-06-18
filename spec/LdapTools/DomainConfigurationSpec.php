@@ -268,9 +268,7 @@ class DomainConfigurationSpec extends ObjectBehavior
     function it_should_error_when_missing_required_config_values()
     {
         $config = [
-            'domain_name' => 'example.local',
             'username' => 'admin',
-            'lazy_bind' => true,
         ];
         $this->shouldThrow('\LdapTools\Exception\ConfigurationException')->duringLoad($config);
     }

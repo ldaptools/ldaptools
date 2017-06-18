@@ -66,8 +66,6 @@ class DomainConfiguration
      */
     protected $required = [
         'domainName',
-        'username',
-        'password',
     ];
 
     /**
