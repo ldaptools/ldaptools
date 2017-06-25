@@ -10,7 +10,7 @@
 
 namespace LdapTools\Query\Builder;
 
-use LdapTools\Query\MatchingRuleOid;
+use LdapTools\Enums\MatchingRuleOid;
 use LdapTools\Query\Operator\MatchingRule;
 
 /**
@@ -40,7 +40,7 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function isRecursivelyMemberOf($group, $attribute = 'groups')
     {
-        return new MatchingRule($attribute, MatchingRuleOid::IN_CHAIN, $group);
+        return new MatchingRule($attribute, MatchingRuleOid::InChain, $group);
     }
 
     /**
@@ -52,6 +52,6 @@ class ADFilterBuilder extends FilterBuilder
      */
     public function hasMemberRecursively($value, $attribute = 'members')
     {
-        return new MatchingRule($attribute, MatchingRuleOid::IN_CHAIN, $value);
+        return new MatchingRule($attribute, MatchingRuleOid::InChain, $value);
     }
 }

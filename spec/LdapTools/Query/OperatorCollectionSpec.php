@@ -10,7 +10,7 @@
 
 namespace spec\LdapTools\Query;
 
-use LdapTools\Query\MatchingRuleOid;
+use LdapTools\Enums\MatchingRuleOid;
 use LdapTools\Query\Operator\bAnd;
 use LdapTools\Query\Operator\bNot;
 use LdapTools\Query\Operator\bOr;
@@ -48,7 +48,7 @@ class OperatorCollectionSpec extends ObjectBehavior
 
     function it_should_add_a_matchingrule_correctly()
     {
-        $this->add(new MatchingRule('foo', MatchingRuleOid::BIT_OR, 1));
+        $this->add(new MatchingRule('foo', MatchingRuleOid::BitOr, 1));
         $this->getMatchingRuleOperators()->shouldHaveCount(1);
     }
 
@@ -111,7 +111,7 @@ class OperatorCollectionSpec extends ObjectBehavior
 
     function it_should_sort_the_operators()
     {
-        $this->add(new MatchingRule('foo', MatchingRuleOid::BIT_OR, 1));
+        $this->add(new MatchingRule('foo', MatchingRuleOid::BitOr, 1));
         $this->add(new bAnd());
 
         $this->toArray()->shouldHaveFirstItemAs('\LdapTools\Query\Operator\bAnd');

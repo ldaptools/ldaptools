@@ -15,7 +15,7 @@ use LdapTools\Cache\CacheInterface;
 use LdapTools\Cache\CacheItem;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
@@ -161,8 +161,8 @@ class LdapOperationInvokerSpec extends ObjectBehavior
 
     function it_should_set_controls_specified_by_the_operation(OperationHandler $handler, $connection, $dispatcher)
     {
-        $control = new LdapControl(LdapControlType::SUB_TREE_DELETE);
-        $control2 = (new LdapControl(LdapControlType::SD_FLAGS_CONTROL, false, LdapControl::berEncodeInt(7)))->setResetValue(LdapControl::berEncodeInt(0));
+        $control = new LdapControl(LdapControlOid::SubTreeDelete);
+        $control2 = (new LdapControl(LdapControlOid::SDFlagsControl, false, LdapControl::berEncodeInt(7)))->setResetValue(LdapControl::berEncodeInt(0));
 
         $operation = (new DeleteOperation('ou=test,dc=foo,dc=bar'))->addControl($control, $control2);
         $handler->supports($operation)->willReturn(true);

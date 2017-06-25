@@ -10,14 +10,14 @@
 
 namespace spec\LdapTools\Connection;
 
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use PhpSpec\ObjectBehavior;
 
 class LdapControlSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->beConstructedWith(LdapControlType::SUB_TREE_DELETE);
+        $this->beConstructedWith(LdapControlOid::SubTreeDelete);
     }
 
     function it_is_initializable()
@@ -27,13 +27,13 @@ class LdapControlSpec extends ObjectBehavior
 
     function it_should_set_the_oid_in_the_constructor()
     {
-        $this->getOid()->shouldBeEqualTo(LdapControlType::SUB_TREE_DELETE);
+        $this->getOid()->shouldBeEqualTo(LdapControlOid::SubTreeDelete);
     }
 
     function it_should_be_able_to_set_the_criticality_and_value_in_the_constructor()
     {
-        $this->beConstructedWith(LdapControlType::SUB_TREE_DELETE, true, 'foo');
-        $this->getOid()->shouldBeEqualTo(LdapControlType::SUB_TREE_DELETE);
+        $this->beConstructedWith(LdapControlOid::SubTreeDelete, true, 'foo');
+        $this->getOid()->shouldBeEqualTo(LdapControlOid::SubTreeDelete);
         $this->getCriticality()->shouldBeEqualTo(true);
         $this->getValue()->shouldBeEqualTo('foo');
     }
@@ -50,7 +50,7 @@ class LdapControlSpec extends ObjectBehavior
 
     function it_should_set_the_oid()
     {
-        $this->setOid(LdapControlType::SHOW_DELETED)->getOid()->shouldBeEqualTo(LdapControlType::SHOW_DELETED);
+        $this->setOid(LdapControlOid::ShowDeleted)->getOid()->shouldBeEqualTo(LdapControlOid::ShowDeleted);
     }
 
     function it_should_set_the_criticality()
@@ -76,7 +76,7 @@ class LdapControlSpec extends ObjectBehavior
     function it_should_get_the_array_structure_of_the_control()
     {
         $this->toArray()->shouldBeEqualTo([
-           'oid' => LdapControlType::SUB_TREE_DELETE,
+           'oid' => LdapControlOid::SubTreeDelete,
             'iscritical' => false
         ]);
 
@@ -84,7 +84,7 @@ class LdapControlSpec extends ObjectBehavior
         $this->setValue(false);
 
         $this->toArray()->shouldBeEqualTo([
-            'oid' => LdapControlType::SUB_TREE_DELETE,
+            'oid' => LdapControlOid::SubTreeDelete,
             'iscritical' => true,
             'value' => false
         ]);

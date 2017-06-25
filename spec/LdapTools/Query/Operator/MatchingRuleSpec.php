@@ -11,7 +11,7 @@
 namespace spec\LdapTools\Query\Operator;
 
 use LdapTools\Exception\LdapQueryException;
-use LdapTools\Query\MatchingRuleOid;
+use LdapTools\Enums\MatchingRuleOid;
 use LdapTools\Query\Operator\Comparison;
 use PhpSpec\ObjectBehavior;
 
@@ -19,7 +19,7 @@ class MatchingRuleSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->beConstructedWith('foo', MatchingRuleOid::BIT_AND, '2');
+        $this->beConstructedWith('foo', MatchingRuleOid::BitAnd, '2');
     }
 
     function it_is_initializable()
@@ -49,7 +49,7 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_return_the_correct_ldap_bitwise_or_filter()
     {
-        $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, 2);
+        $this->beConstructedWith('foo', MatchingRuleOid::BitOr, 2);
         $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=2)');
     }
 
@@ -73,7 +73,7 @@ class MatchingRuleSpec extends ObjectBehavior
 
     function it_should_escape_special_characters_when_going_to_ldap()
     {
-        $this->beConstructedWith('foo', MatchingRuleOid::BIT_OR, '\*)3');
+        $this->beConstructedWith('foo', MatchingRuleOid::BitOr, '\*)3');
         $this->toLdapFilter()->shouldBeEqualTo('(foo:1.2.840.113556.1.4.804:=\5c\2a\293)');
     }
 

@@ -10,7 +10,7 @@
 
 namespace LdapTools\AttributeConverter;
 
-use LdapTools\Connection\AD\ExchangeRoleTypes;
+use LdapTools\Enums\Exchange\ServerRole;
 
 /**
  * Converts the current roles of an Exchange server using a bitwise and operation to get a readable name.
@@ -26,15 +26,7 @@ class ConvertExchangeRoles implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $roles = [];
-
-        foreach (ExchangeRoleTypes::ROLES as $role) {
-            if ((int) $value & $role) {
-                $roles[] = ExchangeRoleTypes::NAMES[$role];
-            }
-        }
-
-        return $roles;
+        return (new ServerRole($value))->getNames();
     }
 
     /**

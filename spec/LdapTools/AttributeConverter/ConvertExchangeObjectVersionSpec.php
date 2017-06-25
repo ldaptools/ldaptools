@@ -11,9 +11,9 @@
 namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\ConvertExchangeObjectVersion;
-use LdapTools\Connection\AD\ExchangeObjectVersion;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Enums\Exchange\ObjectVersion;
 use LdapTools\Object\LdapObject;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -46,7 +46,7 @@ class ConvertExchangeObjectVersionSpec extends ObjectBehavior
 
     function it_should_allow_a_simple_version_number_going_to_ldap()
     {
-        foreach (ExchangeObjectVersion::VERSION as $name => $value) {
+        foreach (ObjectVersion::toArray() as $name => $value) {
             $this->toLdap($name)->shouldBeEqualTo((string) $value);
         }
     }
@@ -64,10 +64,10 @@ class ConvertExchangeObjectVersionSpec extends ObjectBehavior
 
         $connection->execute(Argument::any())->willReturn($v2007, $v2010, $v2013, $v2016);
 
-        $this->toLdap('auto')->shouldBeEqualTo((string) ExchangeObjectVersion::VERSION['2007']);
-        $this->toLdap('auto')->shouldBeEqualTo((string) ExchangeObjectVersion::VERSION['2010']);
-        $this->toLdap('auto')->shouldBeEqualTo((string) ExchangeObjectVersion::VERSION['2013']);
-        $this->toLdap('auto')->shouldBeEqualTo((string) ExchangeObjectVersion::VERSION['2016']);
+        $this->toLdap('auto')->shouldBeEqualTo((string) ObjectVersion::v2007);
+        $this->toLdap('auto')->shouldBeEqualTo((string) ObjectVersion::v2010);
+        $this->toLdap('auto')->shouldBeEqualTo((string) ObjectVersion::v2013);
+        $this->toLdap('auto')->shouldBeEqualTo((string) ObjectVersion::v2016);
     }
 
     function it_should_throw_an_exception_if_a_version_number_to_use_cannot_be_determined($connection)
@@ -88,9 +88,9 @@ class ConvertExchangeObjectVersionSpec extends ObjectBehavior
 
     function it_should_get_the_object_version_from_ldap()
     {
-        $this->fromLdap((string) ExchangeObjectVersion::VERSION['2007'])->shouldBeEqualTo('2007');
-        $this->fromLdap((string) ExchangeObjectVersion::VERSION['2013'])->shouldBeEqualTo('2013');
+        $this->fromLdap((string) ObjectVersion::v2007)->shouldBeEqualTo('v2007');
+        $this->fromLdap((string) ObjectVersion::v2013)->shouldBeEqualTo('v2013');
         // No way around this, as they are both the same version...
-        $this->fromLdap((string) ExchangeObjectVersion::VERSION['2016'])->shouldBeEqualTo('2013');
+        $this->fromLdap((string) ObjectVersion::v2016)->shouldBeEqualTo('v2013');
     }
 }

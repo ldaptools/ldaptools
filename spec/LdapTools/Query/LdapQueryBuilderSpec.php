@@ -14,9 +14,9 @@ use LdapTools\Cache\NoCache;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
 use LdapTools\DomainConfiguration;
 use LdapTools\Connection\LdapConnection;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Factory\CacheFactory;
 use LdapTools\Event\SymfonyEventDispatcher;
@@ -277,8 +277,8 @@ class LdapQueryBuilderSpec extends ObjectBehavior
     
     function it_should_add_LDAP_controls_to_the_query_operation()
     {
-        $control1 = new LdapControl(LdapControlType::SHOW_DELETED, true);
-        $control2 = new LdapControl(LdapControlType::PAGED_RESULTS, false);
+        $control1 = new LdapControl(LdapControlOid::ShowDeleted, true);
+        $control2 = new LdapControl(LdapControlOid::PagedResults, false);
         
         $this->addControl($control1, $control2);
         $this->getLdapQuery()->getQueryOperation()->getControls()->shouldBeEqualTo([$control1, $control2]);

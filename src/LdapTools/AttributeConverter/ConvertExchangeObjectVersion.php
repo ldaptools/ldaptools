@@ -10,9 +10,9 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Enums\Exchange\ObjectVersion;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Query\LdapQueryBuilder;
-use LdapTools\Connection\AD\ExchangeObjectVersion;
 
 /**
  * Converts the msExchVersion value that is stamped on mail-enabled objects.
@@ -39,14 +39,14 @@ class ConvertExchangeObjectVersion extends ConvertExchangeVersion
         $value = strtolower($value);
 
         if ($value == 'auto') {
-            $msExchVersion = ExchangeObjectVersion::VERSION[$this->getMsExchVersion()];
-        } elseif (array_key_exists($value, ExchangeObjectVersion::VERSION)) {
-            $msExchVersion = ExchangeObjectVersion::VERSION[$value];
+            $msExchVersion = ObjectVersion::getNameValue('v'.$this->getMsExchVersion());
+        } elseif (ObjectVersion::isValidName($value)) {
+            $msExchVersion = ObjectVersion::getNameValue($value);
         } else {
             throw new AttributeConverterException(sprintf(
                'Version name "%s" is not recognized. Recognized values are: %s',
                 $value,
-                'auto, '.implode(', ', array_keys(ExchangeObjectVersion::VERSION))
+                'auto, '.implode(', ', ObjectVersion::values())
             ));
         }
 
@@ -60,9 +60,7 @@ class ConvertExchangeObjectVersion extends ConvertExchangeVersion
     {
         // Exchange 2013 and 2016 share the same value. No way to tell them apart aside from querying other things.
         // But that still does not mean this mailbox/object is also at that "version"?
-        $version = array_search($value, ExchangeObjectVersion::VERSION);
-
-        return $version === false ? $value : (string) $version;
+        return ObjectVersion::isValidValue($value) ? (string) ObjectVersion::getValueName($value) : $value;
     }
 
     /**

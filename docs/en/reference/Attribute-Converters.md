@@ -30,6 +30,11 @@ process and the converter may use the connection to make LDAP calls to resolve d
 
   * `fromLdap`: Converts a LDAP numeric string to a PHP int.
 
+#### *enum*
+  * `toLdap`: Takes a friendly enum name and converts it to the value it represents.
+  
+  * `fromLdap`: Takes an enum value and converts it to the friendly name it represents.
+
 #### *flags*
   * `toLdap`: Takes a bool for the current attribute and flips the bit of the overall flag value going to LDAP.
   
@@ -84,11 +89,6 @@ process and the converter may use the connection to make LDAP calls to resolve d
   * `toLdap`: Takes an array of email addresses and formats them properly for the proxyAddresses attribute.
   
   * `fromLdap`: Parses through the proxyAddresses attribute to return only the address portion for a specific address type.
-
-#### *exchange_recipient_type*
-  * `toLdap`: Takes an integer and maps it to the friendly display name of the recipient type info.
-  
-  * `fromLdap`: Takes a friendly recipient type name and converts it to the integer value.
 
 #### *exchange_object_version*
   * `toLdap`: Takes a friendly Exchange version (ie. 2013, 2016, etc) and maps it to the object version number.

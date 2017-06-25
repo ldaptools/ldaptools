@@ -14,7 +14,7 @@ use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
 use LdapTools\Event\LdapObjectEvent;
@@ -97,7 +97,7 @@ class LdapObjectManager
 
         $operation = new DeleteOperation($ldapObject->get('dn'));
         if ($recursively) {
-            $operation->addControl((new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true));
+            $operation->addControl((new LdapControl(LdapControlOid::SubTreeDelete))->setCriticality(true));
         }
 
         $this->connection->execute($operation);

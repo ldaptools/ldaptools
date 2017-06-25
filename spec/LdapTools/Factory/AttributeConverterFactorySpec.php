@@ -22,6 +22,11 @@ class AttributeConverterFactorySpec extends ObjectBehavior
         $this->shouldHaveType('LdapTools\Factory\AttributeConverterFactory');
     }
 
+    function it_should_return_ConvertEnum_when_calling_get_with_enum()
+    {
+        $this::get('enum')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertEnum');
+    }
+
     function it_should_return_ConvertBoolean_when_calling_get_with_bool()
     {
         $this::get('bool')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertBoolean');
@@ -145,11 +150,6 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     function it_should_return_a_lockout_time_converter()
     {
         $this::get('lockout_time')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertLockoutTime');
-    }
-
-    function it_should_return_an_exchange_recipient_type_converter()
-    {
-        $this::get('exchange_recipient_type')->shouldReturnAnInstanceOf('\LdapTools\AttributeConverter\ConvertExchangeRecipientType');
     }
 
     function it_should_return_an_exchange_object_version_converter()

@@ -10,6 +10,8 @@
 
 namespace LdapTools\Connection\AD;
 
+trigger_error('The LdapTools\Connection\AD\ExchangeObjectVersion is deprecated and will be removed in a later version. Use LdapTools\Enums\Exchange\ObjectVersion instead.', E_USER_DEPRECATED);
+
 /**
  * Represents version information stored in the msExchVersion attribute for a mail-enabled user/contact/etc.
  *

@@ -7,7 +7,7 @@ use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\DomainConfiguration;
 use LdapTools\Event\Event;
 use LdapTools\Event\EventDispatcherInterface;
@@ -92,7 +92,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function it_should_delete_a_ldap_object_recursively_if_specified($connection)
     {
-        $control = (new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true);
+        $control = (new LdapControl(LdapControlOid::SubTreeDelete))->setCriticality(true);
         $connection->execute((new DeleteOperation('cn=foo,dc=foo,dc=bar'))->addControl($control))
             ->shouldBeCalled()
             ->willReturn(true);

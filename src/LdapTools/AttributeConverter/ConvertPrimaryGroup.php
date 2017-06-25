@@ -10,9 +10,9 @@
 
 namespace LdapTools\AttributeConverter;
 
+use LdapTools\Enums\AD\GroupType;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Exception\EmptyResultException;
-use LdapTools\Query\GroupTypeFlags;
 use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 
@@ -80,7 +80,7 @@ class ConvertPrimaryGroup implements AttributeConverterInterface
             $query->andWhere(['member' => $this->getDn()]);
         }
         try {
-            return $query->andWhere($query->filter()->bitwiseAnd('groupType', GroupTypeFlags::SECURITY_ENABLED))
+            return $query->andWhere($query->filter()->bitwiseAnd('groupType', GroupType::SecurityEnabled))
                  ->getLdapQuery()
                  ->getSingleScalarResult();
         } catch (EmptyResultException $e) {

@@ -10,6 +10,8 @@
 
 namespace LdapTools\Connection\AD;
 
+trigger_error('The LdapTools\Connection\AD\ExchangeRoleTypes is deprecated and will be removed in a later version. Use LdapTools\Enums\Exchange\ServerRole instead.', E_USER_DEPRECATED);
+
 /**
  * The different Exchange Role types.
  *

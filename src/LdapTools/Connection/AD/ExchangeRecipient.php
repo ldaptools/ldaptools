@@ -10,6 +10,8 @@
 
 namespace LdapTools\Connection\AD;
 
+trigger_error('The LdapTools\Connection\AD\ExchangeRecipient is deprecated and will be removed in a later version. Use LdapTools\Enums\Exchange\RecipientTypeDetails or LdapTools\Enums\Exchange\RecipientDisplayType instead.', E_USER_DEPRECATED);
+
 /**
  * Constant values for Exchange Recipient Type Details and Display Type.
  *

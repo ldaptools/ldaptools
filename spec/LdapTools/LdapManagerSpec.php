@@ -12,7 +12,7 @@ namespace spec\LdapTools;
 
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Object\LdapObject;
 use LdapTools\Operation\AuthenticationOperation;
@@ -267,7 +267,7 @@ class LdapManagerSpec extends ObjectBehavior
 
         $this->delete($ldapObject);
 
-        $operation->addControl((new LdapControl(LdapControlType::SUB_TREE_DELETE))->setCriticality(true));
+        $operation->addControl((new LdapControl(LdapControlOid::SubTreeDelete))->setCriticality(true));
         $connection->execute($operation)->shouldBeCalled();
 
         $this->delete($ldapObject, true);

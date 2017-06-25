@@ -8,29 +8,32 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Query;
+namespace LdapTools\Enums;
 
-trigger_error('The LdapTools\Query\MatchingRuleOid is deprecated and will be removed in a later version. Use LdapTools\Enums\MatchingRuleOid instead.', E_USER_DEPRECATED);
+use Enums\SimpleEnumInterface;
+use Enums\SimpleEnumTrait;
 
 /**
- * Defines various LDAP matching rule OIDs.
+ * Possible LDAP matching rule OIDs.
  *
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class MatchingRuleOid
+class MatchingRuleOid implements SimpleEnumInterface
 {
+    use SimpleEnumTrait;
+
     /**
      * Equivalent to a bitwise AND operation.
      */
-    const BIT_AND = '1.2.840.113556.1.4.803';
+    const BitAnd = '1.2.840.113556.1.4.803';
 
     /**
      * Equivalent to a bitwise OR operation.
      */
-    const BIT_OR = '1.2.840.113556.1.4.804';
+    const BitOr = '1.2.840.113556.1.4.804';
 
     /**
      * Walks the chain of ancestry in objects all the way to the root until it finds a match.
      */
-    const IN_CHAIN = '1.2.840.113556.1.4.1941';
+    const InChain = '1.2.840.113556.1.4.1941';
 }

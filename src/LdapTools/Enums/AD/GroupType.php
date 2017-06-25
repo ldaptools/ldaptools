@@ -8,9 +8,10 @@
  * file that was distributed with this source code.
  */
 
-namespace LdapTools\Query;
+namespace LdapTools\Enums\AD;
 
-trigger_error('The LdapTools\Query\GroupTypeFlags is deprecated and will be removed in a later version. Use LdapTools\Enums\AD\GroupType instead.', E_USER_DEPRECATED);
+use Enums\FlagEnumInterface;
+use Enums\FlagEnumTrait;
 
 /**
  * The possible flags that can be assigned to a groupType attribute.
@@ -18,40 +19,42 @@ trigger_error('The LdapTools\Query\GroupTypeFlags is deprecated and will be remo
  * @see https://msdn.microsoft.com/en-us/library/cc223142.aspx
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class GroupTypeFlags
+class GroupType implements FlagEnumInterface
 {
+    use FlagEnumTrait;
+
     /**
      * A builtin group created by the system. This type of group cannot be created by the client.
      */
-    const BUILTIN_GROUP = 1;
+    const BuiltinGroup = 1;
 
     /**
      * A global type group.
      */
-    const GLOBAL_GROUP = 2;
+    const GlobalGroup = 2;
 
     /**
      * A domain local type group.
      */
-    const DOMAIN_LOCAL_GROUP = 4;
+    const DomainLocalGroup = 4;
 
     /**
      * A universal type group.
      */
-    const UNIVERSAL_GROUP = 8;
+    const UniversalGroup = 8;
 
     /**
      * An APP_BASIC group type for Windows Server Authorization Manager.
      */
-    const APP_BASIC = 16;
+    const AppBasic = 16;
 
     /**
      * An APP_QUERY group for Windows Server Authorization Manager.
      */
-    const APP_QUERY = 32;
+    const AppQuery = 32;
 
     /**
      * Specifies whether a group is security enabled. If this is not set, then it is a distribution type group.
      */
-    const SECURITY_ENABLED = 2147483648;
+    const SecurityEnabled = 2147483648;
 }

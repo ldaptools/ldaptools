@@ -12,7 +12,7 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\BatchModify\Batch;
 use LdapTools\Query\Builder\FilterBuilder;
-use LdapTools\Query\GroupTypeFlags;
+use LdapTools\Enums\AD\GroupType;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Utilities\MBString;
 
@@ -31,7 +31,7 @@ class ConvertGroupType implements AttributeConverterInterface
         $this->setOptions([
             'typeMap' => [],
             'types' => [],
-            'defaultValue' => GroupTypeFlags::GLOBAL_GROUP + GroupTypeFlags::SECURITY_ENABLED,
+            'defaultValue' => GroupType::GlobalGroup + GroupType::SecurityEnabled,
         ]);
     }
 

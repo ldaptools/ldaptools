@@ -19,7 +19,7 @@ use LdapTools\Query\Operator\bNot;
 use LdapTools\Query\Operator\Comparison;
 use LdapTools\Query\Operator\MatchingRule;
 use LdapTools\Query\Operator\Wildcard;
-use LdapTools\Query\MatchingRuleOid;
+use LdapTools\Enums\MatchingRuleOid;
 
 /**
  * Used to help build-up the filter operators in a more fluid object-oriented method.
@@ -286,7 +286,7 @@ class FilterBuilder
      */
     public function bitwiseAnd($attribute, $value)
     {
-        return $this->match($attribute, MatchingRuleOid::BIT_AND, $value);
+        return $this->match($attribute, MatchingRuleOid::BitAnd, $value);
     }
 
     /**
@@ -298,6 +298,6 @@ class FilterBuilder
      */
     public function bitwiseOr($attribute, $value)
     {
-        return $this->match($attribute, MatchingRuleOid::BIT_OR, $value);
+        return $this->match($attribute, MatchingRuleOid::BitOr, $value);
     }
 }
