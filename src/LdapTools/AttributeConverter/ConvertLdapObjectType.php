@@ -48,7 +48,7 @@ class ConvertLdapObjectType implements AttributeConverterInterface
         return $ldapType;
     }
     
-    public function getIsMultiValuedConverter()
+    public function isMultiValuedConverter()
     {
         return true;
     }

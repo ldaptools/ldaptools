@@ -127,13 +127,6 @@ interface AttributeConverterInterface
     public function getShouldAggregateValues();
 
     /**
-     * Set whether or not this converter should aggregate multiple attributes into one value.
-     *
-     * @param bool $aggregateValues
-     */
-    public function setShouldAggregateValues($aggregateValues);
-
-    /**
      * Set the last value in the case of an aggregate value.
      *
      * @param mixed $value
@@ -170,16 +163,9 @@ interface AttributeConverterInterface
     public function isBatchSupported(Batch $batch);
 
     /**
-     * Set whether this converter should the full array of attributes passed to it rather than one at a time.
-     *
-     * @param bool $isMultiValuedConverter
-     */
-    public function setIsMultiValuedConverter($isMultiValuedConverter);
-
-    /**
-     * Get whether this converter should the full array of attributes passed to it rather than one at a time.
+     * Get whether this converter should convert the full array of attributes passed to it rather than one at a time.
      *
      * @return bool
      */
-    public function getIsMultiValuedConverter();
+    public function isMultiValuedConverter();
 }

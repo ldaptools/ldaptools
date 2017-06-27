@@ -32,11 +32,6 @@ class ConvertGPLink implements AttributeConverterInterface
      */
     protected $gpoLinks = null;
 
-    public function __construct()
-    {
-        $this->setIsMultiValuedConverter(true);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -64,6 +59,14 @@ class ConvertGPLink implements AttributeConverterInterface
         $gpoInfo = $this->explodeGPOLinkString(is_array($gpLink) ? reset($gpLink) : $gpLink);
 
         return empty($gpoInfo) ? [] : $this->getGPOLinkArray($gpoInfo);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isMultiValuedConverter()
+    {
+        return true;
     }
 
     /**

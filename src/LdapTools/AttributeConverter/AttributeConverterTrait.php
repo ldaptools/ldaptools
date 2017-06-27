@@ -193,14 +193,6 @@ trait AttributeConverterTrait
     }
 
     /**
-     * @param bool
-     */
-    public function setShouldAggregateValues($aggregateValues)
-    {
-        $this->aggregateValues = (bool) $aggregateValues;
-    }
-
-    /**
      * @return bool
      */
     public function getShouldAggregateValues()
@@ -237,17 +229,9 @@ trait AttributeConverterTrait
     }
 
     /**
-     * @param bool
-     */
-    public function setIsMultiValuedConverter($isMultiValuedConverter)
-    {
-        $this->isMultiValuedConverter = (bool) $isMultiValuedConverter;
-    }
-
-    /**
      * @return bool
      */
-    public function getIsMultiValuedConverter()
+    public function isMultiValuedConverter()
     {
         return $this->isMultiValuedConverter;
     }

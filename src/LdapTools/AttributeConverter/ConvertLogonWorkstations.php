@@ -24,11 +24,6 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
 {
     use ConverterUtilitiesTrait, AttributeConverterTrait;
 
-    public function __construct()
-    {
-        $this->setIsMultiValuedConverter(true);
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -55,6 +50,14 @@ class ConvertLogonWorkstations implements AttributeConverterInterface
     public function fromLdap($value)
     {
         return explode(',', reset($value)) ?: [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isMultiValuedConverter()
+    {
+        return true;
     }
 
     /**

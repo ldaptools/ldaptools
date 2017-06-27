@@ -45,7 +45,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
     /**
      * {@inheritdoc}
      */
-    public function getIsMultiValuedConverter()
+    public function isMultiValuedConverter()
     {
         return $this->getRemoveOriginalValue();
     }

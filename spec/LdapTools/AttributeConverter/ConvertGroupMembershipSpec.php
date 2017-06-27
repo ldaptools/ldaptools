@@ -99,13 +99,13 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
     function it_should_act_as_a_multivalued_converter()
     {
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
-        $this->getIsMultivaluedConverter()->shouldBeEqualTo(true);
+        $this->isMultivaluedConverter()->shouldBeEqualTo(true);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $this->getIsMultivaluedConverter()->shouldBeEqualTo(true);
+        $this->isMultivaluedConverter()->shouldBeEqualTo(true);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
-        $this->getIsMultivaluedConverter()->shouldBeEqualTo(false);
+        $this->isMultivaluedConverter()->shouldBeEqualTo(false);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
-        $this->getIsMultivaluedConverter()->shouldBeEqualTo(false);
+        $this->isMultivaluedConverter()->shouldBeEqualTo(false);
     }
 
     function it_should_only_specify_the_original_attribute_to_be_removed_on_modification_or_creation()

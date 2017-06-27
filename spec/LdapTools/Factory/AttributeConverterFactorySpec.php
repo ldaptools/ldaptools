@@ -232,11 +232,6 @@ class AttributeConverterFactorySpec extends ObjectBehavior
 
     function it_should_let_me_get_whether_this_is_a_multivalued_converter_on_a_returned_converter()
     {
-        $this->get('windows_guid')->getIsMultiValuedConverter()->shouldBeBool();
-    }
-
-    function it_should_let_me_set_whether_this_is_a_multivalued_converter_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->setIsMultiValuedConverter(true)->shouldBeNull();
+        $this->get('windows_guid')->isMultiValuedConverter()->shouldBeBool();
     }
 }

@@ -26,7 +26,6 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
 
     public function __construct()
     {
-        $this->setIsMultiValuedConverter(true);
         $this->setOptions([
             'addressType' => [],
             'default' => [],
@@ -67,6 +66,14 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isMultiValuedConverter()
+    {
+        return true;
     }
 
     /**

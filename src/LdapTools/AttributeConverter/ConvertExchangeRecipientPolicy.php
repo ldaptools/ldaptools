@@ -63,7 +63,7 @@ class ConvertExchangeRecipientPolicy extends ConvertValueToDn
     /**
      * {@inheritdoc}
      */
-    public function getIsMultiValuedConverter()
+    public function isMultiValuedConverter()
     {
         return true;
     }

@@ -91,7 +91,7 @@ class OperatorValueResolver extends BaseValueResolver
         if ($values instanceof BaseOperator) {
             $this->processOperator($values, $alias);
         }
-        $operator->setConvertedValue($isValueArray || $converter->getIsMultiValuedConverter() ? $values : $values[0], $alias);
+        $operator->setConvertedValue($isValueArray || $converter->isMultiValuedConverter() ? $values : $values[0], $alias);
         $operator->setWasConverterUsed(true, $alias);
     }
     
