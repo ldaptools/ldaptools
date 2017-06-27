@@ -241,7 +241,7 @@ abstract class BaseValueResolver
         $converter = is_null($converter) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $converter;
         $converter->setAttribute($attribute);
 
-        if ($converter->getIsMultiValuedConverter()) {
+        if ($converter->isMultiValuedConverter()) {
             $values = $converter->$direction($values);
         } else {
             foreach ($values as $index => $value) {
