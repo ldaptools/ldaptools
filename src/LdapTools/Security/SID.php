@@ -332,10 +332,11 @@ class SID
         $this->revisionLevel = $sid['rev'];
         $this->identifierAuthority = $sid['id'];
         $subs = isset($sid['count']) ? $sid['count'] : 0;
+        $sidHex = $subs ? bin2hex($value) : '';
 
         // The sub-authorities depend on the count, so only get as many as the count, regardless of data beyond it
         for ($i = 0; $i < $subs; $i++) {
-            $this->subAuthorities[] = unpack('V1sub', hex2bin(substr(bin2hex($value), 16 + ($i * 8), 8)))['sub'];
+            $this->subAuthorities[] = unpack('V1sub', hex2bin(substr($sidHex, 16 + ($i * 8), 8)))['sub'];
         }
     }
 
