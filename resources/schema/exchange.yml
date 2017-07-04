@@ -424,7 +424,6 @@ objects:
             - 'mailboxDatabase'
             - 'mailboxServer'
             - 'mailboxGuid'
-            - 'smtpAddresses'
             - 'defaultSmtpAddress'
     exchange_contact:
         type: ExchangeContact
