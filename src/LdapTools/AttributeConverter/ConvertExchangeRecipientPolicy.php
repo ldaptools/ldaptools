@@ -24,6 +24,17 @@ class ConvertExchangeRecipientPolicy extends ConvertValueToDn
      */
     const AUTO_UPDATE = '{26491cfc-9e50-4857-861b-0cb8df22b5d7}';
 
+    public function __construct()
+    {
+        $this->options = array_merge($this->options, [
+            'base_dn' => '%_configurationnamingcontext_%',
+            'select' => 'objectGuid',
+            'filter' => [
+                'objectClass' => 'msExchRecipientPolicy',
+            ],
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */

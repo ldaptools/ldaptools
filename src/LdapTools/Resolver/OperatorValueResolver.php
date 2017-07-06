@@ -86,8 +86,8 @@ class OperatorValueResolver extends BaseValueResolver
         }
         $isValueArray = is_array($operator->getValue());
         $values = $isValueArray ? $operator->getValue() : [$operator->getValue()];
-        $converter = $this->getConverterWithOptions($this->schema->getConverter($operator->getAttribute()));
-        $values = $this->doConvertValues($operator->getAttribute(), $values, 'toLdap', $converter);
+        $converter = $this->getConverterWithOptions($this->schema->getConverter($operator->getAttribute()), $operator->getAttribute());
+        $values = $this->doConvertValues($operator->getAttribute(), $values, 'toLdap');
         if ($values instanceof BaseOperator) {
             $this->processOperator($values, $alias);
         }
@@ -98,7 +98,7 @@ class OperatorValueResolver extends BaseValueResolver
     /**
      * {@inheritdoc}
      */
-    protected function iterateAggregates(array $toAggregate, $values,  AttributeConverterInterface $converter)
+    protected function iterateAggregates(array $toAggregate, $values,  $converterName)
     {
     }
 }

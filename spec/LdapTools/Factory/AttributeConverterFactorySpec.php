@@ -10,9 +10,6 @@
 
 namespace spec\LdapTools\Factory;
 
-use LdapTools\AttributeConverter\AttributeConverterInterface;
-use LdapTools\BatchModify\Batch;
-use LdapTools\Connection\LdapConnectionInterface;
 use PhpSpec\ObjectBehavior;
 
 class AttributeConverterFactorySpec extends ObjectBehavior
@@ -192,46 +189,5 @@ class AttributeConverterFactorySpec extends ObjectBehavior
     {
         $this->register('foo_bar', '\LdapTools\Configuration');
         $this->shouldThrow('\Exception')->duringGet('foo_bar');
-    }
-
-    function it_should_let_me_set_the_ldap_connection_on_a_returned_converter(LdapConnectionInterface $ldap)
-    {
-        $this->get('windows_guid')->setLdapConnection($ldap)->getLdapConnection()->shouldEqual($ldap);
-    }
-
-    function it_should_let_me_set_the_converter_options_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->setOptions(['foo' => 'bar'])->getOptions()->shouldEqual(['foo' => 'bar']);
-    }
-
-    function it_should_let_me_set_the_converter_operation_type_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->setOperationType(AttributeConverterInterface::TYPE_MODIFY)->getOperationType()->shouldEqual(AttributeConverterInterface::TYPE_MODIFY);
-    }
-
-    function it_should_let_me_set_the_dn_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->setDn('cn=foo,dc=foo,dc=bar')->getDn()->shouldEqual('cn=foo,dc=foo,dc=bar');
-    }
-
-    function it_should_let_me_set_the_last_value_returned_converter()
-    {
-        $this->get('windows_guid')->setLastValue('foo')->getLastValue()->shouldEqual('foo');
-    }
-
-    function it_should_let_me_set_the_batch_on_a_returned_converter()
-    {
-        $batch = new Batch(1, 'foo', 'bar');
-        $this->get('windows_guid')->setBatch($batch)->getBatch()->shouldEqual($batch);
-    }
-
-    function it_should_let_me_check_a_batch_is_supported_on_the_converter()
-    {
-        $this->get('windows_guid')->isBatchSupported(new Batch(1, 'foo', 'bar'))->shouldBeBool();
-    }
-
-    function it_should_let_me_get_whether_this_is_a_multivalued_converter_on_a_returned_converter()
-    {
-        $this->get('windows_guid')->isMultiValuedConverter()->shouldBeBool();
     }
 }

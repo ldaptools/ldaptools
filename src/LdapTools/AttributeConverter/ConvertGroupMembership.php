@@ -26,15 +26,25 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
 {
     use OperationGeneratorTrait;
 
+    public function __construct()
+    {
+        $this->options = array_merge($this->options, [
+            'to_attribute' => 'member',
+            'from_attribute' => 'memberOf',
+            'attribute' => 'sAMAccountName',
+            'filter' => [
+                'objectClass' => 'group',
+            ],
+        ]);
+    }
+
     /**
      * {@inheritdoc}
      */
     public function toLdap($values)
     {
-        $this->validateCurrentAttribute($this->options);
-
         if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO) {
-            $values = $this->getDnFromValue($values);
+            $values = parent::toLdap($values);
         } else {
             $this->createOperationsFromValues($values);
         }
@@ -75,7 +85,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
         if (!($this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY && $this->getBatch()->isTypeRemoveAll())) {
             $batchType = $this->getBatchTypeForOperation();
             foreach ($values as $value) {
-                $this->addOperation($this->getDnFromValue($value), $batchType);
+                $this->addOperation(parent::toLdap($value), $batchType);
             }
         }
     }
@@ -102,7 +112,7 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
             };
         }
 
-        $collection->add(new Batch($batchType, $this->getOptionsArray()['to_attribute'], $valueDn));
+        $collection->add(new Batch($batchType, $this->options['to_attribute'], $valueDn));
         $operation = new BatchModifyOperation($dn, $collection);
         $this->operation->addPostOperation($operation);
     }
@@ -123,12 +133,12 @@ class ConvertGroupMembership extends ConvertValueToDn implements OperationGenera
      */
     protected function removeCurrentGroups()
     {
-        $valuesToRemove = $this->getCurrentLdapAttributeValue($this->getOptionsArray()['from_attribute']);
+        $valuesToRemove = $this->getCurrentLdapAttributeValue($this->options['from_attribute']);
         $valuesToRemove = is_null($valuesToRemove) ? [] : $valuesToRemove;
         $valuesToRemove = is_array($valuesToRemove)  ? $valuesToRemove : [$valuesToRemove];
 
         foreach ($valuesToRemove as $value) {
-            $this->addOperation($this->getDnFromValue($value), Batch::TYPE['REMOVE']);
+            $this->addOperation(parent::toLdap($value), Batch::TYPE['REMOVE']);
         }
     }
 

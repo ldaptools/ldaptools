@@ -25,6 +25,13 @@ class ConvertEnum implements AttributeConverterInterface
         ConverterUtilitiesTrait;
 
     /**
+     * @var array
+     */
+    protected $options = [
+        'enum' => '',
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function toLdap($value)
@@ -63,24 +70,21 @@ class ConvertEnum implements AttributeConverterInterface
      */
     protected function getEnum()
     {
-        $this->validateCurrentAttribute($this->options);
-        $opts = $this->getArrayValue($this->options, $this->getAttribute());
-
-        if (!isset($opts['enum'])) {
+        if (empty($this->options['enum'])) {
             throw new AttributeConverterException(sprintf(
-                'You must set the enum option for the "%s" attribute',
+                'You must set an "enum" option for the "%s" attribute.',
                 $this->getAttribute()
             ));
         }
-        if (!is_subclass_of($opts['enum'], SimpleEnumInterface::class)) {
+        if (!is_subclass_of($this->options['enum'], SimpleEnumInterface::class)) {
             throw new AttributeConverterException(sprintf(
                 'The enum class "%s" for "%s" must be an instance of "%s"',
-                $opts['enum'],
+                $this->options['enum'],
                 $this->getAttribute(),
                 SimpleEnumInterface::class
             ));
         }
 
-        return $opts['enum'];
+        return $this->options['enum'];
     }
 }

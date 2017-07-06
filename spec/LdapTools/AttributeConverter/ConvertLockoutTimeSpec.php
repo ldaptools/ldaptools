@@ -17,7 +17,7 @@ class ConvertLockoutTimeSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->setOptions(['bool' => 'locked']);
+        $this->setOptions(['bool' => true]);
         $this->setAttribute('locked');
     }
 
@@ -42,6 +42,7 @@ class ConvertLockoutTimeSpec extends ObjectBehavior
 
     function it_should_convert_a_lockoutTime_to_a_DateTime_object_if_the_attribute_is_no_expecting_bool()
     {
+        $this->setOptions(['bool' => false]);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
         $this->setAttribute('lockedDate');
 
@@ -51,6 +52,7 @@ class ConvertLockoutTimeSpec extends ObjectBehavior
 
     function it_should_convert_a_datetime_object_to_windows_time_when_going_to_ldap()
     {
+        $this->setOptions(['bool' => false]);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $this->setAttribute('lockedDate');
 
@@ -64,6 +66,7 @@ class ConvertLockoutTimeSpec extends ObjectBehavior
 
     function it_should_throw_an_attribute_converter_exception_if_the_value_to_ldap_is_not_supported()
     {
+        $this->setOptions(['bool' => false]);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $this->setAttribute('lockedDate');
 

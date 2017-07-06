@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
@@ -32,21 +33,16 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         ],
     ];
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
-        $options = [
-            'addressType' => [
-                'exchangeSmtpAddress' => 'smtp',
-                'exchangeDefaultSmtpAddress' => 'smtp',
-            ],
-            'default' => [
-                'exchangeDefaultSmtpAddress'
-            ],
-        ];
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $this->setOptions($options);
+        $this->setOptions([
+            'addressType' => 'smtp',
+            'is_default' => false
+        ]);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
+        $this->setAttribute('exchangeSmtpAddress');
     }
 
     function it_is_initializable()
@@ -61,32 +57,29 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
 
     function it_should_convert_an_array_of_addresses_to_an_array_of_specific_address_types()
     {
-        $smtp = ['foo@bar.com','foo.bar@foo.com'];
-        $this->setAttribute('exchangeSmtpAddress');
-        // 514 represents a "normal account" with the disabled bit set.
-        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo($smtp);
-        $this->setAttribute('exchangeDefaultSmtpAddress');
+        $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo(['foo@bar.com','foo.bar@foo.com']);
+        $this->setOptions(['is_default' => true]);
         $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo(['foo.bar@foo.com']);
     }
 
     function it_should_return_the_default_address_for_a_specific_type_of_address_if_requested()
     {
-        $this->setAttribute('exchangeDefaultSmtpAddress');
+        $this->setOptions(['is_default' => true]);
         $this->fromLdap(['smtp:foo@bar.com','SMTP:foo.bar@foo.com','x400:foo'])->shouldBeEqualTo(['foo.bar@foo.com']);
     }
 
     function it_should_return_an_empty_string_for_the_default_address_if_it_cannot_be_found()
     {
-        $this->setAttribute('exchangeDefaultSmtpAddress');
+        $this->setOptions(['is_default' => true]);
         $this->fromLdap(['x400:foo'])->shouldBeEqualTo('');
     }
 
     function it_should_aggregate_values_when_converting_an_array_of_addresses_to_ldap_on_creation()
     {
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
-        $this->setAttribute('exchangeSmtpAddress');
         $this->toLdap(['foo@bar.com','foo.bar@foo.com'])->shouldBeEqualTo(['smtp:foo@bar.com', 'smtp:foo.bar@foo.com']);
-        $this->setAttribute('exchangeDefaultSmtpAddress');
+
+        $this->setOptions(['is_default' => true]);
         $this->toLdap(['foo@bar.com'])->shouldBeEqualTo(['SMTP:foo@bar.com', 'smtp:foo.bar@foo.com']);
         $this->toLdap(['foo2@bar.com'])->shouldBeEqualTo(['smtp:foo@bar.com', 'smtp:foo.bar@foo.com','SMTP:foo2@bar.com']);
     }
@@ -106,14 +99,15 @@ class ConvertExchangeProxyAddressSpec extends ObjectBehavior
         ];
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $this->setAttribute('exchangeSmtpAddress');
         $this->setBatch(new Batch(Batch::TYPE['ADD'],'exchangeSmtpAddress',['chad@sikorra.com']));
         $this->toLdap(['chad@sikorra.com'])->shouldBeEqualTo($addresses);
         $this->getBatch()->getModType()->shouldBeEqualTo(Batch::TYPE['REPLACE']);
+
         unset($addresses[0]);
         $this->setBatch(new Batch(Batch::TYPE['REMOVE'],'exchangeSmtpAddress',['foo@foo.bar']));
         $this->toLdap(['foo@foo.bar'])->shouldBeEqualTo($addresses);
-        $this->setAttribute('exchangeDefaultSmtpAddress');
+
+        $this->setOptions(['is_default' => true]);
         $this->setBatch(new Batch(Batch::TYPE['ADD'],'exchangeDefaultSmtpAddress',['foo@foo.bar']));
         $this->toLdap(['FooBar@foo'])->shouldBeLike([
             1 => "smtp:Foo.Bar@foo.bar",

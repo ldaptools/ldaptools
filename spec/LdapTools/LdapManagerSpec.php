@@ -169,7 +169,7 @@ class LdapManagerSpec extends ObjectBehavior
         $this->domain->setSchemaName('example');
         $this->beConstructedWith($this->config);
         $this->shouldThrow(new \RuntimeException('Unable to load Repository for type "foo": Cannot find object type "foo" in schema.'))->duringGetRepository('foo');
-        $this->shouldThrow(new \RuntimeException('Unable to load Repository for type "user": Repository class "\Foo\Bar" not found.'))->duringGetRepository('user');
+        $this->shouldThrow(new \RuntimeException('Unable to load Repository for type "CustomRepository": Repository class "\Foo\Bar" not found.'))->duringGetRepository('CustomRepository');
     }
 
     function it_should_return_a_ldap_object_creator_when_calling_createLdapObject()

@@ -9,43 +9,40 @@ objects:
         class: user
         converter_options:
             lockout_time:
-                bool: locked
-            group_membership:
-                groups:
-                    to_attribute: member
-                    from_attribute: memberOf
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: group
+                locked:
+                    bool: true
             flags:
-                userAccountControl:
-                    attribute: 'userAccountControl'
-                    defaultValue: '512'
-                    flagMap:
-                        disabled: '2'
-                        enabled: '2'
-                        passwordIsReversible: '128'
-                        passwordNeverExpires: '65536'
-                        smartCardRequired: '262144'
-                        trustedForAllDelegation: '524288'
-                        trustedForAnyAuthDelegation: '16777216'
-                    invert:
-                        - 'enabled'
+                _default:
+                    default_value:
+                        LdapTools\Enums\AD\UserAccountControl: 'NormalAccount'
+                    attribute:
+                        LdapTools\Enums\AD\UserAccountControl: 'userAccountControl'
+                disabled:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::Disabled'
+                enabled:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::Disabled'
+                    invert: true
+                passwordIsReversible:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::EncryptedTextPwdAllowed'
+                passwordNeverExpires:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::PasswordNeverExpires'
+                smartCardRequired:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::SmartCardRequired'
+                trustedForAllDelegation:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::TrustedForDelegation'
+                trustedForAnyAuthDelegation:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::TrustedToAuthForDelegation'
             value_to_dn:
                 exchangeMailboxDatabase:
-                    attribute: cn
                     filter:
                         objectClass: msExchMDB
                 exchangePolicyActiveSync:
-                    attribute: cn
                     filter:
                         objectClass: msExchMobileMailboxPolicy
                 exchangePolicyRBAC:
-                    attribute: cn
                     filter:
                         objectClass: msExchRBACPolicy
                 exchangePolicyRetention:
-                    attribute: cn
                     filter:
                         objectClass: msExchRecipientPolicy
                 exchangeSendOnBehalfOf:
@@ -65,11 +62,11 @@ objects:
                         objectClass: contact
                         objectCategory: person
             exchange_proxy_address:
-                addressType:
-                    exchangeSmtpAddresses: 'smtp'
-                    exchangeDefaultSmtpAddress: 'smtp'
-                default:
-                    - 'exchangeDefaultSmtpAddress'
+                exchangeDefaultSmtpAddress:
+                    address_type: smtp
+                    is_default: true
+                exchangeSmtpAddresses:
+                    address_type: smtp
         # These are converters to be applied for going both to and from LDAP.
         converters:
              bool:
@@ -256,32 +253,26 @@ objects:
                  - 'created'
                  - 'modified'
         converter_options:
-            group_membership:
-                groups:
-                    to_attribute: member
-                    from_attribute: memberOf
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: group
             group_type:
-                defaultValue: '-2147483646'
-                distribution: typeDistribution
-                types:
-                    scope: [ scopeDomainLocal, scopeGlobal, scopeUniversal ]
-                    type: [ typeBuiltin, typeSecurity, typeDistribution ]
-                typeMap:
-                    typeBuiltin: '1'
-                    typeSecurity: '2147483648'
-                    typeDistribution: '2147483648'
-                    scopeDomainLocal: '4'
-                    scopeGlobal: '2'
-                    scopeUniversal: '8'
+                typeBuiltin:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::BuiltinGroup'
+                typeSecurity:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::SecurityEnabled'
+                typeDistribution:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::SecurityEnabled'
+                    invert: true
+                scopeDomainLocal:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::DomainLocalGroup'
+                scopeGlobal:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::GlobalGroup'
+                scopeUniversal:
+                    flag_enum: 'LdapTools\Enums\AD\GroupType::UniversalGroup'
             exchange_proxy_address:
-                addressType:
-                    exchangeSmtpAddresses: 'smtp'
-                    exchangeDefaultSmtpAddress: 'smtp'
-                default:
-                    - 'exchangeDefaultSmtpAddress'
+                exchangeSmtpAddresses:
+                    address_type: 'smtp'
+                exchangeDefaultSmtpAddress:
+                    address_type: 'smtp'
+                    is_default: true
             value_to_dn:
                 members:
                     display_dn: true
@@ -357,25 +348,21 @@ objects:
                  - 'trustedForAllDelegation'
                  - 'trustedForAnyAuthDelegation'
         converter_options:
-            group_membership:
-                groups:
-                    to_attribute: member
-                    from_attribute: memberOf
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: group
             flags:
-                userAccountControl:
-                    # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
-                    defaultValue: '4096'
-                    attribute: 'userAccountControl'
-                    flagMap:
-                        disabled: '2'
-                        enabled: '2'
-                        trustedForAllDelegation: '524288'
-                        trustedForAnyAuthDelegation: '16777216'
-                    invert:
-                        - 'enabled'
+                _default:
+                    default_value:
+                        LdapTools\Enums\AD\UserAccountControl: 'WorkstationTrustAccount'
+                    attribute:
+                        LdapTools\Enums\AD\UserAccountControl: 'userAccountControl'
+                disabled:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::Disabled'
+                enabled:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::Disabled'
+                    invert: true
+                trustedForAllDelegation:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::TrustedForDelegation'
+                trustedForAnyAuthDelegation:
+                    flag_enum: 'LdapTools\Enums\AD\UserAccountControl::TrustedToAuthForDelegation'
         attributes:
             accountName: sAMAccountName
             created: whenCreated
@@ -432,18 +419,11 @@ objects:
                  - 'modified'
         converter_options:
             exchange_proxy_address:
-                addressType:
-                    exchangeSmtpAddresses: 'smtp'
-                    exchangeDefaultSmtpAddress: 'smtp'
-                default:
-                    - 'exchangeDefaultSmtpAddress'
-            group_membership:
-                groups:
-                    to_attribute: member
-                    from_attribute: memberOf
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: group
+                exchangeSmtpAddresses:
+                    address_type: 'smtp'
+                exchangeDefaultSmtpAddress:
+                    address_type: 'smtp'
+                    is_default: true
             value_to_dn:
                 manager:
                     display_dn: true
@@ -656,11 +636,12 @@ objects:
                  - 'modified'
         converter_options:
             ldap_type:
-                user: [ top, person, organizationalPerson, user ]
-                group: [ top, group ]
-                computer: [ top, person, organizationalPerson, user, computer ]
-                contact: [ top, person, organizationalPerson, contact ]
-                ou: [ top, organizationalUnit ]
+                schemaType:
+                    user: [ top, person, organizationalPerson, user ]
+                    group: [ top, group ]
+                    computer: [ top, person, organizationalPerson, user, computer ]
+                    contact: [ top, person, organizationalPerson, contact ]
+                    ou: [ top, organizationalUnit ]
         attributes:
             created: whenCreated
             dn: distinguishedName

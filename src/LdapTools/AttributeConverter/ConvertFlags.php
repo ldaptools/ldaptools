@@ -10,12 +10,11 @@
 
 namespace LdapTools\AttributeConverter;
 
+use Enums\FlagEnumInterface;
 use LdapTools\BatchModify\Batch;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Query\Builder\FilterBuilder;
-use LdapTools\Security\Flags;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
-use LdapTools\Utilities\MBString;
 
 /**
  * Aggregates a generic flag map to/from LDAP given the correct options.
@@ -27,25 +26,35 @@ class ConvertFlags implements AttributeConverterInterface
     use ConverterUtilitiesTrait, AttributeConverterTrait;
 
     /**
-     * @var null|array
+     * @var array
      */
-    protected $currentOptions;
+    protected $options = [
+        # The fully qualified flag class and enum name.
+        # ie. 'LdapTools\Enums\AD\UserAccountControl::Disabled'
+        'flag_enum' => '',
+        # The default value to use for a flag enum class if no value is defined for the flags yet
+        # ie. 'LdapTools\Enums\AD\UserAccountControl' => 'NormalAccount'
+        'default_value' => [],
+        # If the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled)
+        'invert' => false,
+    ];
 
-    public function __construct()
-    {
-        $this->setOptions([
-            'flagMap' => [],
-            'defaultValue' => '',
-            'invert' => [],
-            'attribute' => '',
-        ]);
-    }
+    /**
+     * @var string
+     */
+    protected $flagClass = '';
+
+    /**
+     * @var string
+     */
+    protected $flagName = '';
 
     /**
      * {@inheritdoc}
      */
     public function toLdap($value)
     {
+        $this->init();
         if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO) {
             return $this->getQueryOperator((bool) $value);
         }
@@ -58,9 +67,10 @@ class ConvertFlags implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $value = (new Flags($value))->has($this->getCurrentAttributeFlag());
+        $this->init();
+        $value = $this->getFlagEnum($value)->has($this->flagName);
 
-        return $this->shouldInvertValue() ? !$value : $value;
+        return $this->options['invert'] ? !$value : $value;
     }
 
     /**
@@ -88,25 +98,14 @@ class ConvertFlags implements AttributeConverterInterface
      */
     protected function modifyFlagValue($value)
     {
-        $this->setDefaultLastValue($this->getAttributeOptions()['attribute'], $this->getAttributeOptions()['defaultValue']);
-        if (is_array($this->getLastValue())) {
-            $flags = $this->getLastValue();
-            $flags = new Flags(reset($flags));
-        } else {
-            $flags = new Flags($this->getLastValue());
-        }
+        $this->setDefaultLastValue($this->getEnumAttribute(), $this->getDefaultEnumValue());
+        $flags = $this->getFlagFromLastValue($this->getLastValue());
 
-        // If the bit we are expecting is already set how we want it, then do not attempt to modify it.
-        if ($this->fromLdap($flags->getValue()) === $value) {
-            return $flags->getValue();
-        }
-        $value = $this->shouldInvertValue() ? !$value : $value;
-
-        $mappedValue = $this->getCurrentAttributeFlag();
+        $value = $this->options['invert'] ? !$value : $value;
         if ($value) {
-            $flags->add((int) $mappedValue);
+            $flags->add($this->flagName);
         } else {
-            $flags->remove((int) $mappedValue)->getValue();
+            $flags->remove($this->flagName);
         }
 
         return $flags->getValue();
@@ -121,57 +120,95 @@ class ConvertFlags implements AttributeConverterInterface
     protected function getQueryOperator($value)
     {
         $fb = new FilterBuilder();
-        $operator = $fb->bitwiseAnd($this->getAttributeOptions()['attribute'], $this->getCurrentAttributeFlag());
-        $value = $this->shouldInvertValue() ? !$value : $value;
+        $operator = $fb->bitwiseAnd($this->getEnumAttribute(), $this->getFlagEnum()->getValue());
+        $value = $this->options['invert'] ? !$value : $value;
 
         return $value ? $operator : $fb->bNot($operator);
     }
 
     /**
-     * Check if the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled)
-     *
-     * @return bool
+     * @param mixed $lastValue
+     * @return FlagEnumInterface
      */
-    protected function shouldInvertValue()
+    protected function getFlagFromLastValue($lastValue)
     {
-        $options = $this->getAttributeOptions();
+        if (is_array($lastValue)) {
+            $flags = $this->getFlagEnum(reset($lastValue));
+        } else {
+            $flags = $this->getFlagEnum($lastValue);
+        }
 
-        return isset($options['invert']) && in_array(MBString::strtolower($this->getAttribute()), $options['invert']);
+        return $flags;
     }
 
     /**
-     * Get the flag value for the current attribute we are checking.
-     *
-     * @return int
-     */
-    protected function getCurrentAttributeFlag()
-    {
-        return $this->getArrayValue($this->getAttributeOptions()['flagMap'], $this->getAttribute());
-    }
-
-    /**
-     * @return array
+     * @param mixed $value
+     * @return FlagEnumInterface
      * @throws AttributeConverterException
      */
-    protected function getAttributeOptions()
+    protected function getFlagEnum($value = null)
     {
-        $attribute = MBString::strtolower($this->getAttribute());
+        $enumValue = $value ?: $this->flagName;
 
-        if (isset($this->currentOptions[$attribute])) {
-            return $this->currentOptions[$attribute];
+        if (!is_subclass_of($this->flagClass, FlagEnumInterface::class)) {
+            throw new AttributeConverterException(sprintf(
+                'The flag_enum "%s" for "%s" must be an instance of "%s"',
+                $this->flagClass,
+                $this->getAttribute(),
+                FlagEnumInterface::class
+            ));
         }
 
-        foreach ($this->getOptions() as $options) {
-            if (isset($options['flagMap']) && array_key_exists($attribute, MBString::array_change_key_case($options['flagMap']))) {
-                $this->currentOptions[$attribute] = $options;
+        return new $this->flagClass($enumValue);
+    }
 
-                return $this->currentOptions[$attribute];
-            }
+    /**
+     * @throws AttributeConverterException
+     */
+    protected function init()
+    {
+        $parts = explode('::', $this->options['flag_enum']);
+
+        if (count($parts) != 2) {
+            throw new AttributeConverterException(sprintf(
+                'The flag_enum value "%s" is not valid for "%s".',
+                $this->options['flag_enum'],
+                $this->getAttribute()
+            ));
         }
 
-        throw new AttributeConverterException(sprintf(
-            'The attribute "%s" does not appear to be mapped to any flag values.',
-            $this->getAttribute()
-        ));
+        $this->flagClass = $parts[0];
+        $this->flagName = $parts[1];
+    }
+
+    /**
+     * @return mixed
+     */
+    protected function getDefaultEnumValue()
+    {
+        $default = null;
+
+        if (isset($this->options['default_value'][$this->flagClass])) {
+            $default = $this->options['default_value'][$this->flagClass];
+        }
+
+        return $default;
+    }
+
+    /**
+     * @return string
+     * @throws AttributeConverterException
+     */
+    protected function getEnumAttribute()
+    {
+        if (!isset($this->options['attribute'][$this->flagClass])) {
+            throw new AttributeConverterException(sprintf(
+                'No attribute option is defined for class "%s" and "%s".',
+                $this->flagClass,
+                $this->getAttribute()
+            ));
+        }
+
+        return $this->options['attribute'][$this->flagClass];
     }
 }

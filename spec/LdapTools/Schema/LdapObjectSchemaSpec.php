@@ -203,14 +203,16 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_have_an_empty_for_converter_options_when_instantiated()
     {
-        $this->getConverterOptions()->shouldBeEqualTo([]);
+        $this->getConverterOptions('int', 'foo')->shouldBeEqualTo([]);
     }
 
     function it_should_properly_set_the_converter_options()
     {
-        $options = ['foo' => ['bar']];
-        $this->setConverterOptions($options);
-        $this->getConverterOptions()->shouldBeEqualTo($options);
+        $options = [
+            'foo' => 'bar',
+        ];
+        $this->setConverterOptions('int', 'foo', $options);
+        $this->getConverterOptions('int', 'foo')->shouldBeEqualTo($options);
     }
 
     function it_should_properly_set_attributes_that_should_always_return_an_array()

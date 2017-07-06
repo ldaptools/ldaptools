@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\AttributeConverter;
 
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Object\LdapObject;
@@ -54,7 +55,7 @@ class ConvertValueToDnSpec extends ObjectBehavior
         ],
     ];
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
     }
@@ -81,12 +82,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))' && $operation->getAttributes() == ['dn'];
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
@@ -101,12 +101,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $connection->execute(Argument::that(function($operation) use ($guidHex, $guid) {
             return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap($guid)->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
@@ -120,12 +119,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
             return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap($sid)->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
@@ -135,12 +133,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $dn = 'CN=Chad,OU=Employees,DC=example,DC=com';
         $ldapObject = new LdapObject(['dn' => $dn], ['user'], 'user', 'user');
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap($ldapObject)->shouldBeEqualTo($dn);
@@ -149,12 +146,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_error_if_a_LdapObject_is_missing_a_DN($connection)
     {
         $ldapObject = new LdapObject(['cn' => 'foo'], ['user'], 'user', 'user');
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap($ldapObject);
@@ -164,12 +160,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
     {
         $dn = $this->entry[0]['distinguishedname'][0];
         $connection->execute(Argument::any())->shouldNotBeCalled();
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap($dn)->shouldBeEqualTo($dn);
@@ -177,20 +172,14 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_convert_a_dn_into_its_common_name()
     {
-        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']]);
+        $this->setOptions([ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']);
         $this->setAttribute('foo');
         $this->fromLdap('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldBeEqualTo('Foo,=bar');
     }
 
-    function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute($connection)
-    {
-        $this->setLdapConnection($connection);
-        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
-    }
-
     function it_should_display_the_dn_from_ldap_if_specified()
     {
-        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo', 'display_dn' => true]]);
+        $this->setOptions([ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo', 'display_dn' => true]);
         $this->setAttribute('foo');
         $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('cn=Foo,dc=bar,dc=foo');
     }
@@ -200,13 +189,12 @@ class ConvertValueToDnSpec extends ObjectBehavior
         $connection->execute(Argument::that(function($operation) {
             return $operation->getFilter() == '(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))';
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => ['bar', 'foo'],
             ],
             'or_filter' => true,
-        ]]);
+        ]);
         $this->setAttribute('foo');
         $this->setLdapConnection($connection);
         $this->toLdap('Foo')->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
@@ -218,13 +206,12 @@ class ConvertValueToDnSpec extends ObjectBehavior
             return $operation->getBaseDn() == 'ou=user,dc=foo,dc=bar';
         }))->shouldBeCalled()->willReturn($this->entry);
 
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
             'base_dn' => 'ou=user,dc=foo,dc=bar',
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
@@ -237,13 +224,12 @@ class ConvertValueToDnSpec extends ObjectBehavior
             return $operation->getAttributes() == ['foo'];
         }))->shouldBeCalled()->willReturn($this->entryWithSelect);
 
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
             'select' => 'foo',
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
@@ -254,13 +240,12 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_accept_a_legacy_dn_from_ldap_if_specified()
     {
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
             'legacy_dn' => true,
-        ]]);
+        ]);
         $this->setAttribute('foo');
 
         $this->fromLdap('/o=LdapTools/ou=Exchange Administrative Group (FYDIBOHF23SPDLT)/cn=Foo')->shouldBeEqualTo('Foo');
@@ -268,13 +253,12 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_allow_a_wildcard_if_specified_in_the_options($connection)
     {
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
             'allow_wildcard' => true,
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
@@ -287,12 +271,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
 
     function it_should_not_allow_a_wildcard_if_not_specified_in_the_options($connection)
     {
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ]
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 
@@ -306,12 +289,11 @@ class ConvertValueToDnSpec extends ObjectBehavior
     function it_should_throw_a_useful_message_if_a_value_cannot_be_converted_from_searching_ldap($connection)
     {
         $connection->execute(Argument::any())->willReturn([]);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
+        $this->setOptions([
             'filter' => [
                 'objectClass' => 'bar'
             ],
-        ]]);
+        ]);
         $this->setLdapConnection($connection);
         $this->setAttribute('foo');
 

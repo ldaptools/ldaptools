@@ -87,22 +87,24 @@ class BatchValueResolver extends BaseValueResolver
     /**
      * {@inheritdoc}
      */
-    protected function iterateAggregates(array $toAggregate, $values, AttributeConverterInterface $converter)
+    protected function iterateAggregates(array $toAggregate, $values, $converterName)
     {
         $batches = $this->getBatchesForAttributes($toAggregate);
+        $lastValue = null;
 
+        /** @var Batch $batch */
         foreach ($batches as $index => $batch) {
-            /** @var Batch $batch */
+            $converter = $this->getConverterWithOptions($converterName, $batch->getAttribute());
             $this->validateBatchAggregate($batch, $converter);
+            $converter->setLastValue($lastValue);
             $converter->setBatch($batch);
-            $values = $this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap', $converter);
-            $converter->setLastValue($values);
+            $lastValue = $this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap', $converter);
             if ($index !== $this->currentBatchIndex) {
                 $this->batches->remove($index);
             }
         }
 
-        return $values;
+        return $lastValue;
     }
 
     /**
@@ -147,9 +149,9 @@ class BatchValueResolver extends BaseValueResolver
     /**
      * {@inheritdoc}
      */
-    protected function getConverterWithOptions($converterName)
+    protected function getConverterWithOptions($converterName, $attribute)
     {
-        $converter = parent::getConverterWithOptions($converterName);
+        $converter = parent::getConverterWithOptions($converterName, $attribute);
         $converter->setBatch($this->batches->get($this->currentBatchIndex));
         
         return $converter;

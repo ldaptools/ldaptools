@@ -51,16 +51,11 @@ class LdapObjectManagerSpec extends ObjectBehavior
 
     function let(LdapConnectionInterface $connection)
     {
-        $config = (new DomainConfiguration('example.com'))->setSchemaName('example');
-        $connection->getConfig()->willReturn($config);
-
+        $connection->getConfig()->willReturn(new DomainConfiguration('example.com'));
         $config = new Configuration();
-        $parserTest = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../resources/schema');
-        $parser = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
+        $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
         $cache = CacheFactory::get('none', []);
-        $this->dispatcherTest = new SymfonyEventDispatcher();
         $this->dispatcher = new SymfonyEventDispatcher();
-        $this->objectSchemaFactoryTest = new LdapObjectSchemaFactory($cache, $parserTest, $this->dispatcherTest);
         $this->objectSchemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
 
         $this->beConstructedWith($connection, $this->objectSchemaFactory, $this->dispatcher);
@@ -97,7 +92,7 @@ class LdapObjectManagerSpec extends ObjectBehavior
             ->shouldBeCalled()
             ->willReturn(true);
 
-        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user');
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
         $this->delete($ldapObject, true);
     }
 

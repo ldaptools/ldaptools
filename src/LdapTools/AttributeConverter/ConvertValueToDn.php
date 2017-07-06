@@ -17,7 +17,6 @@ use LdapTools\Query\LdapQueryBuilder;
 use LdapTools\Query\Operator\bOr;
 use LdapTools\Utilities\ConverterUtilitiesTrait;
 use LdapTools\Utilities\LdapUtilities;
-use LdapTools\Utilities\MBString;
 
 /**
  * Takes a common string value and converts it into a full distinguished name.
@@ -29,13 +28,45 @@ class ConvertValueToDn implements AttributeConverterInterface
     use AttributeConverterTrait, ConverterUtilitiesTrait;
 
     /**
+     * @var array
+     */
+    protected $options = [
+        # The attribute containing the friendly/common name of the value
+        'attribute' => 'cn',
+        # Whether the DN should be displayed instead of the friendly/common name
+        'display_dn' => false,
+        # Whether the value is expected to be a legacy (exchange) DN
+        'legacy_dn' => false,
+        # The value to select/use when going back to LDAP
+        'select' => 'dn',
+        # The filter to use when querying LDAP
+        'filter' => [],
+        # Whether the query should be a logical OR filter
+        'or_filter' => false,
+        # The base DN to use when querying LDAP
+        'base_dn' => null,
+        # Whether or not a wildcard should be allowed in the friendly name
+        'allow_wildcard' => false,
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function toLdap($value)
     {
-        $this->validateCurrentAttribute();
+        if ($value instanceof LdapObject && !$value->has($this->options['select'])) {
+            throw new AttributeConverterException(sprintf(
+                'The LdapObject must have a "%s" defined when used in "%s".',
+                $this->options['select'],
+                $this->getAttribute()
+            ));
+        } elseif ($value instanceof LdapObject) {
+            $value = $value->get($this->options['select']);
+        } elseif (!LdapUtilities::isValidLdapObjectDn($value) && !is_null($this->getLdapConnection())) {
+            $value = $this->getAttributeFromLdapQuery($value, $this->options['select']);
+        }
 
-        return $this->getDnFromValue($value);
+        return $value;
     }
 
     /**
@@ -43,10 +74,8 @@ class ConvertValueToDn implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        $options = $this->getOptionsArray();
-
-        if (!(isset($options['display_dn']) && $options['display_dn'])) {
-            $value = $this->explodeDnValue($value, $options);
+        if (!($this->options['display_dn'])) {
+            $value = $this->explodeDnValue($value);
         }
 
         return $value;
@@ -54,44 +83,16 @@ class ConvertValueToDn implements AttributeConverterInterface
 
     /**
      * @param string $value
-     * @param array $options
      * @return array
      */
-    protected function explodeDnValue($value, array $options)
+    protected function explodeDnValue($value)
     {
-        if (isset($options['legacy_dn']) && $options['legacy_dn']) {
+        if ($this->options['legacy_dn']) {
             $value = LdapUtilities::explodeExchangeLegacyDn($value);
             $value = end($value);
         }  else {
             $value = LdapUtilities::explodeDn($value);
             $value = reset($value);
-        }
-
-        return $value;
-    }
-
-    /**
-     * Given a value try to determine how to get its full distinguished name.
-     *
-     * @param string $value
-     * @return string $dn
-     * @throws AttributeConverterException
-     */
-    protected function getDnFromValue($value)
-    {
-        $options = $this->getOptionsArray();
-        $toSelect = (isset($options['select']) ? $options['select'] : 'dn');
-
-        if ($value instanceof LdapObject && !$value->has($toSelect)) {
-            throw new AttributeConverterException(sprintf(
-                'The LdapObject must have a "%s" defined when used in "%s".',
-                $toSelect,
-                $this->getAttribute()
-            ));
-        } elseif ($value instanceof LdapObject) {
-            $value = $value->get($toSelect);
-        } elseif (!LdapUtilities::isValidLdapObjectDn($value) && !is_null($this->getLdapConnection())) {
-            $value = $this->getAttributeFromLdapQuery($value, $toSelect);
         }
 
         return $value;
@@ -107,11 +108,10 @@ class ConvertValueToDn implements AttributeConverterInterface
      */
     protected function getAttributeFromLdapQuery($value, $toSelect)
     {
-        $options = $this->getOptionsArray();
-        $query = $this->buildLdapQuery($options['filter'], (isset($options['or_filter']) && $options['or_filter']), $toSelect);
+        $query = $this->buildLdapQuery($this->options['filter'], $this->options['or_filter'], $toSelect);
 
         $bOr = $this->getQueryOrStatement($query, $value);
-        $eq = $this->getQueryComparisonStatement($value, $options, $query);
+        $eq = $this->getQueryComparisonStatement($value, $query);
 
         if (!empty($bOr->getChildren())) {
             $bOr->add($eq);
@@ -119,9 +119,7 @@ class ConvertValueToDn implements AttributeConverterInterface
         } else {
             $query->where($eq);
         }
-        if (isset($options['base_dn'])) {
-            $query->setBaseDn($options['base_dn']);
-        }
+        $query->setBaseDn($this->options['base_dn']);
 
         try {
             return $query->getLdapQuery()->getSingleScalarResult();
@@ -180,54 +178,17 @@ class ConvertValueToDn implements AttributeConverterInterface
 
     /**
      * @param string $value
-     * @param array $options
      * @param LdapQueryBuilder $query
      * @return \LdapTools\Query\Operator\BaseOperator
      */
-    protected function getQueryComparisonStatement($value, $options, LdapQueryBuilder $query)
+    protected function getQueryComparisonStatement($value, LdapQueryBuilder $query)
     {
-        if ($options['allow_wildcard']) {
-            $eq = $query->filter()->like($options['attribute'], $value);
+        if ($this->options['allow_wildcard']) {
+            $eq = $query->filter()->like($this->options['attribute'], $value);
         } else {
-            $eq = $query->filter()->eq($options['attribute'], $value);
+            $eq = $query->filter()->eq($this->options['attribute'], $value);
         }
 
         return $eq;
-    }
-
-    /**
-     * Validates and retrieves the options array for the current attribute.
-     *
-     * @return array
-     * @throws AttributeConverterException
-     */
-    protected function getOptionsArray()
-    {
-        $this->validateCurrentAttribute();
-        $options = $this->getArrayValue($this->options, $this->getAttribute());
-
-        if (!isset($options['filter']) || !is_array($options['filter'])) {
-            throw new AttributeConverterException(sprintf('Filter not valid for "%s".', $this->getAttribute()));
-        }
-        if (!isset($options['attribute'])) {
-            throw new AttributeConverterException(sprintf('Attribute to search on not defined for "%s"', $this->getAttribute()));
-        }
-        $options['allow_wildcard'] = isset($options['allow_wildcard']) ? $options['allow_wildcard'] : false;
-
-        return $options;
-    }
-
-    /**
-     * Make sure that the current attribute has actually been defined.
-     *
-     * @throws AttributeConverterException
-     */
-    protected function validateCurrentAttribute()
-    {
-        if (!array_key_exists(MBString::strtolower($this->getAttribute()), MBString::array_change_key_case($this->getOptions()))) {
-            throw new AttributeConverterException(
-                sprintf('Attribute "%s" must be defined in the converter options.', $this->getAttribute())
-            );
-        }
     }
 }

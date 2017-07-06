@@ -108,7 +108,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'CustomRepository')
             ->getRepository()
             ->shouldBeEqualTo('\Foo\Bar');
     }
@@ -131,25 +131,25 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'generic')
             ->getDefaultValues()
-            ->shouldHaveKey('displayName');
+            ->shouldBeEqualTo(['name' => 'bar']);
     }
 
     function it_should_parse_required_attributes_for_an_object()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'generic')
             ->getRequiredAttributes()
-            ->shouldBeEqualTo(['username', 'password']);
+            ->shouldBeEqualTo(['name']);
     }
 
     function it_should_parse_the_default_container_for_an_object()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'DefaultContainer')
             ->getDefaultContainer()
             ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
     }
@@ -158,7 +158,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'DefaultBaseDN')
             ->getBaseDn()
             ->shouldBeEqualTo('ou=bar,dc=example,dc=local');
     }
@@ -228,18 +228,15 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parse('example', 'converter_options')
-            ->getConverterOptions()
-            ->shouldHaveKey('generalized_time');
-        $this->parse('example', 'converter_options')
-            ->getConverterOptions()
-            ->shouldContain(['type' => 'windows']);
+            ->getConverterOptions('generalized_time', 'foo')
+            ->shouldBeEqualTo(['type' => 'windows']);
     }
 
     function it_should_parse_a_schema_objects_multivalued_attriutes()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'user')
+        $this->parse('example', 'MultivaluedAttributes')
             ->getMultivaluedAttributes()
             ->shouldBeEqualTo(['otherHomePhone']);
     }
@@ -249,7 +246,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
         $this->parseAll('example')->shouldBeArray();
-        $this->parseAll('example')->shouldHaveCount(15);
+        $this->parseAll('example')->shouldHaveCount(14);
         $this->parseAll('example')->shouldReturnAnArrayOfLdapObjectSchemas();
     }
 
@@ -257,7 +254,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('includes', 'user')->getObjectClass()->shouldBeEqualTo(['user']);
+        $this->parse('includes', 'generic')->getObjectClass()->shouldBeEqualTo(['foo']);
         $this->parse('includes', 'foo')->shouldReturnAnInstanceOf('\LdapTools\Schema\LdapObjectSchema');
     }
 
@@ -371,7 +368,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'UseR')->getObjectType()->shouldBeEqualTo('user');
+        $this->parse('example', 'GeneriC')->getObjectType()->shouldBeEqualTo('generic');
     }
 
 

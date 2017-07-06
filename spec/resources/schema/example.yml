@@ -1,356 +1,25 @@
 objects:
-    user:
-        type: user
-        class: user
-        category: person
-        repository: '\Foo\Bar'
-        converter_options:
-            flags:
-                userAccountControl:
-                    attribute: userAccountControl
-                    defaultValue: '512'
-                    invert: [ 'enabled' ]
-                    flagMap:
-                        disabled: '2'
-                        passwordIsReversible: '128'
-                        passwordNeverExpires: '65536'
-                        smartCardRequired: '262144'
-                        trustedForAllDelegation: '524288'
-                        trustedForAnyAuthDelegation: '16777216'
-            group_membership:
-                groups:
-                    attribute: sAMAccountName
-                    to_attribute: member
-                    filter:
-                        objectClass: group
-            value_to_dn:
-                exchangeMailboxDatabase:
-                    attribute: cn
-                    filter:
-                        objectClass: msExchMDB
-                exchangePolicyActiveSync:
-                    attribute: cn
-                    filter:
-                        objectClass: msExchMobileMailboxPolicy
-                exchangePolicyRBAC:
-                    attribute: cn
-                    filter:
-                        objectClass: msExchRBACPolicy
-                exchangePolicyRetention:
-                    attribute: cn
-                    filter:
-                        objectClass: msExchRecipientPolicy
-                exchangeSendOnBehalfOf:
-                    display_dn: true
-                    attribute: sAMAccountName
-                    filter:
-                        objectClass: person
-                manager:
-                    display_dn: true
-                    attribute: sAMAccountName
-                    or_filter: true
-                    filter:
-                        objectClass: contact
-                        objectCategory: person
-            exchange_proxy_address:
-                addressType:
-                    exchangeSmtpAddresses: 'smtp'
-                    exchangeDefaultSmtpAddress: 'smtp'
-                default:
-                    - 'exchangeDefaultSmtpAddress'
-        converters:
-             bool:
-                 - 'exchangeHideFromGAL'
-             int:
-                 - 'badPasswordCount'
-                 - 'employeeNumber'
-             windows_guid:
-                 - 'exchangeMailboxGuid'
-                 - 'guid'
-             encode_windows_password:
-                 - 'password'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-             windows_time:
-                 - 'passwordLastSet'
-             flags:
-                 - 'disabled'
-                 - 'passwordIsReversible'
-                 - 'passwordNeverExpires'
-                 - 'smartCardRequired'
-                 - 'trustedForAllDelegation'
-                 - 'trustedForAnyAuthDelegation'
-             password_must_change: [ passwordMustChange ]
-             value_to_dn:
-                - 'exchangeMailboxDatabase'
-                - 'exchangePolicyRBAC'
-                - 'exchangePolicyActiveSync'
-                - 'exchangePolicyRetention'
-                - 'groups'
-                - 'manager'
-             exchange_proxy_address:
-                - 'exchangeSmtpAddresses'
-                - 'exchangeDefaultSmtpAddress'
-             logon_workstations: [ logonWorkstations ]
-             account_expires: [ accountExpirationDate ]
-             primary_group: [ primaryGroup ]
+    generic:
+        type: generic
+        class: foo
+        category: bar
         attributes:
-            accountExpirationDate: accountExpires
-            badPasswordCount: badPwdCount
-            city: l
-            company: company
-            country: c
-            created: whenCreated
-            department: department
-            description: description
-            division: division
-            disabled: userAccountControl
-            displayName: displayname
-            dn: distinguishedName
-            emailAddress: mail
-            employeeId: employeeId
-            employeeNumber: employeeNumber
-            exchangeAlias: mailNickname
-            exchangeHideFromGAL: msExchHideFromAddressLists
-            exchangeMailboxDatabase: homeMDB
-            exchangeMailboxGuid: msExchMailboxGUID
-            exchangePolicyActiveSync: msExchMobileMailboxPolicyLink
-            exchangePolicyRBAC: msExchRBACPolicyLink
-            exchangePolicyRetention: msExchMailboxTemplateLink
-            exchangeSendOnBehalfOf: publicDelegates
-            exchangeSmtpAddresses: proxyAddresses
-            exchangeDefaultSmtpAddress: proxyAddresses
-            fax: facsimileTelephoneNumber
-            firstName: givenName
-            groups: memberOf
-            guid: objectGuid
-            homeDirectory: homeDirectory
-            homeDrive: homeDrive
-            homePage: wWWHomePage
-            homePhone: homePhone
-            initials: initials
-            ipPhone: ipPhone
-            lastName: sn
-            logonWorkstations: userWorkstations
-            manager: manager
-            middleName: middleName
-            mobilePhone: mobile
-            modified: whenChanged
-            name: cn
-            office: physicalDeliveryOfficeName
-            organization: o
-            otherFaxes: otherFacsimileTelephoneNumber
-            otherHomePhones: otherHomePhone
-            otherIpPhones: otherIpPhone
-            otherPagers: otherPager
-            otherPhoneNumbers: otherTelephoneNumber
-            pager: pager
-            password: unicodePwd
-            passwordIsReversible: userAccountControl
-            passwordLastSet: pwdLastSet
-            passwordNeverExpires: userAccountControl
-            passwordMustChange: pwdLastSet
-            phoneNumber: telephoneNumber
-            poBox: postOfficeBox
-            primaryGroup: primaryGroupID
-            profilePath: profilePath
-            scriptPath: scriptPath
-            servicePrincipalNames: servicePrincipalName
-            sid: objectSid
-            smartCardRequired: userAccountControl
-            state: st
-            streetAddress: streetAddress
-            title: title
-            trustedForAllDelegation: userAccountControl
-            trustedForAnyAuthDelegation: userAccountControl
-            username: sAMAccountName
-            upn: userPrincipalName
-            zipCode: postalCode
-        # These attributes will be forced into an array regardless of the number of results they return.
-        multivalued_attributes:
-            - otherHomePhone
+            name: foo
         default_values:
-            name: %username%
-            displayName: "%username%"
-            firstName: "%username%"
-            upn: "%username%@%_domainname_%"
-            disabled: false
-            objectclass: [ 'top', 'person', 'organizationalPerson', 'user' ]
-            userAccountControl: "512"
-        required_attributes:
-            - 'username'
-            - 'password'
-        default_container: 'ou=foo,ou=bar,dc=example,dc=local'
-        base_dn: 'ou=bar,dc=example,dc=local'
-    group:
-        type: group
-        class: group
-        repository: '\LdapTools\Configuration'
-        converters:
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-        attributes:
-            created: whenCreated
-            description: description
-            displayName: displayname
-            dn: distinguishedName
-            emailAddress: mail
-            guid: objectGuid
-            modified: whenChanged
-            name: cn
-            sid: objectSid
-        attributes_to_select:
-            - 'name'
-            - 'dn'
-            - 'guid'
-    computer:
-        type: computer
-        category: computer
-        converters:
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-        attributes:
-            accountName: sAMAccountName
-            created: whenCreated
-            description: description
-            dnsHostName: dNSHostName
-            dn: distinguishedName
-            guid: objectGuid
-            location: location
-            modified: whenChanged
-            name: cn
-            os: operatingSystem
-            osServicePack: operatingSystemServicePack
-            osVersion: operatingSystemVersion
-            sid: objectSid
-        attributes_to_select:
-            - 'name'
-            - 'os'
-            - 'dn'
-            - 'guid'
-        default_values:
-            accountName: "%name%"
-            # This makes it a typical workstation: WORKSTATION_TRUST_ACCOUNT == 4096
-            userAccountControl: "4096"
-            objectclass: [ 'top', 'person', 'organizationalPerson', 'user', 'computer' ]
-        required_attributes:
-            - 'name'
-    contact:
-        type: contact
-        category: contact
-        converters:
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-        attributes:
-            created: whenCreated
-            description: description
-            dn: dn
-            displayName: displayName
-            emailAddress: mail
-            firstName: givenName
-            guid: objectGuid
-            lastName: sn
-            modified: whenChanged
-            name: cn
-            phoneNumber: telephoneNumber
-            sid: objectSid
-        attributes_to_select:
-            - 'name'
-            - 'emailAddress'
-            - 'phoneNumber'
-            - 'dn'
-            - 'guid'
-        default_values:
-            displayName: "%name%"
-            objectclass: [ 'top', 'person', 'organizationalPerson', 'contact' ]
-        required_attributes:
-            - 'name'
-            - 'emailAddress'
-    ou:
-        type: ou
-        class: organizationalUnit
-        converters:
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-        attributes:
-            city: l
-            country: c
-            created: whenCreated
-            description: description
-            dn: distinguishedName
-            guid: objectGuid
-            modified: whenChanged
-            name: ou
-            sid: objectSid
-            state: st
-            streetAddress: streetAddress
-            zipCode: postalCode
-        attributes_to_select:
-            - 'description'
-            - 'name'
-            - 'guid'
-            - 'sid'
-        default_values:
-            objectclass: [ 'top', 'organizationalUnit' ]
+            name: bar
         required_attributes:
             - 'name'
     without_name:
         type: noname
         category: user
-        converters:
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
         attributes:
-            created: whenCreated
-            description: description
-            dn: dn
-            displayName: displayName
             emailAddress: mail
-            firstName: givenName
-            guid: objectGuid
-            lastName: sn
-            modified: whenChanged
-            phoneNumber: telephoneNumber
-            sid: objectSid
-        attributes_to_select:
-            - 'emailAddress'
-            - 'phoneNumber'
-            - 'dn'
-            - 'guid'
     extend_default:
         type: extend_default
         extends_default: [ ad, user ]
         repository: '\Foo\Bar'
-    extends_contact:
-        extends: contact
+    extends_generic:
+        extends: generic
         type: custom_contact
         attributes_to_select:
             - 'fax'
@@ -370,7 +39,9 @@ objects:
         converters:
             generalized_time: foo
         converter_options:
-            generalized_time: { type: windows }
+            generalized_time:
+                foo:
+                    type: windows
     ldap_controls:
         type: controls
         filter:
@@ -394,57 +65,32 @@ objects:
         scope: onelevel
         attributes:
            foo: bar
-    deleted:
-        type: deleted
-        filter:
-            eq: [ isDeleted, true ]
-            present: lastKnownLocation
-        controls:
-            - [ 1.2.840.113556.1.4.417, true ]
-        paging: false
-        base_dn: "CN=Deleted Objects,%_defaultNamingContext_%"
-        converters:
-             bool:
-                 - 'isDeleted'
-             ldap_type:
-                 - 'type'
-             windows_guid:
-                 - 'guid'
-             windows_sid:
-                 - 'sid'
-             windows_generalized_time:
-                 - 'created'
-                 - 'modified'
-        converter_options:
-            ldap_type:
-                user: [ top, person, organizationalPerson, user ]
-                group: [ top, group ]
-                computer: [ top, person, organizationalPerson, user, computer ]
-                contact: [ top, person, organizationalPerson, contact ]
-                ou: [ top, organizationalUnit ]
-        attributes:
-            created: whenCreated
-            dn: distinguishedName
-            firstName: givenName
-            lastName: sn
-            guid: objectGuid
-            isDeleted: isDeleted
-            lastKnownLocation: lastKnownParent
-            lastKnownName: msds-lastKnownRdn
-            modified: whenChanged
-            name: cn
-            sid: objectSid
-            type: objectClass
-            upn: userPrincipalName
-        attributes_to_select:
-            - 'name'
-            - 'guid'
-            - 'lastKnownLocation'
-            - 'lastKnownName'
-            - 'sid'
     custom_rdn:
         type: CustomRDN
         class: CustomRDN
         rdn: foo
         attributes:
             name: cn
+    custom_repository:
+        type: CustomRepository
+        class: CustomRepository
+        attributes:
+            name: cn
+        repository: \Foo\Bar
+    default_container:
+        extends_default: [ad, user]
+        type: DefaultContainer
+        default_container: 'ou=foo,ou=bar,dc=example,dc=local'
+    default_basedn:
+        type: DefaultBaseDN
+        class: DefaultBaseDN
+        attributes:
+            name: cn
+        base_dn: 'ou=bar,dc=example,dc=local'
+    multivalued_attributes:
+        type: MultivaluedAttributes
+        class: MultivaluedAttributes
+        attributes:
+            name: cn
+        multivalued_attributes:
+            - 'otherHomePhone'

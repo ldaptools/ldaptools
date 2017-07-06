@@ -20,6 +20,7 @@ use LdapTools\Object\LdapObject;
 use LdapTools\Operation\BatchModifyOperation;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
+use LdapTools\Schema\Parser\SchemaYamlParser;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -68,77 +69,26 @@ class BatchValueResolverSpec extends ObjectBehavior
     /**
      * @var array
      */
-    protected $ldapObjectOpts = [['dn' => 'cn=foo,dc=foo,dc=bar'], [], 'user', 'user'];
+    protected $ldapObjectOpts = [['dn' => 'cn=foo,dc=foo,dc=bar'], 'user'];
 
     function let(LdapConnectionInterface $connection)
     {
-        $schema = new LdapObjectSchema('ad', 'user');
-        $schema->setAttributeMap([
-            'username' => 'sAMAccountName',
-            'emailAddress' => 'mail',
-            'disabled' => 'userAccountControl',
-            'passwordMustChange' => 'pwdLastSet',
-            'passwordNeverExpires' => 'userAccountControl',
-            'trustedForAllDelegation' => 'userAccountControl',
-            'mrmEnabled' => 'msExchELCMailboxFlags',
-            'retentionHoldEnabled' => 'msExchELCMailboxFlags',
-            'litigationHoldEnabled' => 'msExchELCMailboxFlags',
-            'groups' => 'memberOf',
-        ]);
-        $schema->setConverterMap([
-            'disabled' => 'flags',
-            'passwordMustChange' => 'password_must_change',
-            'trustedForAllDelegation' => 'flags',
-            'passwordNeverExpires' => 'flags',
-            'litigationHoldEnabled' => 'flags',
-            'retentionHoldEnabled' => 'flags',
-            'mrmEnabled' => 'flags',
-            'groups' => 'group_membership',
-        ]);
-        $schema->setConverterOptions([
-            'flags' => [
-                'userAccountControl' => [
-                    'flagMap' => [
-                        'disabled' => '2',
-                        'passwordNeverExpires' => '65536',
-                        'smartCardRequired' => '262144',
-                        'trustedForAllDelegation' => '524288',
-                        'passwordIsReversible' => '128',
-                    ],
-                    'attribute' => 'userAccountControl',
-                    'invert' => ['enabled'],
-                    'defaultValue' => '512',
-                ],
-                'msExchELCMailboxFlags' => [
-                    'attribute' => 'msExchELCMailboxFlags',
-                    'defaultValue' => '0',
-                    'flagMap' => [
-                        'retentionHoldEnabled' => '1',
-                        'mrmEnabled' => '2',
-                        'calendarLoggingDisabled' => '4',
-                        'calendarLoggingEnabled' => '4',
-                        'litigationHoldEnabled' => '8',
-                        'singleItemRecoveryEnabled' => '16',
-                        'isArchiveDatabaseValid' => '32',
-                    ],
-                    'invert' => [ 'calendarLoggingEnabled' ],
-                ],
-            ],
-            'group_membership' => [
-                'groups' => [
-                    'to_attribute' => 'member',
-                    'from_attribute' => 'memberOf',
-                    'attribute' => 'sAMAccountName',
-                    'filter' => [
-                        'objectClass' => 'group',
-                    ],
-                ],
-            ],
-        ]);
+        $parser = new SchemaYamlParser(__DIR__.'/../../../resources/schema');
+        $this->schema = $parser->parse('exchange', 'ExchangeMailboxUser');
+
         $this->expectedSearch = new QueryOperation('(&(distinguishedName=cn=foo,dc=foo,dc=bar))', ['userAccountControl']);
-        $this->schema = $schema;
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $connection->getRootDse()->willReturn(new LdapObject(['foo' => 'bar']));
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
+                && $operation->getAttributes() == ['userAccountControl'];
+        }))->willReturn($this->expectedResult);
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(objectClass=*))'
+                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
+                && $operation->getAttributes() == ['msExchELCMailboxFlags'];
+        }))->willReturn($this->expectedElcResult);
     }
 
     function it_is_initializable()
@@ -152,8 +102,8 @@ class BatchValueResolverSpec extends ObjectBehavior
         $ldapObject = new LdapObject(...$this->ldapObjectOpts);
         $ldapObject->set('disabled', true);
         $ldapObject->set('trustedForAllDelegation', true);
-        $ldapObject->set('litigationHoldEnabled', true);
-        $ldapObject->set('retentionHoldEnabled', true);
+        $ldapObject->set('litigationEnabled', true);
+        $ldapObject->set('retentionEnabled', true);
         $ldapObject->set('username', 'foo');
         $ldapObject->add('emailAddress', 'chad.sikorra@gmail.com');
         $ldapObject->remove('phoneNumber','555-5555');
@@ -188,18 +138,6 @@ class BatchValueResolverSpec extends ObjectBehavior
             'attrib' => 'pager',
             'modtype' => LDAP_MODIFY_BATCH_REMOVE_ALL,
         ];
-
-        $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(objectClass=*))'
-                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
-                && $operation->getAttributes() == ['userAccountControl'];
-        }))->willReturn($this->expectedResult);
-
-        $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(objectClass=*))'
-                && $operation->getBaseDn() == 'cn=foo,dc=foo,dc=bar'
-                && $operation->getAttributes() == ['msExchELCMailboxFlags'];
-        }))->willReturn($this->expectedElcResult);
 
         $this->beConstructedWith($this->schema, $ldapObject->getBatchCollection(), AttributeConverterInterface::TYPE_MODIFY);
         $this->setLdapConnection($connection);

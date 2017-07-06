@@ -52,7 +52,6 @@ class SchemaYamlParser implements SchemaParserInterface
         'default_values' => 'setDefaultValues',
         'required_attributes' => 'setRequiredAttributes',
         'default_container' => 'setDefaultContainer',
-        'converter_options' => 'setConverterOptions',
         'multivalued_attributes' => 'setMultivaluedAttributes',
         'base_dn' => 'setBaseDn',
         'paging' => 'setUsePaging',
@@ -155,6 +154,7 @@ class SchemaYamlParser implements SchemaParserInterface
             }
             $ldapObjectSchema->$setter($value);
         }
+        $this->parseConverterOptions($ldapObjectSchema, $objectSchema);
         $ldapObjectSchema->setFilter($this->parseFilter($ldapObjectSchema, $objectSchema));
         $ldapObjectSchema->setAttributeMap(isset($objectSchema['attributes']) ? $objectSchema['attributes'] : []);
         $ldapObjectSchema->setConverterMap($this->parseConverterMap($objectSchema));
@@ -304,6 +304,23 @@ class SchemaYamlParser implements SchemaParserInterface
         }
         
         return $controls;
+    }
+
+    /**
+     * @param LdapObjectSchema $schema
+     * @param array $arraySchema
+     */
+    protected function parseConverterOptions(LdapObjectSchema $schema, array $arraySchema)
+    {
+        if (!isset($arraySchema['converter_options'])) {
+            return;
+        }
+
+        foreach ($arraySchema['converter_options'] as $converter => $attributes) {
+            foreach ($attributes as $attribute => $options) {
+                $schema->setConverterOptions($converter, $attribute, $options);
+            }
+        }
     }
 
     /**

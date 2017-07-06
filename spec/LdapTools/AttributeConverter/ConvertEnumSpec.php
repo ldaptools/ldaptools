@@ -18,8 +18,7 @@ class ConvertEnumSpec extends ObjectBehavior
 {
     function let()
     {
-        $this->setAttribute('foo');
-        $this->setOptions(['foo' => ['enum' => '\LdapTools\Enums\Exchange\RecipientDisplayType']]);
+        $this->setOptions(['enum' => '\LdapTools\Enums\Exchange\RecipientDisplayType']);
     }
 
     function it_is_initializable()
@@ -49,7 +48,7 @@ class ConvertEnumSpec extends ObjectBehavior
 
     function it_should_throw_an_error_if_the_enum_does_not_implement_the_enum_interface()
     {
-        $this->setOptions(['foo' => ['enum' => '\SplObjectStorage']]);
+        $this->setOptions(['enum' => '\SplObjectStorage']);
 
         $this->shouldThrow('LdapTools\Exception\AttributeConverterException')->duringToLdap('DistributionGroup');
     }

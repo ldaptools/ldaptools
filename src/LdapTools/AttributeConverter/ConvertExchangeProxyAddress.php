@@ -24,20 +24,21 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
 {
     use ConverterUtilitiesTrait, AttributeConverterTrait;
 
-    public function __construct()
-    {
-        $this->setOptions([
-            'addressType' => [],
-            'default' => [],
-        ]);
-    }
+    /**
+     * @var array
+     */
+    protected $options = [
+        # The address type to filter from the proxy addresses
+        'address_type' => 'smtp',
+        # Whether or not to the default/primary of the address type is being worked with
+        'is_default' => false,
+    ];
 
     /**
      * {@inheritdoc}
      */
     public function toLdap($value)
     {
-        $this->validateCurrentAttribute($this->getOptions()['addressType']);
         $this->setDefaultLastValue('proxyAddresses', []);
 
         $this->modifyAddressArray($value);
@@ -53,19 +54,11 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      */
     public function fromLdap($value)
     {
-        if (!is_array($value)) {
-            throw new \InvalidArgumentException('This converter expects an array of values from LDAP.');
-        }
-        $this->validateCurrentAttribute($this->getOptions()['addressType']);
-        $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
-
-        if ($this->isDefaultValueAttribute()) {
-            $result = $this->getDefaultAddressByType($value, $addressType);
+        if ($this->options['is_default']) {
+            return $this->getDefaultAddressByType($value);
         } else {
-            $result = $this->getAddressesByType($value, $addressType);
+            return $this->getAddressesByType($value);
         }
-
-        return $result;
     }
 
     /**
@@ -77,18 +70,25 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getShouldAggregateValues()
+    {
+        return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
+    }
+
+    /**
      * Get all the addresses of a specific type from a standard proxyAddress array.
      *
      * @param array $proxyAddresses
-     * @param string $type
      * @return array
      */
-    protected function getAddressesByType(array $proxyAddresses, $type)
+    protected function getAddressesByType(array $proxyAddresses)
     {
         $addresses = [];
 
         foreach ($proxyAddresses as $address) {
-            if (preg_match('/^' . $type . ':(.*)$/i', $address, $matches)) {
+            if (preg_match('/^' . $this->options['address_type'] . ':(.*)$/i', $address, $matches)) {
                 $addresses[] = $matches[1];
             }
         }
@@ -100,24 +100,23 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      * Get the default email for a specific address type.
      *
      * @param array $proxyAddresses
-     * @param string $type
-     * @return string
+     * @return array
      */
-    protected function getDefaultAddressByType(array $proxyAddresses, $type)
+    protected function getDefaultAddressByType(array $proxyAddresses)
     {
-        $matches = preg_grep('/^'.strtoupper($type).':(.*)$/', $proxyAddresses);
+        $matches = preg_grep('/^'.strtoupper($this->options['address_type']).':(.*)$/', $proxyAddresses);
 
-        return (count($matches) == 0) ? '' : [substr_replace(reset($matches), '', 0, (strlen($type) + 1))];
-    }
+        $defaultAddress = '';
+        if (count($matches) !== 0) {
+            $defaultAddress = [substr_replace(
+                reset($matches),
+                '',
+                0,
+                (strlen($this->options['address_type']) + 1)
+            )];
+        }
 
-    /**
-     * Determine if the current attribute we are on is the default attribute for its type.
-     *
-     * @return bool
-     */
-    protected function isDefaultValueAttribute()
-    {
-        return in_array(MBString::strtolower($this->getAttribute()), MBString::array_change_value_case($this->getOptions()['default']));
+        return $defaultAddress;
     }
 
     /**
@@ -129,7 +128,7 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     {
         $addresses = $this->formatAddresses($addresses);
 
-        if ($this->isDefaultValueAttribute()) {
+        if ($this->options['is_default']) {
             $this->modifyDefaultAddress(reset($addresses));
         } else {
             $this->modifyAddresses($addresses);
@@ -145,8 +144,8 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     protected function formatAddresses(array $emailAddresses)
     {
         foreach ($emailAddresses as $index => $emailAddress) {
-            $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
-            $addressPrefix = $this->isDefaultValueAttribute() ? strtoupper($addressType) . ':' : strtolower($addressType) . ':';
+            $addressType = $this->options['address_type'];
+            $addressPrefix = $this->options['is_default'] ? strtoupper($addressType) . ':' : strtolower($addressType) . ':';
             $emailAddresses[$index] = $addressPrefix . $emailAddress;
         }
 
@@ -181,17 +180,15 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
     protected function modifyDefaultAddress($defaultAddress)
     {
         $values = is_array($this->getLastValue()) ? $this->getLastValue() : [$this->getLastValue()];
-
-        $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
         $isAddressInArray = in_array(MBString::strtolower($defaultAddress), MBString::array_change_value_case($values));
 
-        $length = strlen($addressType);
+        $length = strlen($this->options['address_type']);
         foreach ($values as $index => $address) {
             // If another address is already the default then it must be changed.
-            if ((substr($address, 0, $length) === strtoupper($addressType)) && ($address !== $defaultAddress)) {
-                $values[$index] = substr_replace($address, $addressType, 0, $length);
+            if ((substr($address, 0, $length) === strtoupper($this->options['address_type'])) && ($address !== $defaultAddress)) {
+                $values[$index] = substr_replace($address, $this->options['address_type'], 0, $length);
             // If the address is the one we are looking for but is not the default, then make it the default.
-            } elseif ($isAddressInArray && (MBString::strtolower($address) == MBString::strtolower($defaultAddress))) {
+            } elseif ($isAddressInArray && (MBString::strtolower($address) === MBString::strtolower($defaultAddress))) {
                 $values[$index] = $defaultAddress;
             }
         }
@@ -213,17 +210,8 @@ class ConvertExchangeProxyAddress implements AttributeConverterInterface
      */
     protected function replaceAddressesOfType(array $addresses, array $replaceWith)
     {
-        $addressType = $this->getArrayValue($this->getOptions()['addressType'], $this->getAttribute());
-        $addresses = preg_grep('/^'.$addressType.':(.*)$/i', $addresses, PREG_GREP_INVERT);
+        $addresses = preg_grep('/^'.$this->options['address_type'].':(.*)$/i', $addresses, PREG_GREP_INVERT);
 
         return array_merge($addresses, $replaceWith);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShouldAggregateValues()
-    {
-        return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
     }
 }

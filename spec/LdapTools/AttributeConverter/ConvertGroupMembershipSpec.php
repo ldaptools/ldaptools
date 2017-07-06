@@ -15,8 +15,9 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
+use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
-use LdapTools\Operation\QueryOperation;
+use LdapTools\Operation\LdapOperationInterface;
 use PhpSpec\ObjectBehavior;
 use Prophecy\Argument;
 
@@ -78,7 +79,9 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
 
     function let(LdapConnectionInterface $connection)
     {
-        $connection->getConfig()->willReturn(new DomainConfiguration('example.local'));
+        $connection->getConfig()->willReturn(new DomainConfiguration('bar.foo'));
+        $this->setLdapConnection($connection);
+        $this->setOptions([ 'filter' => ['objectClass' => 'bar']]);
     }
 
     function it_is_initializable()
@@ -122,140 +125,85 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
     
     function it_should_convert_a_dn_to_a_normal_name()
     {
-        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']]);
-        $this->setAttribute('foo');
         $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('Foo');
     }
 
     function it_should_convert_a_GUID_back_to_a_dn($connection)
     {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $guid = 'a1131cd3-902b-44c6-b49a-1f6a567cda25';
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
 
         $connection->execute(Argument::that(function($operation) use ($guidHex, $guid) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(sAMAccountName='.$guid.')))';
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
-        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
         $this->toLdap($guid)->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
     }
 
     function it_should_convert_a_SID_back_to_a_dn($connection)
     {
+        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
         $sid = 'S-1-5-21-1004336348-1177238915-682003330-512';
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';
 
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(sAMAccountName='.$sid.')))';
         }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
-        $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
         $this->toLdap($sid)->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
     }
 
-    function it_should_convert_a_LdapObject_back_to_a_dn(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function it_should_convert_a_LdapObject_back_to_a_dn()
     {
-        $dn = 'CN=Chad,OU=Employees,DC=example,DC=com';
-        $ldapObject = new LdapObject(['dn' => $dn], ['user'], 'user', 'user');
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
-        $this->toLdap($ldapObject)->shouldBeEqualTo($dn);
+
+        $this->toLdap(new LdapObject(['dn' => 'CN=Chad,OU=Employees,DC=example,DC=com'], 'user'))->shouldBeEqualTo('CN=Chad,OU=Employees,DC=example,DC=com');
     }
 
-    function it_should_error_if_a_LdapObject_is_missing_a_DN($connection)
+    function it_should_error_if_a_LdapObject_is_missing_a_DN()
     {
-        $ldapObject = new LdapObject(['cn' => 'foo'], ['user'], 'user', 'user');
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
-        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap($ldapObject);
+
+        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap(new LdapObject(['cn' => 'foo'], 'user'));
     }
 
     function it_should_convert_a_dn_back_to_a_dn($connection)
     {
-        $dn = $this->entry[0]['distinguishedname'][0];
-        $connection->getConfig()->willReturn(new DomainConfiguration('bar.foo'));
-        $connection->execute(Argument::any())->shouldNotBeCalled();
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
-        $this->toLdap($dn)->shouldBeEqualTo($dn);
+        $connection->execute(Argument::any())->shouldNotBeCalled();
+
+        $this->toLdap("CN=Chad,OU=Employees,DC=example,DC=com")->shouldBeEqualTo("CN=Chad,OU=Employees,DC=example,DC=com");
     }
 
     function it_should_convert_a_dn_into_its_common_name()
     {
-        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo']]);
-        $this->setAttribute('foo');
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
-        $this->fromLdap('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldBeEqualTo('Foo,=bar');
-    }
 
-    function it_should_throw_an_error_if_no_options_exist_for_the_current_attribute($connection)
-    {
-        $this->setLdapConnection($connection);
-        $this->shouldThrow('\LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
+        $this->fromLdap('cn=Foo\,\=bar,dc=foo,dc=bar')->shouldBeEqualTo('Foo,=bar');
     }
 
     function it_should_display_the_dn_from_ldap_if_specified()
     {
-        $this->setOptions(['foo' =>[ 'filter' => ['objectClass' => 'bar'],  'attribute' => 'foo', 'display_dn' => true]]);
-        $this->setAttribute('foo');
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_FROM);
+        $this->setOptions([ 'display_dn' => true]);
+
         $this->fromLdap('cn=Foo,dc=bar,dc=foo')->shouldBeEqualTo('cn=Foo,dc=bar,dc=foo');
     }
 
     function it_should_allow_an_or_filter_for_an_attribute($connection)
     {
-        $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(|(objectClass=bar)(objectClass=foo))(cn=Foo))';
-        }))->willReturn($this->entry);
-        $this->setOptions(['foo' => [
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => ['bar', 'foo'],
-            ],
-            'or_filter' => true,
-        ]]);
-        $this->setAttribute('foo');
-        $this->setLdapConnection($connection);
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
+
+        $connection->execute(Argument::that(function($operation) {
+            return $operation->getFilter() == '(&(|(objectClass=bar)(objectClass=foo))(sAMAccountName=Foo))';
+        }))->willReturn($this->entry);
+        $this->setOptions(['or_filter' => true, 'filter' => ['objectClass' => ['bar', 'foo']]]);
+
         $this->toLdap('Foo')->shouldBeEqualTo($this->entry[0]['distinguishedname'][0]);
     }
 
-    function it_should_generate_add_operations_based_off_a_name_guid_sid_and_LdapObject_on_a_create_operation($connection, \LdapTools\Operation\AddOperation $operation)
+    function it_should_generate_add_operations_based_off_a_name_guid_sid_and_LdapObject_on_a_create_operation($connection, AddOperation $operation)
     {
         $sid = 'S-1-5-21-1004336348-1177238915-682003330-512';
         $sidHex = '\01\05\00\00\00\00\00\05\15\00\00\00\dc\f4\dc\3b\83\3d\2b\46\82\8b\a6\28\00\02\00\00';
@@ -263,27 +211,19 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
         $dn = 'cn=foo,dc=example,dc=local';
         $objectDn = 'CN=SomeGroup,OU=Employees,DC=example,DC=com';
-        $ldapObject = new LdapObject(['dn' => $objectDn], ['group'], 'group', 'group');
+        $ldapObject = new LdapObject(['dn' => $objectDn], 'group');
 
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(sAMAccountName=Foo))';
         }))->willReturn($this->entry);
         $connection->execute(Argument::that(function($operation) use ($guid, $guidHex) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(sAMAccountName='.$guid.')))';
         }))->willReturn($this->entryGuid);
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(sAMAccountName='.$sid.')))';
         }))->willReturn($this->entrySid);
-        $this->setOptions(['foo' => [
-            'to_attribute' => 'member',
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
+
         $this->setOperation($operation);
-        $this->setLdapConnection($connection);
-        $this->setAttribute('foo');
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->setDn($dn);
         $operation->getDn()->willReturn($dn);
@@ -314,27 +254,19 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $guidHex = '\d3\1c\13\a1\2b\90\c6\44\b4\9a\1f\6a\56\7c\da\25';
         $dn = 'cn=foo,dc=example,dc=local';
         $objectDn = 'CN=SomeGroup,OU=Employees,DC=example,DC=com';
-        $ldapObject = new LdapObject(['dn' => $objectDn], ['group'], 'group', 'group');
+        $ldapObject = new LdapObject(['dn' => $objectDn], 'group');
 
         $connection->execute(Argument::that(function($operation) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(cn=Foo))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(sAMAccountName=Foo))';
         }))->willReturn($this->entry);
         $connection->execute(Argument::that(function($operation) use ($guid, $guidHex) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(cn='.$guid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectGuid='.$guidHex.')(sAMAccountName='.$guid.')))';
         }))->willReturn($this->entryGuid);
         $connection->execute(Argument::that(function($operation) use ($sid, $sidHex) {
-            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(cn='.$sid.')))';
+            return $operation->getFilter() == '(&(&(objectClass=bar))(|(objectSid='.$sidHex.')(sAMAccountName='.$sid.')))';
         }))->willReturn($this->entrySid);
-        $this->setOptions(['foo' => [
-            'to_attribute' => 'member',
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
+
         $this->setOperation($operation);
-        $this->setLdapConnection($connection);
-        $this->setAttribute('foo');
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setDn($dn);
 
@@ -382,21 +314,12 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $this->toLdap([$guid, $ldapObject])->shouldBeArray();
     }
 
-    function it_should_generate_operations_to_remove_all_current_groups_on_a_modify_reset_operation($connection, \LdapTools\Operation\LdapOperationInterface $operation)
+    function it_should_generate_operations_to_remove_all_current_groups_on_a_modify_reset_operation($connection, LdapOperationInterface $operation)
     {
         $batch = new Batch(Batch::TYPE['REMOVE_ALL'], 'groups');
         $dn = 'cn=foo,dc=foo,dc=bar';
-        $this->setOptions(['groups' => [
-            'to_attribute' => 'member',
-            'from_attribute' => 'memberOf',
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
         $this->setOperation($operation);
-        $this->setLdapConnection($connection);
-        $this->setAttribute('groups');
+
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setDn($dn);
         $this->setBatch($batch);
@@ -422,24 +345,15 @@ class ConvertGroupMembershipSpec extends ObjectBehavior
         $this->toLdap([null]);
     }
 
-    function it_should_generate_operations_to_remove_all_current_groups_and_add_new_ones_on_a_modify_set_operation($connection, \LdapTools\Operation\LdapOperationInterface $operation)
+    function it_should_generate_operations_to_remove_all_current_groups_and_add_new_ones_on_a_modify_set_operation($connection, LdapOperationInterface $operation)
     {
         $group1 = 'cn=foo,dc=example,dc=local';
         $group2 = 'cn=bar,dc=example,dc=local';
         $batch = new Batch(Batch::TYPE['REPLACE'], 'groups', [$group1, $group2]);
         
         $dn = 'cn=foo,dc=foo,dc=bar';
-        $this->setOptions(['groups' => [
-            'to_attribute' => 'member',
-            'from_attribute' => 'memberOf',
-            'attribute' => 'cn',
-            'filter' => [
-                'objectClass' => 'bar'
-            ],
-        ]]);
+
         $this->setOperation($operation);
-        $this->setLdapConnection($connection);
-        $this->setAttribute('groups');
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setDn($dn);
         $this->setBatch($batch);

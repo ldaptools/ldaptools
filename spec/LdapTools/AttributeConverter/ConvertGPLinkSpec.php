@@ -12,6 +12,7 @@ namespace spec\LdapTools\AttributeConverter;
 
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\BatchModify\Batch;
+use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
 use LdapTools\Object\LdapObject;
 use LdapTools\Security\GUID;
@@ -101,7 +102,7 @@ class ConvertGPLinkSpec extends ObjectBehavior
 
     protected $expectedGPOLinks = [];
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
         $this->expectedCurrentValueResult[0]['gplink'][0] = implode('', $this->gPLinks);
         $this->expectedDisplayResult[0]['objectguid'][0] = (new GUID('8E1F85EB-4882-4920-88A5-CF52F31D8D31'))->toBinary();

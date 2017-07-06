@@ -31,11 +31,6 @@ trait AttributeConverterTrait
     protected $dn;
 
     /**
-     * @var array Any options that may be recognized by the converter.
-     */
-    protected $options = [];
-
-    /**
      * @var int The operation type for this conversion process.
      */
     protected $type = AttributeConverterInterface::TYPE_SEARCH_FROM;
@@ -103,7 +98,9 @@ trait AttributeConverterTrait
      */
     public function setOptions(array $options)
     {
-        $this->options = array_merge($this->options, $options);
+        if (isset($this->options)) {
+            $this->options = array_merge($this->options, $options);
+        }
 
         return $this;
     }
@@ -113,7 +110,7 @@ trait AttributeConverterTrait
      */
     public function getOptions()
     {
-        return $this->options;
+        return isset($this->options) ? $this->options : [];
     }
 
     /**

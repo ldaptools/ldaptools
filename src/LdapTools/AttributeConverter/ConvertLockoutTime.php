@@ -26,13 +26,20 @@ class ConvertLockoutTime implements AttributeConverterInterface
     use AttributeConverterTrait;
 
     /**
+     * @var array
+     */
+    protected $options = [
+        'bool' => false,
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function toLdap($value)
     {
-        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO && $this->expectsBool()) {
+        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO && $this->options['bool']) {
             $value = $this->getQueryValue($value);
-        } elseif ($this->expectsBool()) {
+        } elseif ($this->options['bool']) {
             $value = $this->getUnlockValue($value);
         } else {
             $value = $this->getLockDateTime($value);
@@ -47,7 +54,7 @@ class ConvertLockoutTime implements AttributeConverterInterface
     public function fromLdap($value)
     {
         $fromLdap = ($value >= '1');
-        if (!$this->expectsBool() && $fromLdap) {
+        if (!$this->options['bool'] && $fromLdap) {
             $fromLdap = (new ConvertWindowsTime())->fromLdap($value);
         }
 
@@ -63,14 +70,6 @@ class ConvertLockoutTime implements AttributeConverterInterface
         $fb = new FilterBuilder();
 
         return $value ? $fb->gte('lockoutTime', '1') : $fb->bOr($fb->notPresent('lockoutTime'), $fb->eq('lockoutTime', '0'));
-    }
-
-    /**
-     * @return bool
-     */
-    protected function expectsBool()
-    {
-        return MBString::strtolower($this->getOptions()['bool']) == MBString::strtolower($this->getAttribute());
     }
 
     /**

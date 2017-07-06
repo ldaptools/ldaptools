@@ -229,34 +229,28 @@ objects:
             value_to_dn:
                 archiveDatabase:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: msExchMDB
                 mailboxDatabase:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: msExchMDB
                 mailboxServer:
                     base_dn: "%_configurationnamingcontext_%"
                     select: legacyExchangeDn
-                    attribute: cn
                     legacy_dn: true
                     filter:
                         objectClass: msExchExchangeServer
                 activeSyncPolicy:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: msExchMobileMailboxPolicy
                 rbacPolicy:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: msExchRBACPolicy
                 retentionPolicy:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: msExchRecipientPolicy
                 sendOnBehalfOf:
@@ -266,46 +260,42 @@ objects:
                         objectClass: person
                 showInAddressBooks:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: addressBookContainer
             exchange_proxy_address:
-                addressType:
-                    smtpAddresses: 'smtp'
-                    defaultSmtpAddress: 'smtp'
-                default:
-                    - 'defaultSmtpAddress'
+                defaultSmtpAddress:
+                    address_type: smtp
+                    is_default: true
+                smtpAddresses:
+                    address_type: smtp
             enum:
                 recipientTypeDetails:
                     enum: 'LdapTools\Enums\Exchange\RecipientTypeDetails'
                 recipientDisplayType:
                     enum: 'LdapTools\Enums\Exchange\RecipientDisplayType'
-            exchange_recipient_policy:
-                recipientPolicies:
-                    base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
-                    select: objectGuid
-                    filter:
-                        objectClass: msExchRecipientPolicy
+                mailboxStatus:
+                    enum: 'LdapTools\Enums\Exchange\ExchangeUserAccountControl'
             flags:
-                msExchUserAccountControl:
-                    attribute: 'msExchUserAccountControl'
-                    defaultValue: 0
-                    flagMap:
-                        mailboxDisabled: 2
-                msExchELCMailboxFlags:
-                    attribute: 'msExchELCMailboxFlags'
-                    defaultValue: '0'
-                    flagMap:
-                        retentionEnabled: '1'
-                        mrmEnabled: '2'
-                        calendarLoggingDisabled: '4'
-                        calendarLoggingEnabled: '4'
-                        litigationEnabled: '8'
-                        singleItemRecoveryEnabled: '16'
-                        isArchiveDatabaseValid: '32'
-                    invert:
-                        - 'calendarLoggingEnabled'
+                _default:
+                    attribute:
+                        LdapTools\Enums\Exchange\ELCMailbox: 'msExchELCMailboxFlags'
+                    default_value:
+                        LdapTools\Enums\Exchange\ELCMailbox: 'MRMEnabled'
+                retentionEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::RetentionEnabled'
+                mrmEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::MRMEnabled'
+                calendarLoggingDisabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::CalendarLoggingDisabled'
+                calendarLoggingEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::CalendarLoggingDisabled'
+                    invert: true
+                litigationEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::LitigationEnabled'
+                singleItemRecoveryEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::SingleItemRecoveryEnabled'
+                isArchiveDatabaseValid:
+                    flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::ArchiveDatabaseValid'
         converters:
              bool:
                  - 'hideFromAddressBooks'
@@ -335,6 +325,7 @@ objects:
              enum:
                  - 'recipientTypeDetails'
                  - 'recipientDisplayType'
+                 - 'mailboxStatus'
              exchange_object_version:
                  - 'version'
              exchange_recipient_policy:
@@ -368,10 +359,10 @@ objects:
             litigationEnabled: msExchELCMailboxFlags
             litigationOwner: msexchLitigationHoldOwner
             mailboxDatabase: homeMDB
-            mailboxDisabled: msExchUserAccountControl
             mailboxGuid: msExchMailboxGUID
             mailboxSecurity: msExchMailboxSecurityDescriptor
             mailboxServer: msExchHomeServerName
+            mailboxStatus: msExchUserAccountControl
             mailTips: msExchSenderHintTranslations
             mrmEnabled: msExchELCMailboxFlags
             quotaSizeWarning: mDBStorageQuota
@@ -400,7 +391,6 @@ objects:
             emailAddress: "%username%@%_domainname_%"
             language: 'en-US'
             legacyExchangeDn: 'auto:%username%'
-            mailboxDisabled: false
             mailboxGuid: 'auto'
             mailboxSecurity: 'O:PSG:PSD:(A;CI;RCCC;;;PS)'
             mrmEnabled: true
@@ -415,6 +405,7 @@ objects:
                 - 'All Users'
                 - 'Default Global Address List'
                 - 'Mailboxes(VLV)'
+            mailboxStatus: 'Enabled'
             useDefaultQuota: true
             version: 'auto'
         attributes_to_select:
@@ -432,33 +423,21 @@ objects:
             eq: [ msExchRecipientDisplayType, 6 ]
         converter_options:
             exchange_proxy_address:
-                addressType:
-                    smtpAddresses: 'smtp'
-                    defaultSmtpAddress: 'smtp'
-                default:
-                    - 'defaultSmtpAddress'
+                defaultSmtpAddress:
+                    address_type: smtp
+                    is_default: true
+                smtpAddresses:
+                    address_type: smtp
             enum:
                 recipientTypeDetails:
                     enum: 'LdapTools\Enums\Exchange\RecipientTypeDetails'
                 recipientDisplayType:
                     enum: 'LdapTools\Enums\Exchange\RecipientDisplayType'
-            exchange_recipient_policy:
-                recipientPolicies:
-                    base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
-                    select: objectGuid
-                    filter:
-                        objectClass: msExchRecipientPolicy
-            flags:
-                msExchUserAccountControl:
-                    attribute: 'msExchUserAccountControl'
-                    defaultValue: 0
-                    flagMap:
-                        disabled: 2
+                status:
+                    enum: 'LdapTools\Enums\Exchange\ExchangeUserAccountControl'
             value_to_dn:
                 showInAddressBooks:
                     base_dn: "%_configurationnamingcontext_%"
-                    attribute: cn
                     filter:
                         objectClass: addressBookContainer
         converters:
@@ -473,20 +452,18 @@ objects:
              enum:
                  - 'recipientDisplayType'
                  - 'recipientTypeDetails'
+                 - 'status'
              exchange_object_version:
                  - 'version'
              exchange_recipient_policy:
                  - 'recipientPolicies'
              exchange_legacy_dn:
                  - 'legacyExchangeDn'
-             flags:
-                 - 'disabled'
              windows_account_name:
                  - 'alias'
         attributes:
             alias: mailNickname
             defaultSmtpAddress: proxyAddresses
-            disabled: msExchUserAccountControl
             hideFromAddressBooks: msExchHideFromAddressLists
             isMapiRecipient: mAPIRecipient
             recipientDisplayType: msExchRecipientDisplayType
@@ -494,6 +471,7 @@ objects:
             recipientTypeDetails:  msExchRecipientTypeDetails
             showInAddressBooks: showInAddressBook
             smtpAddresses: proxyAddresses
+            status: msExchUserAccountControl
             version: msExchVersion
         multivalued_attributes:
             - 'smtpAddresses'
@@ -505,7 +483,7 @@ objects:
             internetEncoding: '1310720'
             isMapiRecipient: false
             legacyExchangeDn: 'auto:%name%'
-            disabled: false
+            status: 'Enabled'
             recipientPolicies:
                 - 'Default Policy'
             recipientDisplayType: 'RemoteMailUser'

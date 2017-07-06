@@ -23,6 +23,17 @@ class ConvertLdapObjectType implements AttributeConverterInterface
     use AttributeConverterTrait;
 
     /**
+     * @var array
+     */
+    protected $options = [
+        'user' => [],
+        'group' => [],
+        'computer' => [],
+        'contact' => [],
+        'ou' => [],
+    ];
+
+    /**
      * {@inheritdoc}
      */
     public function toLdap($value)
@@ -38,7 +49,7 @@ class ConvertLdapObjectType implements AttributeConverterInterface
         $ldapType = ['Unknown'];
         $value = MBString::array_change_value_case($value);
 
-        foreach ($this->getOptions() as $type => $classes) {
+        foreach ($this->options as $type => $classes) {
             if (MBString::array_change_value_case($classes) == $value) {
                 $ldapType = [$type];
                 break;

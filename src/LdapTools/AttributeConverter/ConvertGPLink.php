@@ -266,11 +266,9 @@ class ConvertGPLink implements AttributeConverterInterface
         $toDn->setAttribute('gpoLink');
         $toDn->setLdapConnection($this->connection);
         $toDn->setOptions([
-            'gpoLink' => [
-                'attribute' => 'displayName',
-                'filter' => [
-                    'objectClass' => 'groupPolicyContainer'
-                ]
+            'attribute' => 'displayName',
+            'filter' => [
+                'objectClass' => 'groupPolicyContainer'
             ]
         ]);
 

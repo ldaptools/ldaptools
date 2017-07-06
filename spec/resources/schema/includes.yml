@@ -5,7 +5,7 @@ objects:
         class: bar
         attributes:
             name: cn
-    user:
+    generic:
         type: user
         class: foobar
         attributes:

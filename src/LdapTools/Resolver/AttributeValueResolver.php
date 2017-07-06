@@ -10,7 +10,6 @@
 
 namespace LdapTools\Resolver;
 
-use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Schema\LdapObjectSchema;
 
 /**
@@ -87,7 +86,7 @@ class AttributeValueResolver extends BaseValueResolver
             if (!$this->schema->hasConverter($attribute) && !isset($this->converted[$attribute])) {
                 $attributes[$attribute] = $this->encodeValues($values);
             // Only continue if it has a converter and has not already been converted.
-            } elseif ($this->schema->hasConverter($attribute) && !isset($this->converted[$attribute])) {
+            } elseif ($this->schema->hasConverter($attribute) && !in_array($attribute, $this->converted)) {
                 $values = $this->getConvertedValues($values, $attribute, $direction);
                 if (in_array($attribute, $this->aggregated)) {
                     $attribute = $this->schema->getAttributeToLdap($attribute);
@@ -120,16 +119,19 @@ class AttributeValueResolver extends BaseValueResolver
     /**
      * {@inheritdoc}
      */
-    protected function iterateAggregates(array $toAggregate, $values, AttributeConverterInterface $converter)
+    protected function iterateAggregates(array $toAggregate, $values, $converterName)
     {
+        $lastValue = null;
+
         foreach ($toAggregate as $aggregate) {
             if (isset($this->entry[$aggregate])) {
-                $values = $this->getConvertedValues($this->entry[$aggregate], $aggregate, 'toLdap', $converter);
-                $converter->setLastValue($values);
+                $converter = $this->getConverterWithOptions($converterName, $aggregate);
+                $converter->setLastValue($lastValue);
+                $lastValue = $this->getConvertedValues($this->entry[$aggregate], $aggregate, 'toLdap', $converter);
                 $this->converted[] = $aggregate;
             }
         }
 
-        return $values;
+        return $lastValue;
     }
 }

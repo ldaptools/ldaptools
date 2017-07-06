@@ -54,23 +54,21 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     public function let(LdapConnectionInterface $connection)
     {
-        $this->config = (new DomainConfiguration('example.com'))->setSchemaName('example');
+        $this->config = new DomainConfiguration('example.com');
         $this->config->setUseTls(true);
-        $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],['*'], '','ad');
+        $ldapObject = new LdapObject(['defaultNamingContext' => 'dc=example,dc=com'],'RootDSE');
         $connection->getConfig()->willReturn($this->config);
         $connection->getRootDse()->willReturn($ldapObject);
 
         $config = new Configuration();
         $parser = SchemaParserFactory::get($config->getSchemaFormat(), $config->getSchemaFolder());
-        $parserTest = SchemaParserFactory::get($config->getSchemaFormat(), __DIR__.'/../../resources/schema');
         $cache = CacheFactory::get('none', []);
         $this->dispatcher = new SymfonyEventDispatcher();
-        $this->schemaFactoryTest = new LdapObjectSchemaFactory($cache, $parserTest, $this->dispatcher);
         $this->schemaFactory = new LdapObjectSchemaFactory($cache, $parser, $this->dispatcher);
         $this->attributes['unicodePwd'] = (new EncodeWindowsPassword())->toLdap('12345');
         $this->addOperation = (new AddOperation('foo'))->setDn("cn=somedude,dc=foo,dc=bar")->setAttributes($this->attributes);
 
-        $this->beConstructedWith($connection, $this->schemaFactoryTest, $this->dispatcher);
+        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
     }
 
     function it_is_initializable()
@@ -152,9 +150,6 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $connection->execute($this->addOperation)->willReturn(true);
         $this->addOperation->setDn('cn=chad,ou=users,dc=foo,dc=bar');
 
-        $this->config->setSchemaName('ad');
-        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
-
         $this->createUser()
             ->with(['username' => 'somedude', 'password' => '12345'])
             ->setDn('cn=chad,ou=users,dc=foo,dc=bar')
@@ -168,9 +163,6 @@ class LdapObjectCreatorSpec extends ObjectBehavior
         $operation = new AddOperation('cn=foo\\3d\\2cbar,dc=foo,dc=bar', $attributes);
         $operation->setLocation('dc=foo,dc=bar');
         $connection->execute($operation)->willReturn(true);
-
-        $this->config->setSchemaName('ad');
-        $this->beConstructedWith($connection, $this->schemaFactory, $this->dispatcher);
 
         $this->createUser()
             ->with(['name' => 'foo=,bar', 'username' => 'somedude', 'password' => '12345'])
@@ -186,12 +178,15 @@ class LdapObjectCreatorSpec extends ObjectBehavior
 
     function it_should_use_a_default_container_defined_in_the_schema($connection)
     {
+        $parser = SchemaParserFactory::get('yml', __DIR__.'/../../resources/schema');
+        $schemaobj = $parser->parse('example', 'DefaultContainer');
+
         $operation = clone $this->addOperation;
         $operation->setDn('cn=somedude,ou=foo,ou=bar,dc=example,dc=local');
         $operation->setLocation('ou=foo,ou=bar,dc=example,dc=local');
         $connection->execute($operation)->willReturn(true);
 
-        $this->createUser()
+        $this->create($schemaobj)
             ->with(['username' => 'somedude', 'password' => '12345'])
             ->execute();
     }

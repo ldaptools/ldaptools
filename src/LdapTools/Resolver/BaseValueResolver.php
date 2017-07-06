@@ -28,13 +28,6 @@ use LdapTools\Utilities\LdapUtilities;
 abstract class BaseValueResolver
 {
     /**
-     * Any converter options defined by the schema object.
-     *
-     * @var array
-     */
-    protected $options = [];
-
-    /**
      * @var LdapOperationInterface|null
      */
     protected $operation;
@@ -74,10 +67,10 @@ abstract class BaseValueResolver
      *
      * @param array $toAggregate
      * @param mixed $values
-     * @param AttributeConverterInterface $converter
+     * @param string $converterName
      * @return array|string The final value after all possible values have been iterated through.
      */
-    abstract protected function iterateAggregates(array $toAggregate, $values, AttributeConverterInterface $converter);
+    abstract protected function iterateAggregates(array $toAggregate, $values, $converterName);
 
     /**
      * @param LdapObjectSchema $schema
@@ -87,9 +80,6 @@ abstract class BaseValueResolver
     {
         $this->type = $type;
         $this->schema = $schema;
-        if ($schema) {
-            $this->options = $schema->getConverterOptions();
-        }
     }
 
     /**
@@ -152,18 +142,15 @@ abstract class BaseValueResolver
      * @param AttributeConverterInterface|null $aggregate
      * @return array
      */
-    protected function getConvertedValues($values, $attribute, $direction, $aggregate = null)
+    protected function getConvertedValues($values, $attribute, $direction, AttributeConverterInterface $aggregate = null)
     {
         $values = is_array($values) ? $values : [$values];
-        $converter = is_null($aggregate) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $aggregate;
+        $converter = $this->getConverterWithOptions($this->schema->getConverter($attribute), $attribute);
 
-        if (is_null($aggregate) && $converter->getShouldAggregateValues() && $direction == 'toLdap') {
-            $values = $this->convertAggregateValues($attribute, $values, $converter);
+        if (!$aggregate && $converter->getShouldAggregateValues() && $direction == 'toLdap') {
+            $values = $this->convertAggregateValues($attribute, $values);
         } else {
             $values = $this->doConvertValues($attribute, $values, $direction, $aggregate);
-        }
-        if ($converter instanceof OperationGeneratorInterface && $converter->getRemoveOriginalValue()) {
-            $this->remove[] = $attribute;
         }
 
         return $values;
@@ -174,10 +161,9 @@ abstract class BaseValueResolver
      *
      * @param string $attribute
      * @param array $values
-     * @param AttributeConverterInterface $converter
      * @return array
      */
-    protected function convertAggregateValues($attribute, array $values, AttributeConverterInterface $converter)
+    protected function convertAggregateValues($attribute, array $values)
     {
         $this->aggregated[] = $attribute;
         $converterName = $this->schema->getConverter($attribute);
@@ -195,7 +181,7 @@ abstract class BaseValueResolver
                 unset($toAggregate[$i]);
             }
         }
-        $values = $this->iterateAggregates($toAggregate, $values, $converter);
+        $values = $this->iterateAggregates($toAggregate, $values, $converterName);
 
         return is_array($values) ? $values : [$values];
     }
@@ -204,25 +190,23 @@ abstract class BaseValueResolver
      * Get an instance of a converter with its options set.
      *
      * @param string $converterName The name of the converter from the schema.
+     * @param string $attribute The name of the attribute.
      * @return AttributeConverterInterface
      */
-    protected function getConverterWithOptions($converterName)
+    protected function getConverterWithOptions($converterName, $attribute)
     {
         $converter = AttributeConverterFactory::get($converterName);
+        $converter->setOptions(array_merge(
+            $this->schema->getConverterOptions($converterName, '_default'),
+            $this->schema->getConverterOptions($converterName, $attribute)
+        ));
+        $converter->setOperationType($this->type);
+        $converter->setLdapConnection($this->connection);
+        $converter->setDn($this->dn);
 
-        if (isset($this->options[$converterName])) {
-            $converter->setOptions($this->options[$converterName]);
-        }
-        if ($this->connection) {
-            $converter->setLdapConnection($this->connection);
-        }
-        if ($this->dn !== null) {
-            $converter->setDn($this->dn);
-        }
         if ($converter instanceof OperationGeneratorInterface) {
             $converter->setOperation($this->operation);
         }
-        $converter->setOperationType($this->type);
 
         return $converter;
     }
@@ -233,12 +217,12 @@ abstract class BaseValueResolver
      * @param string $attribute
      * @param array $values
      * @param string $direction
-     * @param AttributeConverterInterface|null $converter
+     * @param AttributeConverterInterface|null $aggregate
      * @return mixed
      */
-    protected function doConvertValues($attribute, array $values, $direction, AttributeConverterInterface $converter = null)
+    protected function doConvertValues($attribute, array $values, $direction, AttributeConverterInterface $aggregate = null)
     {
-        $converter = is_null($converter) ? $this->getConverterWithOptions($this->schema->getConverter($attribute)) : $converter;
+        $converter = $aggregate ?: $this->getConverterWithOptions($this->schema->getConverter($attribute), $attribute);
         $converter->setAttribute($attribute);
 
         if ($converter->isMultiValuedConverter()) {
@@ -247,6 +231,9 @@ abstract class BaseValueResolver
             foreach ($values as $index => $value) {
                 $values[$index] = $converter->$direction($value);
             }
+        }
+        if ($converter instanceof OperationGeneratorInterface && $converter->getRemoveOriginalValue() && !in_array($attribute, $this->remove)) {
+            $this->remove[] = $attribute;
         }
 
         return $values;

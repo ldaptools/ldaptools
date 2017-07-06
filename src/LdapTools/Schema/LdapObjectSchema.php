@@ -459,21 +459,35 @@ class LdapObjectSchema
     /**
      * Set any options to be passed to specific converters.
      *
+     * @param string $converter
+     * @param string $attribute
      * @param array $converterOptions
      */
-    public function setConverterOptions(array $converterOptions)
+    public function setConverterOptions($converter, $attribute, array $converterOptions)
     {
-        $this->converterOptions = $converterOptions;
+        if (!isset($this->converterOptions[$converter])) {
+            $this->converterOptions[$converter] = [];
+        }
+        $this->converterOptions[$converter][MBString::strtolower($attribute)] = $converterOptions;
     }
 
     /**
-     * Get the array of converter names and the options that will be passed to them.
+     * Get the array of converter options for a specific converter and attribute.
      *
+     * @param string $converter
+     * @param string $attribute
      * @return array
      */
-    public function getConverterOptions()
+    public function getConverterOptions($converter, $attribute)
     {
-        return $this->converterOptions;
+        $lcAttr = MBString::strtolower($attribute);
+
+        $options = [];
+        if (isset($this->converterOptions[$converter]) && isset($this->converterOptions[$converter][$lcAttr])) {
+            $options = $this->converterOptions[$converter][$lcAttr];
+        }
+
+        return $options;
     }
 
     /**

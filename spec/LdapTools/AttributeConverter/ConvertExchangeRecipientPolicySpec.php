@@ -25,17 +25,6 @@ class ConvertExchangeRecipientPolicySpec extends ObjectBehavior
     function let(LdapConnectionInterface $connection)
     {
         $this->setLdapConnection($connection);
-        $this->setAttribute('recipientPolicies');
-        $this->setOptions([
-            'recipientPolicies' => [
-                'base_dn' => '"%_configurationnamingcontext_%',
-                'attribute' => 'cn',
-                'select' => 'objectGuid',
-                'filter' => [
-                    'objectClass' => 'msExchRecipientPolicy'
-                ]
-            ]
-        ]);
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
         $connection->getRootDse()->willReturn(new LdapObject(['configurationNamingContext' => 'cn=config,dc=foo,dc=bar']));
     }

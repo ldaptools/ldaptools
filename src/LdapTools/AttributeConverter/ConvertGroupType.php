@@ -10,11 +10,9 @@
 
 namespace LdapTools\AttributeConverter;
 
-use LdapTools\BatchModify\Batch;
-use LdapTools\Query\Builder\FilterBuilder;
+use Enums\FlagEnumInterface;
 use LdapTools\Enums\AD\GroupType;
-use LdapTools\Utilities\ConverterUtilitiesTrait;
-use LdapTools\Utilities\MBString;
+use LdapTools\Query\Builder\FilterBuilder;
 
 /**
  * Converts the groupType bitmask value to a PHP bool, or a bool for a specific bit back to the value for LDAP.
@@ -22,61 +20,18 @@ use LdapTools\Utilities\MBString;
  * @see https://msdn.microsoft.com/en-us/library/cc223142.aspx
  * @author Chad Sikorra <Chad.Sikorra@gmail.com>
  */
-class ConvertGroupType implements AttributeConverterInterface
+class ConvertGroupType extends ConvertFlags
 {
-    use ConverterUtilitiesTrait, AttributeConverterTrait;
+    const SCOPES = [
+        'DomainLocalGroup',
+        'GlobalGroup',
+        'UniversalGroup',
+    ];
 
     public function __construct()
     {
-        $this->setOptions([
-            'typeMap' => [],
-            'types' => [],
-            'defaultValue' => GroupType::GlobalGroup + GroupType::SecurityEnabled,
-        ]);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function toLdap($value)
-    {
-        $this->validateCurrentAttribute($this->getOptions()['typeMap']);
-
-        if ($this->getOperationType() == AttributeConverterInterface::TYPE_SEARCH_TO) {
-            $valueToLdap = $this->getQueryOperator($value);
-        } else {
-            $valueToLdap = $this->modifyGroupTypeValue((bool)$value);
-        }
-
-        return $valueToLdap;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function fromLdap($value)
-    {
-        $this->validateCurrentAttribute($this->getOptions()['typeMap']);
-        $value = (bool) ((int) $value & (int) $this->getArrayValue($this->getOptions()['typeMap'], $this->getAttribute()));
-
-        // Invert the value for the distribution group, as it is the absence of the security bit.
-        return $this->shouldInvertValue() ? !$value : $value;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getShouldAggregateValues()
-    {
-        return ($this->getOperationType() == self::TYPE_MODIFY || $this->getOperationType() == self::TYPE_CREATE);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function isBatchSupported(Batch $batch)
-    {
-        return $batch->isTypeReplace();
+        # Default to a security enabled global group
+        $this->options['default_value'][GroupType::class] = -2147483646;
     }
 
     /**
@@ -86,89 +41,76 @@ class ConvertGroupType implements AttributeConverterInterface
      * @param bool $value
      * @return int
      */
-    protected function modifyGroupTypeValue($value)
+    protected function modifyFlagValue($value)
     {
-        $this->setDefaultLastValue('groupType', $this->getOptions()['defaultValue']);
-        $lastValue = is_array($this->getLastValue()) ? reset($this->getLastValue()) : $this->getLastValue();
+        $this->setDefaultLastValue('groupType', $this->getDefaultEnumValue());
+        $flags = $this->getFlagFromLastValue($this->getLastValue());
 
-        // If the bit we are expecting is already set how we want it, then do not attempt to modify it.
-        if ($this->fromLdap($lastValue) == $value) {
-            return $lastValue;
-        }
-
-        if (in_array($this->getAttribute(), $this->getOptions()['types']['type'])) {
-            $value = $this->shouldInvertValue() ? !$value : $value;
-            $this->setLastValue($this->modifyBitmaskValue($lastValue, $value, $this->getAttribute()));
+        if (!in_array($this->flagName, self::SCOPES)) {
+            $this->modifyBitmaskValue(
+                $flags,
+                $this->options['invert'] ? !$value : $value,
+                $this->flagName
+            );
         } else {
-            $this->modifyGroupScopeBit($lastValue, $value);
+            $this->modifyGroupScopeBit($flags, $value);
         }
 
-        return (string) $this->getLastValue();
+        return $flags->getValue();
     }
 
     /**
      * Based on the current value, remove the bit for the scope that is already set before adding the new one (if the
      * value is set to true for the scope to be active anyway).
      *
-     * @param int $lastValue
+     * @param FlagEnumInterface $flags
      * @param bool $value
      */
-    protected function modifyGroupScopeBit($lastValue, $value)
+    protected function modifyGroupScopeBit(FlagEnumInterface $flags, $value)
     {
         if ($value) {
-            foreach ($this->getOptions()['types']['scope'] as $attribute) {
-                if (MBString::strtolower($attribute) == MBString::strtolower($this->getAttribute())) {
+            foreach (self::SCOPES as $scope) {
+                if ($this->flagName === $scope) {
                     continue;
                 }
-                if (((int)$lastValue & (int)$this->getOptions()['typeMap'][$attribute])) {
-                    $lastValue = $this->modifyBitmaskValue($lastValue, false, $attribute);
+                if ($flags->has($scope)) {
+                    $this->modifyBitmaskValue($flags, false, $scope);
                 }
             }
         }
-        $lastValue = $this->modifyBitmaskValue($lastValue, $value, $this->getAttribute());
 
-        $this->setLastValue($lastValue);
+        $this->modifyBitmaskValue($flags, $value, $this->flagName);
     }
 
     /**
      * Modify the existing value based on the attributes bit.
      *
-     * @param int $value
+     * @param FlagEnumInterface $flags
      * @param bool $toggle
-     * @param string $attribute
-     * @return int
+     * @param string $flagName
      */
-    protected function modifyBitmaskValue($value, $toggle, $attribute)
+    protected function modifyBitmaskValue($flags, $toggle, $flagName)
     {
-        $bit = $this->getBitForAttribute($attribute);
+        $bit = $this->getBitForAttribute($flagName);
 
         if ($toggle) {
-            $value = (int) $value + (int) $bit;
+            $flags->add($bit);
         } else {
-            $value = (int) $value - (int) $bit;
+            $flags->remove($bit);
         }
-
-        return $value;
     }
 
     /**
-     * Check if this is a distribution type for the attribute. That type is just inverse of a security enabled type.
-     *
-     * @return bool
-     */
-    protected function shouldInvertValue()
-    {
-        return MBString::strtolower($this->getAttribute()) == MBString::strtolower($this->getOptions()['distribution']);
-    }
-
-    /**
-     * @param string $attribute
+     * @param string $flagName
      * @return int
      */
-    protected function getBitForAttribute($attribute)
+    protected function getBitForAttribute($flagName)
     {
-        $bit = MBString::array_change_key_case($this->getOptions()['typeMap'])[MBString::strtolower($attribute)];
-        $bit = in_array($this->getAttribute(), $this->getOptions()['types']['type']) ? -1 * abs($bit) : $bit;
+        $bit = $this->getFlagEnum($flagName)->getValue();
+
+        if (!in_array($flagName, self::SCOPES)) {
+            $bit = -1 * abs($bit);
+        }
 
         return $bit;
     }
@@ -182,9 +124,9 @@ class ConvertGroupType implements AttributeConverterInterface
     protected function getQueryOperator($value)
     {
         $fb = new FilterBuilder();
-        $bit = abs($this->getBitForAttribute($this->getAttribute()));
+        $bit = abs($this->getBitForAttribute($this->flagName));
         $operator = $fb->bitwiseAnd('groupType', (string) $bit);
-        $value = $this->shouldInvertValue() ? !$value : $value;
+        $value = $this->options['invert'] ? !$value : $value;
 
         return $value ? $operator : $fb->bNot($operator);
     }

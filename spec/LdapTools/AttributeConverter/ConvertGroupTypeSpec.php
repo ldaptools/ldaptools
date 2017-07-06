@@ -13,6 +13,7 @@ namespace spec\LdapTools\AttributeConverter;
 use LdapTools\AttributeConverter\AttributeConverterInterface;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\DomainConfiguration;
+use LdapTools\Enums\AD\GroupType;
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Operation\QueryOperation;
 use PhpSpec\ObjectBehavior;
@@ -50,27 +51,10 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         ],
     ];
 
-    function let(\LdapTools\Connection\LdapConnectionInterface $connection)
+    function let(LdapConnectionInterface $connection)
     {
         $connection->getConfig()->willReturn(new DomainConfiguration('foo.bar'));
-        $options = [
-            'defaultValue' => '-2147483646',
-            'distribution' =>'typeDistribution',
-            'types' => [
-                'scope' => [ 'scopeDomainLocal', 'scopeGlobal', 'scopeUniversal' ],
-                'type' => [ 'typeBuiltin', 'typeSecurity', 'typeDistribution' ],
-            ],
-            'typeMap' => [
-                'typeBuiltin' => '1',
-                'typeSecurity' => '2147483648',
-                'typeDistribution' => '2147483648',
-                'scopeDomainLocal' => '4',
-                'scopeGlobal' => '2',
-                'scopeUniversal' => '8',
-            ],
-        ];
         $this->expectedSearch = new QueryOperation('(&(distinguishedName=cn=foo,dc=foo,dc=bar))', ['groupType']);
-        $this->setOptions($options);
         $this->setLdapConnection($connection);
         $this->setDn('cn=foo,dc=foo,dc=bar');
         $this->expectedOp = function($operation) {
@@ -91,29 +75,30 @@ class ConvertGroupTypeSpec extends ObjectBehavior
 
     function it_should_convert_a_value_from_ldap_to_a_php_bool()
     {
-        $this->setAttribute('typeDistribution');
-        // A security type group...
+        // A non-security enabled group is represented by a security bit inverse..
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => true]);
+        // A global security type group...
         $this->fromLdap('-2147483646')->shouldBeEqualTo(false);
-        // A distribution type group...
-        $this->fromLdap('2')->shouldBeEqualTo(true);
+        // A global group...
+        $this->fromLdap(GroupType::GlobalGroup)->shouldBeEqualTo(true);
 
-        $this->setAttribute('typeSecurity');
-        // A security type group...
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => false]);
+        // A global security group...
         $this->fromLdap('-2147483646')->shouldBeEqualTo(true);
         // A distribution type group...
         $this->fromLdap('2')->shouldBeEqualTo(false);
 
-        $this->setAttribute('scopeGlobal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::GlobalGroup']);
         $this->fromLdap('2')->shouldBeEqualTo(true);
         $this->fromLdap('-2147483646')->shouldBeEqualTo(true);
         $this->fromLdap('4')->shouldBeEqualTo(false);
 
-        $this->setAttribute('scopeDomainLocal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::DomainLocalGroup']);
         $this->fromLdap('4')->shouldBeEqualTo(true);
         $this->fromLdap('-2147483644')->shouldBeEqualTo(true);
         $this->fromLdap('2')->shouldBeEqualTo(false);
 
-        $this->setAttribute('scopeUniversal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::UniversalGroup']);
         $this->fromLdap('8')->shouldBeEqualTo(true);
         $this->fromLdap('-2147483640')->shouldBeEqualTo(true);
         $this->fromLdap('4')->shouldBeEqualTo(false);
@@ -132,25 +117,38 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
-        $this->setAttribute('typeDistribution');
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::GlobalGroup']);
+        $this->toLdap(true)->shouldBeEqualTo('-2147483646');
+        $this->setLastValue('-2147483646');
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => true]);
         $this->toLdap(true)->shouldBeEqualTo('2');
-        $this->setAttribute('scopeUniversal');
+        $this->setLastValue('2');
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::UniversalGroup', 'invert' => false]);
         $this->toLdap(true)->shouldBeEqualTo('8');
-        $this->setAttribute('typeSecurity');
+        $this->setLastValue('8');
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled']);
         $this->toLdap(true)->shouldBeEqualTo('-2147483640');
     }
 
     function it_should_aggregate_values_when_converting_a_bool_to_ldap_on_creation($connection)
     {
         $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
-
         $this->setOperationType(AttributeConverterInterface::TYPE_CREATE);
         $this->getShouldAggregateValues()->shouldBeEqualTo(true);
-        $this->setAttribute('typeDistribution');
-        $this->toLdap(true)->shouldBeEqualTo('2');
-        $this->setAttribute('scopeUniversal');
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::UniversalGroup', 'invert' => false]);
+        $this->toLdap(true)->shouldBeEqualTo('-2147483640');
+        $this->setLastValue(['-2147483640']);
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => true]);
         $this->toLdap(true)->shouldBeEqualTo('8');
-        $this->setAttribute('typeSecurity');
+        $this->setLastValue(['8']);
+
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => false]);
         $this->toLdap(true)->shouldBeEqualTo('-2147483640');
     }
 
@@ -161,9 +159,9 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $connection->execute(Argument::that($this->expectedOp))->willReturn($result);
         
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $this->setAttribute('typeSecurity');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled']);
         $this->toLdap(true)->shouldBeEqualTo('-2147483646');
-        $this->setAttribute('scopeGlobal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::GlobalGroup']);
         $this->toLdap(true)->shouldBeEqualTo('-2147483646');
     }
 
@@ -172,7 +170,7 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $connection->execute(Argument::that($this->expectedOp))->willReturn(['count' => 0]);
 
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $this->setAttribute('typeSecurity');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled']);
         $this->shouldThrow(new AttributeConverterException("Unable to find LDAP object: cn=foo,dc=foo,dc=bar"))->duringToLdap(true);
     }
 
@@ -181,35 +179,27 @@ class ConvertGroupTypeSpec extends ObjectBehavior
         $this->setDn(null);
         $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
         $this->setAttribute('typeDistribution');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled']);
         $this->shouldThrow(new AttributeConverterException('Unable to query for the current "groupType" attribute.'))->duringToLdap(true);
-    }
-
-    function it_should_be_case_insensitive_to_the_current_attribute_name($connection)
-    {
-        $connection->execute(Argument::that($this->expectedOp))->willReturn($this->expectedResult);
-
-        $this->setOperationType(AttributeConverterInterface::TYPE_MODIFY);
-        $this->setAttribute('TypeSecuritY');
-        $this->toLdap(true)->shouldBeEqualTo("-2147483646");
     }
 
     function it_should_convert_a_bool_value_into_the_bitwise_operator_for_the_returned_value()
     {
         $this->setOperationType(AttributeConverterInterface::TYPE_SEARCH_TO);
 
-        $this->setAttribute('typeSecurity');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled']);
         $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2147483648)');
         $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2147483648))');
-        $this->setAttribute('typeDistribution');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::SecurityEnabled', 'invert' => true]);
         $this->toLdap(true)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2147483648))');
         $this->toLdap(false)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2147483648)');
-        $this->setAttribute('scopeGlobal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::GlobalGroup', 'invert' => false]);
         $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=2)');
         $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=2))');
-        $this->setAttribute('scopeUniversal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::UniversalGroup']);
         $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=8)');
         $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=8))');
-        $this->setAttribute('scopeDomainLocal');
+        $this->setOptions(['flag_enum' => 'LdapTools\Enums\AD\GroupType::DomainLocalGroup']);
         $this->toLdap(true)->toLdapFilter()->shouldEqual('(groupType:1.2.840.113556.1.4.803:=4)');
         $this->toLdap(false)->toLdapFilter()->shouldEqual('(!(groupType:1.2.840.113556.1.4.803:=4))');
     }
