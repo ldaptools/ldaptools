@@ -60,32 +60,6 @@ trait ConverterUtilitiesTrait
     abstract public function getLdapConnection();
 
     /**
-     * If the current attribute does not exist in the array, then throw an error.
-     *
-     * @param array $options
-     * @throws AttributeConverterException
-     */
-    protected function validateCurrentAttribute(array $options)
-    {
-        if (!array_key_exists(MBString::strtolower($this->getAttribute()), MBString::array_change_key_case($options))) {
-            throw new AttributeConverterException(
-                sprintf('You must first define "%s" in the options for this converter.', $this->getAttribute())
-            );
-        }
-    }
-
-    /**
-     * Get the value of an array key in a case-insensitive way.
-     *
-     * @param array $options
-     * @param string $key
-     */
-    protected function getArrayValue(array $options, $key)
-    {
-        return MBString::array_change_key_case($options)[MBString::strtolower($key)];
-    }
-
-    /**
      * This can be called to retrieve the current value of an attribute from LDAP.
      *
      * @param string $attribute The attribute name to query for a value from the converter context
