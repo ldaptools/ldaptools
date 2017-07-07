@@ -97,20 +97,16 @@ class LdapObject
     }
 
     /**
-     * Get the value of an attribute. An attribute with multiple values will return an array of values.
+     * Get the value of an attribute. An attribute with multiple values will return an array of values. If the attribute
+     * does not exist it will return null by default. Pass an optional default value to return something other than null.
      *
      * @param string $attribute
+     * @param mixed $default
      * @return mixed
      */
-    public function get($attribute)
+    public function get($attribute, $default = null)
     {
-        if ($this->has($attribute)) {
-            return array_change_key_case($this->attributes)[strtolower($attribute)];
-        } else {
-            throw new InvalidArgumentException(
-                sprintf('Attribute "%s" is not defined for this LDAP object.', $attribute)
-            );
-        }
+        return $this->has($attribute) ? array_change_key_case($this->attributes)[strtolower($attribute)] : $default;
     }
 
     /**
@@ -267,7 +263,7 @@ class LdapObject
         $method = $matches[1];
         $attribute = lcfirst($matches[2]);
 
-        if ('get' == $method || 'reset' == $method) {
+        if ('reset' == $method) {
             return $this->$method($attribute);
         } else {
             return $this->$method($attribute, ...$arguments);

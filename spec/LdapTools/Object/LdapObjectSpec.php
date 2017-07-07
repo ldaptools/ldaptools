@@ -52,6 +52,7 @@ class LdapObjectSpec extends ObjectBehavior
     function it_should_allow_me_to_call_a_magical_getter_for_an_attribute()
     {
         $this->getFirstName()->shouldBeEqualTo('Chad');
+        $this->getFirstName('default')->shouldNotBeEqualTo('default');
     }
 
     function it_should_allow_me_to_call_a_magical_getter_case_insensitive()
@@ -59,9 +60,15 @@ class LdapObjectSpec extends ObjectBehavior
         $this->getfIrStnAmE()->shouldBeEqualTo('Chad');
     }
 
-    function it_should_error_when_getting_an_attribute_that_doesnt_exist()
+    function it_should_return_null_when_getting_an_attribute_that_doesnt_exist()
     {
-        $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGetFoo();
+        $this->getFoo()->shouldBeNull();
+    }
+
+    function it_should_return_the_default_value_if_specified_for_an_attribute_that_doesnt_exist()
+    {
+        $this->get('foo', 'none')->shouldBeEqualTo('none');
+        $this->getFoo('none')->shouldBeEqualTo('none');
     }
 
     function it_should_return_self_from_a_magic_setter()
