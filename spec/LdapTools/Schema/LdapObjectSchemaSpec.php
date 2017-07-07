@@ -116,9 +116,8 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_return_the_mapped_attribute_when_calling_getAttributeToLdap()
     {
-        $this->setAttributeMap(['foo' => 'bar', 'fÓObar' => 'foo']);
+        $this->setAttributeMap(['foo' => 'bar']);
         $this->getAttributeToLdap('foo')->shouldBeEqualTo('bar');
-        $this->getAttributeToLdap('Fóobar')->shouldBeEqualTo('foo');
     }
 
     function it_should_return_the_same_attribute_you_pass_it_when_calling_getAttributeToLdap_and_there_is_no_mapping()
@@ -128,9 +127,8 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_return_true_when_calling_hasAttribute_and_the_attribute_is_in_the_schema()
     {
-        $this->setAttributeMap(['foo' => 'bar', 'fóo' => 'bar']);
+        $this->setAttributeMap(['foo' => 'bar']);
         $this->hasAttribute('foo')->shouldBeEqualTo(true);
-        $this->hasAttribute('fÓO')->shouldBeEqualTo(true);
     }
 
     function it_should_return_false_when_calling_hasAttribute_and_the_attribute_is_not_in_the_schema()
@@ -153,15 +151,14 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_return_all_names_mapped_to_one_attribute_when_calling_getNamesMappedToAttribute()
     {
-        $this->setAttributeMap(['foo' => 'bar', 'panda' => 'bar', 'foobar' => 'fóo']);
-        $this->getNamesMappedToAttribute('fÓO')->shouldBeEqualTo(['foobar']);
+        $this->setAttributeMap(['foo' => 'bar', 'panda' => 'bar']);
+        $this->getNamesMappedToAttribute('bar')->shouldBeEqualTo(['foo', 'panda']);
     }
 
     function it_should_return_whether_an_ldap_attribute_has_a_name_mapped_to_it_when_calling_hasNameMappedToAttribute()
     {
-        $this->setAttributeMap(['foo' => 'bar', 'panda' => 'bar', 'foobar' => 'fóo']);
+        $this->setAttributeMap(['foo' => 'bar', 'panda' => 'bar']);
         $this->hasNamesMappedToAttribute('bar')->shouldBeEqualTo(true);
-        $this->hasNamesMappedToAttribute('fÓo')->shouldBeEqualTo(true);
         $this->hasNamesMappedToAttribute('foo')->shouldBeEqualTo(false);
     }
 
@@ -224,21 +221,18 @@ class LdapObjectSchemaSpec extends ObjectBehavior
 
     function it_should_be_able_to_tell_whether_a_specific_attribute_should_return_an_array()
     {
-        $attributes = ['foo', 'fóo'];
+        $attributes = ['foo', 'foobar'];
         $this->setMultivaluedAttributes($attributes);
         $this->isMultivaluedAttribute('foo')->shouldBeEqualTo(true);
         $this->isMultivaluedAttribute('FOO')->shouldBeEqualTo(true);
-        $this->isMultivaluedAttribute('FÓO')->shouldBeEqualTo(true);
-        $this->isMultivaluedAttribute('fóo')->shouldBeEqualTo(true);
         $this->isMultivaluedAttribute('bar')->shouldBeEqualTo(false);
     }
 
     function it_should_get_the_converter_for_an_attribute()
     {
-        $this->setConverterMap(['foo' => 'bar', 'fóo' => 'bar']);
+        $this->setConverterMap(['foo' => 'bar']);
         $this->getConverter('foo')->shouldBeEqualTo('bar');
         $this->getConverter('FOO')->shouldBeEqualTo('bar');
-        $this->getConverter('fÓo')->shouldBeEqualTo('bar');
     }
 
     function it_should_throw_an_error_if_the_converter_doesnt_exist()

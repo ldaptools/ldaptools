@@ -54,25 +54,10 @@ class MBStringSpec extends ObjectBehavior
         $this::strtolower('FOO')->shouldEqual('foo');
     }
 
-    function it_should_change_the_case_of_the_keys_for_an_array()
-    {
-        $this::array_change_key_case(['Ädam' => 'Foo', 'Böb' => 'foo', 'foO' => 'foo'])->shouldBeEqualTo(
-           ['ädam' => 'Foo', 'böb' => 'foo', 'foo' => 'foo']
-        );
-    }
-
     function it_should_change_the_case_of_the_values_for_an_array()
     {
         $this::array_change_value_case(['Foo' => 'Ädam', 'bar' => 'Böb', 'foobar' => 'fOo'])->shouldBeEqualTo(
             ['Foo' => 'ädam', 'bar' => 'böb', 'foobar' => 'foo']
         );
-    }
-
-    function it_should_find_a_value_in_an_array_and_return_it_in_its_original_case()
-    {
-        $this::array_search_get_value('foo', ['FoO', 'bar'])->shouldBeEqualTo('FoO');
-        $this::array_search_get_value('foo', ['foo', 'bar'])->shouldBeEqualTo('foo');
-        $this::array_search_get_value('ädam', ['Ädam', 'Böb', 'foo'])->shouldBeEqualTo('Ädam');
-        $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->during('array_search_get_value', ['foobar', ['foo', 'bar']]);
     }
 }

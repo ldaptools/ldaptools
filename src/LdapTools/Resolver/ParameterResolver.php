@@ -12,7 +12,6 @@ namespace LdapTools\Resolver;
 
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Exception\LogicException;
-use LdapTools\Utilities\MBString;
 
 /**
  * Iterates over the attributes to process and replace parameter values in the required order based on dependencies.
@@ -258,10 +257,10 @@ class ParameterResolver
             foreach ($parameters as $parameter) {
                 $value = '';
                 // Explicitly set parameters values will take precedence
-                if (array_key_exists(MBString::strtolower($parameter), MBString::array_change_key_case($this->parameters))) {
-                    $value = array_change_key_case($this->parameters)[MBString::strtolower($parameter)];
-                } elseif (array_key_exists(MBString::strtolower($parameter), MBString::array_change_key_case($attributes))) {
-                    $value = MBString::array_change_key_case($attributes)[MBString::strtolower($parameter)];
+                if (array_key_exists(strtolower($parameter), array_change_key_case($this->parameters))) {
+                    $value = array_change_key_case($this->parameters)[strtolower($parameter)];
+                } elseif (array_key_exists(strtolower($parameter), array_change_key_case($attributes))) {
+                    $value = array_change_key_case($attributes)[strtolower($parameter)];
                 }
                 if (is_array($value) && count($value) !== 1) {
                     throw new InvalidArgumentException(sprintf(

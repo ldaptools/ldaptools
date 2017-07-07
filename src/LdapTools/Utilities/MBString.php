@@ -10,8 +10,6 @@
 
 namespace LdapTools\Utilities;
 
-use LdapTools\Exception\InvalidArgumentException;
-
 /**
  * Some utility functions to handle multi-byte strings properly, as support is lacking/inconsistent for most PHP string
  * functions. This provides a wrapper for various workarounds and falls back to normal functions if needed.
@@ -111,27 +109,6 @@ class MBString
     }
 
     /**
-     * Change the keys in an array to their lower-case values.
-     *
-     * @param array $values
-     * @return array
-     */
-    public static function array_change_key_case(array $values)
-    {
-        if (self::isMbstringLoaded()) {
-            $newValues = [];
-
-            foreach ($values as $key => $value) {
-                $newValues[self::strtolower($key)] = $value;
-            }
-
-            return $newValues;
-        }
-
-        return array_change_key_case($values);
-    }
-
-    /**
      * Change the values in an array to lower-case values.
      *
      * @param array $values
@@ -146,26 +123,6 @@ class MBString
         }
 
         return $newValues;
-    }
-
-    /**
-     * Given an array value determine if it exists in the array and return the value as it is in the array.
-     *
-     * @param string $needle
-     * @param array $haystack
-     * @return string
-     */
-    public static function array_search_get_value($needle, array $haystack)
-    {
-        $lcNeedle = self::strtolower($needle);
-
-        foreach ($haystack as $value) {
-            if ($lcNeedle == self::strtolower($value)) {
-                return $value;
-            }
-        }
-
-        throw new InvalidArgumentException(sprintf('Value "%s" not found in array.', $needle));
     }
 
     /**

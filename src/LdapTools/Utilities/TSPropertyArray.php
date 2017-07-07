@@ -94,7 +94,7 @@ class TSPropertyArray
      */
     public function has($propName)
     {
-        return array_key_exists(MBString::strtolower($propName), MBString::array_change_key_case($this->tsProperty));
+        return array_key_exists(strtolower($propName), array_change_key_case($this->tsProperty));
     }
 
     /**
@@ -132,7 +132,7 @@ class TSPropertyArray
     public function remove($propName)
     {
         foreach (array_keys($this->tsProperty) as $property) {
-            if (MBString::strtolower($propName) == MBString::strtolower($property)) {
+            if (strtolower($propName) == strtolower($property)) {
                 unset($this->tsProperty[$property]);
             }
         }
@@ -162,7 +162,7 @@ class TSPropertyArray
      */
     public function toBinary()
     {
-        $binary = hex2bin(str_pad(dechex(MBString::ord($this->signature)), 2, 0, STR_PAD_LEFT));
+        $binary = hex2bin(str_pad(dechex(ord($this->signature)), 2, 0, STR_PAD_LEFT));
         $binary .= hex2bin(str_pad(dechex(count($this->tsProperty)), 2, 0, STR_PAD_LEFT));
         foreach ($this->tsProperty as $tsProperty) {
             $binary .= $tsProperty->toBinary();
@@ -243,7 +243,7 @@ class TSPropertyArray
      */
     protected function getTsPropObj($propName)
     {
-        return MBString::array_change_key_case($this->tsProperty)[MBString::strtolower($propName)];
+        return array_change_key_case($this->tsProperty)[strtolower($propName)];
     }
     
     /**
@@ -256,7 +256,7 @@ class TSPropertyArray
     {
         $tsPropArray = bin2hex($tsPropArray);
         // The signature is a 2-byte unicode character at the front
-        $this->signature = MBString::chr(hexdec(substr($tsPropArray, 0, 2)));
+        $this->signature = chr(hexdec(substr($tsPropArray, 0, 2)));
         // The property count is a 2-byte unsigned integer indicating the number of elements for the tsPropertyArray
         // It starts at position 2. The actual variable data begins at position 4.
         $length = $this->addTSPropData(substr($tsPropArray, 4), hexdec(substr($tsPropArray, 2, 2)));

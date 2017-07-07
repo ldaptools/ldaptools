@@ -15,7 +15,6 @@ use LdapTools\BatchModify\Batch;
 use LdapTools\BatchModify\BatchCollection;
 use LdapTools\Exception\LogicException;
 use LdapTools\Schema\LdapObjectSchema;
-use LdapTools\Utilities\MBString;
 
 /**
  * Parses through a BatchCollection to resolve, modify, and remove values based on the attributes and converters used.
@@ -117,9 +116,10 @@ class BatchValueResolver extends BaseValueResolver
     {
         $batches = [];
 
+        $lcAttributes = array_map('strtolower', $attributes);
         foreach ($this->batches as $index => $batch) {
             /** @var Batch $batch */
-            if (in_array(MBString::strtolower($batch->getAttribute()), MBString::array_change_value_case($attributes))) {
+            if (in_array(strtolower($batch->getAttribute()), $lcAttributes)) {
                 $batches[$index] = $batch;
             }
         }

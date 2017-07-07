@@ -122,7 +122,7 @@ class DialInData
      */
     public function toBinary()
     {
-        $binary = hex2bin(str_pad(dechex(MBString::ord($this->signature)), 2, 0, STR_PAD_LEFT));
+        $binary = hex2bin(str_pad(dechex(ord($this->signature)), 2, 0, STR_PAD_LEFT));
         $binary .= hex2bin($this->dec2hex($this->userPrivilege));
         $binary .= hex2bin($this->callbackPhoneNumber);
         
@@ -137,7 +137,7 @@ class DialInData
     protected function decode($binary)
     {
         $hex = bin2hex($binary);
-        $this->signature = MBString::chr(hexdec(substr($hex, 0, 2)));
+        $this->signature = chr(hexdec(substr($hex, 0, 2)));
         $this->userPrivilege = hexdec(substr($hex, 2, 2));
         $this->callbackPhoneNumber = substr($hex, 4, 48);
     }

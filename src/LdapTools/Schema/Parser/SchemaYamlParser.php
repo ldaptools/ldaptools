@@ -15,7 +15,6 @@ use LdapTools\Exception\SchemaParserException;
 use LdapTools\Operation\QueryOperation;
 use LdapTools\Schema\LdapObjectSchema;
 use LdapTools\Utilities\ArrayToOperator;
-use LdapTools\Utilities\MBString;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 
@@ -197,7 +196,7 @@ class SchemaYamlParser implements SchemaParserInterface
     {
         $objectSchema = null;
         foreach ($schema['objects'] as $ldapObject) {
-            if (array_key_exists('type', $ldapObject) && MBString::strtolower($ldapObject['type']) == MBString::strtolower($objectType)) {
+            if (array_key_exists('type', $ldapObject) && strtolower($ldapObject['type']) == strtolower($objectType)) {
                 $objectSchema = $ldapObject;
             }
         }

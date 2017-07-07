@@ -11,7 +11,6 @@
 namespace LdapTools\AttributeConverter;
 
 use LdapTools\Exception\AttributeConverterException;
-use LdapTools\Utilities\MBString;
 
 /**
  * Based off the objectClass of an object, determine what LDAP Object schema type it is.
@@ -47,10 +46,10 @@ class ConvertLdapObjectType implements AttributeConverterInterface
     public function fromLdap($value)
     {
         $ldapType = ['Unknown'];
-        $value = MBString::array_change_value_case($value);
+        $value = array_map('strtolower', $value);
 
         foreach ($this->options as $type => $classes) {
-            if (MBString::array_change_value_case($classes) == $value) {
+            if (array_map('strtolower', $classes) == $value) {
                 $ldapType = [$type];
                 break;
             }

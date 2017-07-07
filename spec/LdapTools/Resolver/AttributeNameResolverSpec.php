@@ -88,6 +88,12 @@ class AttributeNameResolverSpec extends ObjectBehavior
         $this->fromLdap($fromLdap, ['*'])->shouldHaveKeys($keys);
     }
 
+    function it_should_find_a_value_in_an_array_and_return_it_in_its_original_case()
+    {
+        $this::arraySearchGetValue('foo', ['FoO', 'bar'])->shouldBeEqualTo('FoO');
+        $this::arraySearchGetValue('foo', ['foo', 'bar'])->shouldBeEqualTo('foo');
+    }
+
     public function getMatchers()
     {
         return [

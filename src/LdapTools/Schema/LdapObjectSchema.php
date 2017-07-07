@@ -13,7 +13,6 @@ namespace LdapTools\Schema;
 use LdapTools\Connection\LdapControl;
 use LdapTools\Exception\InvalidArgumentException;
 use LdapTools\Query\Operator\BaseOperator;
-use LdapTools\Utilities\MBString;
 
 /**
  * Describes the attributes for a LDAP object from a schema definition.
@@ -170,8 +169,8 @@ class LdapObjectSchema
     public function setAttributeMap(array $attributeMap)
     {
         $this->attributeMap = $attributeMap;
-        $this->lcAttributeNameMap = MBString::array_change_key_case($attributeMap);
-        $this->lcAttributeValueMap = MBString::array_change_value_case($attributeMap);
+        $this->lcAttributeNameMap = array_change_key_case($attributeMap);
+        $this->lcAttributeValueMap = array_map('strtolower', $attributeMap);
     }
 
     /**
@@ -192,7 +191,7 @@ class LdapObjectSchema
     public function setConverterMap(array $converterMap)
     {
         $this->converterMap = $converterMap;
-        $this->lcConverterMap = MBString::array_change_key_case($converterMap);
+        $this->lcConverterMap = array_change_key_case($converterMap);
     }
 
     /**
@@ -213,7 +212,7 @@ class LdapObjectSchema
      */
     public function hasConverter($attributeName)
     {
-        return isset($this->lcConverterMap[MBString::strtolower($attributeName)]);
+        return isset($this->lcConverterMap[strtolower($attributeName)]);
     }
 
     /**
@@ -228,7 +227,7 @@ class LdapObjectSchema
             throw new InvalidArgumentException(sprintf('No converter exists for attribute "%s".', $attributeName));
         }
 
-        return $this->lcConverterMap[MBString::strtolower($attributeName)];
+        return $this->lcConverterMap[strtolower($attributeName)];
     }
 
     /**
@@ -299,7 +298,7 @@ class LdapObjectSchema
      */
     public function hasAttribute($attribute)
     {
-        return isset($this->lcAttributeNameMap[MBString::strtolower($attribute)]);
+        return isset($this->lcAttributeNameMap[strtolower($attribute)]);
     }
 
     /**
@@ -310,7 +309,7 @@ class LdapObjectSchema
      */
     public function hasNamesMappedToAttribute($attribute)
     {
-        return (bool) array_search(MBString::strtolower($attribute), $this->lcAttributeValueMap);
+        return (bool) array_search(strtolower($attribute), $this->lcAttributeValueMap);
     }
 
     /**
@@ -322,7 +321,7 @@ class LdapObjectSchema
      */
     public function getNamesMappedToAttribute($attribute)
     {
-        return array_keys($this->lcAttributeValueMap, MBString::strtolower($attribute));
+        return array_keys($this->lcAttributeValueMap, strtolower($attribute));
     }
 
     /**
@@ -333,7 +332,7 @@ class LdapObjectSchema
      */
     public function getAttributeToLdap($attribute)
     {
-        return $this->hasAttribute($attribute) ? $this->lcAttributeNameMap[MBString::strtolower($attribute)] : $attribute;
+        return $this->hasAttribute($attribute) ? $this->lcAttributeNameMap[strtolower($attribute)] : $attribute;
     }
 
     /**
@@ -468,7 +467,7 @@ class LdapObjectSchema
         if (!isset($this->converterOptions[$converter])) {
             $this->converterOptions[$converter] = [];
         }
-        $this->converterOptions[$converter][MBString::strtolower($attribute)] = $converterOptions;
+        $this->converterOptions[$converter][strtolower($attribute)] = $converterOptions;
     }
 
     /**
@@ -480,7 +479,7 @@ class LdapObjectSchema
      */
     public function getConverterOptions($converter, $attribute)
     {
-        $lcAttr = MBString::strtolower($attribute);
+        $lcAttr = strtolower($attribute);
 
         $options = [];
         if (isset($this->converterOptions[$converter]) && isset($this->converterOptions[$converter][$lcAttr])) {
@@ -518,7 +517,7 @@ class LdapObjectSchema
      */
     public function isMultivaluedAttribute($attribute)
     {
-        return in_array(MBString::strtolower($attribute), MBString::array_change_value_case($this->multivaluedAttributes));
+        return in_array(strtolower($attribute), array_map('strtolower', $this->multivaluedAttributes));
     }
 
     /**

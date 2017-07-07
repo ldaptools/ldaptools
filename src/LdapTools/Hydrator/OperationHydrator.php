@@ -22,7 +22,6 @@ use LdapTools\Query\OperatorCollection;
 use LdapTools\Resolver\BaseValueResolver;
 use LdapTools\Resolver\ParameterResolver;
 use LdapTools\Utilities\LdapUtilities;
-use LdapTools\Utilities\MBString;
 
 /**
  * Converts LDAP operation data based on a schema and its properties.
@@ -184,12 +183,12 @@ class OperationHydrator extends ArrayHydrator
      */
     protected function getRdnFromAttributes(array $attributes) {
         $rdn = [];
-        $rdnAttributes = MBString::array_change_value_case($this->schema->getRdn());
+        $rdnAttributes = array_map('strtolower', $this->schema->getRdn());
 
         foreach ($rdnAttributes as $rdnAttribute) {
             $rdnAttribute = $this->schema->getAttributeToLdap($rdnAttribute);
             foreach ($attributes as $attribute) {
-                if (MBString::strtolower($attribute) === $rdnAttribute) {
+                if (strtolower($attribute) === $rdnAttribute) {
                     $rdn[] = $attribute;
                 }
             }
@@ -220,7 +219,7 @@ class OperationHydrator extends ArrayHydrator
         foreach ($this->schema->getRdn() as $rdn) {
             /** @var \LdapTools\BatchModify\Batch $batch */
             foreach ($operation->getBatchCollection() as $index => $batch) {
-                if (MBString::strtolower($rdn) === MBString::strtolower($batch->getAttribute()) && $batch->isTypeReplace()) {
+                if (strtolower($rdn) === strtolower($batch->getAttribute()) && $batch->isTypeReplace()) {
                     $newRdn = $this->schema->getAttributeToLdap($rdn).'='.LdapUtilities::escapeValue(
                         $batch->getValues()[0],
                         null,

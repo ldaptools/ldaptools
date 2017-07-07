@@ -12,7 +12,6 @@ namespace LdapTools\AttributeConverter;
 
 use LdapTools\Exception\AttributeConverterException;
 use LdapTools\Query\Builder\FilterBuilder;
-use LdapTools\Utilities\MBString;
 
 /**
  * Converts the lockoutTime to either a bool or a DateTime object.

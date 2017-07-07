@@ -11,7 +11,6 @@
 namespace LdapTools\Resolver;
 
 use LdapTools\Schema\LdapObjectSchema;
-use LdapTools\Utilities\MBString;
 
 /**
  * Resolves names for a LDAP entry going to and from LDAP so they are the correct case/name.
@@ -56,7 +55,7 @@ class AttributeNameResolver
             }
             // If the LDAP attribute name was also explicitly selected for, and is not already in the array, add it...
             if ($this->selectedButNotPartOfEntry($attribute, $newEntry)) {
-                $newEntry[MBString::array_search_get_value($attribute, $this->selectedAttributes)] = $value;
+                $newEntry[self::arraySearchGetValue($attribute, $this->selectedAttributes)] = $value;
             }
         }
         // The DN attribute must be present as it is used in many critical functions.
@@ -80,6 +79,26 @@ class AttributeNameResolver
         }
 
         return $toLdap;
+    }
+
+    /**
+     * Given an array value determine if it exists in the array and return the value as it is in the array.
+     *
+     * @param string $needle
+     * @param array $haystack
+     * @return string|null
+     */
+    public static function arraySearchGetValue($needle, array $haystack)
+    {
+        $lcNeedle = strtolower($needle);
+
+        foreach ($haystack as $value) {
+            if ($lcNeedle == strtolower($value)) {
+                return $value;
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -109,10 +128,10 @@ class AttributeNameResolver
      */
     protected function selectedButNotPartOfEntry($attribute, array $entry)
     {
-        $lcAttribute = MBString::strtolower($attribute);
+        $lcAttribute = strtolower($attribute);
 
-        $inSelectedAttributes = in_array($lcAttribute, MBString::array_change_value_case($this->selectedAttributes));
-        $existsInEntry = array_key_exists($lcAttribute, MBString::array_change_key_case($entry));
+        $inSelectedAttributes = in_array($lcAttribute, array_map('strtolower', $this->selectedAttributes));
+        $existsInEntry = array_key_exists($lcAttribute, array_change_key_case($entry));
 
         return ($inSelectedAttributes && !$existsInEntry);
     }
@@ -137,7 +156,7 @@ class AttributeNameResolver
         foreach ($mappedNames as $mappedName) {
             // Any names specifically selected for should be in the result array...
             if ($this->selectedButNotPartOfEntry($mappedName, $newEntry)) {
-                $newEntry[MBString::array_search_get_value($mappedName, $this->selectedAttributes)] = $value;
+                $newEntry[self::arraySearchGetValue($mappedName, $this->selectedAttributes)] = $value;
             }
         }
 
