@@ -10,6 +10,8 @@
 
 namespace LdapTools\Event;
 
+use LdapTools\Object\LdapObject;
+
 /**
  * Helps reduce some duplication between a move and a restore event.
  *
@@ -18,14 +20,14 @@ namespace LdapTools\Event;
 trait MoveEventTrait
 {
     /**
-     * @var string The location the LDAP object is moving to.
+     * @var string|LdapObject The location the LDAP object is moving to.
      */
     protected $container;
 
     /**
      * Get the location the LDAP object is moving to.
      *
-     * @return string
+     * @return string|LdapObject
      */
     public function getContainer()
     {
@@ -35,7 +37,7 @@ trait MoveEventTrait
     /**
      * Set the location the LDAP object is moving to.
      *
-     * @param string $container The OU/container in DN form.
+     * @param string|LdapObject $container The OU/container in DN form.
      */
     public function setContainer($container)
     {

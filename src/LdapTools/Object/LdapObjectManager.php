@@ -108,7 +108,7 @@ class LdapObjectManager
      * Moves an object from one container/OU to another in LDAP.
      *
      * @param LdapObject $ldapObject
-     * @param string $container
+     * @param string|LdapObject $container
      */
     public function move(LdapObject $ldapObject, $container)
     {
@@ -120,7 +120,7 @@ class LdapObjectManager
         $operation = new RenameOperation(
             $ldapObject->get('dn'),
             LdapUtilities::getRdnFromDn($ldapObject->get('dn')),
-            $container,
+            (string) $container,
             true
         );
         $this->connection->execute($operation);
@@ -144,7 +144,7 @@ class LdapObjectManager
      * 2. Set the DN so the object ends up in a location other than the "Deleted Objects" container.
      *
      * @param LdapObject $ldapObject
-     * @param null|string $location The DN of a container/OU where the restored object should go.
+     * @param null|string|LdapObject $location The DN of a container/OU where the restored object should go.
      */
     public function restore(LdapObject $ldapObject, $location = null)
     {
@@ -194,7 +194,7 @@ class LdapObjectManager
     {
         // If a location was defined, use that.
         if ($location) {
-            $newLocation = $location;
+            $newLocation = (string) $location;
         // Check the attribute for the last known location first...
         } elseif ($ldapObject->has('lastKnownLocation')) {
             $newLocation = $ldapObject->get('lastKnownLocation');

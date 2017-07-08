@@ -277,7 +277,7 @@ class LdapManager
      * Move an object in LDAP from one container/OU to another.
      *
      * @param LdapObject $ldapObject
-     * @param string $container The container/OU in DN format.
+     * @param string|LdapObject $container The container/OU in DN format, or an LdapObject.
      * @return $this
      */
     public function move(LdapObject $ldapObject, $container)
@@ -291,7 +291,7 @@ class LdapManager
      * Restore a deleted LDAP object. Optionally specify where to restore it to (full DN of a container/OU).
      *
      * @param LdapObject $ldapObject
-     * @param string|null $container The container/OU in DN format of where it should be restored to.
+     * @param string|null|LdapObject $container The container/OU in DN format of where it should be restored to.
      * @return $this
      */
     public function restore(LdapObject $ldapObject, $container = null)

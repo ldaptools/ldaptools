@@ -326,4 +326,33 @@ class LdapObjectManagerSpec extends ObjectBehavior
         $connection->execute($operation)->shouldBeCalled();
         $this->persist($ldapObject);
     }
+
+    function it_should_allow_using_a_ldap_object_for_the_move_location($connection)
+    {
+        $location = new LdapObject(['dn' => 'ou=employees,dc=foo,dc=bar']);
+        $operation = new RenameOperation(
+            'cn=foo,dc=foo,dc=bar',
+            'cn=foo',
+            'ou=employees,dc=foo,dc=bar'
+        );
+        $connection->execute($operation)->shouldBeCalled()->willReturn(true);
+
+        $ldapObject = new LdapObject(['dn' => 'cn=foo,dc=foo,dc=bar'], 'user');
+        $this->move($ldapObject, $location);
+    }
+
+    function it_should_allow_using_a_ldap_object_for_the_restore_location($connection)
+    {
+        $dn = 'cn=foo\0ADEL:0101011,cn=Deleted Objects,dc=example,dc=local';
+        $ldapObject = new LdapObject(['dn' => $dn, 'lastKnownLocation' => 'cn=Users,dc=example,dc=local'], 'deleted');
+        $location = new LdapObject(['dn' => 'ou=Employees,dc=example,dc=local']);
+
+        $connection->execute(Argument::that(function($operation) use ($dn) {
+            /** @var BatchModifyOperation $operation */
+            $batches = $operation->getBatchCollection()->toArray();
+
+            return $batches[1]->getValues() == ['cn=foo,ou=Employees,dc=example,dc=local'];
+        }))->shouldBeCalled();
+        $this->restore($ldapObject, $location);
+    }
 }
