@@ -23,6 +23,27 @@ class ResponseCode implements SimpleEnumInterface
     use SimpleEnumTrait;
 
     /**
+     * A helpful map to provide more useful error messages for specific response codes.
+     */
+    protected static $messages = [
+        self::AccountInvalid => 'Account does not exist.',
+        self::AccountCredentialsInvalid => 'Account password is invalid.',
+        self::AccountRestrictions => 'Account Restrictions prevent this user from signing in.',
+        self::AccountRestrictionsTime => 'Time Restriction - The account cannot login at this time.',
+        self::AccountRestrictionsDevice => 'Device Restriction - The account is not allowed to log on to this computer.',
+        self::AccountPasswordExpired => 'The password for this account has expired.',
+        self::AccountDisabled => 'The account is currently disabled.',
+        self::AccountContextIDS => 'The account is a member of too many groups and cannot be logged on.',
+        self::AccountExpired => 'The account has expired.',
+        self::AccountPasswordMustChange => "The account's password must change before it can login.",
+        self::AccountLocked => 'The account is currently locked out.',
+        self::CurrentPasswordIncorrect => 'Unable to update the password. The value for the current password is incorrect.',
+        self::PasswordMalformed => 'Unable to update the password. The value contains characters not allowed in passwords.',
+        self::PasswordRestrictions => 'Unable to update the password. It does not meet the length, complexity, or history requirements for the domain.',
+        self::MemberNotInGroup => 'The specified user account is not a member of the specified group account.',
+    ];
+
+    /**
      * The account does not exist in the directory.
      */
     const AccountInvalid = 1317;
@@ -98,4 +119,44 @@ class ResponseCode implements SimpleEnumInterface
      * The account is locked out.
      */
     const AccountLocked = 1909;
+
+    /**
+     * Check if an error (enum name or value) has a helpful message defined.
+     *
+     * @param mixed $value
+     * @return bool
+     */
+    public static function hasMessageForError($value)
+    {
+        if (self::isValidName($value)) {
+            $value = self::getNameValue($value);
+        }
+
+        return isset(self::$messages[$value]);
+    }
+
+    /**
+     * Get the helpful error message for a specific error if it exists.
+     *
+     * @param mixed $value
+     * @return string|null
+     */
+    public static function getMessageForError($value)
+    {
+        if (self::isValidName($value)) {
+            $value = self::getNameValue($value);
+        }
+
+        return isset(self::$messages[$value]) ? self::$messages[$value] : null;
+    }
+
+    /**
+     * Get the helpful error message for this response code, if any is defined.
+     *
+     * @return null|string
+     */
+    public function getMessage()
+    {
+        return self::getMessageForError($this->value);
+    }
 }

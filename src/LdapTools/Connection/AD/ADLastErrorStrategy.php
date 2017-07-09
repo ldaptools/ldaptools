@@ -10,7 +10,7 @@
 
 namespace LdapTools\Connection\AD;
 
-use LdapTools\Connection\ADResponseCodes;
+use LdapTools\Enums\AD\ResponseCode;
 use LdapTools\Connection\LastErrorStrategy;
 
 /**
@@ -27,8 +27,8 @@ class ADLastErrorStrategy extends LastErrorStrategy
     {
         $extendedError = $this->getExtendedErrorNumber();
 
-        if (array_key_exists($extendedError, ADResponseCodes::RESPONSE_MESSAGE)) {
-            $message = ADResponseCodes::RESPONSE_MESSAGE[$extendedError];
+        if (ResponseCode::hasMessageForError($extendedError)) {
+            $message = ResponseCode::getMessageForError($extendedError);
         } else {
             $message = parent::getLastErrorMessage();
         }

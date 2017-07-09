@@ -10,6 +10,8 @@
 
 namespace LdapTools\Connection;
 
+trigger_error('The LdapTools\Connection\ADResponseCodes is deprecated and will be removed in a later version. Use LdapTools\Enums\AD\ResponseCode instead.', E_USER_DEPRECATED);
+
 /**
  * Maps AD extended response codes to their meanings.
  *
