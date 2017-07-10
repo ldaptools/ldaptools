@@ -619,7 +619,7 @@ objects:
             eq: [ isDeleted, true ]
             present: lastKnownLocation
         controls:
-            - [ 1.2.840.113556.1.4.417, true ]
+            - [ 'ShowDeleted', true ]
         paging: false
         base_dn: "CN=Deleted Objects,%_defaultNamingContext_%"
         converters:
