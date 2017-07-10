@@ -10,6 +10,10 @@
 
 namespace LdapTools\Connection;
 
+use LdapTools\Enums\LdapControlOid;
+use LdapTools\Exception\InvalidArgumentException;
+use LdapTools\Utilities\LdapUtilities;
+
 /**
  * Represents an LDAP control.
  *
@@ -18,7 +22,7 @@ namespace LdapTools\Connection;
 class LdapControl
 {
     /**
-     * @var string The OID for the control.
+     * @var string|LdapControlOid The OID for the control.
      */
     protected $oid;
 
@@ -38,7 +42,7 @@ class LdapControl
     protected $resetValue = false;
 
     /**
-     * @param string $oid
+     * @param string|LdapControlOid $oid
      * @param bool $criticality
      * @param mixed|null $value
      */
@@ -149,7 +153,7 @@ class LdapControl
     public function toArray()
     {
         $control = [
-            'oid' => $this->oid,
+            'oid' => $this->resolveOid(),
             'iscritical' => $this->criticality
         ];
         if (!is_null($this->value)) {
@@ -168,5 +172,27 @@ class LdapControl
     public static function berEncodeInt($int)
     {
         return sprintf("%c%c%c%c%c", 48, 3, 2, 1, $int);
+    }
+
+    /**
+     * @return string
+     */
+    protected function resolveOid()
+    {
+        $oid = $this->oid;
+
+        if ($oid instanceof LdapControlOid) {
+            $oid = $oid->getValue();
+        } elseif (LdapControlOid::isValidName($oid)) {
+            $oid = LdapControlOid::getNameValue($oid);
+        } elseif (is_string($oid) && !preg_match(LdapUtilities::MATCH_OID, $oid)) {
+            throw new InvalidArgumentException(sprintf(
+                'The value "%s" is not a valid OID. Valid LdapControlOid enum names are: %s',
+                $oid,
+                implode(', ', LdapControlOid::names())
+            ));
+        }
+
+        return $oid;
     }
 }

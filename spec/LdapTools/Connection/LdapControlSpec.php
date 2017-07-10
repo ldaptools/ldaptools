@@ -11,6 +11,7 @@
 namespace spec\LdapTools\Connection;
 
 use LdapTools\Enums\LdapControlOid;
+use LdapTools\Exception\InvalidArgumentException;
 use PhpSpec\ObjectBehavior;
 
 class LdapControlSpec extends ObjectBehavior
@@ -95,4 +96,31 @@ class LdapControlSpec extends ObjectBehavior
         $this::berEncodeInt(7)->shouldBeEqualTo(hex2bin('3003020107'));
     }
 
+    function it_should_accept_an_ldap_control_oid_enum_as_an_oid_value()
+    {
+        $oid = new LdapControlOid('ShowDeleted');
+        $this->beConstructedWith($oid);
+
+        $this->toArray()->shouldBeEqualTo([
+            'oid' => "1.2.840.113556.1.4.417",
+            'iscritical' => false,
+        ]);
+    }
+
+    function it_should_accept_an_ldap_control_oid_enum_name_as_an_oid_value()
+    {
+        $this->beConstructedWith('ShowDeleted');
+
+        $this->toArray()->shouldBeEqualTo([
+            'oid' => "1.2.840.113556.1.4.417",
+            'iscritical' => false,
+        ]);
+    }
+
+    function it_should_throw_an_error_when_an_invalid_oid_or_enum_name_is_used_on_toArray()
+    {
+        $this->beConstructedWith('Foo');
+
+        $this->shouldThrow(InvalidArgumentException::class)->during('toArray');
+    }
 }
