@@ -371,6 +371,14 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('example', 'GeneriC')->getObjectType()->shouldBeEqualTo('generic');
     }
 
+    function it_should_allow_a_ldap_control_oid_by_enum_name()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->parse('control_oid', 'ControlName')->getControls()->shouldBeLike([
+            new LdapControl('ShowDeleted', true)
+        ]);
+    }
 
     function it_should_set_a_default_RDN_in_the_LdapObjectSchema_when_parsing()
     {

@@ -1,0 +1,8 @@
+objects:
+    control_name:
+        type: ControlName
+        class: ControlName
+        controls:
+            - [ 'ShowDeleted', true ]
+        attributes:
+            name: cn
