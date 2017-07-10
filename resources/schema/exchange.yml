@@ -106,18 +106,18 @@ objects:
                  - 'created'
                  - 'modified'
              int:
-                 - 'numberOfPreviousPasswordsDisallowed'
+                 - 'passwordHistoryLimit'
         attributes:
             name: cn
             created: whenCreated
             dn: distinguishedName
             guid: objectGuid
             modified: whenChanged
-            numberOfPreviousPasswordsDisallowed: msExchMobileDeviceNumberOfPreviousPasswordsDisallowed
+            passwordHistoryLimit: msExchMobileDeviceNumberOfPreviousPasswordsDisallowed
             sid: objectSid
         attributes_to_select:
             - 'name'
-            - 'numberOfPreviousPasswordsDisallowed'
+            - 'passwordHistoryLimit'
             - 'guid'
             - 'dn'
             - 'guid'

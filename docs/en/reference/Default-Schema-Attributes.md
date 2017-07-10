@@ -433,7 +433,7 @@ These are Exchange ActiveSync policies.
 | created | whenCreated | `\DateTime` | The date the ActiveSync policy was created |
 | guid | objectGuid | string | The ActiveSync policy's GUID |
 | modified | whenModified | `\DateTime` | The date the ActiveSync policy was last modified |
-| numberOfPreviousPasswordsDisallowed | msExchMobileDeviceNumberOfPreviousPasswordsDisallowed | int | Password history limit |
+| passwordHistoryLimit | msExchMobileDeviceNumberOfPreviousPasswordsDisallowed | int | Password history limit |
 | sid | objectSid | string | The ActiveSync policy's SID (Security Identifier) |
 
 #### Exchange RBAC Policy Type
