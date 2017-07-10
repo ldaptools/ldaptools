@@ -271,13 +271,13 @@ should start. It also accepts parameter names for the defaultNamingContext and t
 #### controls
 
 These are arrays of LDAP controls that should be used when performing operations/queries with this schema type. Each
-control should be an array with the OID, and optionally the criticality and value:
+control should be an array with the OID (or friendly constant name from [LdapControlOid](https://github.com/ldaptools/ldaptools/blob/master/src/LdapTools/Enums/LdapControlOid.php)), and optionally the criticality and value:
 
 ```yaml
     # The OID must come first, followed by whether the control is critical, and then an optional value.
     # If you omit the criticality then it defaults to false.
     controls:
-        - [ 1.2.840.113556.1.4.417, true ]  
+        - [ 1.2.840.113556.1.4.417, true ]
 ```
 
 --------------------
