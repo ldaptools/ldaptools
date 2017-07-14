@@ -94,10 +94,10 @@ trait ConverterUtilitiesTrait
      */
     protected function setDefaultLastValue($attribute, $default)
     {
-        if (empty($this->getLastValue()) && $this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY) {
+        if (empty($this->getLastValue()) && $this->getLastValue() !== '0' && $this->getOperationType() == AttributeConverterInterface::TYPE_MODIFY) {
             $original = $this->getCurrentLdapAttributeValue($attribute);
             $this->setLastValue(is_null($original) ? $default : $original);
-        } elseif (empty($this->getLastValue()) && $this->getOperationType() == AttributeConverterInterface::TYPE_CREATE) {
+        } elseif (empty($this->getLastValue()) && $this->getLastValue() !== '0' && $this->getOperationType() == AttributeConverterInterface::TYPE_CREATE) {
             $this->setLastValue($default);
         }
     }
