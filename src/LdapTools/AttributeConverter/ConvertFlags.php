@@ -35,6 +35,9 @@ class ConvertFlags implements AttributeConverterInterface
         # The default value to use for a flag enum class if no value is defined for the flags yet
         # ie. 'LdapTools\Enums\AD\UserAccountControl' => 'NormalAccount'
         'default_value' => [],
+        # The LDAP attribute to use for LDAP queries against for specific flag enum classes.
+        # ie. 'LdapTools\Enums\AD\UserAccountControl' => 'userAccountControl'
+        'attribute' => [],
         # If the attribute value/meaning should be inverted. Provided as a convenience (ie. enabled)
         'invert' => false,
     ];
