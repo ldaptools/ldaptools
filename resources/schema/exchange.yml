@@ -279,8 +279,22 @@ objects:
                 _default:
                     attribute:
                         LdapTools\Enums\Exchange\ELCMailbox: 'msExchELCMailboxFlags'
+                        LdapTools\Enums\Exchange\MobileAccessControl: 'msExchOmaAdminWirelessEnable'
                     default_value:
                         LdapTools\Enums\Exchange\ELCMailbox: 'MRMEnabled'
+                        LdapTools\Enums\Exchange\MobileAccessControl: 'None'
+                activeSyncEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\MobileAccessControl::ActiveSyncDisabled'
+                    invert: true
+                activeSyncPushEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\MobileAccessControl::OutlookMobileAccessDisabled'
+                    invert: true
+                omaEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\MobileAccessControl::OutlookMobileAccessDisabled'
+                    invert: true
+                owaForDevicesEnabled:
+                    flag_enum: 'LdapTools\Enums\Exchange\MobileAccessControl::OWAForDevicesDisabled'
+                    invert: true
                 retentionEnabled:
                     flag_enum: 'LdapTools\Enums\Exchange\ELCMailbox::RetentionEnabled'
                 mrmEnabled:
@@ -333,6 +347,10 @@ objects:
              exchange_legacy_dn:
                  - 'legacyExchangeDn'
              flags:
+                 - 'activeSyncEnabled'
+                 - 'activeSyncPushEnabled'
+                 - 'omaEnabled'
+                 - 'owaForDevicesEnabled'
                  - 'litigationEnabled'
                  - 'mailboxDisabled'
                  - 'mrmEnabled'
@@ -341,6 +359,8 @@ objects:
                  - 'calendarLoggingEnabled'
                  - 'calendarLoggingDisabled'
         attributes:
+            activeSyncEnabled: msExchOmaAdminWirelessEnable
+            activeSyncPushEnabled: msExchOmaAdminWirelessEnable
             activeSyncPolicy: msExchMobileMailboxPolicyLink
             alias: mailNickname
             archiveDatabase: msExchArchiveDatabaseLink
@@ -365,6 +385,8 @@ objects:
             mailboxStatus: msExchUserAccountControl
             mailTips: msExchSenderHintTranslations
             mrmEnabled: msExchELCMailboxFlags
+            omaEnabled: msExchOmaAdminWirelessEnable
+            owaForDevicesEnabled: msExchOmaAdminWirelessEnable
             quotaSizeWarning: mDBStorageQuota
             quotaSizeProhibitSend: mDBOverQuotaLimit
             quotaSizeProhibitAll: mDBOverHardQuotaLimit

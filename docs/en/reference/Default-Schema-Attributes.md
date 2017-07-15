@@ -351,6 +351,8 @@ along with the attributes below.
 
 | LdapTools Name  | LDAP Attribute | Value Type | Description |
 | --------------- | -------------- | ---------- | ----------- |
+| activeSyncEnabled | msExchOmaAdminWirelessEnable | bool | Whether or not ActiveSync is enabled |
+| activeSyncPushEnabled | msExchOmaAdminWirelessEnable | bool | Whether or not ActiveSync Push is enabled |
 | activeSyncPolicy | msExchMobileMailboxPolicyLink | string | The Active Sync policy name |
 | alias | mailNickname | string | The Exchange Mailbox alias | 
 | archiveDatabase | msExchArchiveDatabaseLink | string | The Archive Database name |
@@ -374,6 +376,8 @@ along with the attributes below.
 | mailboxServer | msExchHomeServerName | string | The name of the exchange server where the mailbox resides |
 | mailTips | msExchSenderHintTranslations | string | 
 | mrmEnabled | msExchELCMailboxFlags | bool | Whether or not message records management is enabled |
+| omaEnabled | msExchOmaAdminWirelessEnable | bool | Whether or not OMA is enabled |
+| owaForDevicesEnabled | msExchOmaAdminWirelessEnable | bool | Whether or not OWA for devices is enabled |
 | quotaSizeWarning | mDBStorageQuota | int | The quota size warning for the mailbox |
 | quotaSizeProhibitSend | mDBOverQuotaLimit | int | The quota size to limit sends at |
 | quotaSizeProhibitAll | mDBOverHardQuotaLimit | int | The quota size to limit all actions at |
