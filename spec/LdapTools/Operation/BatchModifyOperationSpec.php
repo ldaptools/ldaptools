@@ -146,6 +146,12 @@ class BatchModifyOperationSpec extends ObjectBehavior
         $batch->setAttribute('foobar');
 
         $this->setBatchCollection($new->getBatchCollection());
-        $this->getBatchCollection()->get(0)->getAttribute()->shouldNotBeEqualTo('foobar');
+        $this->getBatchCollection()->getBatchArray()->shouldNotBeEqualTo([
+            'attrib' => "foobar",
+            'modtype' => 1,
+            'values' => [
+                0 => "bar",
+            ],
+        ]);
     }
 }

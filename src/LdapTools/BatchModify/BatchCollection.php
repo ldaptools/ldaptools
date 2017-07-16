@@ -10,8 +10,6 @@
 
 namespace LdapTools\BatchModify;
 
-use LdapTools\Exception\InvalidArgumentException;
-
 /**
  * Represents a collection of batch statements to be sent to LDAP.
  *
@@ -31,30 +29,100 @@ class BatchCollection implements \IteratorAggregate
 
     /**
      * @param string|null $dn
+     * @param Batch[] $batches
      */
-    public function __construct($dn = null)
+    public function __construct($dn = null, Batch ...$batches)
     {
         $this->dn = $dn;
+        $this->add(...$batches);
     }
 
     /**
-     * Allows this object to be iterated over.
+     * Set the batches for the collecton.
      *
-     * @return \ArrayIterator
+     * @param Batch[] ...$batches
+     * @return $this
      */
-    public function getIterator()
+    public function set(Batch ...$batches)
     {
-        return new \ArrayIterator($this->toArray());
+        $this->batches = $batches;
+
+        return $this;
     }
 
     /**
      * Add an individual batch action to the collection.
      *
-     * @param Batch $batch
+     * @param Batch[] ...$batches
+     * @return $this
      */
-    public function add(Batch $batch)
+    public function add(Batch ...$batches)
     {
-        $this->batches[] = $batch;
+        foreach ($batches as $batch) {
+            if (!$this->has($batch)) {
+                $this->batches[] = $batch;
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove a specific batch from the collection.
+     *
+     * @param Batch[] ...$batches
+     * @return $this
+     */
+    public function remove(Batch ...$batches)
+    {
+        foreach ($batches as $batch) {
+            foreach ($this->batches as $i => $batchItem) {
+                if ($batchItem === $batch) {
+                    unset($this->batches[$i]);
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if a specific batch index exists.
+     *
+     * @param Batch $batch
+     * @return bool
+     */
+    public function has(Batch $batch)
+    {
+        foreach ($this->batches as $batchItem) {
+            if ($batchItem === $batch) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Get the distinguished name of the LDAP object this batch will target.
+     *
+     * @return string
+     */
+    public function getDn()
+    {
+        return $this->dn;
+    }
+
+    /**
+     * Set the distinguished name of the LDAP object this batch will target.
+     *
+     * @param string $dn
+     * @return $this
+     */
+    public function setDn($dn)
+    {
+        $this->dn = $dn;
+
+        return $this;
     }
 
     /**
@@ -84,60 +152,13 @@ class BatchCollection implements \IteratorAggregate
     }
 
     /**
-     * Get a specific batch from the collection by its index number in the array.
+     * Allows this object to be iterated over.
      *
-     * @param int $index
-     * @return Batch
+     * @return \ArrayIterator
      */
-    public function get($index)
+    public function getIterator()
     {
-        $this->validateBatchIndexExists($index);
-
-        return $this->batches[$index];
-    }
-
-    /**
-     * Remove a specific batch from the collection by its index number in the array.
-     *
-     * @param int $index
-     * @return Batch
-     */
-    public function remove($index)
-    {
-        $this->validateBatchIndexExists($index);
-
-        unset($this->batches[$index]);
-    }
-
-    /**
-     * Check if a specific batch index exists.
-     *
-     * @param int $index
-     * @return bool
-     */
-    public function has($index)
-    {
-        return isset($this->batches[$index]);
-    }
-
-    /**
-     * Get the distinguished name of the LDAP object this batch will target.
-     *
-     * @return string
-     */
-    public function getDn()
-    {
-        return $this->dn;
-    }
-
-    /**
-     * Set the distinguished name of the LDAP object this batch will target.
-     *
-     * @param string $dn
-     */
-    public function setDn($dn)
-    {
-        $this->dn = $dn;
+        return new \ArrayIterator($this->toArray());
     }
 
     /**
@@ -147,18 +168,6 @@ class BatchCollection implements \IteratorAggregate
     {
         foreach ($this->batches as $i =>$batch) {
             $this->batches[$i] = clone $batch;
-        }
-    }
-
-    /**
-     * Checks to make sure that the index actually exists.
-     *
-     * @param int $index
-     */
-    protected function validateBatchIndexExists($index)
-    {
-        if (!isset($this->batches[$index])) {
-            throw new InvalidArgumentException(sprintf('Batch index "%s" does not exist.', $index));
         }
     }
 }

@@ -218,7 +218,7 @@ class OperationHydrator extends ArrayHydrator
 
         foreach ($this->schema->getRdn() as $rdn) {
             /** @var \LdapTools\BatchModify\Batch $batch */
-            foreach ($operation->getBatchCollection() as $index => $batch) {
+            foreach ($operation->getBatchCollection() as $batch) {
                 if (strtolower($rdn) === strtolower($batch->getAttribute()) && $batch->isTypeReplace()) {
                     $newRdn = $this->schema->getAttributeToLdap($rdn).'='.LdapUtilities::escapeValue(
                         $batch->getValues()[0],
@@ -226,7 +226,7 @@ class OperationHydrator extends ArrayHydrator
                         LDAP_ESCAPE_DN
                     );
                     $operation->addPostOperation(new RenameOperation($operation->getDn(), $newRdn));
-                    $operation->getBatchCollection()->remove($index);
+                    $operation->getBatchCollection()->remove($batch);
                 }
             }
         }

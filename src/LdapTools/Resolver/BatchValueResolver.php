@@ -29,9 +29,9 @@ class BatchValueResolver extends BaseValueResolver
     protected $batches;
 
     /**
-     * @var int The current batch index number being processed.
+     * @var Batch The current batch being processed.
      */
-    protected $currentBatchIndex = 0;
+    protected $currentBatch;
 
     /**
      * @param LdapObjectSchema $schema
@@ -51,20 +51,20 @@ class BatchValueResolver extends BaseValueResolver
      */
     public function toLdap()
     {
-        foreach ($this->batches as $index => $batch) {
+        foreach ($this->batches as $batch) {
             /** @var Batch $batch */
-            if (!$this->batches->has($index)) {
+            if (!$this->batches->has($batch)) {
                 continue;
             } elseif (!$this->schema->hasConverter($batch->getAttribute())) {
                 $batch->setValues($this->encodeValues($batch->getValues()));
             } else {
-                $this->currentBatchIndex = $index;
+                $this->currentBatch = $batch;
                 $batch->setValues($this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap'));
 
                 if (in_array($batch->getAttribute(), $this->aggregated)) {
                     $batch->setAttribute($this->schema->getAttributeToLdap($batch->getAttribute()));
                 } elseif (in_array($batch->getAttribute(), $this->remove)) {
-                    $this->batches->remove($index);
+                    $this->batches->remove($batch);
                 }
             }
         }
@@ -92,14 +92,14 @@ class BatchValueResolver extends BaseValueResolver
         $lastValue = null;
 
         /** @var Batch $batch */
-        foreach ($batches as $index => $batch) {
+        foreach ($batches as $batch) {
             $converter = $this->getConverterWithOptions($converterName, $batch->getAttribute());
             $this->validateBatchAggregate($batch, $converter);
             $converter->setLastValue($lastValue);
             $converter->setBatch($batch);
             $lastValue = $this->getConvertedValues($batch->getValues(), $batch->getAttribute(), 'toLdap', $converter);
-            if ($index !== $this->currentBatchIndex) {
-                $this->batches->remove($index);
+            if ($batch !== $this->currentBatch) {
+                $this->batches->remove($batch);
             }
         }
 
@@ -152,7 +152,7 @@ class BatchValueResolver extends BaseValueResolver
     protected function getConverterWithOptions($converterName, $attribute)
     {
         $converter = parent::getConverterWithOptions($converterName, $attribute);
-        $converter->setBatch($this->batches->get($this->currentBatchIndex));
+        $converter->setBatch($this->currentBatch);
         
         return $converter;
     }

@@ -10,6 +10,7 @@
 
 namespace spec\LdapTools\Ldif\Entry;
 
+use LdapTools\BatchModify\Batch;
 use LdapTools\Configuration;
 use LdapTools\Connection\LdapConnectionInterface;
 use LdapTools\Connection\LdapControl;
@@ -58,25 +59,46 @@ class LdifEntryModifySpec extends ObjectBehavior
     function it_should_add_an_attribute_value()
     {
         $this->add('foo', 'bar');
-        $this->getBatchCollection()->get(0)->isTypeAdd()->shouldBeEqualTo(true);
+        $this->getBatchCollection()->getBatchArray()->shouldContain([
+            'attrib' => "foo",
+            'modtype' => Batch::TYPE['ADD'],
+            'values' => [
+                0 => "bar",
+            ],
+        ]);
     }
 
     function it_should_delete_an_attribute_value()
     {
         $this->delete('foo', 'bar');
-        $this->getBatchCollection()->get(0)->isTypeRemove()->shouldBeEqualTo(true);
+        $this->getBatchCollection()->getBatchArray()->shouldContain([
+            'attrib' => "foo",
+            'modtype' => Batch::TYPE['REMOVE'],
+            'values' => [
+                0 => "bar",
+            ],
+        ]);
     }
 
     function it_should_replace_an_attribute_value()
     {
         $this->replace('foo', 'bar');
-        $this->getBatchCollection()->get(0)->isTypeReplace()->shouldBeEqualTo(true);
+        $this->getBatchCollection()->getBatchArray()->shouldContain([
+            'attrib' => "foo",
+            'modtype' => Batch::TYPE['REPLACE'],
+            'values' => [
+                0 => "bar",
+            ],
+        ]);
     }
 
     function it_should_reset_an_attribute_value()
     {
         $this->reset('foo');
-        $this->getBatchCollection()->get(0)->isTypeRemoveAll()->shouldBeEqualTo(true);
+        $this->getBatchCollection()->getBatchArray()->shouldContain([
+            'attrib' => "foo",
+            'modtype' => Batch::TYPE['REMOVE_ALL'],
+        ]);
     }
 
     function it_should_get_an_add_operation()
