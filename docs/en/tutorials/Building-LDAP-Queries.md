@@ -736,9 +736,9 @@ $lqb->filter()->in('id', [1, 2, 3, 4, 5]);
 Creates a bitwise 'AND' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.803:=value)`
 
 ```php
-use LdapTools\Query\UserAccountControlFlags;
+use LdapTools\Enums\AD\UserAccountControl;
 
-$lqb->filter()->bitwiseAnd('userAccountControl', UserAccountControlFlags::DISABLED);
+$lqb->filter()->bitwiseAnd('userAccountControl', UserAccountControl::Disabled);
 ```
 
 ------------------------
@@ -747,9 +747,9 @@ $lqb->filter()->bitwiseAnd('userAccountControl', UserAccountControlFlags::DISABL
 Creates a bitwise 'OR' comparison between the attribute and the value: `(attribute:1.2.840.113556.1.4.804:=value)`
 
 ```php
-use LdapTools\Query\GroupTypeFlags;
+use LdapTools\Enums\AD\GroupType;
 
-$lqb->filter()->bitwiseOr('groupType', GroupTypeFlags::UNIVERSAL_GROUP);
+$lqb->filter()->bitwiseOr('groupType', GroupType::UniversalGroup);
 ```
 
 ------------------------
