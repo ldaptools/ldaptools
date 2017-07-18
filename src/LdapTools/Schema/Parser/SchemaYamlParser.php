@@ -26,6 +26,47 @@ use Symfony\Component\Yaml\Yaml;
 class SchemaYamlParser implements SchemaParserInterface
 {
     /**
+     * The valid directives for the schema.
+     *
+     * @internal
+     */
+    const SCHEMA_DIRECTIVES = [
+        'extends',
+        'extends_default',
+        'include',
+        'include_default',
+        'objects',
+    ];
+
+    /**
+     * The valid directives for the schema objects.
+     *
+     * @internal
+     */
+    const SCHEMA_OBJECT_DIRECTIVES = [
+        'attributes',
+        'attributes_to_select',
+        'base_dn',
+        'class',
+        'category',
+        'controls',
+        'converters',
+        'converter_options',
+        'default_container',
+        'default_values',
+        'extends',
+        'extends_default',
+        'filter',
+        'multivalued_attributes',
+        'repository',
+        'required_attributes',
+        'paging',
+        'rdn',
+        'scope',
+        'type',
+    ];
+
+    /**
      * @var array Schema names to their YAML mappings (ie. ['ad' => [ <yaml array> ]])
      */
     protected $schemas = [];
@@ -141,6 +182,7 @@ class SchemaYamlParser implements SchemaParserInterface
         $objectSchema = $this->mergeAnyExtendedSchemas($objectSchema, $schemaName);
         $objectSchema = $this->cleanObjectArray($objectSchema);
         $this->updateObjectArray($schemaName, $objectSchema);
+        $this->validateObjectDirectives($schemaName, $objectType, $objectSchema);
         
         $ldapObjectSchema = new LdapObjectSchema($schemaName, $objectSchema['type']);
         foreach ($this->optionMap as $option => $setter) {
@@ -161,6 +203,52 @@ class SchemaYamlParser implements SchemaParserInterface
         $this->validateObjectSchema($ldapObjectSchema);
 
         return $ldapObjectSchema;
+    }
+
+    /**
+     * @param string $schemaName
+     * @throws SchemaParserException
+     */
+    protected function validateSchemaDirectives($schemaName)
+    {
+        if (!array_key_exists('objects', $this->schemas[$this->schemaFolder][$schemaName])) {
+            throw new SchemaParserException(sprintf(
+                'Cannot find the "objects" section in the schema "%s" in "%s".',
+                $schemaName,
+                $this->schemaFolder
+            ));
+        }
+        $unrecognized = array_keys(array_diff_key($this->schemas[$this->schemaFolder][$schemaName], array_flip(self::SCHEMA_DIRECTIVES)));
+
+        if (!empty($unrecognized)) {
+            throw new SchemaParserException(sprintf(
+                'Unrecognized directive(s) for schema "%s": %s. Valid directives are: %s',
+                $schemaName,
+                implode(', ', $unrecognized),
+                implode(', ',self::SCHEMA_DIRECTIVES)
+            ));
+        }
+    }
+
+    /**
+     * @param string $schemaName
+     * @param string $objectType
+     * @param array $schemaObject
+     * @throws SchemaParserException
+     */
+    protected function validateObjectDirectives($schemaName, $objectType, array $schemaObject)
+    {
+        $unrecognized = array_keys(array_diff_key($schemaObject, array_flip(self::SCHEMA_OBJECT_DIRECTIVES)));
+
+        if (!empty($unrecognized)) {
+            throw new SchemaParserException(sprintf(
+                'Unrecognized directive(s) for schema "%s" type "%s": %s. Valid directives are: %s',
+               $schemaName,
+               $objectType,
+               implode(', ', $unrecognized),
+               implode(', ',self::SCHEMA_OBJECT_DIRECTIVES)
+            ));
+        }
     }
 
     /**
@@ -362,13 +450,7 @@ class SchemaYamlParser implements SchemaParserInterface
             }
             $this->mergeDefaultSchemaFile($schemaName);
             $this->mergeIncludedSchemas($schemaName);
-            if (!array_key_exists('objects', $this->schemas[$this->schemaFolder][$schemaName])) {
-                throw new SchemaParserException(sprintf(
-                    'Cannot find the "objects" section in the schema "%s" in "%s".',
-                    $schemaName,
-                    $this->schemaFolder
-                ));
-            }
+            $this->validateSchemaDirectives($schemaName);
         }
     }
 

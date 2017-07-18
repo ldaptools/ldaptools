@@ -1,0 +1,6 @@
+objects:
+    invalid_directive:
+        type: InvalidDirective
+        class: invalid
+        foo: bar
+        bar: foo

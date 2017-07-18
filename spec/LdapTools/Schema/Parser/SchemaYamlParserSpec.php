@@ -392,6 +392,20 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->parse('example', 'CustomRDN')->getRdn()->shouldBeEqualTo(['foo']);
     }
 
+    function it_should_error_on_invalid_schema_object_directives()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->shouldThrow('LdapTools\Exception\SchemaParserException')->duringParse('invalid_object_directive', 'InvalidDirective');
+    }
+
+    function it_should_error_on_invalid_schema_directives()
+    {
+        $this->beConstructedWith(__DIR__.'/../../../resources/schema');
+
+        $this->shouldThrow('LdapTools\Exception\SchemaParserException')->duringParseAll('invalid_schema_directive');
+    }
+
     function getMatchers()
     {
         return [
