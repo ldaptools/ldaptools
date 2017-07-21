@@ -348,12 +348,6 @@ class LdapQueryBuilderSpec extends ObjectBehavior
         $this->where(['foo' => 'bar']);
         $this->toLdapFilter()->shouldBeEqualTo('(&(foo=bar))');
     }
-    
-    function it_should_throw_an_error_if_the_schema_has_no_filter_defined()
-    {
-        $schema = new LdapObjectSchema('foo','bar');
-        $this->shouldThrow(new InvalidArgumentException('The schema type "bar" needs a filter defined to query LDAP with it.'))->duringFrom($schema);
-    }
 
     function it_should_generate_a_filter_from_multiple_types()
     {

@@ -176,18 +176,10 @@ class LdapQueryBuilder
      * @param mixed $type The string schema type name or a LdapObjectSchema
      * @param null|string $alias The alias name to refer to the type being selected
      * @return $this
-     * @throws \LdapTools\Exception\LdapQueryException
-     * @todo The LdapObjectSchema should require the filter on construction so the exception is not needed
      */
     public function from($type, $alias = null)
     {
         $type = $this->getSchemaFromType($type);
-        if (is_null($type->getFilter())) {
-            throw  new InvalidArgumentException(sprintf(
-                'The schema type "%s" needs a filter defined to query LDAP with it.',
-                $type->getObjectType()
-            ));
-        }
         $this->operation->getFilter()->addLdapObjectSchema($type, $alias);
         $this->hydrator->setLdapObjectSchema($type);
 
