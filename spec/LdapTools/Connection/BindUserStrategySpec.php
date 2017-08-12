@@ -42,4 +42,14 @@ class BindUserStrategySpec extends ObjectBehavior
 
         $this->getUsername('foo')->shouldBeEqualTo('CN=foo,DC=foo,DC=bar');
     }
+
+    function it_should_not_use_the_format_definition_if_the_value_is_already_a_dn()
+    {
+        $config = new DomainConfiguration('example.local');
+        $config->setLdapType(LdapConnection::TYPE_OPENLDAP);
+        $config->setBindFormat('CN=%username%,DC=foo,DC=bar');
+        $this->beConstructedThrough('getInstance', [ $config ]);
+
+        $this->getUsername('cn=foo,dc=foo,dc=bar')->shouldBeEqualTo('cn=foo,dc=foo,dc=bar');
+    }
 }

@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 
-namespace spec\LdapTools\Connection;
+namespace spec\LdapTools\Connection\AD;
 
 use LdapTools\DomainConfiguration;
 use PhpSpec\ObjectBehavior;

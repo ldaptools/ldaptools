@@ -33,19 +33,18 @@ class ADBindUserStrategy extends BindUserStrategy
     public function getUsername($username)
     {
         if (LdapUtilities::isValidGuid($username)) {
-            $username = '{'.$username.'}';
-        } elseif (!(LdapUtilities::isValidSid($username) || $this->isValidUserDn($username) || $this->isInUpnForm($username))) {
-            $username = parent::getUsername($username);
+            return '{'.$username.'}';
+        } elseif (LdapUtilities::isValidSid($username) || $this->isInUpnForm($username)) {
+            return $username;
         }
 
-        return $username;
+        return parent::getUsername($username);
     }
 
-    protected function isValidUserDn($dn)
-    {
-        return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] > 2);
-    }
-
+    /**
+     * @param string $username
+     * @return bool
+     */
     protected function isInUpnForm($username)
     {
         return strpos($username, '@') !== false;

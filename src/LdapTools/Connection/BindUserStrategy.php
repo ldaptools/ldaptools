@@ -66,18 +66,30 @@ class BindUserStrategy
     }
 
     /**
-     * Given the connection resource and the other required parameters, attempt the bind and return the result.
+     * Determine the format to use for a bind username going to LDAP.
      *
      * @param string $username
      * @return string
      */
     public function getUsername($username)
     {
+        if ($this->isValidUserDn($username)) {
+            return $username;
+        }
         $replacements = [
             $username,
             $this->config->getDomainName(),
         ];
 
         return preg_replace($this->params, $replacements, $this->bindFormat);
+    }
+
+    /**
+     * @param string $dn
+     * @return bool
+     */
+    protected function isValidUserDn($dn)
+    {
+        return (($pieces = ldap_explode_dn($dn, 1)) && isset($pieces['count']) && $pieces['count'] > 2);
     }
 }
