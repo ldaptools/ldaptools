@@ -50,6 +50,7 @@ objects:
             state: st
             streetAddress: streetAddress
             title: title
+            username: uid
             zipCode: postalCode
         attributes_to_select:
             - 'firstName'
