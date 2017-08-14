@@ -1,6 +1,21 @@
 CHANGELOG
 =========
 
+0.25.0 (2017-08-13)
+-------------------
+  * Added an Exchange Contacts schema type to create/modify/query Exchange contacts.
+  * Added attributes to modify ActiveSync related properties on Exchange mailboxes.
+  * An LdapObject will now return null for attributes that do not exist, rather than throwing an exception.
+  * Improve schema directive parsing. Exceptions are now thrown on invalid directives.
+  * The controls directive in the schema can now recognize friendly control names.
+  * Corrected a performance issue caused by mbstring on large LDAP result sets. Mbstring is now used selectively.
+  * Converter options are now attribute specific in the schema.
+  * Only require the defaultSmtpAddress for an Exchange mailbox (not smtpAddresses).
+  * Removed the requirement for the username/password in a domain config when loading from an array.
+  * The bind_format config option will not be used if the auth username value is already a DN.
+  * Reorganized numerous class constant collections into enum classes (Under LdapTools\Enums)
+  * Numerous deprecated methods have now been removed.
+
 0.24.0 (2017-04-09)
 -------------------
   * You can now create Microsoft Exchange Mailboxes (2007+) using the ExchangeMailboxUser schema type.
