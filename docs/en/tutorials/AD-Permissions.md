@@ -27,7 +27,7 @@ So to query and retrieve the permissions for a specific account, do something li
 
 ```php
 use LdapTools\Connection\LdapControl;
-use LdapTools\Connection\LdapControlType;
+use LdapTools\Enums\LdapControlOid;
 use LdapTools\Security\SecurityDescriptor;
 use LdapTools\Security\Ace\AceRights;
 use LdapTools\Security\SID;
@@ -36,7 +36,7 @@ use LdapTools\Security\SID;
 
 // This tells the DC that when we request/process the 'ntSecurityDescriptor' we will exclude the SACL.
 // Without this the attribute will not be returned from AD (unless you're using a domain admin account)
-$sdControl = new LdapControl(LdapControlType::SD_FLAGS_CONTROL, true, LdapControl::berEncodeInt(7));
+$sdControl = new LdapControl(LdapControlOid::SDFlagsControl, true, LdapControl::berEncodeInt(7));
 $ldap->getConnection()->setControl($sdControl);
 
 $user = $ldap->buildLdapQuery()
