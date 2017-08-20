@@ -540,6 +540,7 @@ These are typical LDAP user objects.
 | state | st | string |
 | streetAddress | streetAddress | string |
 | title | title | string |
+| username | uid | string |
 | zipCode | postalCode | string |
 
 #### OpenLDAP Group Types
