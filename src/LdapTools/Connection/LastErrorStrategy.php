@@ -61,7 +61,7 @@ class LastErrorStrategy
      */
     public function getLastErrorMessage()
     {
-        return ldap_error($this->connection);
+        return @ldap_error($this->connection);
     }
 
     /**
@@ -71,7 +71,7 @@ class LastErrorStrategy
      */
     public function getErrorNumber()
     {
-        return ldap_errno($this->connection);
+        return @ldap_errno($this->connection);
     }
 
     /**
