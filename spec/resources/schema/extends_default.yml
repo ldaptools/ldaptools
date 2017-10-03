@@ -1,9 +1,12 @@
 extends_default: ad
 objects:
-    user:
+    foo_user:
+        type: foo_user
+        extends_default: ['ad', 'user']
         default_container: 'ou=foo,ou=bar,dc=example,dc=local'
         attributes:
             foo: bar
+            username: foo
         category:
         repository: '\Foo\Bar\Repo'
         required_attributes:

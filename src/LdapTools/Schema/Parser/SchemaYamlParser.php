@@ -544,7 +544,11 @@ class SchemaYamlParser implements SchemaParserInterface
     {
         // Directives used that exist in the schema being extended, that are arrays, should be merged.
         foreach (array_intersect_key($schema, $parent) as $key => $value) {
-            if (is_array($value)) {
+            # Simple merge on non-multidimensional arrays...
+            if (is_array($value) && count($value) === count($value, COUNT_RECURSIVE)) {
+                $schema[$key] = array_merge($parent[$key], $value);
+            # Recursive merge on multidimensional arrays...
+            } elseif (is_array($value)) {
                 $schema[$key] = array_merge_recursive($parent[$key], $value);
             }
         }

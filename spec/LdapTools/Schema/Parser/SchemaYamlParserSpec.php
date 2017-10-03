@@ -167,27 +167,31 @@ class SchemaYamlParserSpec extends ObjectBehavior
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->getDefaultContainer()
             ->shouldBeEqualTo('ou=foo,ou=bar,dc=example,dc=local');
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->hasAttribute('username')
             ->shouldBeEqualTo(true);
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->hasAttribute('foo')
             ->shouldBeEqualTo(true);
-        $this->parse('extends_default', 'user')
-            ->hasAttribute('username')
-            ->shouldBeEqualTo(true);
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->getRepository()
             ->shouldBeEqualTo('\Foo\Bar\Repo');
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->getRequiredAttributes()
             ->shouldContain('foo');
-        $this->parse('extends_default', 'user')
+        $this->parse('extends_default', 'foo_user')
             ->getRequiredAttributes()
-            ->shouldContain('username');
+            ->shouldBeEqualTo([
+                "username",
+                "password",
+                "foo",
+            ]);
+        $this->parse('extends_default', 'foo_user')
+            ->getAttributeMap()
+            ->shouldHaveKeyWithValue('username', 'foo');
     }
 
     function it_should_parse_a_schema_with_an_object_that_extends_a_default_schema_object()
