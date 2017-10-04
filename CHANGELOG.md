@@ -1,6 +1,12 @@
 CHANGELOG
 =========
 
+0.25.1 (2017-10-04)
+-------------------
+  * Fix merging certain schema elements (attributes, etc) when extending other schemas.
+  * Ignore invalid resource connections when checking for a ldap_error.
+  * Add a username attribute to the OpenLDAP schema (maps to UID).
+
 0.25.0 (2017-08-13)
 -------------------
   * Added an Exchange Contacts schema type to create/modify/query Exchange contacts.
