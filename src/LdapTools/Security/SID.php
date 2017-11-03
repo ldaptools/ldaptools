@@ -336,7 +336,9 @@ class SID
 
         // The sub-authorities depend on the count, so only get as many as the count, regardless of data beyond it
         for ($i = 0; $i < $subs; $i++) {
-            $this->subAuthorities[] = unpack('V1sub', hex2bin(substr($sidHex, 16 + ($i * 8), 8)))['sub'];
+            # Work around 32bit unsigned int issues in unpack on 32bit PHP builds.
+            # Here we just reverse endian'ness by splitting hex chunks, reversing, and doing a simple hex to dec.
+            $this->subAuthorities[] = hexdec(implode('', array_reverse(str_split(substr($sidHex, 16 + ($i * 8), 8), 2))));
         }
     }
 

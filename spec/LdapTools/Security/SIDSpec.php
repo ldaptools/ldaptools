@@ -200,4 +200,12 @@ class SIDSpec extends ObjectBehavior
 
         $this->getShortName()->shouldBeEqualTo('EA');
     }
+
+    function it_should_decode_a_sid_with_large_subauth_ints()
+    {
+        $this->beConstructedWith(hex2bin('0105000000000005150000000d51c025d5f21d96a569fbc7e0040000'));
+
+        $this->toString()->shouldBeEqualTo('S-1-5-21-633360653-2518545109-3355142565-1248');
+        $this->toBinary()->shouldBeEqualTo(hex2bin('0105000000000005150000000d51c025d5f21d96a569fbc7e0040000'));
+    }
 }
