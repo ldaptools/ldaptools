@@ -1,6 +1,10 @@
 CHANGELOG
 =========
 
+0.25.2 (2017-11-04)
+-------------------
+  * Fix objectSID parsing of certain subauths on 32bit PHP. 
+
 0.25.1 (2017-10-04)
 -------------------
   * Fix merging certain schema elements (attributes, etc) when extending other schemas.
