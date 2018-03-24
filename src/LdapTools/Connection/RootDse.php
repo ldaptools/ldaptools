@@ -77,7 +77,10 @@ class RootDse
         try {
             $rootDse = self::doLdapQuery($anonymous);
         } catch (\Exception $e) {
-            throw new LdapConnectionException(sprintf('Unable to query the RootDSE. %s', $e->getMessage()));
+            throw new LdapConnectionException(sprintf(
+                'Unable to query the RootDSE. %s',
+                $e->getMessage()
+            ), $e->getCode());
         } finally {
             // Make sure to set things back to how they were...
             if ($anonymous && $this->connection->isBound()) {

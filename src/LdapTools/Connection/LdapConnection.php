@@ -184,6 +184,14 @@ class LdapConnection implements LdapConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function getLastErrorNumber()
+    {
+        return LastErrorStrategy::getInstance($this->config->getLdapType(), $this->connection)->getErrorNumber();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getLastError()
     {
         return LastErrorStrategy::getInstance($this->config->getLdapType(), $this->connection)->getLastErrorMessage();

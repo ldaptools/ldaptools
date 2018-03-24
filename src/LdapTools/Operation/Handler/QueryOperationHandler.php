@@ -126,9 +126,10 @@ class QueryOperationHandler implements OperationHandlerInterface
     {
         if (!$result) {
             throw new LdapConnectionException(sprintf(
-                'LDAP search failed. Diagnostic message: "%s"',
+                'LDAP search failed (%s). Diagnostic message: "%s"',
+                $this->connection->getLastErrorNumber(),
                 $this->connection->getDiagnosticMessage()
-            ));
+            ), $this->connection->getLastErrorNumber());
         }
 
         $entries = @ldap_get_entries($this->connection->getResource(), $result);

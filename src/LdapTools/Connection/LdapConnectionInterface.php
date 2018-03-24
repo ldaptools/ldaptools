@@ -98,6 +98,13 @@ interface LdapConnectionInterface
     public function getLastError();
 
     /**
+     * Get the error number from the LDAP server for the last operation.
+     *
+     * @return int
+     */
+    public function getLastErrorNumber();
+
+    /**
      * Get the extended error number from LDAP for the last operation.
      *
      * @return int

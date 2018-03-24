@@ -103,9 +103,10 @@ class PageControl
         }
         if (!@ldap_control_paged_result($this->connection->getResource(), $this->pageSize, false, $this->cookie)) {
             throw new LdapConnectionException(sprintf(
-                'Unable to enable paged results: %s',
+                'Unable to enable paged results (%s): %s',
+                $this->connection->getLastErrorNumber(),
                 $this->connection->getLastError()
-            ));
+            ), $this->connection->getLastErrorNumber());
         }
     }
 

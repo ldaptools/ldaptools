@@ -95,7 +95,6 @@ trait LdapOperationInvokerTrait
      * @param LogOperation|null $log
      * @param \Throwable|\Exception $exception
      * @throws \LdapTools\Exception\LdapConnectionException
-     * @throws null
      */
     protected function logExceptionAndThrow($exception, LogOperation $log = null)
     {
