@@ -147,4 +147,44 @@ class SecurityDescriptorSpec extends ObjectBehavior
         $this->setGroup(new SID('PS'))->getGroup()->toString()->shouldBeEqualTo(SID::SHORT_NAME['PS']);
         $this->setGroup(SID::SHORT_NAME['BA'])->getGroup()->toString()->shouldBeEqualTo(SID::SHORT_NAME['BA']);
     }
+
+    function it_should_not_require_the_owner_when_going_to_binary()
+    {
+        $this->beConstructedWith();
+        $this->setGroup(SID::SHORT_NAME['PS']);
+        $this->setDacl((new Dacl())->addAce((new Ace(AceType::TYPE['ACCESS_ALLOWED']))->setTrustee(SID::SHORT_NAME['PS'])));
+        $this->setSacl((new Sacl())->addAce((new Ace(AceType::TYPE['SYSTEM_AUDIT']))->setTrustee(SID::SHORT_NAME['PS'])));
+
+        $this->toBinary()->shouldBeEqualTo(hex2bin('010014800000000014000000200000003c00000001010000000000050a00000004001c0001000000020014000000000001010000000000050a00000004001c0001000000000014000000000001010000000000050a000000'));
+    }
+
+    function it_should_not_require_the_group_when_going_to_binary()
+    {
+        $this->beConstructedWith();
+        $this->setOwner(SID::SHORT_NAME['PS']);
+        $this->setDacl((new Dacl())->addAce((new Ace(AceType::TYPE['ACCESS_ALLOWED']))->setTrustee(SID::SHORT_NAME['PS'])));
+        $this->setSacl((new Sacl())->addAce((new Ace(AceType::TYPE['SYSTEM_AUDIT']))->setTrustee(SID::SHORT_NAME['PS'])));
+
+        $this->toBinary()->shouldBeEqualTo(hex2bin('010014801400000000000000200000003c00000001010000000000050a00000004001c0001000000020014000000000001010000000000050a00000004001c0001000000000014000000000001010000000000050a000000'));
+    }
+
+    function it_should_not_require_the_dacl_when_going_to_binary()
+    {
+        $this->beConstructedWith();
+        $this->setOwner(SID::SHORT_NAME['PS']);
+        $this->setGroup(SID::SHORT_NAME['PS']);
+        $this->setSacl((new Sacl())->addAce((new Ace(AceType::TYPE['SYSTEM_AUDIT']))->setTrustee(SID::SHORT_NAME['PS'])));
+
+        $this->toBinary()->shouldBeEqualTo(hex2bin('0100108014000000200000002c0000000000000001010000000000050a00000001010000000000050a00000004001c0001000000020014000000000001010000000000050a000000'));
+    }
+
+    function it_should_not_require_the_sacl_when_going_to_binary()
+    {
+        $this->beConstructedWith();
+        $this->setOwner(SID::SHORT_NAME['PS']);
+        $this->setGroup(SID::SHORT_NAME['PS']);
+        $this->setDacl((new Dacl())->addAce((new Ace(AceType::TYPE['ACCESS_ALLOWED']))->setTrustee(SID::SHORT_NAME['PS'])));
+
+        $this->toBinary()->shouldBeEqualTo(hex2bin('010004801400000020000000000000002c00000001010000000000050a00000001010000000000050a00000004001c0001000000000014000000000001010000000000050a000000'));
+    }
 }

@@ -233,13 +233,6 @@ class SecurityDescriptor
         $dacl = $this->dacl ? $this->dacl->toBinary($canonicalize) : null;
         $sacl = $this->sacl ? $this->sacl->toBinary() : null;
 
-        if ($owner === null || $group === null) {
-            throw new LogicException('The owner and the group must be set in the Security Descriptor.');
-        }
-        if ($sacl === null && $dacl === null) {
-            throw new LogicException('Either the SACL or DACL must be set on the Security Descriptor.');
-        }
-
         /**
          * According the the MS docs, the order of the elements is not important. And indeed, I have found no rhyme or
          * reason as to how the owner/group/sacl/dacl elements are ordered in the security descriptor. As long as they
