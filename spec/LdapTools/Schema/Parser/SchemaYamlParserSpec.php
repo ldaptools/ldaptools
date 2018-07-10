@@ -96,10 +96,18 @@ class SchemaYamlParserSpec extends ObjectBehavior
         );
     }
 
-    function it_should_set_default_attributes_to_select_in_LdapObjectSchema_when_parsing()
+    function it_should_set_default_attributes_to_select_in_LdapObjectSchema_when_parsing_ad()
     {
         $attributes = ['name', 'firstName', 'lastName','username', 'emailAddress', 'dn', 'guid'];
         $this->parse('ad', 'user')
+            ->getAttributesToSelect()
+            ->shouldBeEqualTo($attributes);
+    }
+
+    function it_should_set_default_attributes_to_select_in_LdapObjectSchema_when_parsing_ldap()
+    {
+        $attributes = ['firstName', 'lastName', 'emailAddress', 'dn', 'guid'];
+        $this->parse('openldap', 'user')
             ->getAttributesToSelect()
             ->shouldBeEqualTo($attributes);
     }

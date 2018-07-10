@@ -36,6 +36,7 @@ objects:
             fax: fax
             firstName: givenName
             groups: memberOf
+            guid: entryUUID
             homeDirectory: homeDirectory
             homePhone: homePhone
             initials: initials
@@ -57,6 +58,7 @@ objects:
             - 'lastName'
             - 'emailAddress'
             - 'dn'
+            - 'guid'
         multivalued_attributes:
             - 'groups'
     group:
