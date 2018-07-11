@@ -31,7 +31,7 @@ objects:
             description: description
             displayName: displayName
             dn: dn
-            emailAddress: email
+            emailAddress: mail
             employeeNumber: employeeNumber
             fax: fax
             firstName: givenName
