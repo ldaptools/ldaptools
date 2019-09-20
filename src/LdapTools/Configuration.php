@@ -364,7 +364,7 @@ class Configuration
         try {
             $config = Yaml::parse(file_get_contents($file));
         } catch (ParseException $e) {
-            throw new ConfigurationException('Error in configuration file: %s', $e->getMessage());
+            throw new ConfigurationException(sprintf('Error in configuration file: %s', $e->getMessage()));
         }
 
         return $this->loadFromArray($config);
