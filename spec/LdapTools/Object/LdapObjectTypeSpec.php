@@ -94,7 +94,7 @@ class LdapObjectTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('EXCHANGE_OWA');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

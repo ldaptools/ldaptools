@@ -10,6 +10,7 @@
 
 namespace LdapTools\Operation\Handler;
 
+use LdapTools\Connection\LdapConnection;
 use LdapTools\Exception\LdapConnectionException;
 use LdapTools\Operation\AddOperation;
 use LdapTools\Operation\BatchModifyOperation;
@@ -31,11 +32,21 @@ class OperationHandler implements OperationHandlerInterface
      */
     public function execute(LdapOperationInterface $operation)
     {
-        $result = @call_user_func(
-            $operation->getLdapFunction(),
-            $this->connection->getResource(),
-            ...$operation->getArguments()
-        );
+        $result = null;
+        $resource = $this->connection->getResource();
+        $LdapExtConnectionClass = "LDAP\Connection";
+
+        if (
+            // @deprecated type resource to remove with PHP 7.x end of life
+            is_resource($resource)
+            || (class_exists('LDAP\Connection') && $resource instanceof $LdapExtConnectionClass)
+        ) {
+            $result = @call_user_func(
+                $operation->getLdapFunction(),
+                $resource,
+                ...$operation->getArguments()
+            );
+        }
 
         if ($result === false) {
             throw new LdapConnectionException(sprintf(

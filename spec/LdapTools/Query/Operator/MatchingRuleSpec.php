@@ -156,7 +156,7 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->setConvertedValue('foo', 'u');
         $this->toLdapFilter('u')->shouldBeEqualTo('(foobar:1.2.840.113556.1.4.803:=foo)');
     }
-    
+
     function it_should_return_the_filter_for_the_value_if_the_value_is_a_BaseOperator_instance()
     {
         $this->setAttribute('foo');
@@ -208,7 +208,7 @@ class MatchingRuleSpec extends ObjectBehavior
         $this->toLdapFilter()->shouldBeEqualTo('(:dn:2.4.8.10:=America)');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

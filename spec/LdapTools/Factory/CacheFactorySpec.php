@@ -49,7 +49,7 @@ class CacheFactorySpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foobar', []);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

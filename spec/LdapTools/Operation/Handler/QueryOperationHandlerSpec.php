@@ -63,7 +63,6 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
         $pager->setIsEnabled(true)->shouldBeCalled();
         $pager->start(10, 0)->shouldBeCalled();
-        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
@@ -79,7 +78,6 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
         $pager->setIsEnabled(true)->shouldBeCalled();
         $pager->start(10, 20)->shouldBeCalled();
-        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);
@@ -92,7 +90,6 @@ class QueryOperationHandlerSpec extends ObjectBehavior
 
         $pager->setIsEnabled(false)->shouldBeCalled();
         $pager->start(null, 0)->shouldBeCalled();
-        $pager->next()->shouldBeCalled();
 
         // Cannot simulate this without a connection. But the above control logic will be validated anyway.
         $this->shouldThrow('\LdapTools\Exception\LdapConnectionException')->duringExecute($operation);

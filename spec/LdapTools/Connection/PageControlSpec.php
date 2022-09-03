@@ -48,10 +48,10 @@ class PageControlSpec extends ObjectBehavior
         $connection->getResource()->shouldNotBeCalled();
 
         $this->start(10);
-        $this->update(null);
+        $this->next(null);
         $this->end();
     }
-    
+
     function it_should_be_able_to_start_the_control_with_a_size_limit()
     {
         $this->start(10, 20);

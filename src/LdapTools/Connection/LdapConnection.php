@@ -43,7 +43,7 @@ class LdapConnection implements LdapConnectionInterface
     protected $isBound = false;
 
     /**
-     * @var resource
+     * @var LDAP\Connection|resource
      */
     protected $connection;
 
@@ -242,7 +242,7 @@ class LdapConnection implements LdapConnectionInterface
         } else {
             $idleTime = (new \DateTime())->getTimestamp() - $this->lastActivity->getTimestamp();
         }
-        
+
         return $idleTime;
     }
 

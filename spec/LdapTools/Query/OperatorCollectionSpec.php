@@ -80,7 +80,7 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->addLdapObjectSchema($schema);
         $this->getAliases()->shouldContain($schema);
     }
-    
+
     function it_should_add_a_ldapobjectschema_with_a_specific_alias()
     {
         $schema = new LdapObjectSchema('foo', 'bar');
@@ -89,7 +89,7 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->addLdapObjectSchema($schema, $alias);
         $this->getAliases()->shouldHaveKeyWithValue($alias, $schema);
     }
-    
+
     function it_should_validate_an_alias_name()
     {
         $schema = new LdapObjectSchema('foo', 'bar');
@@ -97,12 +97,12 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a.b');
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a*b');
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a b');
-        
+
         $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, 'a');
         $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, '_a');
         $this->shouldNotThrow('LdapTools\Exception\InvalidArgumentException')->duringAddLdapObjectSchema($schema, '0_Ab');
     }
-    
+
     function it_should_add_a_ldapobjectschema_with_an_alias_of_the_object_type_by_default()
     {
         $this->addLdapObjectSchema(new LdapObjectSchema('foo', 'bar'));
@@ -144,13 +144,13 @@ class OperatorCollectionSpec extends ObjectBehavior
         $foo->setFilter(new Comparison('foo', Comparison::EQ, 'bar'));
         $bar = new LdapObjectSchema('foo', 'bar');
         $bar->setFilter(new Comparison('bar', Comparison::EQ, 'foo'));
-        
+
         $this->addLdapObjectSchema($bar);
         $this->addLdapObjectSchema($foo);
 
         $this->toLdapFilter()->shouldBeEqualTo('(|(bar=foo)(foo=bar))');
     }
-    
+
     function it_should_get_the_ldap_filter_for_a_specific_alias()
     {
         $foo = new LdapObjectSchema('foo', 'foo');
@@ -164,7 +164,7 @@ class OperatorCollectionSpec extends ObjectBehavior
         $this->toLdapFilter('foo')->shouldBeEqualTo('(foo=bar)');
         $this->toLdapFilter('bar')->shouldBeEqualTo('(bar=foo)');
     }
-    
+
     function it_should_throw_an_exception_when_trying_to_get_a_filter_for_an_alias_that_doesnt_exist()
     {
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringToLdapFilter('foo');
@@ -194,8 +194,8 @@ class OperatorCollectionSpec extends ObjectBehavior
 
         $this->toLdapFilter()->shouldBeEqualTo('(foo=bar)');
     }
-    
-    public function getMatchers()
+
+    public function getMatchers(): array
     {
         return [
             'haveFirstItemAs' => function($subject, $class) {

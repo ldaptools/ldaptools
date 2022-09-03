@@ -277,7 +277,7 @@ class ArrayHydratorSpec extends ObjectBehavior
         $this->hydrateToLdap($attributes)->shouldContain('TRUE');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveKeyWithDateTime' => function($subject, $key) {

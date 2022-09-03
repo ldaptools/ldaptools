@@ -249,7 +249,7 @@ class ComparisonSpec extends ObjectBehavior
         $this->toLdapFilter()->shouldEqual('(foobar=stuff)');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

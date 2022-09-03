@@ -34,7 +34,7 @@ class SchemaParserFactorySpec extends ObjectBehavior
         $this->shouldThrow('\LdapTools\Exception\InvalidArgumentException')->duringGet('foo', 'bar');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

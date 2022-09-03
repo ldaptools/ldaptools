@@ -18,11 +18,11 @@
         }
     ],
     "require": {
-        "php": ">=5.6",
+        "php": ">=7.0",
         "ext-ldap": "*",
-        "symfony/yaml": ">=2.0",
-        "symfony/event-dispatcher": ">=2.0",
-        "ramsey/uuid": ">=3.0",
+        "symfony/yaml": "~3.0",
+        "symfony/event-dispatcher": "~4.0",
+        "ramsey/uuid": "~4.0",
         "chadsikorra/php-simple-enum": "^1.0.0"
     },
     "suggest": {
@@ -32,9 +32,9 @@
         "ext-intl": "Better UTF-8 handling."
     },
     "require-dev": {
-        "phpspec/phpspec": "~3.0",
-        "friendsofphp/php-cs-fixer": "~1.0",
-        "tedivm/stash": ">=0.14.1",
+        "phpspec/phpspec": "~7.2",
+        "friendsofphp/php-cs-fixer": "~3.0",
+        "tedivm/stash": "~0.17.0",
         "doctrine/cache": "~1.0"
     },
     "config": {

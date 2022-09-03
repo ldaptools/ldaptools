@@ -221,7 +221,7 @@ class WildcardSpec extends ObjectBehavior
         $this->getWildcardType()->shouldBeEqualTo(Wildcard::CONTAINS);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

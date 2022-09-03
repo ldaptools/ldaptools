@@ -71,7 +71,7 @@ class ConvertWindowsGuidSpec extends ObjectBehavior
         $this->shouldThrow('LdapTools\Exception\AttributeConverterException')->duringToLdap('foo');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveBinaryGuid' => function ($subject) {
