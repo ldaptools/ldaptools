@@ -95,7 +95,7 @@ class LdapQuerySpec extends ObjectBehavior
             "dn" => "cn=Users,dc=example,dc=local",
         ],
     ];
-    
+
     protected $ldapEntries = [
         "count" => 2,
         0 => [
@@ -471,11 +471,11 @@ class LdapQuerySpec extends ObjectBehavior
         $this->setOrderBy(['foo' => 'ASC']);
         $this->operation->setAttributes(['cn','givenName']);
         $this->operation->setBaseDn('dc=foo,dc=bar');
-        
+
         $connection->execute(Argument::that(function($op) {
             return $op->getAttributes() == ['cn', 'givenName', 'foo'];
         }))->willReturn($this->ldapEntries);
-        
+
         $this->execute(HydratorFactory::TO_ARRAY);
     }
 
@@ -683,7 +683,7 @@ class LdapQuerySpec extends ObjectBehavior
         $filter->addLdapObjectSchema($container);
         $this->operation->setFilter($filter);
         $this->operation->setAttributes([]);
-        
+
         $connection->execute(Argument::that(function($op) {
             return $op->getFilter() == '(objectClass=organizationalUnit)';
         }))->shouldBeCalled()->willReturn($this->ous);
@@ -700,7 +700,7 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getResult()->shouldHavePlaceKeyAndValue(2, 'name', 'Users');
         $this->getResult()->shouldHavePlaceKeyAndValue(3, 'name', 'West');
     }
-    
+
     function it_should_query_results_from_multiple_schema_types($connection)
     {
         $foo = new LdapObjectSchema('foo','foo');
@@ -719,9 +719,9 @@ class LdapQuerySpec extends ObjectBehavior
         $bar->setConverterMap(['generalized_time' => ['created']]);
         $foo->setAttributeMap($map);
         $foo->setAttributesToSelect(['firstName', 'lastName']);
-        
+
         $fb = new FilterBuilder();
-        
+
         $filter = new OperatorCollection();
         $filter->addLdapObjectSchema($foo);
         $filter->addLdapObjectSchema($bar);
@@ -742,7 +742,7 @@ class LdapQuerySpec extends ObjectBehavior
             return $op->getFilter() == '(&(bar=foo)(&(cn=Smith*)(sn=*)))'
                 && $op->getAttributes() == ['cn', 'whencreated'];
         }))->shouldBeCalled()->willReturn($this->sortEntries);
-        
+
         $this->getResult()->count()->shouldBeEqualTo(4);
         $this->getArrayResult()->shouldHaveCount(4);
     }
@@ -821,7 +821,7 @@ class LdapQuerySpec extends ObjectBehavior
         $this->getQueryOperation()->getExpireCacheAt()->shouldBeEqualTo($date);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveKeys' => function($subject, $keys) {

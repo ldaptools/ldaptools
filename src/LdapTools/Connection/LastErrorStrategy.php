@@ -20,7 +20,8 @@ use LdapTools\Connection\AD\ADLastErrorStrategy;
 class LastErrorStrategy
 {
     /**
-     * @var resource
+     * @var LDAP\Connection|resource
+     * @todo type resource to remove with PHP 7.x end of life
      */
     protected $connection;
 
@@ -30,7 +31,8 @@ class LastErrorStrategy
     protected $diagnosticOpt = 'LDAP_OPT_ERROR_STRING';
 
     /**
-     * @param resource $connection
+     * @param LDAP\Connection|resource $connection
+     * @todo type resource to remove with PHP 7.x end of life
      */
     public function __construct($connection)
     {
@@ -42,8 +44,9 @@ class LastErrorStrategy
 
     /**
      * @param string $type
-     * @param resource $connection
+     * @param LDAP\Connection|resource $connection
      * @return ADLastErrorStrategy|LastErrorStrategy
+     * @todo type resource to remove with PHP 7.x end of life
      */
     public static function getInstance($type, $connection)
     {
@@ -93,8 +96,17 @@ class LastErrorStrategy
      */
     public function getDiagnosticMessage()
     {
-        @ldap_get_option($this->connection, constant($this->diagnosticOpt), $message);
-        
+        $message = null;
+        $LdapExtConnectionClass = "LDAP\Connection";
+
+        if (
+            // @deprecated type resource to remove with PHP 7.x end of life
+            is_resource($this->connection)
+            || (class_exists('LDAP\Connection') && $this->connection instanceof $LdapExtConnectionClass)
+        ) {
+            @ldap_get_option($this->connection, constant($this->diagnosticOpt), $message);
+        }
+
         return $message;
     }
 }

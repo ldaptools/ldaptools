@@ -45,26 +45,48 @@ class QueryOperationHandler implements OperationHandlerInterface
     public function execute(LdapOperationInterface $operation)
     {
         $allEntries = [];
+        $resource = $this->connection->getResource();
 
         /** @var QueryOperation $operation */
         $this->paging()->setIsEnabled($this->shouldUsePaging($operation));
         $this->paging()->start($operation->getPageSize(), $operation->getSizeLimit());
-        do {
-            $this->paging()->next();
 
+        $LdapExtConnectionClass = "LDAP\Connection";
+        if (
+            // @deprecated type resource to remove with PHP 7.x end of life
+            !is_resource($resource)
+            && !(class_exists('LDAP\Connection') && $resource instanceof $LdapExtConnectionClass)
+        ) {
+            $this->handleLdapConnectionError();
+        }
+
+        do {
             $result = @call_user_func(
                 $operation->getLdapFunction(),
-                $this->connection->getResource(),
+                $resource,
                 ...$operation->getArguments()
             );
-            $allEntries = $this->processSearchResult($result, $allEntries);
 
-            $this->paging()->update($result);
+            $allEntries = $this->processSearchResult($result, $allEntries);
+            $this->paging()->next($result);
+            @ldap_free_result($result);
         } while ($this->paging()->isActive());
         $this->paging()->end();
-        @ldap_free_result($result);
 
         return $allEntries;
+    }
+
+    /**
+     * Handle ldap connection error
+     * @throws LdapConnectionException
+     */
+    private function handleLdapConnectionError()
+    {
+        throw new LdapConnectionException(sprintf(
+            'LDAP search failed (%s). Diagnostic message: "%s"',
+            $this->connection->getLastErrorNumber(),
+            $this->connection->getDiagnosticMessage()
+        ), $this->connection->getLastErrorNumber());
     }
 
     /**
@@ -117,7 +139,7 @@ class QueryOperationHandler implements OperationHandlerInterface
     /**
      * Process a LDAP search result and merge it with the existing entries if possible.
      *
-     * @param resource $result
+     * @param LDAP\Result|resource $result
      * @param array $allEntries
      * @return array
      * @throws LdapConnectionException
@@ -125,11 +147,7 @@ class QueryOperationHandler implements OperationHandlerInterface
     protected function processSearchResult($result, array $allEntries)
     {
         if (!$result) {
-            throw new LdapConnectionException(sprintf(
-                'LDAP search failed (%s). Diagnostic message: "%s"',
-                $this->connection->getLastErrorNumber(),
-                $this->connection->getDiagnosticMessage()
-            ), $this->connection->getLastErrorNumber());
+            $this->handleLdapConnectionError();
         }
 
         $entries = @ldap_get_entries($this->connection->getResource(), $result);

@@ -152,7 +152,7 @@ class LdapObjectHydratorSpec extends ObjectBehavior
         $this->hydrateToLdap($ldapObject)->shouldHaveCount(4);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveKeyWithValue' => function($subject, $key, $value) {

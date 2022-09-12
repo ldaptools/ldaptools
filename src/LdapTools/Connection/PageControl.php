@@ -70,7 +70,35 @@ class PageControl
             $this->cookie = '';
             $this->pageSize = ($sizeLimit && $sizeLimit < $pageSize) ? $sizeLimit : $pageSize;
             $this->sizeLimit = $sizeLimit;
+            // Update the LDAP server controls with the pagination options.
+            $this->setLdapServerControls();
         }
+    }
+
+    /**
+     * Build ldap server controls options, and more specifically the pagination options.
+     * @return array[]
+     */
+    public function buildLdapServerControls()
+    {
+        return [
+            LDAP_CONTROL_PAGEDRESULTS => [
+                'oid'        => LDAP_CONTROL_PAGEDRESULTS,
+                'isCritical' => false,
+                'value'      => [
+                    'size'   => $this->pageSize,
+                    'cookie' => $this->cookie,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Set LDAP server controls options.
+     */
+    public function setLdapServerControls()
+    {
+        @ldap_set_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $this->buildLdapServerControls());
     }
 
     /**
@@ -90,43 +118,28 @@ class PageControl
     /**
      * Signifies to the connection to expect the next paged result with the current cookie and page size.
      *
-     * @throws LdapConnectionException
+     * @param LDAP\Result|resource $result
      */
-    public function next()
-    {
-        if (!$this->isEnabled) {
-            return;
-        }
-        // If the size limit exceeds the page size, and the next page would exceed the limit, reduce the page size...
-        if ($this->sizeLimit && ($this->resultNumber + $this->pageSize) > $this->sizeLimit) {
-            $this->pageSize = $this->sizeLimit - $this->resultNumber;
-        }
-        if (!@ldap_control_paged_result($this->connection->getResource(), $this->pageSize, false, $this->cookie)) {
-            throw new LdapConnectionException(sprintf(
-                'Unable to enable paged results (%s): %s',
-                $this->connection->getLastErrorNumber(),
-                $this->connection->getLastError()
-            ), $this->connection->getLastErrorNumber());
-        }
-    }
-
-    /**
-     * Updating the paging operation based on the result resource returned from a query.
-     *
-     * @param resource $result
-     * @throws LdapConnectionException
-     */
-    public function update($result)
+    public function next($result)
     {
         if (!$this->isEnabled) {
             return;
         }
         $this->resultNumber += $this->pageSize;
-        if (!@ldap_control_paged_result_response($this->connection->getResource(), $result, $this->cookie)) {
-            throw new LdapConnectionException(
-                sprintf('Unable to set paged results response: %s', $this->connection->getLastError())
-            );
+
+        $errorCode = $dn = $errorMessage = $referrals = null;
+        $controls = $this->buildLdapServerControls();
+        @ldap_parse_result($this->connection->getResource(), $result, $errorCode, $dn, $errorMessage, $referrals, $controls);
+
+        // If the size limit exceeds the page size, and the next page would exceed the limit, reduce the page size...
+        if ($this->sizeLimit && ($this->resultNumber + $this->pageSize) > $this->sizeLimit) {
+            $this->pageSize = $this->sizeLimit - $this->resultNumber;
         }
+
+        // Extract the cookie from the parsed result controls.
+        $this->cookie = $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'];
+        // Update the LDAP server options with the new pagination options.
+        $this->setLdapServerControls();
     }
 
     /**
@@ -136,14 +149,14 @@ class PageControl
      */
     public function resetPagingControl()
     {
-        // Per RFC 2696, to abandon a paged search you should send a size of 0 along with the cookie used in the search.
-        // However, testing this it doesn't seem to completely work. Perhaps a PHP bug?
-        if (!@ldap_control_paged_result($this->connection->getResource(), 0, false, $this->cookie)) {
-            throw new LdapConnectionException(sprintf(
-                'Unable to reset paged results control for read operation: %s',
-                $this->connection->getLastError()
-            ));
+        if (!$this->isEnabled) {
+            return;
         }
+
+        $controls = [LDAP_CONTROL_PAGEDRESULTS => [
+            'oid' => LDAP_CONTROL_PAGEDRESULTS
+        ]];
+        @ldap_set_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $controls);
     }
 
     /**
@@ -154,11 +167,11 @@ class PageControl
     public function isActive()
     {
         $active = ($this->cookie !== null && $this->cookie != '');
-        
+
         if ($this->sizeLimit && $this->sizeLimit === $this->pageSize) {
             $active = false;
         }
-        
+
         return $active;
     }
 

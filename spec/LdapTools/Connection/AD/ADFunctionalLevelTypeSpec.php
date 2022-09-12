@@ -59,7 +59,7 @@ class ADFunctionalLevelTypeSpec extends ObjectBehavior
         $this->shouldHaveConstant('WIN2016');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

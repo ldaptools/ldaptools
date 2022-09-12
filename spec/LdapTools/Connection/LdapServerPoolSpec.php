@@ -186,7 +186,7 @@ class LdapServerPoolSpec extends ObjectBehavior
         $this->getServer()->shouldReturn('foo');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveConstant' => function($subject, $constant) {

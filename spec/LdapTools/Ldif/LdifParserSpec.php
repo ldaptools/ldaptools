@@ -202,7 +202,7 @@ class LdifParserSpec extends ObjectBehavior
         $this->parse($ldif)->toOperations()->shouldBeLike([$add]);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveIndexWithValue' => function($subject, $index, $value) {

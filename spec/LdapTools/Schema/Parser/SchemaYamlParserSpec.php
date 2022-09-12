@@ -311,7 +311,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
 
         $this->parse('filter', 'MultipleClassesAndCategory')->getFilter()->toLdapFilter()->shouldBeEqualTo('(&(objectCategory=foo)(&(objectClass=user)(objectClass=person)))');
     }
-    
+
     function it_should_allow_a_schema_object_type_that_has_only_a_filter_defined()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
@@ -332,15 +332,15 @@ class SchemaYamlParserSpec extends ObjectBehavior
 
         $control1 = new LdapControl('foo', true, 'bar');
         $control2 = new LdapControl('bar');
-        
+
         $this->parse('example', 'controls')->getControls()->shouldBeLike([$control1, $control2]);
     }
-    
+
     function it_should_parse_a_schema_object_with_paging_set()
     {
         $this->beConstructedWith(__DIR__.'/../../../resources/schema');
 
-        $this->parse('example', 'paging')->getUsePaging()->shouldBeEqualTo(false);   
+        $this->parse('example', 'paging')->getUsePaging()->shouldBeEqualTo(false);
     }
 
     function it_should_parse_a_schema_object_with_the_scope_set()
@@ -410,7 +410,7 @@ class SchemaYamlParserSpec extends ObjectBehavior
         $this->shouldThrow('LdapTools\Exception\SchemaParserException')->duringParseAll('invalid_schema_directive');
     }
 
-    function getMatchers()
+    function getMatchers(): array
     {
         return [
             'returnAnArrayOfLdapObjectSchemas' => function($ldapObjectSchemas) {

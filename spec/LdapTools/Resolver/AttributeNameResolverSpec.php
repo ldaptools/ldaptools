@@ -94,7 +94,7 @@ class AttributeNameResolverSpec extends ObjectBehavior
         $this::arraySearchGetValue('foo', ['foo', 'bar'])->shouldBeEqualTo('foo');
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveKeys' => function($subject, $keys) {

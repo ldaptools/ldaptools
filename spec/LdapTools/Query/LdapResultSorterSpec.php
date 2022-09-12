@@ -324,7 +324,7 @@ class LdapResultSorterSpec extends ObjectBehavior
         $this->sort($this->collection)->shouldBeLike($objectResult);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveFirstValue' => function ($subject, $key, $value) {

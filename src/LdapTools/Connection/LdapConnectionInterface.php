@@ -31,7 +31,7 @@ interface LdapConnectionInterface
     /**
      * Get the LDAP connection resource.
      *
-     * @return resource
+     * @return LDAP\Connection|resource
      */
     public function getResource();
 

@@ -30,12 +30,12 @@ class TSPropertyArraySpec extends ObjectBehavior
     {
         $this->shouldHaveType('LdapTools\Utilities\TSPropertyArray');
     }
-    
+
     function it_should_get_the_default_binary_value_when_newly_constructed()
     {
         $this->toBinary()->shouldHaveHex(substr($this->defaultHex, 96));
     }
-    
+
     function it_should_support_being_constructed_with_a_binary_value()
     {
         $tsPropArray = new TSPropertyArray();
@@ -45,7 +45,7 @@ class TSPropertyArraySpec extends ObjectBehavior
         $this->beConstructedWith($bin);
         $this->get('CtxWFProfilePath')->shouldEqual('foo');
     }
-    
+
     function it_should_support_being_constructed_from_an_array_with_property_values()
     {
         $props = TSPropertyArray::DEFAULTS;
@@ -54,12 +54,12 @@ class TSPropertyArraySpec extends ObjectBehavior
         $this->beConstructedWith($props);
         $this->get('CtxWFProfilePath')->shouldEqual('foobar');
     }
-    
+
     function it_should_get_a_specific_TSProperty_object()
     {
         $this->get('CtxWFProfilePath')->shouldBeString();
     }
-    
+
     function it_should_return_whether_a_specific_TSProperty_exists()
     {
         $this->has('foo')->shouldEqual(false);
@@ -71,18 +71,18 @@ class TSPropertyArraySpec extends ObjectBehavior
         $tsProp = new TSProperty();
         $tsProp->setName('foo');
         $tsProp->setValue('bar');
-        
+
         $this->has('foo')->shouldEqual(false);
         $this->add($tsProp);
         $this->has('foo')->shouldEqual(true);
     }
-    
+
     function it_should_remove_a_specific_TSProperty()
     {
         $tsProp = new TSProperty();
         $tsProp->setName('foo');
         $tsProp->setValue('bar');
-        
+
         $this->add($tsProp);
         $this->has('foo')->shouldEqual(true);
         $this->remove('foo');
@@ -96,13 +96,13 @@ class TSPropertyArraySpec extends ObjectBehavior
         $this->set('CTXWFPROFILEPATH', 'bar');
         $this->get('CtxWFProfilePath')->shouldEqual('bar');
     }
-    
+
     function it_should_throw_an_invalid_argument_exception_when_the_property_doesnt_exist()
     {
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringGet('foo');
         $this->shouldThrow('LdapTools\Exception\InvalidArgumentException')->duringSet('foo', 'bar');
     }
-    
+
     function it_should_return_all_the_TSProperty_objects_as_a_key_value_array()
     {
         $this->toArray()->shouldEqual([
@@ -143,16 +143,16 @@ class TSPropertyArraySpec extends ObjectBehavior
         $this->getSignature()->shouldEqual(TSPropertyArray::VALID_SIGNATURE);
         $this->isSignatureValid()->shouldEqual(true);
     }
-    
+
     function it_should_be_able_to_check_whether_the_signature_is_valid()
     {
         $hex = substr($this->defaultHex, 96);
-        
+
         $this->beConstructedWith(hex2bin(substr_replace($hex, '61', 0, 2)));
         $this->isSignatureValid()->shouldEqual(false);
     }
 
-    public function getMatchers()
+    public function getMatchers(): array
     {
         return [
             'haveHex' => function($subject, $value) {
