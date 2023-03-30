@@ -101,13 +101,10 @@ class PageControl
         if ($this->sizeLimit && ($this->resultNumber + $this->pageSize) > $this->sizeLimit) {
             $this->pageSize = $this->sizeLimit - $this->resultNumber;
         }
-        if (!@ldap_control_paged_result($this->connection->getResource(), $this->pageSize, false, $this->cookie)) {
-            throw new LdapConnectionException(sprintf(
-                'Unable to enable paged results (%s): %s',
-                $this->connection->getLastErrorNumber(),
-                $this->connection->getLastError()
-            ), $this->connection->getLastErrorNumber());
-        }
+        $controls = null;
+        ldap_get_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $controls);
+        $controls[LDAP_CONTROL_PAGEDRESULTS] = ['oid' => LDAP_CONTROL_PAGEDRESULTS, 'isCritical' => false, 'value' => ['size' => $this->pageSize, 'cookie' => $this->cookie]];
+        ldap_set_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $controls);
     }
 
     /**
@@ -122,11 +119,10 @@ class PageControl
             return;
         }
         $this->resultNumber += $this->pageSize;
-        if (!@ldap_control_paged_result_response($this->connection->getResource(), $result, $this->cookie)) {
-            throw new LdapConnectionException(
-                sprintf('Unable to set paged results response: %s', $this->connection->getLastError())
-            );
-        }
+        $errorCode = $dn = $errorMessage = $refs = null;
+        $controls = null;
+        ldap_parse_result($this->connection->getResource(), $result, $errorCode, $dn, $errorMessage, $refs, $controls);
+        $this->cookie = $controls[LDAP_CONTROL_PAGEDRESULTS]['value']['cookie'];
     }
 
     /**
@@ -138,12 +134,10 @@ class PageControl
     {
         // Per RFC 2696, to abandon a paged search you should send a size of 0 along with the cookie used in the search.
         // However, testing this it doesn't seem to completely work. Perhaps a PHP bug?
-        if (!@ldap_control_paged_result($this->connection->getResource(), 0, false, $this->cookie)) {
-            throw new LdapConnectionException(sprintf(
-                'Unable to reset paged results control for read operation: %s',
-                $this->connection->getLastError()
-            ));
-        }
+        $controls = null;
+        ldap_get_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $controls);
+        unset($controls[LDAP_CONTROL_PAGEDRESULTS]);
+        ldap_set_option($this->connection->getResource(), LDAP_OPT_SERVER_CONTROLS, $controls);
     }
 
     /**
